@@ -1,5 +1,3 @@
-import './bootstrap';
-
 import 'swiper/css';
 import 'swiper/css/a11y';
 import 'swiper/css/effect-fade';
