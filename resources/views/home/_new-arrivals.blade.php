@@ -11,7 +11,7 @@
         <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">Fresh from the flight case</p><h2 class="section-title">Meet the <em>new arrivals.</em></h2></div><a href="/shop?sort=newest" class="text-link">See everything new <span>↗</span></a></div>
         <div class="grid gap-5 lg:grid-cols-2">
             <article class="reveal-section group relative min-h-[620px] overflow-hidden rounded-[2rem] bg-rythme-black text-white">
-                <img src="{{ asset('images/product-guitar.jpg') }}" alt="Fender American Professional II Stratocaster" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <img src="{{ asset('images/product-guitar.jpg') }}" alt="Fender American Professional II Stratocaster" width="1024" height="1024" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" decoding="async">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent"></div>
                 <div class="absolute inset-x-0 bottom-0 p-8 sm:p-10">
                     <span class="rounded-full bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-rythme-black">Editor's pick</span>

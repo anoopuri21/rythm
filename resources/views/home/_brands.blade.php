@@ -13,7 +13,7 @@
     </div>
     <div class="mx-auto mt-16 max-w-7xl px-5 sm:px-8">
         <article class="reveal-section relative min-h-[520px] overflow-hidden rounded-[2rem] bg-rythme-black text-white">
-            <img src="{{ asset('images/brand-feature.jpg') }}" alt="Electric guitar and amplifier in a golden stage light" class="absolute inset-0 h-full w-full object-cover" loading="lazy">
+            <img src="{{ asset('images/brand-feature.jpg') }}" alt="Electric guitar and amplifier in a golden stage light" width="1376" height="768" class="parallax-media absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async">
             <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
             <div class="relative z-10 flex min-h-[520px] max-w-xl flex-col justify-center p-8 sm:p-14">
                 <p class="mb-5 text-xs font-bold uppercase tracking-[0.28em] text-gold">Brand spotlight · Fender</p>

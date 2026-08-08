@@ -24,6 +24,8 @@ class HomepageTest extends TestCase
                 'id="new-arrivals"',
                 'id="deals"',
                 'id="stories"',
+                'id="testimonials"',
+                'id="footer"',
             ], escape: false);
     }
 
@@ -34,6 +36,8 @@ class HomepageTest extends TestCase
             ->assertSee('RYTHME')
             ->assertSee('Explore instruments')
             ->assertSee('Shop the sale')
-            ->assertSee('Read all stories');
+            ->assertSee('Read all stories')
+            ->assertSee('Made for musicians.')
+            ->assertSee('Join the list');
     }
 }

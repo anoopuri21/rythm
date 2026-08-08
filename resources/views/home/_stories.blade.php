@@ -12,7 +12,7 @@
         <div class="grid gap-8 md:grid-cols-3">
             @foreach($stories as $story)
                 <article class="reveal-section story-card group">
-                    <a href="/stories/{{ Str::slug($story['title']) }}" class="block overflow-hidden rounded-3xl"><img src="{{ asset($story['image']) }}" alt="" class="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy"></a>
+                    <a href="/stories/{{ Str::slug($story['title']) }}" class="block overflow-hidden rounded-3xl"><img src="{{ asset($story['image']) }}" alt="" width="1376" height="768" class="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" decoding="async"></a>
                     <div class="pt-6"><div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.16em] text-rythme-warm-gray"><span class="text-gold-dark">{{ $story['category'] }}</span><span>{{ $story['read'] }}</span></div><h3 class="mt-4 font-playfair text-2xl leading-snug"><a href="/stories/{{ Str::slug($story['title']) }}" class="transition hover:text-gold-dark">{{ $story['title'] }}</a></h3><p class="mt-3 text-sm leading-6 text-rythme-warm-gray">{{ $story['excerpt'] }}</p><div class="mt-5 flex items-center justify-between border-t border-black/10 pt-4"><time class="text-xs text-rythme-warm-gray">{{ $story['date'] }}</time><a href="/stories/{{ Str::slug($story['title']) }}" class="text-sm font-bold transition group-hover:translate-x-1 group-hover:text-gold-dark">Read story →</a></div></div>
                 </article>
             @endforeach

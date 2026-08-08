@@ -1,6 +1,6 @@
 <section id="deals" class="bg-rythme-black px-3 py-3 sm:px-5 sm:py-5">
     <article class="deals-banner relative mx-auto min-h-[650px] max-w-[1500px] overflow-hidden rounded-[2rem] text-white">
-        <img src="{{ asset('images/deals-banner.jpg') }}" alt="Red electric guitar in dramatic stage lighting" class="absolute inset-0 h-full w-full object-cover" loading="lazy">
+        <img src="{{ asset('images/deals-banner.jpg') }}" alt="Red electric guitar in dramatic stage lighting" width="1584" height="672" class="parallax-media absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async">
         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/10"></div>
         <div class="relative z-10 mx-auto flex min-h-[650px] max-w-7xl items-center px-6 py-20 sm:px-12">
             <div class="reveal-section max-w-2xl">

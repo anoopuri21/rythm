@@ -9,10 +9,10 @@
     ];
 @endphp
 
-<section id="why-rythme" class="bg-rythme-cream py-24 sm:py-32">
-    <div class="mx-auto grid max-w-7xl gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div class="reveal-section relative lg:sticky lg:top-28">
-            <div class="overflow-hidden rounded-[2rem]"><img src="{{ asset('images/why-rythme.jpg') }}" alt="An expert carefully setting up an acoustic guitar" class="aspect-[4/5] w-full object-cover" loading="lazy"></div>
+<section id="why-rythme" class="why-section bg-rythme-cream py-24 sm:py-32">
+    <div class="mx-auto grid max-w-7xl gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div class="why-media reveal-section relative">
+            <div class="image-reveal overflow-hidden rounded-[2rem]"><img src="{{ asset('images/why-rythme.jpg') }}" alt="An expert carefully setting up an acoustic guitar" width="1376" height="768" class="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async"></div>
             <div class="absolute -bottom-6 -right-3 max-w-56 rounded-2xl bg-rythme-black p-5 text-white shadow-2xl sm:-right-8">
                 <p class="font-playfair text-3xl text-gold">15+ years</p><p class="mt-1 text-xs leading-5 text-white/60">helping musicians find their sound</p>
             </div>
