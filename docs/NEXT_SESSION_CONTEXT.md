@@ -65,10 +65,9 @@ ln -sfn /tmp/vendor vendor                    # agar vendor symlink missing ho (
 composer install --no-interaction --no-progress   # ⚠️ HAMESHA /home/user/rythm se — composer $baseDir ABSOLUTE embed karta hai
 npm install --no-audit --no-fund
 npm run build
-# ⚠️ TESTS: symlinked vendor se inferBasePath() /tmp ban jata hai → ye env var
-# zaroori hai (bina repo change ke):
-#   APP_BASE_PATH=/home/user/rythm php artisan test
-# Server: APP_BASE_PATH=/home/user/rythm php artisan serve --host=0.0.0.0 --port=8000
+# ⚠️ TESTS: symlinked vendor se inferBasePath() /tmp ban jata hai — FIX COMMITTED
+# (tests/TestCase.php me $_ENV['APP_BASE_PATH'] = dirname(__DIR__); portable — Windows/Linux/sandbox sab pe)
+# Sirf `php artisan test` chalao — koi extra env var nahi chahiye.
 
 # ── STEP 5: .env (local sqlite) ──
 cp .env.example .env
@@ -150,7 +149,7 @@ Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + T
 8. **Automation OFF** — task_mode: false; user explicitly off rakhna chahta hai abhi ke liye
 9. **Workspace fix (vendor → /tmp + symlink):** vendor (52–136MB) snapshot se bahar; workspace me sirf 11-byte symlink `vendor -> /tmp/vendor`. Do quirks resolve kiye:
    - Composer 2.10 `autoload_classmap.php` me `$baseDir = '/home/user/rythm'` **ABSOLUTE embed** karta hai → install HAMESHA `/home/user/rythm` cwd se chalana
-   - Laravel 13 `Testing\TestCase::createApplication()` → `Application::inferBasePath()` → `ClassLoader::getRegisteredLoaders()` se derive → vendor /tmp me → `/tmp/bootstrap/app.php` fail. **Fix (COMMITTED):** `phpunit.xml` me `<env name="APP_BASE_PATH" value="/home/user/rythm"/>`
+   - Laravel 13 `Testing\TestCase::createApplication()` → `Application::inferBasePath()` → `ClassLoader::getRegisteredLoaders()` se derive → vendor /tmp me → `/tmp/bootstrap/app.php` fail. **Fix (COMMITTED):** `tests/TestCase.php` me `setUp()` me `$_ENV['APP_BASE_PATH'] = dirname(__DIR__);` — portable (har platform pe chalta hai; phpunit.xml me kuch hardcoded nahi). Windows/local pe bhi safe.
 10. **Environment reset DEEP hota hai:** sirf `.git` nahi — **working files bhi purani snapshot state pe restore ho sakti hain** (blade files gayab ho gayi thi → sections silently missing). Fix: `git checkout -f -B <branch> origin/<branch>` + `php artisan view:clear`
 
 ## Resume commands
