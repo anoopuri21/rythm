@@ -97,7 +97,7 @@ Fix: `git remote add origin …` → `git fetch origin --quiet` → `git checkou
 
 ## Tech Stack STRICT
 
-Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + TiptapEditor 3.5.16 + Spatie MediaLibrary 11.23.4 + Livewire 3.8.3 + Mary 2.9.9 + GSAP/Lenis/Swiper/CountUp. **Next.js bilkul nahi.** Filament 3.3.54 = ONLY 3.3.x supporting illuminate ^13 — pinned rakhna (`^3.2` resolve hota hai usi pe).
+Laravel 13 (PHP 8.3.30+ — lock resolved for 8.3.30; sandbox runs 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + TiptapEditor 3.5.16 + Spatie MediaLibrary 11.23.4 + Livewire 3.8.3 + Mary 2.9.9 + GSAP/Lenis/Swiper/CountUp. **Next.js bilkul nahi.** Filament 3.3.54 = ONLY 3.3.x supporting illuminate ^13 — pinned rakhna (`^3.2` resolve hota hai usi pe).
 
 ## Strict Rules — `docs/AGENT_RULES_STRICT.md` (MUST read before every task)
 
@@ -150,7 +150,8 @@ Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + T
 9. **Workspace fix (vendor → /tmp + symlink):** vendor (52–136MB) snapshot se bahar; workspace me sirf 11-byte symlink `vendor -> /tmp/vendor`. Do quirks resolve kiye:
    - Composer 2.10 `autoload_classmap.php` me `$baseDir = '/home/user/rythm'` **ABSOLUTE embed** karta hai → install HAMESHA `/home/user/rythm` cwd se chalana
    - Laravel 13 `Testing\TestCase::createApplication()` → `Application::inferBasePath()` → `ClassLoader::getRegisteredLoaders()` se derive → vendor /tmp me → `/tmp/bootstrap/app.php` fail. **Fix (COMMITTED):** `tests/TestCase.php` me `setUp()` me `$_ENV['APP_BASE_PATH'] = dirname(__DIR__);` — portable (har platform pe chalta hai; phpunit.xml me kuch hardcoded nahi). Windows/local pe bhi safe.
-10. **Environment reset DEEP hota hai:** sirf `.git` nahi — **working files bhi purani snapshot state pe restore ho sakti hain** (blade files gayab ho gayi thi → sections silently missing). Fix: `git checkout -f -B <branch> origin/<branch>` + `php artisan view:clear`
+10. **PHP 8.3 compat (2026-08-09):** User ke Windows Laragon pe PHP 8.3.30 hai — purana lock (Symfony 8.1, >=8.4.1) fail karta tha. **Fix:** composer.json `"php": "^8.3"` + `config.platform.php = 8.3.30` + `composer update -W` → Symfony 8.1→7.4 (sab PHP 8.2+). Laravel 13.24.0 intact, tests 7/7. User ko sirf `git pull` + `composer install` karna hai.
+11. **Environment reset DEEP hota hai:** sirf `.git` nahi — **working files bhi purani snapshot state pe restore ho sakti hain** (blade files gayab ho gayi thi → sections silently missing). Fix: `git checkout -f -B <branch> origin/<branch>` + `php artisan view:clear`
 
 ## Resume commands
 

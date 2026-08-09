@@ -4,7 +4,7 @@ Rythme Music Store is a premium, cinematic e-commerce experience for musical ins
 Laravel 13 + Blade + Tailwind 4 + Filament v3 admin — with a 15-section cinematic homepage
 (hero slider, best sellers, video showcase, comparison, UGC, FAQ + JSON-LD, scroll effects).
 
-- **Stack:** Laravel 13.24 (PHP 8.4) · Blade · Tailwind 4 · Alpine.js · GSAP/Lenis/Swiper/CountUp · Filament v3.3.54 · Livewire 3 · Mary UI 2 · TiptapEditor · Spatie MediaLibrary · Razorpay (test mode)
+- **Stack:** Laravel 13.24 (PHP 8.3.30+ / 8.4) · Blade · Tailwind 4 · Alpine.js · GSAP/Lenis/Swiper/CountUp · Filament v3.3.54 · Livewire 3 · Mary UI 2 · TiptapEditor · Spatie MediaLibrary · Razorpay (test mode)
 - **Reference:** bajaao.com (inspiration only — all copy is original)
 - **Repo:** https://github.com/anoopuri21/rythm
 
@@ -14,7 +14,7 @@ Full step-by-step guide: **[docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md)**
 
 TL;DR:
 ```bash
-# 1. Laragon me PHP 8.4 select karo (Menu → PHP → Version)
+# 1. Laragon me PHP 8.3/8.4 select karo (Menu → PHP → Version)
 # 2. Terminal me:
 cd C:\laragon\www
 git clone https://github.com/anoopuri21/rythm.git
@@ -42,7 +42,7 @@ php artisan serve                     # http://127.0.0.1:8000
 
 ## Technology requirements
 
-- **PHP 8.4+** (composer.json: `"php": "^8.4"`)
+- **PHP 8.3.30+** (composer.json: `"php": "^8.3"`; lock resolved for 8.3.30 — PHP 8.4 bhi chalta hai)
 - Composer 2
 - Node.js 20.19+ / 22 LTS (Vite 7)
 - Database: SQLite (zero-config, default) ya MySQL 8+

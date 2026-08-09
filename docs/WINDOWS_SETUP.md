@@ -19,22 +19,21 @@ agent ko do.
 
 ---
 
-## 1. Laragon install + PHP 8.4 verify
+## 1. Laragon install + PHP verify
 
 1. Laragon Full installer chalao → `C:\laragon` me install karo (SmartScreen aaye to **More info → Run anyway**).
 2. Laragon kholo → **Start All** (tray me green icon).
-3. **Menu → PHP → Version** → `8.4.x` select karo. Agar list me nahi hai to **Add/Download** se 8.4.x download karo (Laragon khud kar leta hai) — ya neeche "PHP 8.4 install karne ka manual tarika" (Troubleshooting section me) follow karo.
+3. **Menu → PHP → Version** → `8.3.x` (ya `8.4.x`) select karo — project ab **PHP 8.3.30+ pe chalta hai** (lock file 8.3 ke liye resolve kiya gaya hai). Agar list me nahi hai to **Add/Download** se download karo ya neeche "PHP 8.4 install karne ka manual tarika" follow karo.
 4. **Menu → Terminal** kholo — isi terminal me aage ke saare commands chalenge. **Har baar naya terminal kholna (ya Laragon restart) jab PHP version switch karo** — purana terminal purani PHP use karta hai.
 5. Verify:
 ```bash
-php -v                 # PHP 8.4.x  ← IMPORTANT: 8.3/8.2 hai to ruk jao, upar wala step karo
+php -v                 # PHP 8.3.30+ (8.4 bhi chalega) — 8.2 ya chhota hai to upar wala step karo
 composer --version     # 2.x
 node -v && npm -v      # Node 20.19+ / npm 10+  (Vite 7 ke liye zaroori)
 git --version
 ```
 
-> ⚠️ `php -v` me 8.2/8.3 dikhe to step 1.3 karo — warna `composer install` pe
-> `requires php ^8.4` error aayega (neeche Troubleshooting #1 dekho).
+> ✅ **PHP 8.3.30+ OK hai** — project ka composer.lock ab 8.3 ke liye resolve kiya gaya hai (Symfony 7.4). PHP 8.2 ya chhota ho tabhi ruko.
 
 ---
 
@@ -137,7 +136,7 @@ php artisan test
 
 | # | Error / Problem | Fix |
 |---|---|---|
-| 1 | **`Root composer.json requires php ^8.4 but your php version (8.3.30) does not satisfy`** + `symfony/* requires php >=8.4.1` + `Your lock file does not contain a compatible set of packages` | **PHP 8.3 active hai, project ko 8.4+ chahiye.** Laragon → Menu → PHP → Version → `8.4.x` select → Laragon restart (ya naya Terminal kholo). PHP 8.4 list me nahi hai to manual download karo (neeche "PHP 8.4 install karne ka manual tarika"). Phir `php -v` me **8.4.x** confirm karke `composer run setup` dobara chalao. |
+| 1 | **`Root composer.json requires php ^8.4 but your php version (8.3.30)`** + `Your lock file does not contain a compatible set of packages` | ✅ **FIXED in repo (2026-08-09):** composer.lock ab PHP 8.3.30 ke liye resolve kiya gaya hai (Symfony 8.1→7.4, `platform.php=8.3.30`). **Sirf `git pull` karo aur `composer install` chalao** — error chala jayega. Agar phir bhi aaye to naya Laragon Terminal kholo (`where php` check) ya `composer clear-cache && composer install`. |
 | 2 | `requires php ^8.4` / `your PHP version does not satisfy` (after switching) | Naya Laragon Terminal kholo (purana terminal purani PHP pakde rehta hai). `where php` se check karo ki PATH me sahi PHP hai. |
 | 3 | `ext-gd` / `ext-intl` / `ext-zip` / `ext-fileinfo` missing | Laragon → Menu → PHP → php.ini → `;extension=gd` wale lines se `;` hatao (gd, intl, zip, fileinfo, mbstring, sqlite3, openssl, curl, dom, xml, bcmath) → Laragon restart |
 | 4 | `No application encryption key` | `php artisan key:generate` |
