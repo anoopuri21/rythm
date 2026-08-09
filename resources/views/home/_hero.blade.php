@@ -6,7 +6,7 @@
     ];
 @endphp
 
-<section id="hero" class="relative min-h-[760px] h-screen w-full overflow-hidden bg-rythme-black" aria-label="Featured collections">
+<section id="hero" class="relative h-screen min-h-[760px] w-full overflow-hidden bg-rythme-black supports-[height:100svh]:h-svh" aria-label="Featured collections">
     <div class="hero-swiper swiper h-full">
         <div class="swiper-wrapper">
             @foreach($slides as $slide)
@@ -19,9 +19,15 @@
                             <p class="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
                                 <span class="h-px w-10 bg-gold"></span>{{ $slide['eyebrow'] }}
                             </p>
-                            <h1 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
-                                {{ $slide['title'] }}<br><em class="font-normal text-gold-gradient">{{ $slide['accent'] }}</em>
-                            </h1>
+                            @if($loop->first)
+                                <h1 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
+                                    {{ $slide['title'] }}<br><em class="font-normal text-gold-gradient">{{ $slide['accent'] }}</em>
+                                </h1>
+                            @else
+                                <h2 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
+                                    {{ $slide['title'] }}<br><em class="font-normal text-gold-gradient">{{ $slide['accent'] }}</em>
+                                </h2>
+                            @endif
                             <p class="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">{{ $slide['copy'] }}</p>
                             <div class="mt-9 flex flex-wrap items-center gap-5">
                                 <a href="/shop" class="btn-gold-glow inline-flex items-center gap-3 rounded-full bg-gold px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-gold-light">
