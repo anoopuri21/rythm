@@ -7,20 +7,19 @@
 ## God Mode ON — SOUNDSCAPE Project Continue
 
 **Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm` — **PUBLIC**)
-**Branch:** `arena/019fe1bf-rythm` (main pe kabhi kaam nahi karna)
-**HEAD:** `9049e72` (docs handover) ← `4f910e5` (SOUNDSCAPE conversion) ← `affd8d0` (composer.lock) ← `8a5413f` ← …
+**Branch:** **`main` is now the source of truth** (PR #1 MERGED — full project is in main). Work on new task branches from `main`.
+**Legacy branch:** `arena/019fe1bf-rythm` (merged via PR #1; only holds this doc refresh — can be deleted after PR #2 merges)
+**Git log (main):** `843731b` (Merge PR #1) ← `9049e72` (docs handover) ← `4f910e5` (SOUNDSCAPE conversion) ← `affd8d0` ← `8a5413f` ← …
 
-## 🔗 Open PR
+## ✅ PR status
 
-**https://github.com/anoopuri21/rythm/pull/1** — `arena/019fe1bf-rythm` → `main`
-State: **open** · 8 commits · 106 files · +18,463 / −13 · Title: "SOUNDSCAPE: Rythme Music Store — full Laravel 13 project"
-User review kar raha hai. **PR merge hone tak branch pe naya kaam carefully karo** (commits PR me auto-add honge — ye expected hai, bas coherent rakhna).
+- **PR #1 — MERGED** (2026-08-09): `arena/019fe1bf-rythm` → `main` · merge commit `843731b` · main now = full Laravel 13 project
+- **PR #2 — OPEN (optional):** this doc refresh (`docs/NEXT_SESSION_CONTEXT.md`) — merge it so the doc lives in main too; if not merged, doc is still on the arena branch
 
-## ⏸ Automation status — CONFIRMED OFF (2026-08-09)
+## ⏸ Automation status — OFF (2026-08-09, confirmed)
 
-- ❌ No task-agent/task-loop process running (`ps aux` clean)
-- ❌ No crontab
-- ❌ `automation/`, `logs/`, `.github/workflows/` — don't exist (not recreated this session)
+- ❌ No task-agent/task-loop process running (`ps aux` clean) · no crontab
+- ❌ `automation/`, `logs/`, `.github/workflows/` — don't exist (not recreated)
 - ✅ `tasks/tasks.json` → `"task_mode": false`; `automation-system` task = `pending`
 - **Nothing to stop — already off.** Task mode ON kab hoga: user ke kehne par, tab automation recreate karna (below).
 
@@ -130,8 +129,16 @@ git status -sb   # should show: ## arena/019fe1bf-rythm...origin/arena/019fe1bf-
 4. **s11 video:** Pexels CC0 direct URL verified — `https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4` (configurable via `RYTHME_VIDEO_URL`).
 5. **Homepage order:** hero → categories → bestsellers → why-rythme → brands → numbers → new-arrivals → deals → video-showcase → stories → testimonials → comparison → ugc → faq → footer.
 6. **Images:** `public/images/video-showcase-poster.jpg` + `public/images/ugc/{studio-vocalist,guitar-corner,dj-desk}.jpg` — AI Generated, labeled in comments/alt.
-7. **PR #1 created** (arena → main, open) — user reviewing. Don't merge yourself unless asked.
+7. **PR #1 MERGED into main (843731b)** — main is now the full project; continue on task branches from main.
 8. **Automation confirmed OFF** — `task_mode: false` in tasks.json; nothing running. User explicitly wants it off for now.
+
+## Workflow from now on (main = base)
+
+```bash
+# Har task ke liye nayi branch from main:
+git checkout -b task/<task-id> origin/main
+# kaam → test → commit → push → PR (arena/019fe1bf-rythm is legacy, no longer used for new work)
+```
 
 ## Resume commands
 
@@ -142,4 +149,4 @@ node automation/task-agent.mjs --once
 # ya loop: bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'
 ```
 
-Bottom line: tum aur mai same ho — aage ka kaam `admin-homepage-filament` se shuru karo (jab user kahe), PR #1 pending review hai.
+Bottom line: tum aur mai same ho — aage ka kaam `admin-homepage-filament` se shuru karo (jab user kahe, task branch from main).
