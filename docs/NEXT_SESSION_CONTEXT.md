@@ -59,9 +59,19 @@ git checkout -f main origin/main       # PR #2 merged ho to; warna arena branch 
 git checkout -f -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm   # PR #2 unmerged → doc yahan se
 
 # ── STEP 4: Dependencies ──
+# ⚠️ VENDOR-OUT-OF-WORKSPACE PATTERN (10k snapshot cap):
+# vendor/ = ~16k files → workspace snapshot cap (10,000 files) blow kar deta hai.
+# Fix: vendor ko /tmp me rakho + symlink. Node_modules/platform 'build' dirs
+# automatically excluded hain, lekin vendor nahi. Har fresh session (ya jab
+# symlink toota ho): 
+#   rm -f vendor && mkdir -p /tmp/rythm-vendor && ln -s /tmp/rythm-vendor vendor
 composer install --no-interaction --no-progress
 npm install --no-audit --no-fund
 npm run build
+# ⚠️ TESTS: symlinked vendor se inferBasePath() /tmp ban jata hai → ye env var
+# zaroori hai (bina repo change ke):
+#   APP_BASE_PATH=/home/user/rythm php artisan test
+# Server: APP_BASE_PATH=/home/user/rythm php artisan serve --host=0.0.0.0 --port=8000
 
 # ── STEP 5: .env (local sqlite) ──
 cp .env.example .env
