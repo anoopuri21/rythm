@@ -33,5 +33,30 @@
                 </a>
             @endforeach
         </div>
+
+        {{-- ===== Products slider — real Bajaao products, smooth transition ===== --}}
+        <div class="relative mt-20" data-reveal="up">
+            <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <div>
+                    <p class="section-kicker">Fresh picks from Bajaao's bestsellers</p>
+                    <h3 class="font-playfair text-2xl sm:text-3xl">Popular right <em>now.</em></h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" class="products-prev products-nav-btn" aria-label="Previous products">←</button>
+                    <button type="button" class="products-next products-nav-btn" aria-label="Next products">→</button>
+                </div>
+            </div>
+
+            <div class="products-swiper swiper">
+                <div class="swiper-wrapper">
+                    @foreach(config('catalog.carousel') as $product)
+                        <div class="swiper-slide h-auto">
+                            <x-product-card :product="$product" />
+                        </div>
+                    @endforeach
+                </div>
+                <div class="products-pagination swiper-pagination"></div>
+            </div>
+        </div>
     </div>
 </section>

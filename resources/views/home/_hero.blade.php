@@ -21,7 +21,7 @@
         <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
 
-        <div class="relative z-10 mx-auto w-full max-w-7xl px-5 pt-24 sm:px-8 lg:px-12">
+        <div class="relative z-10 mx-auto w-full max-w-7xl px-5 pt-28 lg:pt-36 sm:px-8 lg:px-12">
             <div class="max-w-3xl text-white">
                 <p class="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light" data-reveal="fade">
                     <span class="h-px w-10 bg-gold"></span>{{ $brand }} · Premium instruments
@@ -56,7 +56,7 @@
                         <img src="{{ asset($slide['image']) }}" alt="" width="1376" height="768" class="hero-slide-image absolute inset-0 h-full w-full object-cover" loading="{{ $loop->first ? 'eager' : 'lazy' }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/10"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/30"></div>
-                        <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-12 pt-20">
+                        <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 pt-28 sm:px-8 lg:px-12 lg:pt-36">
                             <div class="hero-copy max-w-3xl text-white">
                                 <p class="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
                                     <span class="h-px w-10 bg-gold"></span>{{ $slide['eyebrow'] }}

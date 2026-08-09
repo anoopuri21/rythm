@@ -129,14 +129,26 @@ function initScrollTop() {
     const button = document.getElementById('scroll-top');
     if (!button) return;
 
+    let visible = false;
     const render = () => {
-        button.classList.toggle('is-visible', window.scrollY > 600);
+        const show = window.scrollY > 400;
+        if (show !== visible) {
+            visible = show;
+            button.classList.toggle('is-visible', show);
+        }
     };
 
     button.addEventListener('click', () => {
-        window.lenis ? window.lenis.scrollTo(0, { duration: 1.2 }) : window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (window.lenis && typeof window.lenis.scrollTo === 'function') {
+            window.lenis.scrollTo(0, { duration: 1.2 });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
 
-    render();
+    // Native scroll + Lenis (both drive the same render; cheap & idempotent)
     window.addEventListener('scroll', render, { passive: true });
+    if (window.lenis) window.lenis.on('scroll', render);
+
+    render();
 }
