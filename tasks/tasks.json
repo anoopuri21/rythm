@@ -1,13 +1,19 @@
 {
-    "project": "SOUNDSCAPE — Rythme Music Store",
+    "project": "SOUNDSCAPE \u2014 Rythme Music Store",
     "repo": "anoopuri21/rythm",
     "branch": "arena/019fe1bf-rythm",
     "task_mode": false,
-    "locked_features": ["Header", "Footer", "Cart", "Wishlist", "Checkout/Payment"],
+    "locked_features": [
+        "Header",
+        "Footer",
+        "Cart",
+        "Wishlist",
+        "Checkout/Payment"
+    ],
     "tasks": [
         {
             "id": "laravel-13-upgrade",
-            "title": "Upgrade Laravel 12 → 13.24.0 + Tiptap + MediaLibrary",
+            "title": "Upgrade Laravel 12 \u2192 13.24.0 + Tiptap + MediaLibrary",
             "status": "done",
             "note": "php artisan --version = 13.24.0; filament 3.3.54, tiptap 3.5.16, medialibrary 11.23.4, livewire 3.8.3, mary 2.9.9; cloudinary removed (illuminate ^11|^12 only)"
         },
@@ -21,11 +27,22 @@
             "id": "page-home-10-sections",
             "title": "Homepage base 10 sections",
             "status": "done",
-            "sections": ["hero", "categories", "bestsellers", "why-rythme", "brands", "numbers", "new-arrivals", "deals", "stories", "footer"]
+            "sections": [
+                "hero",
+                "categories",
+                "bestsellers",
+                "why-rythme",
+                "brands",
+                "numbers",
+                "new-arrivals",
+                "deals",
+                "stories",
+                "footer"
+            ]
         },
         {
             "id": "homepage-cinematic-v2",
-            "title": "Homepage cinematic sections s11–s16",
+            "title": "Homepage cinematic sections s11\u2013s16",
             "status": "done",
             "sections": [
                 "s11 video-showcase (modal + poster)",
@@ -35,6 +52,12 @@
                 "s15 faq accordion + FAQPage JSON-LD",
                 "s16 cinematic scroll FX (progress bar, data-reveal, data-parallax)"
             ]
+        },
+        {
+            "id": "homepage-cinematic-v3",
+            "title": "Homepage cinematic v3 \u2014 film opening, grain, vignette, letterbox, focus pulls + responsive/SEO fixes",
+            "status": "done",
+            "note": "cinema.js module; h-svh hero fix; single h1; npm build + php artisan test pass; PR #3 (feature/next-sections-pages)"
         },
         {
             "id": "admin-homepage-filament",
@@ -64,7 +87,7 @@
         },
         {
             "id": "automation-system",
-            "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) — task mode ON",
+            "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) \u2014 task mode ON",
             "status": "pending"
         },
         {

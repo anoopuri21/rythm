@@ -199,6 +199,24 @@ function addDataParallax(reducedMotion) {
     });
 }
 
+// s17 · Focus pulls — section titles rack into focus (blur → sharp),
+// like a camera pulling focus between movie scenes.
+function addTitleFocus(reducedMotion) {
+    if (reducedMotion) return;
+
+    gsap.utils.toArray('.section-title, .section-kicker').forEach((element) => {
+        gsap.fromTo(element,
+            { filter: 'blur(10px)' },
+            {
+                filter: 'blur(0px)',
+                duration: 1.15,
+                ease: 'power3.out',
+                scrollTrigger: { trigger: element, start: 'top 86%', once: true },
+            },
+        );
+    });
+}
+
 export function initMotion(reducedMotion) {
     const lenis = new Lenis({
         duration: reducedMotion ? 0 : 1.15,
@@ -220,6 +238,7 @@ export function initMotion(reducedMotion) {
     addCinematicScroll(reducedMotion);
     addDataReveals(reducedMotion);
     addDataParallax(reducedMotion);
+    addTitleFocus(reducedMotion);
     trackPageProgress();
 
     const refresh = () => ScrollTrigger.refresh();

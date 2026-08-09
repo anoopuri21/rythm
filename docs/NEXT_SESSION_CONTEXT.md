@@ -65,6 +65,10 @@ ln -sfn /tmp/vendor vendor                    # agar vendor symlink missing ho (
 composer install --no-interaction --no-progress   # ⚠️ HAMESHA /home/user/rythm se — composer $baseDir ABSOLUTE embed karta hai
 npm install --no-audit --no-fund
 npm run build
+# ⚠️ TESTS: symlinked vendor se inferBasePath() /tmp ban jata hai → ye env var
+# zaroori hai (bina repo change ke):
+#   APP_BASE_PATH=/home/user/rythm php artisan test
+# Server: APP_BASE_PATH=/home/user/rythm php artisan serve --host=0.0.0.0 --port=8000
 
 # ── STEP 5: .env (local sqlite) ──
 cp .env.example .env

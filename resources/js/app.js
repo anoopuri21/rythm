@@ -7,11 +7,13 @@ import 'swiper/css/pagination';
 import { initCarousels } from './modules/carousels';
 import { initMotion } from './modules/motion';
 import { initUi } from './modules/ui';
+import { initCinema } from './modules/cinema';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 document.addEventListener('DOMContentLoaded', () => {
     initUi();
     initCarousels(reducedMotion);
-    initMotion(reducedMotion);
+    const lenis = initMotion(reducedMotion);
+    initCinema(reducedMotion, lenis);
 });
