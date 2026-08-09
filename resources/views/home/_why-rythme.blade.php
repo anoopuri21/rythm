@@ -12,7 +12,7 @@
 <section id="why-rythme" class="why-section bg-rythme-cream py-24 sm:py-32">
     <div class="mx-auto grid max-w-7xl gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         {{-- Sticky media column — clean CSS sticky (no JS pinning) --}}
-        <div class="relative lg:sticky lg:top-36" data-reveal="up">
+        <div class="relative lg:sticky lg:top-32" data-reveal="up">
             <div class="image-reveal overflow-hidden rounded-[2rem]">
                 <img src="{{ asset('images/why-rythme.jpg') }}" alt="An expert carefully setting up an acoustic guitar" width="1376" height="768" class="aspect-[4/5] w-full object-cover" loading="lazy" decoding="async">
             </div>

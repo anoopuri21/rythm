@@ -2,31 +2,13 @@ function initNavbar() {
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
 
-    let ticking = false;
+    // Navbar is white & sticky (in flow, above hero) — only add a soft shadow on scroll.
     const render = () => {
-        const isScrolled = window.scrollY > 50;
-        navbar.classList.toggle('navbar-transparent', !isScrolled);
-        navbar.classList.toggle('navbar-solid', isScrolled);
-        navbar.querySelectorAll('.nav-link').forEach((link) => {
-            link.classList.toggle('text-white', !isScrolled);
-            link.classList.toggle('text-rythme-black', isScrolled);
-        });
-        const logo = navbar.querySelector('.nav-logo');
-        logo?.classList.toggle('text-white', !isScrolled);
-        logo?.classList.toggle('text-gold', isScrolled);
-        const logoText = logo?.querySelector('span');
-        logoText?.classList.toggle('text-white', !isScrolled);
-        logoText?.classList.toggle('text-rythme-black', isScrolled);
-        ticking = false;
-    };
-    const requestRender = () => {
-        if (ticking) return;
-        ticking = true;
-        window.requestAnimationFrame(render);
+        navbar.classList.toggle('navbar-scrolled', window.scrollY > 10);
     };
 
     render();
-    window.addEventListener('scroll', requestRender, { passive: true });
+    window.addEventListener('scroll', render, { passive: true });
 }
 
 function initCountdowns() {

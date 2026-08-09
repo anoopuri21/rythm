@@ -365,17 +365,11 @@ body.is-scrolling-fast .letterbox-bar { opacity: 0.85; }
 }
 
 /* ============================================================
-   Navbar — 2-row: search bar adapts to solid/transparent state
+   Navbar — 2-row (white, sticky). Search bar + scroll shadow
    ============================================================ */
-.nav-search svg { transition: color .3s ease; }
-.navbar-solid .nav-search input {
-    background: rgba(255,255,255,.92);
-    color: #0A0A0A;
-    border-color: rgba(10,10,10,.15);
-}
-.navbar-solid .nav-search input::placeholder { color: rgba(10,10,10,.4); }
-.navbar-solid .nav-search svg { color: rgba(10,10,10,.45); }
-.navbar-solid .nav-search button { box-shadow: 0 6px 18px -6px rgba(212,168,67,.5); }
+.navbar-scrolled { box-shadow: 0 10px 30px -15px rgba(0,0,0,.25); }
+.nav-search input::placeholder { color: rgba(10,10,10,.4); }
+.nav-search input:focus { border-color: #D4A843; }
 
 /* ============================================================
    Products slider (Explore by Category)
