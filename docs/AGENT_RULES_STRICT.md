@@ -8,7 +8,7 @@
 
 | Layer | Version | Notes |
 |---|---|---|
-| PHP | 8.4+ | `php --version` must show 8.4.x |
+| PHP | 8.3.30+ (lock resolved for 8.3.30; sandbox runs 8.4) | `php --version` must show 8.3.30+ |
 | Laravel | **13.24.0** | `php artisan --version` must show `Laravel Framework 13.24.0` |
 | Filament | **3.3.54** | v3 ONLY — never upgrade to Filament 4/5 |
 | Frontend | Blade + Tailwind 4 + Alpine.js + Vite | `npm run build` must pass before any `done` |
