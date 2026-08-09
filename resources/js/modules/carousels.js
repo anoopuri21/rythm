@@ -59,4 +59,39 @@ export function initCarousels(reducedMotion) {
             },
         });
     }
+
+    // Products slider (Explore by Category — Bajaao real products)
+    const products = document.querySelector('.products-swiper');
+    if (products) {
+        new Swiper(products, {
+            modules: commonModules,
+            loop: true,
+            speed: reducedMotion ? 0 : 700,
+            slidesPerView: 1.15,
+            spaceBetween: 16,
+            watchOverflow: true,
+            grabCursor: true,
+            autoplay: reducedMotion ? false : {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            pagination: {
+                el: products.querySelector('.products-pagination'),
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.products-next',
+                prevEl: '.products-prev',
+            },
+            keyboard: { enabled: true, onlyInViewport: true },
+            a11y: { enabled: true },
+            breakpoints: {
+                560: { slidesPerView: 2, spaceBetween: 18 },
+                768: { slidesPerView: 2.4, spaceBetween: 20 },
+                1024: { slidesPerView: 3, spaceBetween: 22 },
+                1280: { slidesPerView: 4, spaceBetween: 24 },
+            },
+        });
+    }
 }
