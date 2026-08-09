@@ -11,7 +11,7 @@
 @if($heroMode === 'video')
     {{-- ============ HERO MODE 2 · VIDEO BANNER (theme-matched, dark + gold) ============ --}}
     {{-- Video source: Pexels free license (CC0) — https://www.pexels.com/video/man-playing-guitar-854924/ --}}
-    <section id="hero" class="relative flex h-screen min-h-[640px] w-full items-center overflow-hidden bg-rythme-black supports-[height:100svh]:h-svh" aria-label="Featured collection video">
+    <section id="hero" class="relative flex h-[calc(100svh-4rem)] min-h-[560px] w-full items-center overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collection video">
         <video class="hero-video absolute inset-0 h-full w-full object-cover opacity-80"
                autoplay muted loop playsinline preload="metadata"
                poster="{{ asset('images/video-showcase-poster.jpg') }}">
@@ -48,7 +48,7 @@
     </section>
 @else
     {{-- ============ HERO MODE 1 · CINEMATIC SLIDER ============ --}}
-    <section id="hero" class="relative h-screen min-h-[640px] w-full overflow-hidden bg-rythme-black supports-[height:100svh]:h-svh" aria-label="Featured collections">
+    <section id="hero" class="relative h-[calc(100svh-4rem)] min-h-[560px] w-full overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collections">
         <div class="hero-swiper swiper h-full">
             <div class="swiper-wrapper">
                 @foreach($slides as $slide)
@@ -56,7 +56,7 @@
                         <img src="{{ asset($slide['image']) }}" alt="" width="1376" height="768" class="hero-slide-image absolute inset-0 h-full w-full object-cover" loading="{{ $loop->first ? 'eager' : 'lazy' }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
                         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/10"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/30"></div>
-                        <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 pt-28 sm:px-8 lg:px-12 lg:pt-36">
+                        <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-12">
                             <div class="hero-copy max-w-3xl text-white">
                                 <p class="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
                                     <span class="h-px w-10 bg-gold"></span>{{ $slide['eyebrow'] }}
