@@ -9,7 +9,7 @@
 <article {{ $attributes->class(['product-card group flex h-full flex-col overflow-hidden rounded-3xl', 'bg-rythme-black-soft border border-white/10 text-white' => $dark, 'bg-white border border-black/5 text-rythme-black' => !$dark]) }}>
     <div class="relative aspect-[4/3] overflow-hidden {{ $dark ? 'bg-[#24211e]' : 'bg-[#f3eee5]' }}">
         {{-- Image: Bajaao real product photo (project rule: product images from Bajaao) --}}
-        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }} — real product photo from Bajaao" width="1024" height="1024" class="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy" decoding="async">
+        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }} — real product photo from Bajaao" width="1024" height="1024" class="h-full w-full object-contain p-6 transition duration-700 group-hover:scale-105" loading="lazy" decoding="async">
         @if(isset($product['badge']))
             <span class="absolute left-4 top-4 rounded-full {{ ($product['badge'] === 'Sale' || $product['badge'] === 'Deal') ? 'bg-rythme-red text-white' : 'bg-gold text-rythme-black' }} px-3 py-1 text-[10px] font-bold uppercase tracking-wider">{{ $product['badge'] }}</span>
         @endif

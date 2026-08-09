@@ -23,7 +23,7 @@
         <div class="relative z-10 mx-auto max-w-3xl px-5 text-center sm:px-8">
             <p class="section-kicker justify-center text-gold-light" data-reveal="up">Rhythm Exports Sound</p>
             <h2 class="section-title mx-auto text-white" data-reveal="up">
-                Feel the music.<br><em class="text-gold-gradient">Live the moment.</em>
+                Feel the music.<br><em class="text-red-gradient">Live the moment.</em>
             </h2>
             <p class="mx-auto mt-6 max-w-xl text-base leading-7 text-white/70 sm:text-lg" data-reveal="up">
                 Watch what happens when the right instrument meets the right hands — a short film about sound, craft and the people who chase it.
@@ -37,7 +37,7 @@
                     aria-haspopup="dialog"
                     aria-controls="video-showcase-modal"
                 >
-                    <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-gold text-rythme-black shadow-[0_0_50px_rgba(212,168,67,0.45)] transition-transform duration-300 group-hover:scale-110">
+                    <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-gold text-rythme-black shadow-[0_0_50px_rgba(213,8,8,0.45)] transition-transform duration-300 group-hover:scale-110">
                         <svg class="ml-1 h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
                     </span>
                     <span class="flex flex-col">

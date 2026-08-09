@@ -19,7 +19,7 @@
         <div class="mb-14 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end" data-reveal="up">
             <div class="max-w-2xl">
                 <p class="section-kicker text-gold-light">Community</p>
-                <h2 class="section-title">Made by the <em class="text-gold-gradient">#RhythmExportsFamily.</em></h2>
+                <h2 class="section-title">Made by the <em class="text-red-gradient">#RhythmExportsFamily.</em></h2>
                 <p class="mt-5 text-base leading-7 text-white/60">
                     From first chords to full stages — tag <span class="font-semibold text-gold-light">#RhythmExportsFamily</span> to feature here and win monthly gear vouchers.
                 </p>
