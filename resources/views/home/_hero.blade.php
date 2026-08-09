@@ -27,7 +27,7 @@
                     <span class="h-px w-10 bg-gold"></span>{{ $brand }} · Premium instruments
                 </p>
                 <h1 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]" data-reveal="up">
-                    Feel the music.<br><em class="font-normal text-gold-gradient">Own the sound.</em>
+                    Feel the music.<br><em class="font-normal text-red-gradient">Own the sound.</em>
                 </h1>
                 <p class="mt-7 max-w-xl text-base leading-7 text-white/75 sm:text-lg" data-reveal="up">
                     Handpicked guitars, keyboards, drums and studio gear — set up by musicians, delivered with care across India.
@@ -63,11 +63,11 @@
                                 </p>
                                 @if($loop->first)
                                     <h1 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
-                                        {{ $slide['title'] }}<br><em class="font-normal text-gold-gradient">{{ $slide['accent'] }}</em>
+                                        {{ $slide['title'] }}<br><em class="font-normal text-red-gradient">{{ $slide['accent'] }}</em>
                                     </h1>
                                 @else
                                     <h2 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
-                                        {{ $slide['title'] }}<br><em class="font-normal text-gold-gradient">{{ $slide['accent'] }}</em>
+                                        {{ $slide['title'] }}<br><em class="font-normal text-red-gradient">{{ $slide['accent'] }}</em>
                                     </h2>
                                 @endif
                                 <p class="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">{{ $slide['copy'] }}</p>

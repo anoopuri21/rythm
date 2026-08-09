@@ -15,6 +15,8 @@
 | Rich Text | `awcodes/filament-tiptap-editor` ^3.5 (TiptapEditor) | Filament me heading/title = **TextInput**, baki sab **TiptapEditor** |
 | Media | `spatie/laravel-medialibrary` ^11.23 | |
 | UI kit | `robsontenorio/mary` 2.x (existing) | |
+| Design | **RED #d50808 · BLACK #000000 · WHITE #ffffff only** — NO gold/yellow | |
+| Font | **Poppins** (sans-serif) only | |
 | Other | Livewire 3.8.3, GSAP + ScrollTrigger, Lenis, Swiper, CountUp | |
 
 **NEVER** use Next.js / React / Vue / jQuery. `next.config.js` must NOT exist — verify:

@@ -21,7 +21,7 @@
 <footer id="footer" class="relative overflow-hidden bg-rythme-black text-white">
     {{-- ============ Fancy CTA section (replaces newsletter) ============ --}}
     <section class="cta-band relative overflow-hidden border-b border-white/10" aria-labelledby="cta-title">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(212,168,67,.22),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(212,168,67,.14),transparent_40%)]"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(213,8,8,.22),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(213,8,8,.14),transparent_40%)]"></div>
         <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
         <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
             <div class="reveal-section" data-reveal="up">

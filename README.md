@@ -4,7 +4,7 @@ Rhythm Exports is a premium, cinematic e-commerce experience for musical instrum
 Laravel 13 + Blade + Tailwind 4 + Filament v3 admin — with a 15-section cinematic homepage
 (hero slider, best sellers, video showcase, comparison, UGC, FAQ + JSON-LD, scroll effects).
 
-- **Stack:** Laravel 13.24 (PHP 8.3.30+ / 8.4) · Blade · Tailwind 4 · Alpine.js · GSAP/Lenis/Swiper/CountUp · Filament v3.3.54 · Livewire 3 · Mary UI 2 · TiptapEditor · Spatie MediaLibrary · Razorpay (test mode)
+- **Stack:** Laravel 13.24 (PHP 8.3.30+ / 8.4) · Blade · Tailwind 4 · Alpine.js · GSAP/Lenis/Swiper/CountUp · Filament v3.3.54 · Livewire 3 · Mary UI 2 · TiptapEditor · Spatie MediaLibrary · Razorpay (test mode) · **Design: red #d50808 / black / white, Poppins**
 - **Reference:** bajaao.com (inspiration only — all copy is original)
 - **Repo:** https://github.com/anoopuri21/rythm
 
