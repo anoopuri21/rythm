@@ -62,6 +62,7 @@ class HomepageSectionsTest extends TestCase
             ->assertOk()
             ->assertSee('<video', escape: false)
             ->assertSee('autoplay muted loop playsinline', escape: false)
+            ->assertSee('videos/hero-montage.mp4', escape: false)
             ->assertSee(config('rythme.hero_video_url'), escape: false)
             ->assertDontSee('hero-swiper swiper', escape: false)
             ->assertSee('class="btn-gold btn-shine"', escape: false);
