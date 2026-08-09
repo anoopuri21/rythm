@@ -1,15 +1,28 @@
-# NEXT SESSION CONTEXT — SOUNDSCAPE Project Continue
+# NEXT SESSION CONTEXT — SOUNDSCAPE Project Continue (updated 2026-08-09)
 
-> Read this FIRST. Same format as the session-start context. Workspace was clean last time;
-> everything is committed to GitHub so recovery is scriptable.
+> Read this FIRST. God Mode ON. Same format as session-start context, fully updated.
 
 ---
 
 ## God Mode ON — SOUNDSCAPE Project Continue
 
-**Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm`)
+**Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm` — **PUBLIC**)
 **Branch:** `arena/019fe1bf-rythm` (main pe kabhi kaam nahi karna)
-**Git log:** `4f910e5` (feat: SOUNDSCAPE conversion) ← `affd8d0` (composer.lock) ← `8a5413f` ← …
+**HEAD:** `9049e72` (docs handover) ← `4f910e5` (SOUNDSCAPE conversion) ← `affd8d0` (composer.lock) ← `8a5413f` ← …
+
+## 🔗 Open PR
+
+**https://github.com/anoopuri21/rythm/pull/1** — `arena/019fe1bf-rythm` → `main`
+State: **open** · 8 commits · 106 files · +18,463 / −13 · Title: "SOUNDSCAPE: Rythme Music Store — full Laravel 13 project"
+User review kar raha hai. **PR merge hone tak branch pe naya kaam carefully karo** (commits PR me auto-add honge — ye expected hai, bas coherent rakhna).
+
+## ⏸ Automation status — CONFIRMED OFF (2026-08-09)
+
+- ❌ No task-agent/task-loop process running (`ps aux` clean)
+- ❌ No crontab
+- ❌ `automation/`, `logs/`, `.github/workflows/` — don't exist (not recreated this session)
+- ✅ `tasks/tasks.json` → `"task_mode": false`; `automation-system` task = `pending`
+- **Nothing to stop — already off.** Task mode ON kab hoga: user ke kehne par, tab automation recreate karna (below).
 
 ## Tech Stack STRICT
 
@@ -19,7 +32,6 @@ Verify:
 ```bash
 php artisan --version        # must be: Laravel Framework 13.24.0
 ls next.config.js             # must NOT exist
-composer show | grep -E "filament/filament|laravel/framework"
 ```
 
 ## Strict Rules File
@@ -50,12 +62,10 @@ composer show | grep -E "filament/filament|laravel/framework"
 | product-detail | pending |
 | cart-checkout-payment (Razorpay test) | pending |
 | wishlist-about-contact | pending |
-| automation-system | pending (recreate + task mode ON) |
+| automation-system | pending (recreate + task mode ON, user approval pe) |
 | footer-5-column | pending (footer locked until this task) |
 
-**Task mode was OFF this session (user instruction).** Next session: task mode ON — recreate automation system first (below), then run task loop.
-
-## Automation System (recreate if missing — same rules)
+## Automation System (recreate ONLY when user turns task mode ON — same rules)
 
 - `automation/config.json` (interval 30; health: `php artisan --version && php artisan config:clear`)
 - `automation/task-agent.mjs` (reads tasks.json → chunk design → test → commit → update tasks.json)
@@ -66,7 +76,7 @@ composer show | grep -E "filament/filament|laravel/framework"
 ## Local System Recreation (new session — FIRST do this)
 
 ```bash
-# 1. PHP 8.4 + extensions (Debian 13: apt has 8.4; /usr/local/bin gets wiped between sessions)
+# 1. PHP 8.4 + extensions (apt; /usr/local/bin gets wiped between sessions)
 sudo apt-get install -y php8.4-cli php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-gd \
   php8.4-sqlite3 php8.4-bcmath php8.4-intl php8.4-dom php8.4-tokenizer php8.4-xmlwriter php8.4-simplexml unzip
 
@@ -74,7 +84,7 @@ sudo apt-get install -y php8.4-cli php8.4-mbstring php8.4-xml php8.4-curl php8.4
 curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
   && sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet
 
-# 3. Repo — if workspace empty: clone + branch
+# 3. Repo — repo is PUBLIC now; clone without token
 git clone https://github.com/anoopuri21/rythm.git /home/user/rythm
 cd /home/user/rythm
 git checkout -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm
@@ -90,34 +100,46 @@ touch database/database.sqlite && php artisan key:generate && php artisan migrat
 
 # 6. Git identity + remote (snapshot wipes .git/config → remote must be re-added)
 git config user.name  "auto-agent"; git config user.email "auto-agent@soundscape.local"
-git remote add origin https://github.com/anoopuri21/rythm.git   # tokenless; push with token inline if needed
+git remote add origin https://github.com/anoopuri21/rythm.git
 
 # 7. Verify
 php artisan --version   # 13.24.0
-php artisan test        # 7 passed
+php artisan test        # 7 passed (25 assertions)
 ```
 
-**⚠️ Git state quirk (encountered 2026-08-09):** workspace snapshots restore `.git` to an older state —
-after any session gap, HEAD may be back on `main`, local `arena/*` branch may be missing, and the remote
-config may be empty. Fix: `git remote add origin …` + `git checkout -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm`
-(force with `-f` if untracked files block the switch — files are identical to the branch tree).
+**⚠️ Git state quirk (CONFIRMED 3× this session — expect it EVERY new session):** workspace snapshot restores `.git` to an old state → after any gap: HEAD back on `main`, local `arena/*` branch missing, remote config empty, everything looks uncommitted. **Code is safe on GitHub. DO NOT re-commit blindly.**
+Fix:
+```bash
+git remote add origin https://github.com/anoopuri21/rythm.git
+git fetch origin --quiet
+git checkout -f -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm
+git status -sb   # should show: ## arena/019fe1bf-rythm...origin/arena/019fe1bf-rythm (clean)
+```
 
-## Session learnings (2026-08-09)
+## Pushing / auth
+
+- Repo **public** → clone/fetch without auth.
+- **Push needs auth.** Options: (a) user's PAT (jo chat me paste hua tha, ab bhi valid hai — user ko revoke karne ko bola gaya hai; revoke ho chuka ho to naya PAT/SSH mangna), (b) SSH key setup.
+- Check before pushing: `git remote -v` (config wipe hote hi empty hota hai).
+
+## Session learnings (2026-08-09, full day)
 
 1. **Laravel 13 + Filament 3.3.54 verified working** — 3.3.54 is the ONLY 3.3.x supporting illuminate ^13; keep it pinned (`^3.2` resolves to it).
-2. **Cloudinary removed** from composer.json — cloudinary-labs 3.0.2 requires illuminate ^11|^12 only. Re-add only when media pipeline is built (Spatie MediaLibrary is the plan).
+2. **Cloudinary removed** from composer.json — cloudinary-labs 3.0.2 requires illuminate ^11|^12 only. Media pipeline = Spatie MediaLibrary.
 3. **Blade gotcha (Laravel 13):** `@context` in raw JSON-LD is a Blade directive → use PHP arrays + `json_encode` for schema markup.
-4. **s11 video:** Pexels CC0 direct URL verified working — `https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4` (configurable via `RYTHME_VIDEO_URL`).
-5. **New homepage order:** hero → categories → bestsellers → why-rythme → brands → numbers → new-arrivals → deals → video-showcase → stories → testimonials → comparison → ugc → faq → footer.
+4. **s11 video:** Pexels CC0 direct URL verified — `https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4` (configurable via `RYTHME_VIDEO_URL`).
+5. **Homepage order:** hero → categories → bestsellers → why-rythme → brands → numbers → new-arrivals → deals → video-showcase → stories → testimonials → comparison → ugc → faq → footer.
 6. **Images:** `public/images/video-showcase-poster.jpg` + `public/images/ugc/{studio-vocalist,guitar-corner,dj-desk}.jpg` — AI Generated, labeled in comments/alt.
-7. **Security:** a GitHub PAT was pasted in chat and used for pushes — **user should revoke it** (Settings → Developer settings → PATs). Repo remote config is tokenless.
+7. **PR #1 created** (arena → main, open) — user reviewing. Don't merge yourself unless asked.
+8. **Automation confirmed OFF** — `task_mode: false` in tasks.json; nothing running. User explicitly wants it off for now.
 
 ## Resume commands
 
 ```bash
-git status && cat tasks/tasks.json && tail -f logs/task-agent.log   # (logs exist only after automation is recreated)
-node automation/task-agent.mjs --once                                # task mode ON
-# or loop: bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'
+git status && cat tasks/tasks.json
+# jab user task mode ON bole:
+node automation/task-agent.mjs --once
+# ya loop: bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'
 ```
 
-Bottom line: tum aur mai same ho — aage ka kaam `admin-homepage-filament` se shuru karo (task mode ON karke).
+Bottom line: tum aur mai same ho — aage ka kaam `admin-homepage-filament` se shuru karo (jab user kahe), PR #1 pending review hai.
