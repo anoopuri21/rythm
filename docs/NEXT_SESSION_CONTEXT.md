@@ -1,41 +1,111 @@
-# NEXT SESSION CONTEXT — SOUNDSCAPE Project Continue
+# NEXT SESSION CONTEXT — SOUNDSCAPE Project Continue (FINAL — 2026-08-09)
 
-> Read this FIRST. Same format as the session-start context. Workspace was clean last time;
-> everything is committed to GitHub so recovery is scriptable.
+> Read this FIRST. God Mode ON. Isi point se continue karna hai — bilkul zero-to-hero setup guide.
 
 ---
 
 ## God Mode ON — SOUNDSCAPE Project Continue
 
-**Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm`)
-**Branch:** `arena/019fe1bf-rythm` (main pe kabhi kaam nahi karna)
-**Git log:** `4f910e5` (feat: SOUNDSCAPE conversion) ← `affd8d0` (composer.lock) ← `8a5413f` ← …
+**Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm` — **PUBLIC**)
+**Current base:** **`main`** (PR #1 MERGED — full Laravel 13 project main me hai) · HEAD main = `843731b`
+**Legacy:** `arena/019fe1bf-rythm` (merged; sirf PR #2 doc-refresh uspe hai — merge/close kar dena)
+**Naya kaam:** main se `task/<id>` branch bana ke (automation task mode ON hote hi system khud karega)
+
+## ✅ Current state (verified 2026-08-09)
+
+- **PR #1 MERGED** (`843731b`): full project main me — Laravel 13.24.0, homepage 10+5 sections, docs, tests
+- **PR #2 OPEN** (optional, 1 file): `docs/NEXT_SESSION_CONTEXT.md` refresh → main. Merge kar do to doc main me bhi aa jayega.
+- **Automation: OFF confirmed** — `task_mode: false`, koi process/crontab nahi, `automation/`+`logs/`+`.github/workflows/` exist nahi karte
+- **Tests:** 7/7 passing (25 assertions) · `php artisan --version` = 13.24.0
+- **Next task: `admin-homepage-filament`** (pending)
+
+## ⚠️ CRITICAL — Local System (GitHub repo ke ALAAVA) har naye session me dobara setup karna hoga!
+
+Workspace snapshot sirf `/home/user` persist karta hai. **System packages + tools (repo ke bahar) WIPE ho jate hain:**
+
+| Tool | Kahan tha | New session me |
+|---|---|---|
+| PHP 8.4 + extensions (intl, mbstring, xml, curl, zip, gd, sqlite3, bcmath, dom, tokenizer, xmlwriter, simplexml) | `/usr/bin` (apt) | ❌ wipe → **reinstall (step 1)** |
+| Composer 2.10.2 | `/usr/local/bin/composer` | ❌ wipe → **reinstall (step 2)** |
+| Node 20 + npm | system | ✅ present (only Node survives) |
+| `vendor/` (composer install) | `/home/user/rythm/vendor` | ❌ excluded → `composer install` |
+| `node_modules/` + `public/build/` | project | ❌ excluded → `npm install && npm run build` |
+| `.env` (secrets) | project | ❌ gitignored → recreate |
+| `database/database.sqlite` | project | ❌ gitignored → recreate |
+| `.git/config` (remote URL) | project | ❌ reset → `git remote add origin` |
+| git identity (auto-agent) | global config | ❌ reset → set again |
+
+**Ye steps har naye session me FIRST run karne hain (poora block):**
+
+```bash
+# ── STEP 1: PHP 8.4 + extensions (Debian 13 — apt me 8.4 native) ──
+sudo apt-get update -qq
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+  php8.4-cli php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-gd \
+  php8.4-sqlite3 php8.4-bcmath php8.4-intl php8.4-dom php8.4-tokenizer \
+  php8.4-xmlwriter php8.4-simplexml unzip
+php -m | grep -iE "intl|mbstring|xml|curl|zip|gd|sqlite|bcmath"   # verify
+
+# ── STEP 2: Composer 2.10.2 (if missing) ──
+curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet
+composer --version
+
+# ── STEP 3: Repo (PUBLIC — bina token) ──
+git clone https://github.com/anoopuri21/rythm.git /home/user/rythm   # agar workspace empty
+cd /home/user/rythm
+git fetch origin --quiet
+git checkout -f main origin/main       # PR #2 merged ho to; warna arena branch se doc le lena
+git checkout -f -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm   # PR #2 unmerged → doc yahan se
+
+# ── STEP 4: Dependencies ──
+composer install --no-interaction --no-progress
+npm install --no-audit --no-fund
+npm run build
+
+# ── STEP 5: .env (local sqlite) ──
+cp .env.example .env
+# Edit: DB_CONNECTION=sqlite | DB_DATABASE=/home/user/rythm/database/database.sqlite
+#        SESSION_DRIVER=file | CACHE_STORE=file | QUEUE_CONNECTION=sync
+touch database/database.sqlite
+php artisan key:generate
+php artisan migrate --force
+
+# ── STEP 6: Git identity + remote (config wipe ho jata hai) ──
+git config --global user.name  "auto-agent"
+git config --global user.email "auto-agent@soundscape.local"
+git remote add origin https://github.com/anoopuri21/rythm.git
+
+# ── STEP 7: Verify everything ──
+php artisan --version        # → Laravel Framework 13.24.0
+php artisan test              # → 7 passed (25 assertions)
+ls next.config.js             # → must NOT exist
+```
+
+## ⚠️ Git quirk (is session me 4× confirm — HAR new session me expect karo)
+
+Snapshot `.git` ko purani state pe restore karta hai → HEAD `main` pe purana commit, remote empty, sab kuch "uncommitted" lagega. **Code GitHub pe safe hai — blind re-commit mat karna.**
+Fix: `git remote add origin …` → `git fetch origin --quiet` → `git checkout -f -B <branch> origin/<branch>` → `git status -sb` (clean dikhna chahiye).
+
+**Push auth:** repo public (clone free). Push ke liye PAT/SSH — purana PAT (`ghp_…2Eic`) last check pe valid tha; revoke ho chuka ho to user se naya mangna.
 
 ## Tech Stack STRICT
 
-Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + GSAP/Lenis/Swiper/CountUp + TiptapEditor 3.5.16 + Spatie MediaLibrary 11.23.4 + Livewire 3.8.3 + Mary 2.9.9. **Next.js bilkul nahi.**
+Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + TiptapEditor 3.5.16 + Spatie MediaLibrary 11.23.4 + Livewire 3.8.3 + Mary 2.9.9 + GSAP/Lenis/Swiper/CountUp. **Next.js bilkul nahi.** Filament 3.3.54 = ONLY 3.3.x supporting illuminate ^13 — pinned rakhna (`^3.2` resolve hota hai usi pe).
 
-Verify:
-```bash
-php artisan --version        # must be: Laravel Framework 13.24.0
-ls next.config.js             # must NOT exist
-composer show | grep -E "filament/filament|laravel/framework"
-```
+## Strict Rules — `docs/AGENT_RULES_STRICT.md` (MUST read before every task)
 
-## Strict Rules File
-
-**`docs/AGENT_RULES_STRICT.md` — MUST read before every task.** Summary:
 - Tech: Laravel 13 + Filament v3 ONLY
-- Images: ONLY Bajaao/Amazon (products) · Unsplash/Pexels free license (UI, with license comment) · AI Generated (hero/banner, alt + `[AI Generated]` comment)
-- Content: SEO friendly, unique (no verbatim Bajaao), natural keywords, Filament heading/title = **TextInput**, baki sab **TiptapEditor**
+- Images: ONLY Bajaao/Amazon (products) · Unsplash/Pexels free license (UI, license comment ke saath) · AI Generated (hero/banner, alt + `[AI Generated]` comment)
+- Content: SEO friendly, unique (no verbatim Bajaao), natural keywords · Filament heading/title = **TextInput**, baki sab **TiptapEditor**
 - Workflow: tasks.json source of truth → chunk plan → build → `npm run build` + `php artisan test` pass → done + commit
 - LOCKED (kabhi touch nahi): Header, Footer, Cart, Wishlist, Checkout/Payment
 
 ## Project Docs
 
-- `docs/architecture/00-project-architecture-overview.md` — Amazon drawer menu + 5-column footer (future), homepage 10+5 cinematic sections, admin multi-group sidebar, flow: Home → Admin Home → Shop → Detail → Cart → Checkout → Payment → Wishlist → About/Contact
-- `config/rythme.php` — s11 video URL (Pexels CC0, override via `RYTHME_VIDEO_URL`)
-- `plan.md` — phases 1–14 all ✅
+- `docs/architecture/00-project-architecture-overview.md` — Amazon drawer menu + 5-column footer target, homepage 10+5 cinematic sections, admin multi-group sidebar, flow: Home → Admin Home → Shop → Detail → Cart → Checkout → Payment → Wishlist → About/Contact
+- `config/rythme.php` — s11 video URL (Pexels CC0, override `RYTHME_VIDEO_URL`)
+- `plan.md` — phases 1–14 ✅
 
 ## Task System (`tasks/tasks.json` — source of truth)
 
@@ -50,74 +120,35 @@ composer show | grep -E "filament/filament|laravel/framework"
 | product-detail | pending |
 | cart-checkout-payment (Razorpay test) | pending |
 | wishlist-about-contact | pending |
-| automation-system | pending (recreate + task mode ON) |
+| automation-system | pending (recreate + task mode ON, user approval pe) |
 | footer-5-column | pending (footer locked until this task) |
 
-**Task mode was OFF this session (user instruction).** Next session: task mode ON — recreate automation system first (below), then run task loop.
-
-## Automation System (recreate if missing — same rules)
+## Automation System (recreate ONLY jab user task mode ON bole — same rules)
 
 - `automation/config.json` (interval 30; health: `php artisan --version && php artisan config:clear`)
 - `automation/task-agent.mjs` (reads tasks.json → chunk design → test → commit → update tasks.json)
-- `automation/task-loop`: `bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'`
+- task-loop: `bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'` (30m)
 - `.github/workflows/auto-dev.yml` (every 2h + push)
 - `logs/task-agent.log`, `logs/task-plan-*.md`, `logs/task-report-*.md`
 
-## Local System Recreation (new session — FIRST do this)
+## Learnings (2026-08-09)
 
-```bash
-# 1. PHP 8.4 + extensions (Debian 13: apt has 8.4; /usr/local/bin gets wiped between sessions)
-sudo apt-get install -y php8.4-cli php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-gd \
-  php8.4-sqlite3 php8.4-bcmath php8.4-intl php8.4-dom php8.4-tokenizer php8.4-xmlwriter php8.4-simplexml unzip
-
-# 2. Composer 2.10.2 (if missing)
-curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
-  && sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet
-
-# 3. Repo — if workspace empty: clone + branch
-git clone https://github.com/anoopuri21/rythm.git /home/user/rythm
-cd /home/user/rythm
-git checkout -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm
-
-# 4. Dependencies (vendor/node_modules/public/build are snapshot-excluded → always reinstall)
-composer install --no-interaction --no-progress
-npm install --no-audit --no-fund && npm run build
-
-# 5. Env (local dev uses sqlite)
-cp .env.example .env   # then set: DB_CONNECTION=sqlite, DB_DATABASE=/home/user/rythm/database/database.sqlite,
-                       # SESSION_DRIVER=file, CACHE_STORE=file, QUEUE_CONNECTION=sync
-touch database/database.sqlite && php artisan key:generate && php artisan migrate --force
-
-# 6. Git identity + remote (snapshot wipes .git/config → remote must be re-added)
-git config user.name  "auto-agent"; git config user.email "auto-agent@soundscape.local"
-git remote add origin https://github.com/anoopuri21/rythm.git   # tokenless; push with token inline if needed
-
-# 7. Verify
-php artisan --version   # 13.24.0
-php artisan test        # 7 passed
-```
-
-**⚠️ Git state quirk (encountered 2026-08-09):** workspace snapshots restore `.git` to an older state —
-after any session gap, HEAD may be back on `main`, local `arena/*` branch may be missing, and the remote
-config may be empty. Fix: `git remote add origin …` + `git checkout -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm`
-(force with `-f` if untracked files block the switch — files are identical to the branch tree).
-
-## Session learnings (2026-08-09)
-
-1. **Laravel 13 + Filament 3.3.54 verified working** — 3.3.54 is the ONLY 3.3.x supporting illuminate ^13; keep it pinned (`^3.2` resolves to it).
-2. **Cloudinary removed** from composer.json — cloudinary-labs 3.0.2 requires illuminate ^11|^12 only. Re-add only when media pipeline is built (Spatie MediaLibrary is the plan).
-3. **Blade gotcha (Laravel 13):** `@context` in raw JSON-LD is a Blade directive → use PHP arrays + `json_encode` for schema markup.
-4. **s11 video:** Pexels CC0 direct URL verified working — `https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4` (configurable via `RYTHME_VIDEO_URL`).
-5. **New homepage order:** hero → categories → bestsellers → why-rythme → brands → numbers → new-arrivals → deals → video-showcase → stories → testimonials → comparison → ugc → faq → footer.
-6. **Images:** `public/images/video-showcase-poster.jpg` + `public/images/ugc/{studio-vocalist,guitar-corner,dj-desk}.jpg` — AI Generated, labeled in comments/alt.
-7. **Security:** a GitHub PAT was pasted in chat and used for pushes — **user should revoke it** (Settings → Developer settings → PATs). Repo remote config is tokenless.
+1. **Filament 3.3.54** = only 3.3.x with illuminate ^13 — pinned rakhna
+2. **Cloudinary removed** — cloudinary-labs 3.0.2 needs illuminate ^11|^12 only; media pipeline = Spatie MediaLibrary
+3. **Laravel 13 Blade gotcha:** `@context` in JSON-LD is a Blade directive → PHP array + `json_encode`
+4. **s11 video:** Pexels CC0 — `https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4` (`RYTHME_VIDEO_URL` override)
+5. **Homepage order:** hero → categories → bestsellers → why-rythme → brands → numbers → new-arrivals → deals → video-showcase → stories → testimonials → comparison → ugc → faq → footer
+6. **Images:** `public/images/video-showcase-poster.jpg` + `public/images/ugc/{studio-vocalist,guitar-corner,dj-desk}.jpg` — AI Generated, labeled
+7. **PR #1 MERGED** — main = base; workflow: `git checkout -b task/<id> origin/main`
+8. **Automation OFF** — task_mode: false; user explicitly off rakhna chahta hai abhi ke liye
 
 ## Resume commands
 
 ```bash
-git status && cat tasks/tasks.json && tail -f logs/task-agent.log   # (logs exist only after automation is recreated)
-node automation/task-agent.mjs --once                                # task mode ON
-# or loop: bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'
+git status && cat tasks/tasks.json
+# jab user task mode ON bole:
+node automation/task-agent.mjs --once
+# ya loop: bash -c 'while true; do node automation/task-agent.mjs --once; sleep 1800; done'
 ```
 
-Bottom line: tum aur mai same ho — aage ka kaam `admin-homepage-filament` se shuru karo (task mode ON karke).
+Bottom line: tum aur mai same ho — `admin-homepage-filament` se shuru karna hai (jab user kahe). Repo + yeh doc = sab kuch recovery ke liye kafi hai.
