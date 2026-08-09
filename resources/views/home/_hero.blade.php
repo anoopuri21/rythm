@@ -15,7 +15,7 @@
         <video class="hero-video absolute inset-0 h-full w-full object-cover opacity-80"
                autoplay muted loop playsinline preload="metadata"
                poster="{{ asset('images/video-showcase-poster.jpg') }}">
-            <source src="{{ config('rythme.hero_video_url') }}" type="video/mp4">
+            <source src="{{ asset(config('rythme.hero_video_url')) }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20"></div>

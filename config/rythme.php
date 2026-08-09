@@ -32,7 +32,11 @@ return [
     */
     'hero_video_url' => env(
         'RYTHME_HERO_VIDEO_URL',
-        'https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4'
+        // Local product montage (16s, 1920x1080, ffmpeg-built):
+        // Squier Strat + Roland FP-30X + KRK Classic 7 (Bajaao product photos) +
+        // 2 AI-generated dark shots (mic, synth — [AI Generated]) + stage poster,
+        // alternating dark/light with smooth crossfades → public/videos/hero-montage.mp4
+        '/videos/hero-montage.mp4'
     ),
 
     /*
