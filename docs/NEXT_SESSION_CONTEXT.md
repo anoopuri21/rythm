@@ -28,7 +28,7 @@ Workspace snapshot sirf `/home/user` persist karta hai. **System packages + tool
 | PHP 8.4 + extensions (intl, mbstring, xml, curl, zip, gd, sqlite3, bcmath, dom, tokenizer, xmlwriter, simplexml) | `/usr/bin` (apt) | ❌ wipe → **reinstall (step 1)** |
 | Composer 2.10.2 | `/usr/local/bin/composer` | ❌ wipe → **reinstall (step 2)** |
 | Node 20 + npm | system | ✅ present (only Node survives) |
-| `vendor/` (composer install) | `/home/user/rythm/vendor` | ❌ excluded → `composer install` |
+| `vendor/` | **`/tmp/vendor`** (workspace me sirf symlink) | ❌ `/tmp` bhi wipe → `mkdir -p /tmp/vendor` + symlink (step 4) |
 | `node_modules/` + `public/build/` | project | ❌ excluded → `npm install && npm run build` |
 | `.env` (secrets) | project | ❌ gitignored → recreate |
 | `database/database.sqlite` | project | ❌ gitignored → recreate |
@@ -58,14 +58,11 @@ git fetch origin --quiet
 git checkout -f main origin/main       # PR #2 merged ho to; warna arena branch se doc le lena
 git checkout -f -B arena/019fe1bf-rythm origin/arena/019fe1bf-rythm   # PR #2 unmerged → doc yahan se
 
-# ── STEP 4: Dependencies ──
-# ⚠️ VENDOR-OUT-OF-WORKSPACE PATTERN (10k snapshot cap):
-# vendor/ = ~16k files → workspace snapshot cap (10,000 files) blow kar deta hai.
-# Fix: vendor ko /tmp me rakho + symlink. Node_modules/platform 'build' dirs
-# automatically excluded hain, lekin vendor nahi. Har fresh session (ya jab
-# symlink toota ho): 
-#   rm -f vendor && mkdir -p /tmp/rythm-vendor && ln -s /tmp/rythm-vendor vendor
-composer install --no-interaction --no-progress
+# ── STEP 4: Dependencies (VENDOR = /tmp + symlink — workspace fix 2026-08-09) ──
+# Har naye session me /tmp bhi khali hota hai:
+mkdir -p /tmp/vendor
+ln -sfn /tmp/vendor vendor                    # agar vendor symlink missing ho (cwd = /home/user/rythm)
+composer install --no-interaction --no-progress   # ⚠️ HAMESHA /home/user/rythm se — composer $baseDir ABSOLUTE embed karta hai
 npm install --no-audit --no-fund
 npm run build
 # ⚠️ TESTS: symlinked vendor se inferBasePath() /tmp ban jata hai → ye env var
@@ -151,6 +148,10 @@ Laravel 13 (PHP 8.4) + Blade + Filament **v3.3.54** + Tailwind 4 + Alpine.js + T
 6. **Images:** `public/images/video-showcase-poster.jpg` + `public/images/ugc/{studio-vocalist,guitar-corner,dj-desk}.jpg` — AI Generated, labeled
 7. **PR #1 MERGED** — main = base; workflow: `git checkout -b task/<id> origin/main`
 8. **Automation OFF** — task_mode: false; user explicitly off rakhna chahta hai abhi ke liye
+9. **Workspace fix (vendor → /tmp + symlink):** vendor (52–136MB) snapshot se bahar; workspace me sirf 11-byte symlink `vendor -> /tmp/vendor`. Do quirks resolve kiye:
+   - Composer 2.10 `autoload_classmap.php` me `$baseDir = '/home/user/rythm'` **ABSOLUTE embed** karta hai → install HAMESHA `/home/user/rythm` cwd se chalana
+   - Laravel 13 `Testing\TestCase::createApplication()` → `Application::inferBasePath()` → `ClassLoader::getRegisteredLoaders()` se derive → vendor /tmp me → `/tmp/bootstrap/app.php` fail. **Fix (COMMITTED):** `phpunit.xml` me `<env name="APP_BASE_PATH" value="/home/user/rythm"/>`
+10. **Environment reset DEEP hota hai:** sirf `.git` nahi — **working files bhi purani snapshot state pe restore ho sakti hain** (blade files gayab ho gayi thi → sections silently missing). Fix: `git checkout -f -B <branch> origin/<branch>` + `php artisan view:clear`
 
 ## Resume commands
 
