@@ -23,10 +23,16 @@ class HomepageTest extends TestCase
                 'id="numbers"',
                 'id="new-arrivals"',
                 'id="deals"',
+                'id="video-showcase"',
                 'id="stories"',
                 'id="testimonials"',
+                'id="comparison"',
+                'id="ugc"',
+                'id="faq"',
                 'id="footer"',
-            ], escape: false);
+            ], escape: false)
+            ->assertSee('"@type": "FAQPage"', escape: false)
+            ->assertSee('#RythmeFamily');
     }
 
     public function test_homepage_contains_primary_navigation_and_calls_to_action(): void

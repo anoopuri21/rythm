@@ -1,6 +1,6 @@
 # Rythme Music Store
 
-Rythme Music Store is a premium, cinematic e-commerce experience for musical instruments. The project includes a customer storefront, interactive product sections, Cloudinary media support, Razorpay payments, and a Filament administration panel.
+Rythme Music Store is a premium, cinematic e-commerce experience for musical instruments. The project includes a customer storefront, interactive product sections, Razorpay payments (test mode), and a Filament administration panel.
 
 ## Technology requirements
 

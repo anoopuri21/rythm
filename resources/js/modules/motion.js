@@ -152,6 +152,53 @@ function trackPageProgress() {
     });
 }
 
+// s16 · Generic data-reveal (up/down/left/right/fade) + data-parallax (speed %)
+function addDataReveals(reducedMotion) {
+    const targets = gsap.utils.toArray('[data-reveal]');
+
+    if (reducedMotion) {
+        gsap.set(targets, { opacity: 1, x: 0, y: 0 });
+        return;
+    }
+
+    targets.forEach((element) => {
+        const variant = element.dataset.reveal;
+        const delta = { up: 56, down: -56, left: 64, right: -64, fade: 0 }[variant] ?? 56;
+        const fromX = variant === 'left' ? 64 : variant === 'right' ? -64 : 0;
+
+        gsap.fromTo(element,
+            { opacity: 0, y: delta, x: fromX },
+            {
+                opacity: 1,
+                y: 0,
+                x: 0,
+                duration: 0.9,
+                ease: 'power3.out',
+                scrollTrigger: { trigger: element, start: 'top 88%', once: true },
+            },
+        );
+    });
+}
+
+function addDataParallax(reducedMotion) {
+    if (reducedMotion) return;
+
+    gsap.utils.toArray('[data-parallax]').forEach((element) => {
+        const speed = Number(element.dataset.parallax || 10);
+
+        gsap.to(element, {
+            yPercent: speed,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: element.parentElement,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.8,
+            },
+        });
+    });
+}
+
 export function initMotion(reducedMotion) {
     const lenis = new Lenis({
         duration: reducedMotion ? 0 : 1.15,
@@ -171,6 +218,8 @@ export function initMotion(reducedMotion) {
     revealContent(reducedMotion);
     animateCounters(reducedMotion);
     addCinematicScroll(reducedMotion);
+    addDataReveals(reducedMotion);
+    addDataParallax(reducedMotion);
     trackPageProgress();
 
     const refresh = () => ScrollTrigger.refresh();

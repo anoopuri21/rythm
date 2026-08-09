@@ -16,7 +16,11 @@
     @include('home._numbers')
     @include('home._new-arrivals')
     @include('home._deals')
+    @include('home._video-showcase')
     @include('home._stories')
     @include('home._testimonials')
+    @include('home._comparison')
+    @include('home._ugc')
+    @include('home._faq')
     @include('home._footer')
 @endsection
