@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         User::firstOrCreate(
             ['email' => 'admin@rythme.test'],
-            ['name' => 'Rythme Admin', 'password' => bcrypt('admin1234')],
+            ['name' => 'Rhythm Exports Admin', 'password' => bcrypt('admin1234')],
         );
 
         User::firstOrCreate(

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Rythme Music Store - Feel The Music, Own The Sound')</title>
-    <meta name="description" content="@yield('meta_description', 'Rythme Music Store - Premium musical instruments, guitars, keyboards, drums, pro audio and more. Shop authentic instruments from top brands.')">
+    <title>@yield('title', 'Rhythm Exports - Feel The Music, Own The Sound')</title>
+    <meta name="description" content="@yield('meta_description', 'Rhythm Exports - Premium musical instruments, guitars, keyboards, drums, pro audio and more. Shop authentic instruments from top brands with free shipping all over India.')">
 
-    <meta property="og:title" content="@yield('title', 'Rythme Music Store')">
+    <meta property="og:title" content="@yield('title', 'Rhythm Exports')">
     <meta property="og:description" content="@yield('meta_description', 'Premium musical instruments store')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
@@ -35,6 +35,10 @@
     <main id="main-content" tabindex="-1">
         @yield('content')
     </main>
+
+    <button type="button" id="scroll-top" class="scroll-top" aria-label="Scroll back to top">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 15l7-7 7 7" /></svg>
+    </button>
 
     @livewireScripts
     @stack('scripts')

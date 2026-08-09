@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Rythme Music Store - Feel The Music, Own The Sound')
-@section('meta_description', 'Shop premium musical instruments at Rythme Music Store. Guitars, Keyboards, Drums, Pro Audio and more from top brands like Fender, Yamaha, Gibson. Free shipping all over India.')
+@section('title', 'Rhythm Exports - Feel The Music, Own The Sound')
+@section('meta_description', 'Shop premium musical instruments at Rhythm Exports. Guitars, Keyboards, Drums, Pro Audio and more from top brands like Fender, Yamaha, Gibson. Free shipping all over India.')
 
 @push('head')
     <link rel="preload" as="image" href="{{ asset('images/hero-guitar.jpg') }}" fetchpriority="high">

@@ -1,6 +1,6 @@
 {{--
     ============================================================
-    s13 · Comparison — "Rythme vs. the rest."
+    s13 · Comparison — "Rhythm Exports vs. the rest."
     Light section, gold check / muted cross rows, responsive.
     ============================================================
 --}}
@@ -21,10 +21,10 @@
     <div class="pointer-events-none absolute -right-24 top-0 select-none font-playfair text-[16rem] leading-none text-rythme-black/[0.03]" aria-hidden="true">vs</div>
     <div class="relative mx-auto max-w-6xl px-5 sm:px-8">
         <div class="mx-auto mb-14 max-w-2xl text-center" data-reveal="up">
-            <p class="section-kicker justify-center">The Rythme difference</p>
-            <h2 class="section-title">Rythme vs. <em>the rest.</em></h2>
+            <p class="section-kicker justify-center">The Rhythm Exports difference</p>
+            <h2 class="section-title">Rhythm Exports vs. <em>the rest.</em></h2>
             <p class="mt-5 text-base leading-7 text-rythme-black/60">
-                We built Rythme around the questions musicians actually ask before buying. Here is how we answer them — compared, honestly.
+                We built Rhythm Exports around the questions musicians actually ask before buying. Here is how we answer them — compared, honestly.
             </p>
         </div>
 
@@ -34,7 +34,7 @@
                     <tr class="border-b border-rythme-black/10">
                         <th scope="col" class="px-6 py-5 text-xs font-bold uppercase tracking-[0.2em] text-rythme-black/50">What matters</th>
                         <th scope="col" class="px-6 py-5 text-xs font-bold uppercase tracking-[0.2em] text-gold-dark">
-                            <span class="flex items-center gap-2">Rythme <span class="h-px w-6 bg-gold"></span></span>
+                            <span class="flex items-center gap-2">Rhythm Exports <span class="h-px w-6 bg-gold"></span></span>
                         </th>
                         <th scope="col" class="px-6 py-5 text-xs font-bold uppercase tracking-[0.2em] text-rythme-black/40">Typical stores</th>
                     </tr>

@@ -17,7 +17,7 @@ class NewsletterSubscriptionController extends Controller
         );
 
         $message = $subscriber->wasRecentlyCreated
-            ? 'Welcome to the Rythme community.'
+            ? 'Welcome to the Rhythm Exports community.'
             : 'You are already on the list.';
 
         if ($request->expectsJson()) {

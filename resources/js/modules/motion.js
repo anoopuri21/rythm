@@ -106,23 +106,8 @@ function addCinematicScroll(reducedMotion) {
         },
     );
 
-    const mediaQuery = gsap.matchMedia();
-    mediaQuery.add('(min-width: 1024px)', () => {
-        const section = document.querySelector('.why-section');
-        const media = document.querySelector('.why-media');
-        if (!section || !media) return undefined;
-
-        const pin = ScrollTrigger.create({
-            trigger: section,
-            start: 'top top+=104',
-            end: 'bottom bottom-=80',
-            pin: media,
-            pinSpacing: false,
-            anticipatePin: 1,
-        });
-
-        return () => pin.kill();
-    });
+    // Why-section media is now CSS position:sticky (clean, no JS pinning).
+    // Kept intentionally simple for alignment reliability across devices.
 
     const footerWordmark = document.querySelector('#footer > p[aria-hidden="true"]');
     if (footerWordmark) {

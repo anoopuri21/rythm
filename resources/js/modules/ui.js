@@ -14,6 +14,9 @@ function initNavbar() {
         const logo = navbar.querySelector('.nav-logo');
         logo?.classList.toggle('text-white', !isScrolled);
         logo?.classList.toggle('text-gold', isScrolled);
+        const logoText = logo?.querySelector('span');
+        logoText?.classList.toggle('text-white', !isScrolled);
+        logoText?.classList.toggle('text-rythme-black', isScrolled);
         ticking = false;
     };
     const requestRender = () => {
@@ -119,4 +122,21 @@ export function initUi() {
     initNavbar();
     initCountdowns();
     initNewsletter();
+    initScrollTop();
+}
+
+function initScrollTop() {
+    const button = document.getElementById('scroll-top');
+    if (!button) return;
+
+    const render = () => {
+        button.classList.toggle('is-visible', window.scrollY > 600);
+    };
+
+    button.addEventListener('click', () => {
+        window.lenis ? window.lenis.scrollTo(0, { duration: 1.2 }) : window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    render();
+    window.addEventListener('scroll', render, { passive: true });
 }

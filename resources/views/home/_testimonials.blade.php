@@ -8,7 +8,7 @@
             'purchase' => 'Fender Player II Stratocaster',
         ],
         [
-            'quote' => 'I was building my first home studio and the advice was refreshingly honest. Rythme helped me spend where it mattered and save where it did not.',
+            'quote' => 'I was building my first home studio and the advice was refreshingly honest. Rhythm Exports helped me spend where it mattered and save where it did not.',
             'name' => 'Naina Kapoor',
             'role' => 'Singer-songwriter · Delhi',
             'initials' => 'NK',
@@ -37,7 +37,7 @@
 
     <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mx-auto mb-14 max-w-3xl text-center">
-            <p class="section-kicker justify-center text-gold-light">Stories from the Rythme community</p>
+            <p class="section-kicker justify-center text-gold-light">Stories from the Rhythm Exports community</p>
             <h2 class="section-title mx-auto text-white">Made for musicians.<br><em class="text-gold-light">Loved by musicians.</em></h2>
             <div class="mt-6 flex items-center justify-center gap-3 text-sm text-white/55">
                 <span class="tracking-[0.2em] text-gold" aria-label="5 out of 5 stars">★★★★★</span>

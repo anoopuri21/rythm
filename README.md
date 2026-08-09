@@ -1,6 +1,6 @@
-# Rythme Music Store
+# Rhythm Exports
 
-Rythme Music Store is a premium, cinematic e-commerce experience for musical instruments.
+Rhythm Exports is a premium, cinematic e-commerce experience for musical instruments.
 Laravel 13 + Blade + Tailwind 4 + Filament v3 admin — with a 15-section cinematic homepage
 (hero slider, best sellers, video showcase, comparison, UGC, FAQ + JSON-LD, scroll effects).
 
