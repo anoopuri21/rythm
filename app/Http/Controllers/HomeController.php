@@ -8,8 +8,8 @@ class HomeController extends Controller
 {
     public function index(): View
     {
-        // This will be managed from the admin settings in a later phase.
-        $heroMode = 'slider';
+        // Hero mode is config-driven (RYTHME_HERO_MODE env): 'slider' | 'video'
+        $heroMode = config('rythme.hero_mode', 'slider');
 
         return view('home.index', compact('heroMode'));
     }

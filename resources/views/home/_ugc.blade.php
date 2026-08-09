@@ -1,15 +1,15 @@
 {{--
     ============================================================
-    s14 · UGC — "Made by the #RythmeFamily"
+    s14 · UGC — "Made by the #RhythmExportsFamily"
     Dark gallery grid. Images: AI Generated — [AI Generated]
     (placeholder visuals; swap for real community posts later)
     ============================================================
 --}}
 @php
     $ugcPosts = [
-        ['image' => 'images/ugc/studio-vocalist.jpg', 'handle' => '@ria.makes.music', 'caption' => 'Tracking vocals on her first Rythme studio bundle.'],
+        ['image' => 'images/ugc/studio-vocalist.jpg', 'handle' => '@ria.makes.music', 'caption' => 'Tracking vocals on her first Rhythm Exports studio bundle.'],
         ['image' => 'images/ugc/guitar-corner.jpg', 'handle' => '@akash.plays', 'caption' => 'Sunday mornings with the CS11 and a window seat.'],
-        ['image' => 'images/ugc/dj-desk.jpg', 'handle' => '@decks.by.dev', 'caption' => 'Weekend sets on a Rythme-sourced rig.'],
+        ['image' => 'images/ugc/dj-desk.jpg', 'handle' => '@decks.by.dev', 'caption' => 'Weekend sets on a Rhythm Exports-sourced rig.'],
     ];
 @endphp
 
@@ -19,12 +19,12 @@
         <div class="mb-14 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end" data-reveal="up">
             <div class="max-w-2xl">
                 <p class="section-kicker text-gold-light">Community</p>
-                <h2 class="section-title">Made by the <em class="text-gold-gradient">#RythmeFamily.</em></h2>
+                <h2 class="section-title">Made by the <em class="text-gold-gradient">#RhythmExportsFamily.</em></h2>
                 <p class="mt-5 text-base leading-7 text-white/60">
-                    From first chords to full stages — tag <span class="font-semibold text-gold-light">#RythmeFamily</span> to feature here and win monthly gear vouchers.
+                    From first chords to full stages — tag <span class="font-semibold text-gold-light">#RhythmExportsFamily</span> to feature here and win monthly gear vouchers.
                 </p>
             </div>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn-gold-glow inline-flex shrink-0 items-center gap-3 rounded-full bg-gold px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-gold-light">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="btn-gold btn-shine">
                 <span class="relative z-10">Share your sound</span><span class="relative z-10" aria-hidden="true">↗</span>
             </a>
         </div>

@@ -12,7 +12,7 @@
                         <div class="min-w-16 rounded-2xl border border-white/15 bg-white/10 px-3 py-4 text-center backdrop-blur-md sm:min-w-20"><span data-unit="{{ $unit }}" class="block font-bebas text-3xl text-gold-light sm:text-4xl">00</span><span class="text-[9px] font-bold uppercase tracking-widest text-white/45">{{ $label }}</span></div>
                     @endforeach
                 </div>
-                <a href="/deals" class="btn-gold-glow mt-9 inline-flex items-center gap-3 rounded-full bg-gold px-7 py-4 text-sm font-bold text-rythme-black hover:bg-gold-light"><span class="relative z-10">Shop the sale</span><span class="relative z-10">↗</span></a>
+                <a href="/deals" class="btn-gold btn-shine mt-9"><span class="relative z-10">Shop the sale</span><span class="relative z-10">↗</span></a>
             </div>
         </div>
         <div class="absolute right-8 top-8 z-10 hidden h-28 w-28 rotate-12 items-center justify-center rounded-full bg-rythme-red text-center font-bebas text-2xl leading-none text-white shadow-2xl sm:flex">UP TO<br><span class="text-4xl">35%</span><br>OFF</div>

@@ -32,18 +32,26 @@ class HomepageTest extends TestCase
                 'id="footer"',
             ], escape: false)
             ->assertSee('"@type": "FAQPage"', escape: false)
-            ->assertSee('#RythmeFamily');
+            ->assertSee('#RhythmExportsFamily');
+    }
+
+    public function test_homepage_brand_is_rhythm_exports_everywhere(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Rhythm Exports')
+            ->assertSee('RHYTHM')
+            ->assertDontSee('Rythme Music Store')
+            ->assertDontSee('RYTHME');
     }
 
     public function test_homepage_contains_primary_navigation_and_calls_to_action(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('RYTHME')
             ->assertSee('Explore instruments')
             ->assertSee('Shop the sale')
             ->assertSee('Read all stories')
-            ->assertSee('Made for musicians.')
-            ->assertSee('Join the list');
+            ->assertSee('Made for musicians.');
     }
 }

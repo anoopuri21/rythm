@@ -21,7 +21,7 @@
         <div class="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/15 blur-[100px]"></div>
 
         <div class="relative z-10 mx-auto max-w-3xl px-5 text-center sm:px-8">
-            <p class="section-kicker justify-center text-gold-light" data-reveal="up">Rythme Sound</p>
+            <p class="section-kicker justify-center text-gold-light" data-reveal="up">Rhythm Exports Sound</p>
             <h2 class="section-title mx-auto text-white" data-reveal="up">
                 Feel the music.<br><em class="text-gold-gradient">Live the moment.</em>
             </h2>
@@ -56,7 +56,7 @@
                     class="fixed inset-0 z-[90] flex items-center justify-center bg-black/90 p-4 sm:p-8"
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Rythme film"
+                    aria-label="Rhythm Exports film"
                 >
                     <button type="button" @click="open = false" class="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-2xl text-white transition hover:border-gold hover:text-gold" aria-label="Close video">&times;</button>
                     <div class="w-full max-w-4xl" @click.outside="open = false">

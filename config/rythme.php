@@ -3,11 +3,43 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Brand
+    |--------------------------------------------------------------------------
+    */
+    'brand_name' => 'Rhythm Exports',
+    'brand_short' => 'RHYTHM',
+    'logo_url' => env(
+        'RYTHME_LOGO_URL',
+        'https://www.rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hero — two selectable modes (one at a time)
+    |   'slider' = cinematic image slider (default)
+    |   'video'  = theme-matched fullscreen video banner
+    | Override in .env: RYTHME_HERO_MODE=video
+    |--------------------------------------------------------------------------
+    */
+    'hero_mode' => env('RYTHME_HERO_MODE', 'slider'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hero video (video mode) — Pexels free license (CC0)
+    | "Man Playing Guitar" by Pixabay — https://www.pexels.com/video/man-playing-guitar-854924/
+    | Override in .env: RYTHME_HERO_VIDEO_URL=https://your-cdn/video.mp4
+    |--------------------------------------------------------------------------
+    */
+    'hero_video_url' => env(
+        'RYTHME_HERO_VIDEO_URL',
+        'https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4'
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
     | s11 · Video Showcase
     |--------------------------------------------------------------------------
-    | Default source: "Man Playing Guitar" by Pixabay on Pexels — free to use
-    | (CC0 / Pexels license). https://www.pexels.com/video/man-playing-guitar-854924/
-    | Override in .env: RYTHME_VIDEO_URL=https://your-cdn/video.mp4
+    | Same Pexels CC0 clip by default; override via RYTHME_VIDEO_URL
     */
     'video_showcase_url' => env(
         'RYTHME_VIDEO_URL',

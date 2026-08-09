@@ -19,7 +19,7 @@
                 <p class="mb-5 text-xs font-bold uppercase tracking-[0.28em] text-gold">Brand spotlight · Fender</p>
                 <h3 class="font-playfair text-4xl leading-tight sm:text-6xl">Born in California.<br><em class="text-gold-light">Played everywhere.</em></h3>
                 <p class="mt-6 max-w-md leading-7 text-white/65">From the unmistakable Stratocaster to the thunder of the Precision Bass, meet the instruments that shaped modern music.</p>
-                <a href="/brands/fender" class="mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-bold text-rythme-black transition hover:bg-gold">Explore Fender <span>↗</span></a>
+                <a href="/brands/fender" class="btn-ghost-light mt-8">Explore Fender <span>↗</span></a>
             </div>
         </article>
     </div>

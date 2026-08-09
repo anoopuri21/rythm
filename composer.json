@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "rythme/music-store",
+    "name": "rhythm-exports/music-store",
     "type": "project",
-    "description": "A cinematic e-commerce store for premium musical instruments.",
+    "description": "Rhythm Exports — a cinematic e-commerce store for premium musical instruments.",
     "keywords": [
         "laravel",
         "framework"

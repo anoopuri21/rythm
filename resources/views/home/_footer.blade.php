@@ -1,7 +1,9 @@
 @php
+    $brand = config('rythme.brand_name');
+    $logo = config('rythme.logo_url');
     $footerGroups = [
         'Shop' => [
-            ['Guitars', '/category/guitars'], ['Keys & Pianos', '/category/keyboards-pianos'],
+            ['Guitars', '/category/guitars'], ['Keyboards & Pianos', '/category/keyboards-pianos'],
             ['Drums & Percussion', '/category/drums-percussion'], ['Studio & Pro Audio', '/category/pro-audio'],
             ['Indian Instruments', '/category/indian-instruments'], ['Deals', '/deals'],
         ],
@@ -9,50 +11,58 @@
             ['Contact us', '/contact'], ['Shipping & delivery', '/shipping'], ['Returns & refunds', '/returns'],
             ['Warranty', '/warranty'], ['Track your order', '/orders/track'], ['FAQs', '/faqs'],
         ],
-        'About Rythme' => [
-            ['Our story', '/about'], ['The Rythme standard', '/about#standard'], ['Journal', '/stories'],
+        'About Rhythm Exports' => [
+            ['Our story', '/about'], ['The Rhythm Exports standard', '/about#standard'], ['Journal', '/stories'],
             ['Careers', '/careers'], ['Privacy', '/privacy'], ['Terms', '/terms'],
         ],
     ];
 @endphp
 
 <footer id="footer" class="relative overflow-hidden bg-rythme-black text-white">
-    <section class="newsletter-strip relative border-b border-white/10" aria-labelledby="newsletter-title">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_50%,rgba(212,168,67,.14),transparent_35%)]"></div>
-        <div class="relative mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:py-16">
-            <div class="reveal-section">
-                <p class="section-kicker text-gold-light">Stay in the loop</p>
-                <h2 id="newsletter-title" class="font-playfair text-3xl sm:text-4xl">Fresh gear. Better stories.<br><em class="text-gold-light">No noise.</em></h2>
-            </div>
-            <form class="newsletter-form reveal-section" action="{{ route('newsletter.store') }}" method="POST" novalidate>
-                @csrf
-                <div class="absolute -left-[9999px]" aria-hidden="true">
-                    <label for="newsletter-company">Company</label>
-                    <input id="newsletter-company" name="company" type="text" tabindex="-1" autocomplete="off">
-                </div>
-                <div class="flex flex-col gap-3 sm:flex-row">
-                    <div class="relative flex-1">
-                        <label class="sr-only" for="newsletter-email">Email address</label>
-                        <input id="newsletter-email" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="254" placeholder="Your email address" class="h-14 w-full rounded-full border border-white/15 bg-white/[0.06] px-6 pr-12 text-sm text-white placeholder:text-white/35 focus:border-gold focus:ring-gold">
-                        <svg class="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    </div>
-                    <button type="submit" class="newsletter-submit h-14 shrink-0 rounded-full bg-gold px-7 text-sm font-bold text-rythme-black transition hover:bg-gold-light disabled:cursor-wait disabled:opacity-70">
-                        <span>Join the list</span>
-                    </button>
-                </div>
-                <p class="newsletter-feedback mt-3 min-h-5 text-xs {{ $errors->has('email') ? 'text-red-300' : (session('newsletter_status') ? 'text-gold-light' : 'text-white/45') }}" role="status" aria-live="polite">
-                    {{ $errors->first('email') ?: (session('newsletter_status') ?: 'Monthly inspiration and members-only offers. Unsubscribe anytime.') }}
+    {{-- ============ Fancy CTA section (replaces newsletter) ============ --}}
+    <section class="cta-band relative overflow-hidden border-b border-white/10" aria-labelledby="cta-title">
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(212,168,67,.22),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(212,168,67,.14),transparent_40%)]"></div>
+        <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
+        <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
+            <div class="reveal-section" data-reveal="up">
+                <p class="section-kicker text-gold-light">The Rhythm Exports promise</p>
+                <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Ready to find <em class="text-gold-light">your sound?</em></h2>
+                <p class="mt-4 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
+                    Talk to a real musician — not a script. Call, WhatsApp or visit us for honest advice, free setups and instruments that are actually worth it.
                 </p>
-            </form>
+                <div class="mt-8 flex flex-wrap items-center gap-4">
+                    <a href="/contact" class="btn-gold btn-shine">Talk to an expert <span aria-hidden="true">→</span></a>
+                    <a href="https://wa.me/919000000000" target="_blank" rel="noopener noreferrer" class="btn-ghost-light">WhatsApp us <span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+            <div class="reveal-section grid grid-cols-2 gap-4 sm:grid-cols-2" data-reveal="up">
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
+                    <p class="font-bebas text-3xl text-gold-light">24×7</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Expert support for every question, big or small</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
+                    <p class="font-bebas text-3xl text-gold-light">15+ yrs</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Serving musicians across India since 2009</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
+                    <p class="font-bebas text-3xl text-gold-light">40+</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">World-class brands, handpicked &amp; guaranteed</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
+                    <p class="font-bebas text-3xl text-gold-light">₹0</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Free setup on every instrument, always</p>
+                </div>
+            </div>
         </div>
     </section>
 
+    {{-- ============ Footer body ============ --}}
     <div class="mx-auto max-w-7xl px-5 pb-8 pt-16 sm:px-8 lg:pt-20">
         <div class="grid gap-12 border-b border-white/10 pb-14 sm:grid-cols-2 lg:grid-cols-[1.25fr_repeat(3,1fr)] lg:gap-10">
             <div class="reveal-section pr-0 lg:pr-12">
-                <a href="{{ route('home') }}" class="inline-flex flex-col" aria-label="Rythme Music Store home">
-                    <span class="font-playfair text-3xl font-bold tracking-[0.12em]">RYTHME</span>
-                    <span class="mt-1 text-[9px] tracking-[0.35em] text-gold">MUSIC STORE</span>
+                <a href="{{ route('home') }}" class="inline-flex flex-col" aria-label="{{ $brand }} home">
+                    <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="mt-2 hidden text-[9px] tracking-[0.35em] text-gold" style="display:none" aria-hidden="true">RHYTHM EXPORTS</span>
                 </a>
                 <p class="mt-6 max-w-xs text-sm leading-7 text-white/45">Premium instruments, thoughtful advice, and a lifelong belief that everyone deserves to find their sound.</p>
                 <div class="mt-7 flex gap-3" aria-label="Social media links">
@@ -84,7 +94,7 @@
         </div>
 
         <div class="flex flex-col gap-5 py-7 text-[11px] text-white/35 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {{ date('Y') }} Rythme Music Store. All rights reserved.</p>
+            <p>© {{ date('Y') }} {{ $brand }}. All rights reserved.</p>
             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span class="inline-flex items-center gap-2"><span class="text-gold">●</span> Secure payments</span>
                 <span>Visa</span><span>Mastercard</span><span>UPI</span><span>Razorpay</span>
@@ -92,5 +102,5 @@
         </div>
     </div>
 
-    <p class="pointer-events-none -mb-[0.16em] select-none text-center font-bebas text-[20vw] leading-[0.72] tracking-[0.02em] text-white/[0.025]" aria-hidden="true">RYTHME</p>
+    <p class="pointer-events-none -mb-[0.16em] select-none text-center font-bebas text-[20vw] leading-[0.72] tracking-[0.02em] text-white/[0.025]" aria-hidden="true">RHYTHM</p>
 </footer>

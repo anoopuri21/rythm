@@ -1,4 +1,4 @@
-# Windows Setup Guide — Rythme Music Store (Laravel 13)
+# Windows Setup Guide — Rhythm Exports (Laravel 13)
 
 Clone → Run karne ka complete step-by-step guide (Windows desktop). Koi error aaye to
 [Troubleshooting](#-troubleshooting) dekho, phir bhi nahi bane to error ka text copy karke
