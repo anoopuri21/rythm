@@ -23,18 +23,18 @@ agent ko do.
 
 1. Laragon Full installer chalao → `C:\laragon` me install karo (SmartScreen aaye to **More info → Run anyway**).
 2. Laragon kholo → **Start All** (tray me green icon).
-3. **Menu → PHP → Version** → `8.4.x` select karo. Agar list me nahi hai to **Add/Download** se 8.4.x download karo (Laragon khud kar leta hai).
-4. **Menu → Terminal** kholo — isi terminal me aage ke saare commands chalenge.
+3. **Menu → PHP → Version** → `8.4.x` select karo. Agar list me nahi hai to **Add/Download** se 8.4.x download karo (Laragon khud kar leta hai) — ya neeche "PHP 8.4 install karne ka manual tarika" (Troubleshooting section me) follow karo.
+4. **Menu → Terminal** kholo — isi terminal me aage ke saare commands chalenge. **Har baar naya terminal kholna (ya Laragon restart) jab PHP version switch karo** — purana terminal purani PHP use karta hai.
 5. Verify:
 ```bash
-php -v                 # PHP 8.4.x
+php -v                 # PHP 8.4.x  ← IMPORTANT: 8.3/8.2 hai to ruk jao, upar wala step karo
 composer --version     # 2.x
-node -v && npm -v      # Node 20.19+ / npm 10+
+node -v && npm -v      # Node 20.19+ / npm 10+  (Vite 7 ke liye zaroori)
 git --version
 ```
 
 > ⚠️ `php -v` me 8.2/8.3 dikhe to step 1.3 karo — warna `composer install` pe
-> `requires php ^8.4` error aayega.
+> `requires php ^8.4` error aayega (neeche Troubleshooting #1 dekho).
 
 ---
 
@@ -135,21 +135,36 @@ php artisan test
 
 ## 🛠 Troubleshooting
 
-| Error / Problem | Fix |
-|---|---|
-| `requires php ^8.4` / `your PHP version does not satisfy` | Laragon → Menu → PHP → Version → 8.4.x |
-| `ext-gd` / `ext-intl` / `ext-zip` / `ext-fileinfo` missing | Laragon → Menu → PHP → php.ini → `;extension=gd` wale lines se `;` hatao (gd, intl, zip, fileinfo, mbstring, sqlite3) → Laragon restart |
-| `No application encryption key` | `php artisan key:generate` |
-| `Vite manifest not found` / bina CSS ka page | `npm install && npm run build` |
-| `Database file at path [database/database.sqlite] does not exist` | `type nul > database\database.sqlite` (ya `composer run setup` chalao) |
-| Port 8000 busy | `php artisan serve --port=8080` (aur `APP_URL` bhi match karo) |
-| `Connection refused` (MySQL wale me) | Laragon me **Start All** dabao |
-| `Table 'rythme_db.users' doesn't exist` | `php artisan migrate` |
-| `Base table or view not found` | `php artisan migrate:fresh --seed` |
-| Blank page / HTTP 500 | `storage\logs\laravel.log` kholo — aakhri error copy karke agent ko do |
-| `git clone` fail | Git for Windows installed hai? URL check karo? |
-| `npm` command not found | Node install karo (Section 0) ya Laragon ka Node use karo |
-| Admin login reject | `php artisan db:seed` phir se chalao (idempotent hai), ya `php artisan tinker` me `App\Models\User::create(['name'=>'Admin','email'=>'admin@rythme.test','password'=>bcrypt('admin1234')]);` |
+| # | Error / Problem | Fix |
+|---|---|---|
+| 1 | **`Root composer.json requires php ^8.4 but your php version (8.3.30) does not satisfy`** + `symfony/* requires php >=8.4.1` + `Your lock file does not contain a compatible set of packages` | **PHP 8.3 active hai, project ko 8.4+ chahiye.** Laragon → Menu → PHP → Version → `8.4.x` select → Laragon restart (ya naya Terminal kholo). PHP 8.4 list me nahi hai to manual download karo (neeche "PHP 8.4 install karne ka manual tarika"). Phir `php -v` me **8.4.x** confirm karke `composer run setup` dobara chalao. |
+| 2 | `requires php ^8.4` / `your PHP version does not satisfy` (after switching) | Naya Laragon Terminal kholo (purana terminal purani PHP pakde rehta hai). `where php` se check karo ki PATH me sahi PHP hai. |
+| 3 | `ext-gd` / `ext-intl` / `ext-zip` / `ext-fileinfo` missing | Laragon → Menu → PHP → php.ini → `;extension=gd` wale lines se `;` hatao (gd, intl, zip, fileinfo, mbstring, sqlite3, openssl, curl, dom, xml, bcmath) → Laragon restart |
+| 4 | `No application encryption key` | `php artisan key:generate` |
+| 5 | `Vite manifest not found` / bina CSS ka page | `npm install && npm run build` |
+| 6 | `Database file at path [database/database.sqlite] does not exist` | `type nul > database\database.sqlite` (ya `composer run setup` chalao) |
+| 7 | Port 8000 busy | `php artisan serve --port=8080` (aur `APP_URL` bhi match karo) |
+| 8 | `Connection refused` (MySQL wale me) | Laragon me **Start All** dabao |
+| 9 | `Table 'rythme_db.users' doesn't exist` | `php artisan migrate` |
+| 10 | `Base table or view not found` | `php artisan migrate:fresh --seed` |
+| 11 | Blank page / HTTP 500 | `storage\logs\laravel.log` kholo — aakhri error copy karke agent ko do |
+| 12 | `git clone` fail | Git for Windows installed hai? URL check karo? |
+| 13 | `npm` command not found | Node install karo (Section 0) ya Laragon ka Node use karo |
+| 14 | Admin login reject | `php artisan db:seed` phir se chalao (idempotent hai), ya `php artisan tinker` me `App\Models\User::create(['name'=>'Admin','email'=>'admin@rythme.test','password'=>bcrypt('admin1234')]);` |
+| 15 | `npm install` me `engine "node" is incompatible` / `EBADENGINE` | Vite 7 ko **Node 20.19+** chahiye. `node -v` check karo — purana hai to https://nodejs.org se Node 22 LTS install karo aur **naya terminal kholo** |
+| 16 | `npm run build` me `esbuild` error | Naya Node LTS install karo, `rm -rf node_modules` + `npm install` phir se |
+| 17 | `composer install` me `The "php" version ... platform config` / lock issue (8.4 active hone ke baad bhi) | `composer clear-cache` phir `composer update --lock` (lock file ko current platform se re-verify) |
+| 18 | `SQLSTATE[HY000]: General error: 14 unable to open database file` | `database\` folder ka path sahi hai? `.env` me `DB_CONNECTION=sqlite` + `database/database.sqlite` file exist karti hai? |
+| 19 | Filament `/admin` pe `404` / blank | `php artisan route:list` me `/admin` dikhta hai? Nahi to `php artisan optimize:clear` + `composer dump-autoload` |
+
+### PHP 8.4 install karne ka manual tarika (agar Laragon me na ho)
+
+1. https://windows.php.net/download → **PHP 8.4 (x64, Thread Safe / VS17)** ZIP download karo
+2. ZIP ko extract karo → `C:\laragon\bin\php\php-8.4.x-Win32-vs17-x64\`
+3. `php.ini-development` ko copy karke `php.ini` banao (ya Laragon → Menu → PHP → php.ini se)
+4. `php.ini` me ye extensions enable karo (`;extension=...` se `;` hatao): `gd`, `intl`, `zip`, `fileinfo`, `mbstring`, `sqlite3`, `pdo_sqlite`, `openssl`, `curl`, `dom`, `xml`, `bcmath`
+5. Laragon restart → Menu → PHP → Version → ab 8.4 dikhega → select karo
+6. Laragon → Menu → Terminal → `php -v` → **8.4.x** confirm → `composer run setup`
 
 ---
 
