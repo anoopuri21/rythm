@@ -442,16 +442,19 @@ const ioCount = new IntersectionObserver((es) => es.forEach(en => {
 }), { threshold: .6 });
 $$('.count').forEach(c => ioCount.observe(c));
 
-/* ─────────────── Countdown ─────────────── */
-const deadline = Date.now() + 72 * 3600 * 1000;
-setInterval(() => {
-  const r = Math.max(0, deadline - Date.now());
-  const set = (u, v) => { const el = $(`[data-unit="${u}"]`, $('#deal-timer')); if (el) el.textContent = String(v).padStart(2, '0'); };
-  set('days', Math.floor(r / 864e5));
-  set('hours', Math.floor(r / 36e5) % 24);
-  set('minutes', Math.floor(r / 6e4) % 60);
-  set('seconds', Math.floor(r / 1e3) % 60);
-}, 1000);
+/* ─────────────── Countdown (deals section removed — guarded) ─────────────── */
+const dealTimer = $('#deal-timer');
+if (dealTimer) {
+  const deadline = Date.now() + 72 * 3600 * 1000;
+  setInterval(() => {
+    const r = Math.max(0, deadline - Date.now());
+    const set = (u, v) => { const el = $(`[data-unit="${u}"]`, dealTimer); if (el) el.textContent = String(v).padStart(2, '0'); };
+    set('days', Math.floor(r / 864e5));
+    set('hours', Math.floor(r / 36e5) % 24);
+    set('minutes', Math.floor(r / 6e4) % 60);
+    set('seconds', Math.floor(r / 1e3) % 60);
+  }, 1000);
+}
 
 /* ─────────────── Reveal on scroll ─────────────── */
 const ioReveal = new IntersectionObserver((es) => es.forEach(en => {
