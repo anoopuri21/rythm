@@ -12,29 +12,29 @@ const CATEGORIES = [
   ['Keyboards & Pianos', '210+ instruments', 'https://www.bajaao.com/cdn/shop/files/ROL-FP30XBK.jpg?v=1779349747'],
   ['Studio & Recording', '260+ essentials', 'https://www.bajaao.com/cdn/shop/files/FCR-SCR2I24.jpg?v=1782732174'],
   ['Drums & Percussion', '190+ instruments', 'https://www.bajaao.com/cdn/shop/files/ALE-NITROMAXKIT.jpg?v=1780654577'],
-  ['Software & Plugins', '150+ titles', 'https://www.bajaao.com/cdn/shop/files/3k_poster_1024x1024_3c293394-d670-408c-8ee7-63cce91a0f31.jpg?v=1773078135'],
+  ['Software & Plugins', '150+ titles', 'https://www.bajaao.com/cdn/shop/files/ableton-daw-software-ableton-live-12-suite-software-download-only-1160354569.jpg?v=1768302320'],
   ['Live Sound', '160+ systems', 'https://www.bajaao.com/cdn/shop/files/Mackie_revised_Website_Banner_1400_x_486.jpg?v=1776311162'],
   ['Indian Instruments', '140+ instruments', 'https://www.bajaao.com/cdn/shop/files/ultimate-guru-other-indian-percussion-taal-sangat-digital-tabla-12538672771.jpg?v=1688490765'],
   ['Wind Instruments', '120+ instruments', 'https://www.bajaao.com/cdn/shop/files/vault-harmonicas-red-vault-ha500-key-c-10-hole-harmonica-29054261919923.jpg?v=1744670088'],
-  ['Accessories', '900+ essentials', 'https://www.bajaao.com/cdn/shop/files/ernie-ball-electric-guitar-strings-ernie-ball-2239-super-slinky-rps9-electric-guita.png?v=1744656943'],
+  ['Accessories', '900+ essentials', 'https://www.bajaao.com/cdn/shop/files/ernie-ball-electric-guitar-strings-ernie-ball-2239-super-slinky-rps9-electric-guitar-strings-34264274206899.png?v=1707561395'],
 ];
 
 const PRODUCTS = [
   ['Fender', 'Squier Sonic Stratocaster Electric Guitar', 17999, 21999, 128, 'Best Seller', 'https://www.bajaao.com/cdn/shop/files/FEN-0373152506.jpg?v=1779349747'],
-  ['Yamaha', 'Yamaha F310 Dreadnought Acoustic Guitar', 7050, null, 42, null, 'https://www.bajaao.com/cdn/shop/files/yamaha-acoustic-guitars-yamaha-f310-drea.jpg?v=1686104369'],
+  ['Yamaha', 'Yamaha F310 Dreadnought Acoustic Guitar', 7050, null, 42, null, 'https://www.bajaao.com/cdn/shop/files/yamaha-acoustic-guitars-tobacco-brown-sunburst-single-yamaha-f310-acoustic-guitar-23024704127155.jpg?v=1741589015'],
   ['Kala', 'Kala Makala MK-S Soprano Ukulele', 4999, null, 18, null, 'https://www.bajaao.com/cdn/shop/files/kala-soprano-ukuleles-kala-makala-mk-s-soprano-ukulele-18300244328609.jpg?v=1686443810'],
-  ['Roland', 'Roland JUPITER-XM Synthesizer', 181261, null, 25, 'Premium', 'https://www.bajaao.com/cdn/shop/files/roland-synthesizers-roland-jupiter-xm-r.jpg?v=1686047780'],
-  ['Akai', 'Akai MPK Mini Play Controller Keyboard', 9375, null, 61, null, 'https://www.bajaao.com/cdn/shop/files/akai-midi-keyboard-controllers-akai-mpk-mini.jpg?v=1685871303'],
+  ['Roland', 'Roland JUPITER-XM Synthesizer', 181261, null, 25, 'Premium', 'https://www.bajaao.com/cdn/shop/files/roland-synthesizers-roland-jupiter-xm-rising-jupiter-series-synthesizer-1176521097.png?v=1768280708'],
+  ['Akai', 'Akai MPK Mini Play Controller Keyboard', 9375, null, 61, null, 'https://www.bajaao.com/cdn/shop/files/akai-midi-keyboards-mk3-akai-mpk-mini-play-mini-controller-keyboard-with-built-in-speakers-with-mpc-beats-software-pack-1177300429.jpg?v=1769755592'],
   ['Focusrite', 'Focusrite Scarlett 2i2 4th Gen Interface', 26533, null, 33, 'New', 'https://www.bajaao.com/cdn/shop/files/FCR-SCR2I24.jpg?v=1782732174'],
-  ['KRK', 'KRK Classic 7 Studio Monitor', 22299, null, 27, null, 'https://www.bajaao.com/cdn/shop/files/krk-studio-monitors-krk-classic-7-active.jpg?v=1686114803'],
-  ['Audio-Technica', 'ATH-M20X Studio Headphones', 4197, null, 54, 'Popular', 'https://www.bajaao.com/cdn/shop/files/audio-technica-studio-headphones-audio-technica-ath-m20x.jpg?v=1686079503'],
-  ['Audio-Technica', 'ATM510 Cardioid Microphone', 8200, null, 19, null, 'https://www.bajaao.com/cdn/shop/files/audio-technica-handheld-microphones-audio-technica-atm510.jpg?v=1686116553'],
-  ['Alesis', 'Alesis Nitro Pro XL Electronic Drum Kit', 90608, null, 38, 'Deal', 'https://www.bajaao.com/cdn/shop/files/alesis-electronic-drum-kits-alesis-nitro-pro.jpg?v=1686116403'],
-  ['Roland', 'Roland EC10 El Cajon Hybrid Cajon', 57485, null, 22, null, 'https://www.bajaao.com/cdn/shop/files/roland-cajons-roland-ec10-el-cajon-hybrid.jpg?v=1686113203'],
+  ['KRK', 'KRK Classic 7 Studio Monitor', 22299, null, 27, null, 'https://www.bajaao.com/cdn/shop/files/krk-monitor-speakers-krk-classic-7-active-2-way-professional-studio-monitor-single-black-31865208471731.jpg?v=1687776513'],
+  ['Audio-Technica', 'ATH-M20X Studio Headphones', 4197, null, 54, 'Popular', 'https://www.bajaao.com/cdn/shop/files/audio-technica-headphones-audio-technica-ath-m20x-headphones-22877388439731.jpg?v=1742013789'],
+  ['Audio-Technica', 'ATM510 Cardioid Microphone', 8200, null, 19, null, 'https://www.bajaao.com/cdn/shop/files/audio-technica-dynamic-microphones-audio-technica-atm510-cardioid-dynamic-handheld-microphone-13893553881160.jpg?v=1688169095'],
+  ['Alesis', 'Alesis Nitro Pro XL Electronic Drum Kit', 90608, null, 38, 'Deal', 'https://www.bajaao.com/cdn/shop/files/alesis-electronic-drum-kits-alesis-nitro-pro-xl-10-piece-electronic-drum-kit-with-mesh-heads-bluetooth-1187135840.jpg?v=1768145949'],
+  ['Roland', 'Roland EC10 El Cajon Hybrid Cajon', 57485, null, 22, null, 'https://www.bajaao.com/cdn/shop/files/roland-cajons-roland-ec10-el-cajon-hybrid-cajon-1176521320.png?v=1768094242'],
   ['Ultimate Guru', 'Taal Sangat Digital Tabla', 6200, null, 17, null, 'https://www.bajaao.com/cdn/shop/files/ultimate-guru-other-indian-percussion-taal-sangat-digital-tabla-12538672771.jpg?v=1688490765'],
   ['Hohner', 'Hohner Ocean Star Tremolo Harmonica', 836, null, 45, null, 'https://www.bajaao.com/cdn/shop/files/vault-harmonicas-red-vault-ha500-key-c-10-hole-harmonica-29054261919923.jpg?v=1744670088'],
-  ['Ernie Ball', 'Super Slinky RPS9 Electric Guitar Strings', 909, null, 30, null, 'https://www.bajaao.com/cdn/shop/files/ernie-ball-electric-guitar-strings-ernie-ball-2239-super-slinky-rps9-electric-guita.png?v=1744656943'],
-  ['Granada', 'Adagio Complete Violin with Bow & Case', 7505, null, 12, 'New', 'https://www.bajaao.com/cdn/shop/files/granada-violins-granada-adagio-complete.jpg?v=1686117803'],
+  ['Ernie Ball', 'Super Slinky RPS9 Electric Guitar Strings', 909, null, 30, null, 'https://www.bajaao.com/cdn/shop/files/ernie-ball-electric-guitar-strings-ernie-ball-2239-super-slinky-rps9-electric-guitar-strings-34264274206899.png?v=1707561395'],
+  ['Granada', 'Adagio Complete Violin with Bow & Case', 7505, null, 12, 'New', 'https://www.bajaao.com/cdn/shop/files/granada-violins-granada-adagio-complete-violin-with-bow-case-full-size-34991213772979.jpg?v=1714818097'],
   ['Casio', 'Casio Privia PX-860 Digital Piano', 76937, null, 29, null, 'https://www.bajaao.com/cdn/shop/files/casio-digital-pianos-casio-privia-px-860-88-key-digital-piano-with-piano-stool-12837748867.jpg?v=1686255161'],
 ];
 
@@ -228,16 +228,17 @@ endCard.innerHTML = `
 pinTrack.appendChild(endCard);
 
 let maxX = 0;
+const isMobile = matchMedia('(max-width: 900px)').matches;
 function measurePin() {
+  if (reducedMotion || isMobile) { pinWrap.style.height = 'auto'; maxX = 0; return; }
   const viewW = pinView.clientWidth;
   const trackW = pinTrack.scrollWidth;
   maxX = Math.max(0, trackW - viewW);
-  if (reducedMotion) { pinWrap.style.height = 'auto'; return; }
   pinWrap.style.height = (pinStage.offsetHeight + maxX) + 'px';
   onPinScroll();
 }
 function onPinScroll() {
-  if (reducedMotion) return;
+  if (reducedMotion || isMobile) return;
   const top = pinWrap.offsetTop;
   const p = Math.min(1, Math.max(0, (window.scrollY - top) / maxX));
   pinTrack.style.transform = `translate3d(${-p * maxX}px,0,0)`;
@@ -253,6 +254,7 @@ function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTi
 window.addEventListener('resize', debounce(measurePin, 160));
 window.addEventListener('load', measurePin);        /* images/fonts ke baad re-measure */
 setTimeout(measurePin, 500);                         /* fallback re-measure */
+matchMedia('(max-width: 900px)').addEventListener('change', () => { location.reload(); });
 measurePin();
 
 /* ─────────────── Product card renderer ─────────────── */

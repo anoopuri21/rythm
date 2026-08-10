@@ -46,6 +46,15 @@ ke upar (peeche nahi chhuphte).
   `position:sticky` → replaced with `overflow:clip` (sticky-safe) + re-measure on
   load/resize/fonts. Section ab scroll pe pin hota hai, cards left→right, end pe unpin.
 
+## v2.3 Fixes (2026-08-10)
+
+- **Images:** 11/20 Bajaao URLs dead the (guessed/fabricated) → sab re-scrape karke
+  verified (HTTP 200) real product URLs lagaye — **20/20 ab load hote hain**.
+- **Glass card name + CTA visibility:** root cause `.pin__stage` pe
+  `justify-content:center` + `overflow:hidden` → content lamba hone par card ka bottom
+  (name/CTA) clip ho jata tha. Fix: compact cards (300px), tighter head/HUD, `overflow:clip`,
+  short-screen media query, mobile = horizontal touch scroll (pin off).
+
 ## Files
 
 - `index.html` — full homepage (nav 2-row, drawer, hero, marquee, categories, products
