@@ -48,14 +48,29 @@
       </div>
     </div>
 
-    <nav class="nav__menu" aria-label="Main categories">
-      <a href="#categories">Guitars</a>
-      <a href="#categories">Ukuleles &amp; Violins</a>
-      <a href="#categories">Keyboards &amp; Pianos</a>
-      <a href="#categories">Studio &amp; Recording</a>
-      <a href="#categories">Drums &amp; Percussion</a>
-      <a href="#categories">Software &amp; Plugins</a>
-      <a href="#categories">More</a>
+    <nav class="nav__menu" aria-label="Main navigation">
+      <div class="nav__item" id="shop-item">
+        <button class="nav__link nav__link--btn" id="shop-btn" aria-expanded="false" aria-haspopup="true">
+          Shop
+          <svg class="nav__chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="mega" id="mega" role="menu" aria-label="Shop categories">
+          <div class="mega__bg" aria-hidden="true">
+            <svg class="mega-shape ms-1" viewBox="0 0 24 24"><circle cx="12" cy="17.5" r="5"/><line x1="12" y1="12.5" x2="12" y2="3.5"/><line x1="9.5" y1="5" x2="14.5" y2="5"/></svg>
+            <svg class="mega-shape ms-2" viewBox="0 0 24 24"><rect x="3" y="8.5" width="18" height="11" rx="1.2"/><line x1="6.5" y1="8.5" x2="6.5" y2="19.5"/><line x1="10" y1="8.5" x2="10" y2="19.5"/><line x1="13.5" y1="8.5" x2="13.5" y2="19.5"/></svg>
+            <svg class="mega-shape ms-3" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><line x1="12" y1="12" x2="12" y2="18.5"/><line x1="8.5" y1="18.5" x2="15.5" y2="18.5"/></svg>
+            <svg class="mega-shape ms-4" viewBox="0 0 24 24"><path d="M4.5 14v-2.5a7.5 7.5 0 0 1 15 0V14"/><rect x="3" y="13.5" width="4" height="7" rx="1.5"/><rect x="17" y="13.5" width="4" height="7" rx="1.5"/></svg>
+          </div>
+          <div class="mega__left">
+            <p class="mega__label">Categories</p>
+            <div class="mega__list" id="mega-list"></div>
+          </div>
+          <div class="mega__right" id="mega-right"></div>
+        </div>
+      </div>
+      <a href="#why" class="nav__link">About</a>
+      <a href="#stories" class="nav__link">Blogs</a>
+      <a href="#footer" class="nav__link">Contact</a>
     </nav>
   </div>
 </header>
@@ -76,6 +91,8 @@
     <a href="#categories">Drums &amp; Percussion</a>
     <a href="#categories">Software &amp; Plugins</a>
     <a href="#categories">More</a>
+    <a href="#why">About</a>
+    <a href="#stories">Blogs</a>
     <a href="#faq">FAQs</a>
     <a href="#footer">Contact</a>
   </div>
@@ -129,13 +146,28 @@
 </div>
 
 <main>
-  <section class="section section--light" id="categories">
-    <div class="section__head">
-      <p class="kicker" data-reveal><span class="kicker__num">01</span> Explore by category</p>
-      <h2 class="section__title" data-reveal>Find your <em>instrument.</em></h2>
-      <p class="section__lead" data-reveal>From your first chord to your hundredth gig — shop real gear from the brands musicians trust.</p>
+  <section class="pin" id="categories">
+    <div class="pin__shapes" aria-hidden="true">
+      <svg class="pinsh ps-1" viewBox="0 0 24 24"><circle cx="12" cy="17.5" r="5"/><line x1="12" y1="12.5" x2="12" y2="3.5"/><line x1="9.5" y1="5" x2="14.5" y2="5"/></svg>
+      <svg class="pinsh ps-2" viewBox="0 0 24 24"><ellipse cx="12" cy="15.5" rx="8" ry="5.5"/><line x1="12" y1="10" x2="12" y2="4.5"/><circle cx="12" cy="3.6" r="1.3"/></svg>
+      <svg class="pinsh ps-3" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><line x1="12" y1="12" x2="12" y2="18.5"/><line x1="8.5" y1="18.5" x2="15.5" y2="18.5"/></svg>
+      <svg class="pinsh ps-4" viewBox="0 0 24 24"><path d="M9.5 17.5V6.5L18 4.5v11"/><ellipse cx="7.6" cy="17.5" rx="2" ry="1.6"/><ellipse cx="16" cy="15.5" rx="2" ry="1.6"/></svg>
     </div>
-    <div class="cat-grid" id="cat-grid"></div>
+    <div class="pin__stage">
+      <div class="pin__head">
+        <p class="kicker" data-reveal><span class="kicker__num">01</span> Explore by category</p>
+        <h2 class="section__title" data-reveal>Find your <em>instrument.</em></h2>
+        <p class="section__lead" data-reveal>Keep scrolling — every category gets its moment on stage.</p>
+      </div>
+      <div class="pin__viewport" id="cat-viewport">
+        <div class="pin__track" id="cat-track"></div>
+      </div>
+      <div class="pin__hud">
+        <span class="pin__hint">SCROLL <b>→</b></span>
+        <div class="pin__bar"><span id="pin-progress"></span></div>
+        <span class="pin__count" id="pin-count">01 / 10</span>
+      </div>
+    </div>
   </section>
 
   <section class="section section--dark" id="popular">

@@ -73,6 +73,21 @@ const UGC = [
   ['@decks.by.dev', 'Weekend sets on a Rhythm Exports-sourced rig', 'images/ugc3.jpg'],
 ];
 
+
+/* ─────────────── MEGA MENU DATA ─────────────── */
+const MENU = [
+  ['Guitars', 'guitars', CATEGORIES[0][2], ['Acoustic Guitars', 'Electric Guitars', 'Bass Guitars', 'Classical Guitars', 'Guitar Amps', 'Effects & Pedals']],
+  ['Ukuleles & Violins', 'ukuleles-violins', CATEGORIES[1][2], ['Soprano Ukuleles', 'Concert Ukuleles', 'Baritone Ukuleles', 'Violins', 'Violas', 'Cellos']],
+  ['Keyboards & Pianos', 'keyboards-pianos', CATEGORIES[2][2], ['Digital Pianos', 'Synthesizers', 'Arranger Keyboards', 'MIDI Controllers', 'Stage Pianos']],
+  ['Studio & Recording', 'studio-recording', CATEGORIES[3][2], ['Audio Interfaces', 'Studio Monitors', 'Studio Headphones', 'Microphones', 'Studio Bundles', 'Sound Treatment']],
+  ['Drums & Percussion', 'drums-percussion', CATEGORIES[4][2], ['Acoustic Drums', 'Electronic Drums', 'Cajons', 'Cymbals', 'Hand Drums', 'Drum Hardware']],
+  ['Software & Plugins', 'software-plugins', CATEGORIES[5][2], ['DAW Software', 'Virtual Instruments', 'Plugins & Effects', 'Sample Packs']],
+  ['Live Sound', 'live-sound', CATEGORIES[6][2], ['PA Speakers', 'Guitar Amps', 'DJ Controllers', 'DJ Mixers', 'DJ Headphones']],
+  ['Indian Instruments', 'indian-instruments', CATEGORIES[7][2], ['Tabla', 'Sitar', 'Harmonium', 'Dholak', 'Other Percussion']],
+  ['Wind Instruments', 'wind-instruments', CATEGORIES[8][2], ['Harmonicas', 'Flutes', 'Saxophones', 'Trumpets', 'Clarinets']],
+  ['Accessories', 'accessories', CATEGORIES[9][2], ['Guitar Strings', 'Picks & Plectrums', 'Cases & Gig Bags', 'Stands', 'Cables & Tuners']],
+];
+
 /* ─────────────── Helpers ─────────────── */
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
@@ -114,6 +129,51 @@ $('.drawer__close').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDrawer(); closeModal(); } });
 
+
+/* ─────────────── SHOP MEGA MENU ─────────────── */
+const shopItem = $('#shop-item');
+const shopBtn = $('#shop-btn');
+const megaList = $('#mega-list');
+const megaRight = $('#mega-right');
+let activeCat = 0;
+
+function renderMegaList() {
+  megaList.innerHTML = '';
+  MENU.forEach(([name], i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mega__cat' + (i === activeCat ? ' active' : '');
+    b.innerHTML = `${name}<svg class="mega__cat-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>`;
+    b.addEventListener('click', () => { activeCat = i; renderMegaList(); renderMegaRight(); });
+    megaList.appendChild(b);
+  });
+}
+function renderMegaRight() {
+  const [name, slug, img, children] = MENU[activeCat];
+  megaRight.innerHTML = `
+    <div class="mega__right-head">
+      <div>
+        <p class="mega__label">Shop ${name}</p>
+        <h4 class="mega__right-title">${name.replace(' & ', ' <em>&amp;</em> ')}</h4>
+      </div>
+      <div class="mega__right-thumb"><img src="${img}" alt="${name}" loading="lazy"></div>
+    </div>
+    <div class="mega__right-list">
+      ${children.map(c => `<a href="#categories">${c}</a>`).join('')}
+    </div>
+    <div class="mega__right-foot">
+      <a href="#categories" class="btn btn--red">Explore ${name} <span>→</span></a>
+    </div>`;
+}
+const closeMega = () => shopItem.classList.remove('open');
+shopBtn.addEventListener('click', (e) => { e.stopPropagation(); shopItem.classList.toggle('open'); });
+shopItem.addEventListener('mouseenter', () => shopItem.classList.add('open'));
+shopItem.addEventListener('mouseleave', closeMega);
+document.addEventListener('click', (e) => { if (!shopItem.contains(e.target)) closeMega(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMega(); });
+renderMegaList();
+renderMegaRight();
+
 /* ─────────────── Hero slider (crossfade + ken burns) ─────────────── */
 const heroSlides = $('#hero-slides');
 HERO_SLIDES.forEach((s, i) => {
@@ -135,21 +195,61 @@ $('#hero-prev').addEventListener('click', () => goHero(heroIdx - 1));
 setInterval(() => goHero(heroIdx + 1), 7000);
 document.addEventListener('DOMContentLoaded', () => $('.hero').classList.add('loaded'));
 
-/* ─────────────── Category grid ─────────────── */
-const catGrid = $('#cat-grid');
-CATEGORIES.forEach(([name, count, img]) => {
+/* ─────────────── Pinned horizontal categories ─────────────── */
+const pinWrap = $('.pin');
+const pinStage = $('.pin__stage');
+const pinView = $('#cat-viewport');
+const pinTrack = $('#cat-track');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function gcard([name, count, img]) {
   const a = document.createElement('a');
-  a.href = '#categories'; a.className = 'cat-card';
+  a.href = '#'; a.className = 'gcard';
   a.innerHTML = `
-    <img src="${img}" alt="${name} — real product photo from Bajaao" loading="lazy">
-    <div class="cat-card__veil"></div>
-    <div class="cat-card__body">
-      <span class="cat-card__count">${count}</span>
-      <span class="cat-card__name">${name}</span>
-      <span class="cat-card__arrow">→</span>
+    <div class="gcard__img"><img src="${img}" alt="${name} — real product photo from Bajaao" loading="lazy"></div>
+    <div class="gcard__body">
+      <h3 class="gcard__name">${name}</h3>
+      <p class="gcard__count">${count}</p>
+      <span class="gcard__cta">Explore <span>→</span></span>
     </div>`;
-  catGrid.appendChild(a);
-});
+  return a;
+}
+CATEGORIES.forEach(c => pinTrack.appendChild(gcard(c)));
+const endCard = document.createElement('a');
+endCard.href = '#'; endCard.className = 'gcard gcard--end';
+endCard.innerHTML = `
+  <div>
+    <span class="gcard__end-icon">→</span>
+    <h3>View all categories</h3>
+    <p>3000+ instruments ready to ship</p>
+  </div>`;
+pinTrack.appendChild(endCard);
+
+let maxX = 0;
+function measurePin() {
+  const viewW = pinView.clientWidth;
+  const trackW = pinTrack.scrollWidth;
+  maxX = Math.max(0, trackW - viewW);
+  if (reducedMotion) { pinWrap.style.height = 'auto'; return; }
+  pinWrap.style.height = (pinStage.offsetHeight + maxX) + 'px';
+  onPinScroll();
+}
+function onPinScroll() {
+  if (reducedMotion) return;
+  const top = pinWrap.offsetTop;
+  const p = Math.min(1, Math.max(0, (window.scrollY - top) / maxX));
+  pinTrack.style.transform = `translate3d(${-p * maxX}px,0,0)`;
+  $('#pin-progress').style.width = (p * 100) + '%';
+  const idx = Math.min(CATEGORIES.length, Math.ceil(p * CATEGORIES.length));
+  $('#pin-count').textContent = String(idx).padStart(2, '0') + ' / ' + CATEGORIES.length;
+}
+let pinTick = false;
+window.addEventListener('scroll', () => {
+  if (!pinTick) { pinTick = true; requestAnimationFrame(() => { onPinScroll(); pinTick = false; }); }
+}, { passive: true });
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+window.addEventListener('resize', debounce(measurePin, 160));
+measurePin();
 
 /* ─────────────── Product card renderer ─────────────── */
 function pcard([brand, name, price, old, reviews, badge, img]) {

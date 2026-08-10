@@ -20,6 +20,23 @@ Sirf `index.html` browser me kholo (double-click). Koi server/build zaroorat nah
 | Drama | Red accents | Red glow orbs, shine-sweep buttons, ring-pulse to-top, red progress bar, red marquee band |
 | Products | Cards | Same Bajaao products — 1:1 images, object-contain, red hover glow, Add-to-cart chips |
 
+## Latest — v2.1 (2026-08-10, phased improvements)
+
+**P1 · Navbar mega menu:** main menu = `Shop ▾ · About · Blogs · Contact`; SHOP ka
+container-width mega menu (full-width nahi): left = scrollable 10-category list (red pill
+active, thin red scrollbar), right = selected category ke subcategories + thumbnail +
+Explore CTA; background instrument line-art + white overlay (glassy).
+
+**P2 · Explore by Category = pinned horizontal scroll:** section scroll pe screen pe pin
+hoti hai (`position: sticky`), aage scroll karne pe cards **left→right** move karte hain
+(JS scroll-driven translateX), saare cards ke baad unpin. Ek time pe **3 cards** (1:1
+images, object-contain, clear). Card = glass (frosted blur): Image → Name → Count →
+[Explore →] CTA; hover pe image scale NAHI. HUD: red progress bar + `03 / 10` counter +
+bouncing "SCROLL →" hint. Reduced-motion pe normal grid fallback.
+
+**P3 · Badge z-index:** `.pcard__badge` / `.pcard__wish` z-index 3 — badges hamesha images
+ke upar (peeche nahi chhuphte).
+
 ## Files
 
 - `index.html` — full homepage (nav 2-row, drawer, hero, marquee, categories, products
