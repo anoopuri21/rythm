@@ -73,3 +73,26 @@ No other sources (no random web hotlinks, no copyrighted images).
 - [ ] `next.config.js` does not exist
 - [ ] Image rules respected (comments + alt)
 - [ ] Content unique, SEO-friendly
+
+## 8. Workflow — Phased Execution (MANDATORY, user instruction 2026-08-10)
+
+- **Har change ko phases me divide karo** (design → implement → test → commit per phase).
+  Chhote phases = kam galtiyan. Ek phase pass hone ke baad hi agla phase.
+- **Design/prototype changes me pehle PLAN banao, user approve kare, tabhi code.**
+  (Plan me: exact UI architecture, files, interactions, phase breakdown.)
+- **User kabhi bhi kisi rule me change karwata hai → turant khud `AGENT_RULES_STRICT.md`
+  (aur related docs) edit kar lo** — dobara batane ka wait nahi.
+- Prototype (`design-prototype/`) changes sirf us folder me — live Laravel site untouched
+  jab tak user porting approve na kare.
+- Har phase ke baad: JS `node --check` (prototype) / `npm run build` + `php artisan test`
+  (Laravel) → commit → phir agla phase.
+
+## 9. User Design Preferences (accumulated)
+
+- Red #d50808 / Black / White only. Poppins base; prototype display font Space Grotesk.
+- Elegant + cinematic + aligned; white empty backgrounds avoid karo (decor/add-ons use karo).
+- Product images: real Bajaao products, 1:1, object-fit contain (kabhi cut nahi).
+- Hover pe image scale avoid karo jahan cards me content ho — glass/frost effects prefer.
+- Badges/CTAs hamesha images ke UPAR (z-index), peeche kabhi nahi.
+- Navbar: 2-row, white, sticky in-flow; mega menu container-width (full-width nahi).
+- Naye design ideas prototype me pehle, approval ke baad Laravel me port.
