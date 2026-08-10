@@ -758,3 +758,12 @@ input { font-family: inherit; }
 .mega__right-list a:hover::before { opacity: 1; width: 14px; border-radius: 3px; }
 .mega__right-foot { margin-top: 24px; }
 @media (max-width: 900px) { .mega { display: none; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   P3 · Badges z-index fix — badges/CTAs hamesha images ke UPAR
+   ═══════════════════════════════════════════════════════════════ */
+.pcard__imgwrap img { z-index: 0; }
+.pcard__badge { z-index: 3; }
+.pcard__wish { z-index: 3; }
+.gcard__img img { z-index: 0; }
+.gcard__badge { position: absolute; left: 10px; top: 10px; z-index: 3; background: var(--red); color: #fff; font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
