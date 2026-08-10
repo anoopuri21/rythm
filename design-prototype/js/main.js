@@ -144,7 +144,9 @@ function renderMegaList() {
     b.type = 'button';
     b.className = 'mega__cat' + (i === activeCat ? ' active' : '');
     b.innerHTML = `${name}<svg class="mega__cat-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>`;
-    b.addEventListener('click', () => { activeCat = i; renderMegaList(); renderMegaRight(); });
+    const selectCat = () => { activeCat = i; renderMegaList(); renderMegaRight(); };
+    b.addEventListener('mouseenter', selectCat);   /* hover pe right panel switch */
+    b.addEventListener('click', selectCat);        /* click bhi kaam kare, collapse nahi */
     megaList.appendChild(b);
   });
 }
@@ -166,7 +168,7 @@ function renderMegaRight() {
     </div>`;
 }
 const closeMega = () => shopItem.classList.remove('open');
-shopBtn.addEventListener('click', (e) => { e.stopPropagation(); shopItem.classList.toggle('open'); });
+shopBtn.addEventListener('click', (e) => { e.stopPropagation(); shopItem.classList.add('open'); });  /* click = sirf open, kabhi collapse nahi */
 shopItem.addEventListener('mouseenter', () => shopItem.classList.add('open'));
 shopItem.addEventListener('mouseleave', closeMega);
 document.addEventListener('click', (e) => { if (!shopItem.contains(e.target)) closeMega(); });
@@ -249,6 +251,8 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 window.addEventListener('resize', debounce(measurePin, 160));
+window.addEventListener('load', measurePin);        /* images/fonts ke baad re-measure */
+setTimeout(measurePin, 500);                         /* fallback re-measure */
 measurePin();
 
 /* ─────────────── Product card renderer ─────────────── */
