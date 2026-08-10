@@ -121,13 +121,14 @@ input { font-family: inherit; }
 
 .nav__menu {
   position: relative;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center;
+  gap: 3.5rem;                          /* proper spacing between main items (desktop) */
   height: 48px; border-top: 1px solid var(--line);
 }
 .nav__menu a {
   position: relative; font-size: .78rem; font-weight: 600;
   letter-spacing: .12em; text-transform: uppercase; color: #000;
-  padding: 0 8px; transition: color .3s;
+  padding: 0 2px; transition: color .3s;
 }
 .nav__menu a::after {
   content: ''; position: absolute; left: 8px; right: 8px; bottom: -2px;
