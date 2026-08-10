@@ -37,6 +37,15 @@ bouncing "SCROLL →" hint. Reduced-motion pe normal grid fallback.
 **P3 · Badge z-index:** `.pcard__badge` / `.pcard__wish` z-index 3 — badges hamesha images
 ke upar (peeche nahi chhuphte).
 
+## v2.2 Fixes (2026-08-10)
+
+- **Mega menu:** SOLID white background (text hamesha visible); container-width
+  (nav__menu anchor); left list pe HOVER se right panel switch hota hai; Shop click =
+  sirf open (kabhi collapse nahi); close = outside click / Esc / mouse leave.
+- **Pinned categories fix:** root cause `overflow:hidden` on body/.pin was breaking
+  `position:sticky` → replaced with `overflow:clip` (sticky-safe) + re-measure on
+  load/resize/fonts. Section ab scroll pe pin hota hai, cards left→right, end pe unpin.
+
 ## Files
 
 - `index.html` — full homepage (nav 2-row, drawer, hero, marquee, categories, products

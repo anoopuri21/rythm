@@ -27,7 +27,7 @@ body {
   font-family: var(--font-body);
   background: var(--white);
   color: var(--black);
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   line-height: 1.6;
 }
@@ -120,6 +120,7 @@ input { font-family: inherit; }
 .nav__burger span { width: 20px; height: 2px; background: #000; border-radius: 2px; transition: transform .3s, opacity .3s; }
 
 .nav__menu {
+  position: relative;
   display: flex; align-items: center; justify-content: space-between;
   height: 48px; border-top: 1px solid var(--line);
 }
@@ -298,7 +299,7 @@ input { font-family: inherit; }
 }
 
 /* ── Pinned horizontal categories (P2) ─────────────────────────── */
-.pin { position: relative; background: #fbfbfb; overflow: hidden; }
+.pin { position: relative; background: #fbfbfb; overflow: clip; }
 .pin__shapes { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .pinsh { position: absolute; stroke: #000; fill: none; stroke-width: 1.2; opacity: .07; }
 .ps-1 { width: 180px; height: 180px; top: 12%; left: 4%; transform: rotate(-16deg); }
@@ -685,7 +686,7 @@ input { font-family: inherit; }
    P1 · SHOP MEGA MENU (container-width, left scrollable list +
    right subcategories, instrument shapes + white overlay)
    ═══════════════════════════════════════════════════════════════ */
-.nav__item { position: relative; height: 100%; display: flex; align-items: center; }
+.nav__item { height: 100%; display: flex; align-items: center; }
 .nav__link--btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; font-family: inherit; font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #000; padding: 0 8px; cursor: pointer; position: relative; transition: color .3s; }
 .nav__link--btn:hover { color: var(--red); }
 .nav__chev { transition: transform .35s var(--ease); }
@@ -693,14 +694,11 @@ input { font-family: inherit; }
 
 .mega {
   position: absolute;
-  top: 100%; left: 30px; right: 30px;         /* container-width — full screen nahi */
-  max-width: 1380px;
+  top: 100%; left: 0; right: 0;               /* container-width — full screen nahi */
   display: grid;
   grid-template-columns: 320px 1fr;
-  background: rgba(255, 255, 255, .88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--line);
+  background: #ffffff;                          /* SOLID — text hamesha visible */
+  border: 1px solid rgba(0, 0, 0, .09);
   border-top: 3px solid var(--red);
   border-radius: 0 0 24px 24px;
   box-shadow: 0 50px 100px -40px rgba(0, 0, 0, .45);
@@ -712,8 +710,7 @@ input { font-family: inherit; }
 .nav__item.open .mega { opacity: 1; visibility: visible; transform: none; }
 
 /* white overlay + instrument shapes background */
-.mega__bg { position: absolute; inset: 0; z-index: 0; background: rgba(255, 255, 255, .72); border-radius: inherit; overflow: hidden; }
-.mega__bg::after { content: ''; position: absolute; inset: 0; background: rgba(255, 255, 255, .55); } /* white overlay */
+.mega__bg { position: absolute; inset: 0; z-index: 0; background: transparent; border-radius: inherit; overflow: hidden; }
 .mega-shape {
   position: absolute; stroke: #000; fill: none; stroke-width: 1.1;
   opacity: .09; pointer-events: none;
