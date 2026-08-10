@@ -6,8 +6,9 @@
     ];
 @endphp
 
-<section id="stories" class="bg-rythme-cream py-24 sm:py-32">
-    <div class="mx-auto max-w-7xl px-5 sm:px-8">
+<section id="stories" class="relative overflow-hidden bg-rythme-cream py-24 sm:py-32">
+    @include('components.instrument-decor')
+    <div class="relative z-[1] mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">The Rhythm Exports journal</p><h2 class="section-title">Ideas for a life<br><em>lived in music.</em></h2></div><a href="/stories" class="text-link">Read all stories <span>↗</span></a></div>
         <div class="grid gap-8 md:grid-cols-3">
             @foreach($stories as $story)

@@ -27,8 +27,9 @@
     <script type="application/ld+json">{!! json_encode($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}</script>
 @endpush
 
-<section id="faq" class="bg-rythme-cream py-24 sm:py-32">
-    <div class="mx-auto max-w-3xl px-5 sm:px-8">
+<section id="faq" class="relative overflow-hidden bg-rythme-cream py-24 sm:py-32">
+    @include('components.instrument-decor')
+    <div class="relative z-[1] mx-auto max-w-3xl px-5 sm:px-8">
         <div class="mb-12 text-center" data-reveal="up">
             <p class="section-kicker justify-center">Good to know</p>
             <h2 class="section-title">Frequently asked <em>questions.</em></h2>

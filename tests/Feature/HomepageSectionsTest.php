@@ -99,7 +99,18 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Find your')
             ->assertSee('aria-label="Guitars — 480+ instruments"', escape: false)
             ->assertSee('bajaao.com/cdn/shop/files', escape: false)
-            ->assertSee('cat-card', escape: false);
+            ->assertSee('class="cat-card group"', escape: false)
+            ->assertSee('class="cat-card-img"', escape: false);
+    }
+
+    public function test_instrument_decor_background_shapes_present(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('instr-decor', escape: false)
+            ->assertSee('instr instr-1', escape: false)
+            ->assertSee('instr instr-5', escape: false)
+            ->assertSee('instr instr-8', escape: false);
     }
 
     public function test_categories_section_has_products_slider_with_bajaao_products(): void
@@ -182,8 +193,8 @@ class HomepageSectionsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // categories + bestsellers
-            ->assertSee('grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4', escape: false) // categories
+            ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
+            ->assertSee('class="cat-grid"', escape: false)               // categories (custom CSS grid)
             ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
             ->assertSee('lg:grid-cols-[1.25fr_repeat(3,1fr)]', escape: false) // footer
