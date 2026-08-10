@@ -73,6 +73,21 @@ const UGC = [
   ['@decks.by.dev', 'Weekend sets on a Rhythm Exports-sourced rig', 'images/ugc3.jpg'],
 ];
 
+
+/* ─────────────── MEGA MENU DATA ─────────────── */
+const MENU = [
+  ['Guitars', 'guitars', CATEGORIES[0][2], ['Acoustic Guitars', 'Electric Guitars', 'Bass Guitars', 'Classical Guitars', 'Guitar Amps', 'Effects & Pedals']],
+  ['Ukuleles & Violins', 'ukuleles-violins', CATEGORIES[1][2], ['Soprano Ukuleles', 'Concert Ukuleles', 'Baritone Ukuleles', 'Violins', 'Violas', 'Cellos']],
+  ['Keyboards & Pianos', 'keyboards-pianos', CATEGORIES[2][2], ['Digital Pianos', 'Synthesizers', 'Arranger Keyboards', 'MIDI Controllers', 'Stage Pianos']],
+  ['Studio & Recording', 'studio-recording', CATEGORIES[3][2], ['Audio Interfaces', 'Studio Monitors', 'Studio Headphones', 'Microphones', 'Studio Bundles', 'Sound Treatment']],
+  ['Drums & Percussion', 'drums-percussion', CATEGORIES[4][2], ['Acoustic Drums', 'Electronic Drums', 'Cajons', 'Cymbals', 'Hand Drums', 'Drum Hardware']],
+  ['Software & Plugins', 'software-plugins', CATEGORIES[5][2], ['DAW Software', 'Virtual Instruments', 'Plugins & Effects', 'Sample Packs']],
+  ['Live Sound', 'live-sound', CATEGORIES[6][2], ['PA Speakers', 'Guitar Amps', 'DJ Controllers', 'DJ Mixers', 'DJ Headphones']],
+  ['Indian Instruments', 'indian-instruments', CATEGORIES[7][2], ['Tabla', 'Sitar', 'Harmonium', 'Dholak', 'Other Percussion']],
+  ['Wind Instruments', 'wind-instruments', CATEGORIES[8][2], ['Harmonicas', 'Flutes', 'Saxophones', 'Trumpets', 'Clarinets']],
+  ['Accessories', 'accessories', CATEGORIES[9][2], ['Guitar Strings', 'Picks & Plectrums', 'Cases & Gig Bags', 'Stands', 'Cables & Tuners']],
+];
+
 /* ─────────────── Helpers ─────────────── */
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
@@ -113,6 +128,51 @@ $('.nav__burger').addEventListener('click', openDrawer);
 $('.drawer__close').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDrawer(); closeModal(); } });
+
+
+/* ─────────────── SHOP MEGA MENU ─────────────── */
+const shopItem = $('#shop-item');
+const shopBtn = $('#shop-btn');
+const megaList = $('#mega-list');
+const megaRight = $('#mega-right');
+let activeCat = 0;
+
+function renderMegaList() {
+  megaList.innerHTML = '';
+  MENU.forEach(([name], i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mega__cat' + (i === activeCat ? ' active' : '');
+    b.innerHTML = `${name}<svg class="mega__cat-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>`;
+    b.addEventListener('click', () => { activeCat = i; renderMegaList(); renderMegaRight(); });
+    megaList.appendChild(b);
+  });
+}
+function renderMegaRight() {
+  const [name, slug, img, children] = MENU[activeCat];
+  megaRight.innerHTML = `
+    <div class="mega__right-head">
+      <div>
+        <p class="mega__label">Shop ${name}</p>
+        <h4 class="mega__right-title">${name.replace(' & ', ' <em>&amp;</em> ')}</h4>
+      </div>
+      <div class="mega__right-thumb"><img src="${img}" alt="${name}" loading="lazy"></div>
+    </div>
+    <div class="mega__right-list">
+      ${children.map(c => `<a href="#categories">${c}</a>`).join('')}
+    </div>
+    <div class="mega__right-foot">
+      <a href="#categories" class="btn btn--red">Explore ${name} <span>→</span></a>
+    </div>`;
+}
+const closeMega = () => shopItem.classList.remove('open');
+shopBtn.addEventListener('click', (e) => { e.stopPropagation(); shopItem.classList.toggle('open'); });
+shopItem.addEventListener('mouseenter', () => shopItem.classList.add('open'));
+shopItem.addEventListener('mouseleave', closeMega);
+document.addEventListener('click', (e) => { if (!shopItem.contains(e.target)) closeMega(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMega(); });
+renderMegaList();
+renderMegaRight();
 
 /* ─────────────── Hero slider (crossfade + ken burns) ─────────────── */
 const heroSlides = $('#hero-slides');
