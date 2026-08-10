@@ -20,7 +20,7 @@
             <div><p class="section-kicker">Played. Loved. Recommended.</p><h2 class="section-title text-white">The sound everyone is <em>talking about.</em></h2></div>
             <div class="flex flex-wrap gap-2" role="tablist" aria-label="Filter best sellers">
                 @foreach($tabs as $value => $label)
-                    <button type="button" @click="tab = '{{ $value }}'" :class="tab === '{{ $value }}' ? 'bg-gold text-rythme-black border-gold' : 'border-white/15 text-white/60 hover:text-white'" class="rounded-full border px-5 py-2.5 text-xs font-bold transition">{{ $label }}</button>
+                    <button type="button" @click="tab = '{{ $value }}'" :class="tab === '{{ $value }}' ? 'bg-gold text-white border-gold' : 'border-white/15 text-white/60 hover:text-white'" class="rounded-full border px-5 py-2.5 text-xs font-bold transition">{{ $label }}</button>
                 @endforeach
             </div>
         </div>

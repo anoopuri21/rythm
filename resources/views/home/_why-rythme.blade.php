@@ -30,7 +30,7 @@
             <div class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2">
                 @foreach($promises as $promise)
                     <article class="reveal-section group border-t border-black/10 pt-5" data-reveal="up">
-                        <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-lg text-gold-dark transition group-hover:bg-gold group-hover:text-rythme-black">{{ $promise['icon'] }}</span>
+                        <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-lg text-gold-dark transition group-hover:bg-gold group-hover:text-white">{{ $promise['icon'] }}</span>
                         <h3 class="font-playfair text-xl">{{ $promise['title'] }}</h3>
                         <p class="mt-2 text-sm leading-6 text-rythme-warm-gray">{{ $promise['copy'] }}</p>
                     </article>

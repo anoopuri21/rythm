@@ -28,7 +28,7 @@
                         <p class="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-gold-light opacity-0 transition-all duration-500 group-hover:opacity-100">{{ $category['count'] }}</p>
                         <h3 class="font-playfair text-xl font-bold text-white sm:text-2xl {{ $index === 0 ? 'lg:text-4xl' : '' }}">{{ $category['name'] }}</h3>
                         <p class="mt-1 max-w-[26ch] text-xs leading-5 text-white/70 opacity-0 transition-all duration-500 group-hover:opacity-100 sm:text-sm">{{ $category['tagline'] }}</p>
-                        <span class="mt-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 text-white transition-all duration-500 group-hover:translate-x-2 group-hover:border-gold group-hover:bg-gold group-hover:text-rythme-black" aria-hidden="true">→</span>
+                        <span class="mt-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/25 text-white transition-all duration-500 group-hover:translate-x-2 group-hover:border-gold group-hover:bg-gold group-hover:text-white" aria-hidden="true">→</span>
                     </div>
                 </a>
             @endforeach

@@ -54,6 +54,29 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('hero-pagination', escape: false);
     }
 
+    public function test_hero_slider_has_two_high_quality_product_slides_first(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+
+        // Two new "High quality" slides at the START (Bajaao real product photos)
+        $html = $response->getContent();
+        $this->assertStringContainsString('High quality · Best sellers', $html);
+        $this->assertStringContainsString('Premium gear.', $html);
+        $this->assertStringContainsString('Play the piano.', $html);
+
+        // They must appear BEFORE the original first slide (Feel the music.)
+        $this->assertGreaterThan(
+            strpos($html, 'High quality · Best sellers'),
+            strpos($html, 'Feel the music.')
+        );
+
+        // Uses Bajaao real product imagery
+        $this->assertStringContainsString('FEN-0373152506.jpg', $html);
+        $this->assertStringContainsString('ROL-FP30XBK.jpg', $html);
+    }
+
     public function test_hero_video_mode_renders_video_banner_instead_of_slider(): void
     {
         config(['rythme.hero_mode' => 'video']);
