@@ -37,7 +37,7 @@
                     aria-haspopup="dialog"
                     aria-controls="video-showcase-modal"
                 >
-                    <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-gold text-rythme-black shadow-[0_0_50px_rgba(213,8,8,0.45)] transition-transform duration-300 group-hover:scale-110">
+                    <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-gold text-white shadow-[0_0_50px_rgba(213,8,8,0.45)] transition-transform duration-300 group-hover:scale-110">
                         <svg class="ml-1 h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
                     </span>
                     <span class="flex flex-col">

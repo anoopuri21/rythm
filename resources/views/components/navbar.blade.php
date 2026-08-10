@@ -29,7 +29,7 @@
                 <svg class="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-rythme-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 <input id="nav-search" type="search" name="q" placeholder="Search guitars, keyboards, mics, ukuleles…"
                        class="h-11 w-full rounded-full border border-black/10 bg-white pl-12 pr-32 text-sm text-rythme-black shadow-sm placeholder:text-black/40 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/40 lg:h-12">
-                <button type="submit" class="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-gold px-4 text-xs font-bold text-rythme-black transition hover:bg-gold-light sm:h-9 sm:px-5">
+                <button type="submit" class="absolute right-1.5 top-1/2 h-8 -translate-y-1/2 rounded-full bg-gold px-4 text-xs font-bold text-white transition hover:bg-gold-light sm:h-9 sm:px-5">
                     Search
                 </button>
             </form>
@@ -88,7 +88,7 @@
                                 </li>
                             @endforeach
                         </ul>
-                        <a href="/category/{{ $item['slug'] }}" @click="openMenu = null" class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-rythme-black px-4 py-2 text-[11px] font-bold text-white transition hover:bg-gold hover:text-rythme-black">
+                        <a href="/category/{{ $item['slug'] }}" @click="openMenu = null" class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-rythme-black px-4 py-2 text-[11px] font-bold text-white transition hover:bg-gold hover:text-white">
                             View all <span aria-hidden="true">→</span>
                         </a>
                     </div>
