@@ -195,21 +195,61 @@ $('#hero-prev').addEventListener('click', () => goHero(heroIdx - 1));
 setInterval(() => goHero(heroIdx + 1), 7000);
 document.addEventListener('DOMContentLoaded', () => $('.hero').classList.add('loaded'));
 
-/* ─────────────── Category grid ─────────────── */
-const catGrid = $('#cat-grid');
-CATEGORIES.forEach(([name, count, img]) => {
+/* ─────────────── Pinned horizontal categories ─────────────── */
+const pinWrap = $('.pin');
+const pinStage = $('.pin__stage');
+const pinView = $('#cat-viewport');
+const pinTrack = $('#cat-track');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function gcard([name, count, img]) {
   const a = document.createElement('a');
-  a.href = '#categories'; a.className = 'cat-card';
+  a.href = '#'; a.className = 'gcard';
   a.innerHTML = `
-    <img src="${img}" alt="${name} — real product photo from Bajaao" loading="lazy">
-    <div class="cat-card__veil"></div>
-    <div class="cat-card__body">
-      <span class="cat-card__count">${count}</span>
-      <span class="cat-card__name">${name}</span>
-      <span class="cat-card__arrow">→</span>
+    <div class="gcard__img"><img src="${img}" alt="${name} — real product photo from Bajaao" loading="lazy"></div>
+    <div class="gcard__body">
+      <h3 class="gcard__name">${name}</h3>
+      <p class="gcard__count">${count}</p>
+      <span class="gcard__cta">Explore <span>→</span></span>
     </div>`;
-  catGrid.appendChild(a);
-});
+  return a;
+}
+CATEGORIES.forEach(c => pinTrack.appendChild(gcard(c)));
+const endCard = document.createElement('a');
+endCard.href = '#'; endCard.className = 'gcard gcard--end';
+endCard.innerHTML = `
+  <div>
+    <span class="gcard__end-icon">→</span>
+    <h3>View all categories</h3>
+    <p>3000+ instruments ready to ship</p>
+  </div>`;
+pinTrack.appendChild(endCard);
+
+let maxX = 0;
+function measurePin() {
+  const viewW = pinView.clientWidth;
+  const trackW = pinTrack.scrollWidth;
+  maxX = Math.max(0, trackW - viewW);
+  if (reducedMotion) { pinWrap.style.height = 'auto'; return; }
+  pinWrap.style.height = (pinStage.offsetHeight + maxX) + 'px';
+  onPinScroll();
+}
+function onPinScroll() {
+  if (reducedMotion) return;
+  const top = pinWrap.offsetTop;
+  const p = Math.min(1, Math.max(0, (window.scrollY - top) / maxX));
+  pinTrack.style.transform = `translate3d(${-p * maxX}px,0,0)`;
+  $('#pin-progress').style.width = (p * 100) + '%';
+  const idx = Math.min(CATEGORIES.length, Math.ceil(p * CATEGORIES.length));
+  $('#pin-count').textContent = String(idx).padStart(2, '0') + ' / ' + CATEGORIES.length;
+}
+let pinTick = false;
+window.addEventListener('scroll', () => {
+  if (!pinTick) { pinTick = true; requestAnimationFrame(() => { onPinScroll(); pinTick = false; }); }
+}, { passive: true });
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+window.addEventListener('resize', debounce(measurePin, 160));
+measurePin();
 
 /* ─────────────── Product card renderer ─────────────── */
 function pcard([brand, name, price, old, reviews, badge, img]) {
