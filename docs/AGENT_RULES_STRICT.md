@@ -106,3 +106,64 @@ No other sources (no random web hotlinks, no copyrighted images).
 - **User color/font change → agent updates the design system ITSELF**: tokens → tailwind.config.js → 02-design-system.md → sweep hardcoded hex → `npm run build` + `php artisan test` green → commit. No user follow-up needed.
 - Fonts: **Poppins only**. No new families without a design-system update.
 - Legacy `gold*`/`rythme*` class names are valid aliases (same values) — do not rename them (breaking change).
+
+---
+
+## 9. Enterprise Rules (user directive 2026-08-13 — ALL future tasks)
+
+> Verified against installed Laravel 13.24.0 (2026-08-13). Where the framework
+> does not support a rule literally, the ADJUSTED form below is binding.
+
+### 9.1 Code style (binding, all new PHP files)
+- `declare(strict_types=1);` as the FIRST line of every new PHP file.
+- Strict scalar/union/intersection type hints on params + returns everywhere;
+  `readonly` classes/properties for immutable data (DTOs).
+- **Model attributes over legacy properties** — verified supported in 13.24:
+  `#[Table('products')]`, `#[Fillable([...])]`, `#[Hidden([...])]`,
+  `#[Guarded([...])]`, `#[Visible([...])]`. Do NOT declare `$fillable`,
+  `$hidden`, `$table` properties on new models.
+- ADJUSTED: **no `#[Casts]` attribute exists** in 13.24 → keep `$casts`
+  property on models (verified: no Casts attribute in Eloquent\Attributes).
+- Controllers ≤ 30 lines: business logic lives in single-responsibility
+  Services/Actions; DTOs between controller ↔ service; custom `FormRequest`
+  classes with `$request->validated()` — never inline validation.
+- **Zero placeholders**: no `// TODO`, no incomplete stubs.
+
+### 9.2 Security (binding)
+- CSRF: Laravel 13's origin-aware `PreventRequestForgery` is the default
+  middleware (verified) — do not downgrade to legacy token-only checks;
+  use `PreventRequestForgery::except()` only for verified webhook routes.
+- Payment webhooks: cryptographic signature verification ALWAYS before
+  acting on payloads (Razorpay HMAC plan — commerce arch §5).
+- Queries: Eloquent builders only; raw SQL only with bound parameters.
+- Passkeys/WebAuthn (Fortify): NOT installed — future task, requires user
+  decision before adding the dependency. Do not add silently.
+
+### 9.3 Performance (binding)
+- Eager loading (`with()`) or lazy-eager (`load()`) on every relational
+  query; prevent N+1.
+- `Cache::touch()` (verified) to extend TTL of cached product state —
+  never rewrite whole cache blocks.
+- Every migration FK/slug/SKU/status column gets an index.
+- Non-blocking workflows (order emails, invoices, shipping webhooks) →
+  queued jobs routed via `Queue::route()` (verified).
+
+### 9.4 UI/UX (binding)
+- Mobile-first responsive Tailwind; dark sections follow design system.
+- Zero-refresh interactions (mini-cart, filters, qty) via Livewire 3.
+- Network feedback: `wire:loading` states, skeleton UI, disabled submit
+  during payment.
+
+### 9.5 E-commerce intelligence (conditional — needs infra/user decision)
+- Laravel AI SDK (`laravel/ai`): NOT installed; add when recommendations/
+  support/search task begins (user approval).
+- Semantic search `whereVectorSimilarTo()`: verified present in 13.24
+  Builder, but requires **PostgreSQL + pgvector** — project DB is SQLite
+  (dev) / MySQL (prod plan). Decision needed: Postgres migration or
+  keyword search fallback. Do not implement on SQLite.
+
+### 9.6 Testing (binding)
+- PHPUnit suite for every Action/endpoint/component (project uses PHPUnit —
+  keep PHPUnit, not Pest) covering success + exception boundaries.
+- Existing gates stay: `npm run build` + `php artisan test` green before
+  marking any task done.

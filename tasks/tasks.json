@@ -66,6 +66,12 @@
             "note": "migrate:fresh --seed clean; admin CRUD works (/admin/products, /admin/categories, /admin/brands); FilamentUser added to User; spatie plugin pkg installed; tiptap namespace FilamentTiptapEditor; tests 32 passed (201 assertions)"
         },
         {
+            "id": "engineering-enterprise-rules",
+            "title": "Adopt enterprise engineering rules (strict types, model attributes, DTOs, FormRequests, PreventRequestForgery, Cache::touch, Queue::route, testing gates)",
+            "status": "done",
+            "note": "Verified against Laravel 13.24.0: #[Table]/#[Fillable]/#[Hidden] attributes read by framework; no #[Casts] attribute (keep $casts property); PreventRequestForgery is default CSRF; Cache::touch + Queue::route + whereVectorSimilarTo present; Fortify + laravel/ai NOT installed (future decisions). Encoded in AGENT_RULES_STRICT.md \u00a79."
+        },
+        {
             "id": "admin-homepage-filament",
             "title": "Filament admin: homepage sections manager (5 sections, TiptapEditor, multi-group sidebar)",
             "status": "pending"
