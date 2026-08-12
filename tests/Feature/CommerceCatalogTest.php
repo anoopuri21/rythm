@@ -96,4 +96,46 @@ class CommerceCatalogTest extends TestCase
     {
         $this->get('/admin/products')->assertRedirect('/admin/login');
     }
+
+    public function test_mass_assignment_protection_blocks_unknown_attributes(): void
+    {
+        $this->seed();
+
+        $product = Product::create([
+            'name' => 'Guard Test',
+            'slug' => 'guard-test',
+            'sku' => 'RYM-GUARD-001',
+            'price' => 100,
+            'stock' => 5,
+            'is_active' => false,
+            'hacked_column' => 'injected',
+            'id' => 999999,
+        ]);
+
+        $this->assertArrayNotHasKey('hacked_column', $product->getAttributes());
+        $this->assertNull($product->getAttribute('hacked_column'));
+        $this->assertNotSame(999999, $product->id);
+        // fillable columns still writable via attributes
+        $this->assertFalse($product->is_active);
+    }
+
+    public function test_hidden_attributes_not_serialized(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
+
+        $serialized = $admin->toArray();
+
+        $this->assertArrayNotHasKey('password', $serialized);
+        $this->assertArrayNotHasKey('remember_token', $serialized);
+        $this->assertArrayHasKey('email', $serialized);
+    }
+
+    public function test_table_attribute_resolves_correct_model_tables(): void
+    {
+        $this->assertSame('products', (new Product)->getTable());
+        $this->assertSame('categories', (new Category)->getTable());
+        $this->assertSame('order_status_histories', (new \App\Models\OrderStatusHistory)->getTable());
+        $this->assertSame('newsletter_subscribers', (new \App\Models\NewsletterSubscriber)->getTable());
+    }
 }
