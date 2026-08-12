@@ -360,3 +360,25 @@ Homepage theme = design system for the whole site (shop, product, cart, wishlist
 - **Tokens:** `brand` `#D50808` · `brand-dark` `#A30404` · `brand-light` `#FF5252` · `brand-soft` `#FF6B6B` · `ink` `#0A0A0A` · `paper` `#FFFDF7` · `paper-dark` `#F5F5F5` · `muted` `#6B6B6B` · font: **Poppins only**
 - Every new page uses semantic utilities (`bg-brand`, `text-ink`, `bg-paper`, `font-sans`) — legacy `gold*`/`rythme*` aliases remain valid.
 - Change protocol: see `02-design-system.md` §6.
+
+---
+
+## 14. Enterprise rules compliance — Sections 5–6 (applied 2026-08-13)
+
+### Section 5 — UI/UX (binding for Phase B+ storefront)
+- Mobile-first responsive Tailwind everywhere; dark sections per design system.
+- **Zero-refresh workflows**: cart drawer, cart badge, wishlist buttons, shop
+  filters, qty steppers — ALL Livewire 3 (no full page reloads).
+- Network feedback mandatory: `wire:loading` spinners, skeleton cards on
+  shop grid load, disabled submit state during Razorpay payment execution.
+- Targets ≥ 44×44px; sticky mobile checkout button (cart UX checklist).
+
+### Section 6 — Smart e-commerce (deferred — infra decisions needed)
+- **Laravel AI SDK (`laravel/ai`)**: not installed. Add ONLY when a
+  recommendations / support / search task begins (user approval).
+- **Semantic search `whereVectorSimilarTo()`**: verified present in Laravel
+  13.24 Builder, but requires **PostgreSQL + pgvector**. Project DB is
+  SQLite (dev) / MySQL (prod plan) — decision required: migrate to Postgres
+  or use keyword search fallback. NOT implementable on SQLite.
+- Razorpay webhook signature verification (crypto check before acting) —
+  binding when Phase F lands.
