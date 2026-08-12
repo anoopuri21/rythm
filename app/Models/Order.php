@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Table('orders')]
+#[Fillable(['order_number', 'user_id', 'email', 'status', 'payment_status', 'subtotal', 'discount', 'shipping_fee', 'tax', 'total', 'currency', 'shipping_address', 'billing_address', 'notes', 'placed_at'])]
 class Order extends Model
 {
     use HasFactory;
@@ -41,23 +47,7 @@ class Order extends Model
         self::PAYMENT_REFUNDED,
     ];
 
-    protected $fillable = [
-        'order_number',
-        'user_id',
-        'email',
-        'status',
-        'payment_status',
-        'subtotal',
-        'discount',
-        'shipping_fee',
-        'tax',
-        'total',
-        'currency',
-        'shipping_address',
-        'billing_address',
-        'notes',
-        'placed_at',
-    ];
+    
 
     protected $casts = [
         'subtotal' => 'decimal:2',

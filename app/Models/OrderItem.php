@@ -1,26 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Table('order_items')]
+#[Fillable(['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'options', 'unit_price', 'qty', 'total'])]
 class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'product_variant_id',
-        'name',
-        'sku',
-        'options',
-        'unit_price',
-        'qty',
-        'total',
-    ];
+    
 
     protected $casts = [
         'options' => 'array',
