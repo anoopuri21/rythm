@@ -1,0 +1,99 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class CommerceCatalogTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_seeder_builds_full_bajaao_catalog(): void
+    {
+        $this->seed();
+
+        // 6 parents + 25 children
+        $this->assertGreaterThanOrEqual(30, Category::count());
+        // brands 8+
+        $this->assertGreaterThanOrEqual(15, Brand::count());
+        // products 30+
+        $this->assertGreaterThanOrEqual(30, Product::count());
+
+        // every product belongs to a category and a brand
+        $this->assertSame(0, Product::whereNull('category_id')->count());
+        $this->assertSame(0, Product::whereNull('brand_id')->count());
+
+        // slugs and skus are unique
+        $this->assertSame(Product::count(), Product::distinct('slug')->count('slug'));
+        $this->assertSame(Product::count(), Product::distinct('sku')->count('sku'));
+    }
+
+    public function test_category_tree_and_variants_exist(): void
+    {
+        $this->seed();
+
+        $guitars = Category::where('slug', 'guitars')->firstOrFail();
+        $this->assertGreaterThanOrEqual(5, $guitars->children()->count());
+
+        $acoustic = Category::where('slug', 'acoustic-guitars')->firstOrFail();
+        $this->assertSame($guitars->id, $acoustic->parent_id);
+
+        // variants exist (finish options)
+        $this->assertGreaterThanOrEqual(5, ProductVariant::count());
+        $variant = ProductVariant::first();
+        $this->assertNotNull($variant->product);
+        $this->assertArrayHasKey('finish', $variant->options ?? []);
+    }
+
+    public function test_featured_and_discount_products_exist(): void
+    {
+        $this->seed();
+
+        $this->assertGreaterThanOrEqual(5, Product::featured()->count());
+        $this->assertGreaterThan(0, Product::whereNotNull('compare_at_price')->count());
+
+        $discounted = Product::whereNotNull('compare_at_price')->first();
+        $this->assertGreaterThan(0, $discounted->discountPercent());
+    }
+
+    public function test_product_factory_relations(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->assertInstanceOf(Category::class, $product->category);
+        $this->assertInstanceOf(Brand::class, $product->brand);
+        $this->assertTrue($product->is_active);
+    }
+
+    public function test_admin_can_access_catalog_resources(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get('/admin/products')
+            ->assertOk()
+            ->assertSee('Yamaha F310 Acoustic Guitar');
+
+        $this->actingAs($admin)
+            ->get('/admin/categories')
+            ->assertOk()
+            ->assertSee('Guitars');
+
+        $this->actingAs($admin)
+            ->get('/admin/brands')
+            ->assertOk()
+            ->assertSee('Fender');
+    }
+
+    public function test_guest_is_redirected_from_admin(): void
+    {
+        $this->get('/admin/products')->assertRedirect('/admin/login');
+    }
+}
