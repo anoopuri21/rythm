@@ -23,6 +23,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductResource extends Resource
 {
@@ -33,6 +34,13 @@ class ProductResource extends Resource
     protected static ?string $navigationGroup = 'SHOP';
 
     protected static ?int $navigationSort = 1;
+
+    /** Prevent N+1 on the list table (category/brand/gallery). */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['category', 'brand', 'media']);
+    }
 
     public static function form(Form $form): Form
     {

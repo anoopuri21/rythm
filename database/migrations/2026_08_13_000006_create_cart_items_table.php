@@ -12,7 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->index('product_id');
             $table->foreignId('product_variant_id')->nullable()->constrained()->nullOnDelete();
+            $table->index('product_variant_id');
             $table->unsignedInteger('qty')->default(1);
             $table->decimal('unit_price', 12, 2);
             $table->timestamps();

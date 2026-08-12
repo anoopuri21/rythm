@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->index('order_id');
             $table->string('gateway')->default('razorpay');
             $table->string('method')->nullable(); // card|upi|netbanking|wallet|emi
             $table->string('gateway_order_id')->nullable();

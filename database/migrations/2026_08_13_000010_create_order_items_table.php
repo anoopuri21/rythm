@@ -12,7 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
+            $table->index('product_id');
             $table->foreignId('product_variant_id')->nullable()->constrained()->nullOnDelete();
+            $table->index('product_variant_id');
             $table->string('name');
             $table->string('sku');
             $table->json('options')->nullable();
