@@ -96,3 +96,13 @@ No other sources (no random web hotlinks, no copyrighted images).
 - Badges/CTAs hamesha images ke UPAR (z-index), peeche kabhi nahi.
 - Navbar: 2-row, white, sticky in-flow; mega menu container-width (full-width nahi).
 - Naye design ideas prototype me pehle, approval ke baad Laravel me port.
+
+---
+
+## 8. Design System STRICT
+
+- **Homepage theme = the site-wide design system** ("Rythme Red"). Source of truth: `@theme` tokens in `resources/css/app.css` + `tailwind.config.js` + `docs/architecture/02-design-system.md`.
+- Every new page/section (shop, product, cart, wishlist, checkout, auth) MUST use design-system tokens/utilities (`bg-brand`, `text-ink`, `bg-paper`, `font-sans`, `section-title`, `section-kicker`) — NEVER ad-hoc hex colors or new fonts.
+- **User color/font change → agent updates the design system ITSELF**: tokens → tailwind.config.js → 02-design-system.md → sweep hardcoded hex → `npm run build` + `php artisan test` green → commit. No user follow-up needed.
+- Fonts: **Poppins only**. No new families without a design-system update.
+- Legacy `gold*`/`rythme*` class names are valid aliases (same values) — do not rename them (breaking change).

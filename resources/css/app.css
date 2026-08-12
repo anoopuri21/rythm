@@ -1,6 +1,63 @@
 @import 'tailwindcss';
 @config '../../tailwind.config.js';
 
+/*
+ * ============================================================
+ * RYTHME DESIGN SYSTEM v1 — "Rythme Red"
+ * Homepage theme = site-wide design system.
+ * Docs: docs/architecture/02-design-system.md
+ *
+ * Semantic tokens — USE THESE in all NEW code:
+ *   brand / brand-dark / brand-light / brand-soft
+ *   ink / ink-soft / ink-muted · paper / paper-dark
+ *   muted · white
+ * Legacy aliases (gold*, rythme*) kept so existing homepage
+ * sections work unchanged.
+ *
+ * CHANGE PROTOCOL: user color/font change → update tokens HERE
+ * + tailwind.config.js + 02-design-system.md FIRST, then
+ * migrate hardcoded hex. Never hardcode hex in views.
+ * ============================================================
+ */
+@theme {
+    /* Brand — Rythme Red */
+    --color-brand: #D50808;
+    --color-brand-dark: #A30404;
+    --color-brand-light: #FF5252;
+    --color-brand-soft: #FF6B6B;
+
+    /* Surface / text */
+    --color-ink: #0A0A0A;
+    --color-ink-soft: #1A1A1A;
+    --color-ink-muted: #2D2D2D;
+    --color-paper: #FFFDF7;
+    --color-paper-dark: #F5F5F5;
+    --color-muted: #6B6B6B;
+    --color-white: #FFFFFF;
+
+    /* Legacy aliases (homepage v1–v3 class names) */
+    --color-gold: #D50808;
+    --color-gold-light: #FF5252;
+    --color-gold-dark: #A30404;
+    --color-rythme-black: #0A0A0A;
+    --color-rythme-black-soft: #111111;
+    --color-rythme-black-muted: #2D2D2D;
+    --color-rythme-red: #D50808;
+    --color-rythme-red-dark: #A30404;
+    --color-rythme-red-light: #FF5252;
+    --color-rythme-cream: #FFFDF7;
+    --color-rythme-cream-dark: #F5F5F5;
+    --color-rythme-warm-white: #FFFFFF;
+    --color-rythme-warm-gray: #6B6B6B;
+
+    /* Typography — Poppins only */
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-playfair: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-inter: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-bebas: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+}
+
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #FFFDF7; }
 ::-webkit-scrollbar-thumb { background: #D50808; border-radius: 4px; }
