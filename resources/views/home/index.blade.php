@@ -22,5 +22,4 @@
     @include('home._comparison', ['homeSections' => $homeSections])
     @include('home._ugc', ['homeSections' => $homeSections])
     @include('home._faq', ['homeSections' => $homeSections])
-    @include('home._footer', ['homeSections' => $homeSections])
 @endsection

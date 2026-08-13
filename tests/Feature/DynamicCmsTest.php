@@ -168,4 +168,41 @@ class DynamicCmsTest extends TestCase
             ->count());
         $this->assertSame('Second', $product->seoEntry->meta_title);
     }
+    public function test_support_pages_render(): void
+    {
+        foreach (['shipping', 'returns', 'warranty', 'faqs', 'terms', 'privacy'] as $slug) {
+            $this->get('/'.$slug)
+                ->assertOk()
+                ->assertSee('Rhythm Exports', escape: false);
+        }
+    }
+
+    public function test_footer_renders_on_all_pages(): void
+    {
+        $this->get('/shop')
+            ->assertOk()
+            ->assertSee('id="footer"', escape: false)
+            ->assertSee('Top brands', escape: false)
+            ->assertSee('Customer care', escape: false)
+            ->assertSee('footer-shop', escape: false);
+    }
+
+    public function test_homepage_has_single_footer(): void
+    {
+        $html = $this->get('/')->getContent();
+
+        $this->assertSame(1, substr_count($html, 'id="footer"'));
+    }
+
+    public function test_footer_links_to_dynamic_slugs(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('/shipping', escape: false)
+            ->assertSee('/returns', escape: false)
+            ->assertSee('/warranty', escape: false)
+            ->assertSee('/faqs', escape: false)
+            ->assertSee('/terms', escape: false)
+            ->assertSee('/privacy', escape: false);
+    }
 }

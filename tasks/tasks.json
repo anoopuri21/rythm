@@ -114,16 +114,17 @@
         {
             "id": "website-completion",
             "title": "Complete remaining storefront (footer 5-column unlock+redesign, polish, gaps)",
-            "status": "pending",
+            "status": "done",
             "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
-            "next": true
+            "note": "Footer 5-column redesign (global component on ALL pages, DB-driven categories/brands, support-page links), support pages seeded (shipping/returns/warranty/faqs/terms/privacy with SEO), footer test coverage. Tests 120 passed (502 assertions)."
         },
         {
             "id": "optimize-performance",
             "title": "Code optimization + performance (query N+1 sweep, caching, asset size, pagination, eager loading audit)",
             "status": "pending",
             "on_hold": true,
-            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes"
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
+            "next": true
         },
         {
             "id": "security-review",

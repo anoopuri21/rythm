@@ -179,7 +179,8 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('your sound?')
             ->assertSee('Talk to an expert')
             ->assertSee('WhatsApp us')
-            ->assertSee('About Rhythm Exports')
+            ->assertSee('Top brands')
+            ->assertSee('Customer care')
             ->assertDontSee('newsletter-email', escape: false)
             ->assertDontSee('Join the list')
             ->assertDontSee('newsletter-form', escape: false);
@@ -202,7 +203,7 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('class="cat-grid"', escape: false)               // categories (custom CSS grid)
             ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
-            ->assertSee('lg:grid-cols-[1.25fr_repeat(3,1fr)]', escape: false) // footer
+            ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)
             ->assertSee('lg:h-[calc(100svh-7.5rem)]', escape: false);  // hero = 100vh - navbar (desktop)
     }
