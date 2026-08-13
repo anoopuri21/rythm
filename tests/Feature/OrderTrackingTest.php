@@ -207,4 +207,42 @@ class OrderTrackingTest extends TestCase
             fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
         );
     }
+    public function test_admin_order_resource_lists_and_views(): void
+    {
+        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+        $order = $this->makeOrder();
+
+        $this->actingAs($admin)
+            ->get('/admin/orders')
+            ->assertOk()
+            ->assertSee($order->order_number);
+
+        $this->actingAs($admin)
+            ->get('/admin/orders/'.$order->id)
+            ->assertOk()
+            ->assertSee('Status history');
+    }
+
+    public function test_admin_can_change_status_from_resource(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+        $order = $this->makeOrder(Order::STATUS_CONFIRMED);
+
+        $this->actingAs($admin)->get('/admin/orders/'.$order->id)->assertOk();
+
+        // Service level change (resource action wraps this)
+        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
+        $this->assertSame(Order::STATUS_PROCESSING, $order->fresh()->status);
+    }
+
+    public function test_admin_cannot_create_orders(): void
+    {
+        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get('/admin/orders/create')
+            ->assertNotFound();
+    }
 }

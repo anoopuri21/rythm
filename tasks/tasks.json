@@ -179,15 +179,16 @@
         {
             "id": "admin-orders-resource",
             "title": "Filament OrderResource \u2014 list/filters/detail/status actions/history + print invoice",
-            "status": "pending",
+            "status": "done",
             "phase": "P1",
-            "next": true
+            "note": "OrderResource: list (order no/customer/total/status/payment filters), view infolist (items, addresses, payment, status history timeline), status actions (processing/shipped/delivered/cancelled with confirmation + OrderService::changeStatus + emails), print invoice link, create disabled. Tests 156 passed (605 assertions). PHASE 1 COMPLETE."
         },
         {
             "id": "password-reset",
             "title": "Password reset (forgot \u2192 email \u2192 reset form, design-system UI)",
             "status": "pending",
-            "phase": "P2"
+            "phase": "P2",
+            "next": true
         },
         {
             "id": "email-verification",
