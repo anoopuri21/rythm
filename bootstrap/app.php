@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Security headers on every response (CSP, nosniff, frame options…).
+        $middleware->prependToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
+
         // Razorpay posts to these endpoints without a CSRF token
         // (crypto-verified server-side instead).
         $middleware->validateCsrfTokens(except: [

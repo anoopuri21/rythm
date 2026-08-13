@@ -121,10 +121,10 @@
         {
             "id": "optimize-performance",
             "title": "Code optimization + performance (query N+1 sweep, caching, asset size, pagination, eager loading audit)",
-            "status": "pending",
+            "status": "done",
             "on_hold": true,
             "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
-            "next": true
+            "note": "preventLazyLoading ON (caught+fixed ProductVariant N+1), BrandService counts cached 1h + observer flush, category tree + homepage sections/seo cached earlier, eager loading verified all services, dead code removed, indexes audited. 120 tests green."
         },
         {
             "id": "security-review",
@@ -132,7 +132,8 @@
             "status": "pending",
             "priority": "HIGH \u2014 e-commerce platform, security is first-class",
             "on_hold": true,
-            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes"
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
+            "next": true
         },
         {
             "id": "codebase-quality-audit",

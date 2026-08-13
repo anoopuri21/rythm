@@ -192,4 +192,34 @@ class CheckoutTest extends TestCase
             $this->assertMatchesRegularExpression('/^RYM-\d{4}-[A-F0-9]{6}$/', $number);
         }
     }
+    public function test_razorpay_webhook_signature_verification(): void
+    {
+        $gateway = new \App\Payment\RazorpayGateway('key_id', 'key_secret', 'whsec_test');
+
+        $body = json_encode(['event' => 'payment.captured', 'payload' => []]);
+        $valid = hash_hmac('sha256', $body, 'whsec_test');
+
+        $this->assertTrue($gateway->verifyWebhookSignature($body, $valid));
+        $this->assertFalse($gateway->verifyWebhookSignature($body, 'tampered'));
+        $this->assertFalse($gateway->verifyWebhookSignature($body, ''));
+    }
+
+    public function test_razorpay_callback_signature_verification(): void
+    {
+        $gateway = new \App\Payment\RazorpayGateway('key_id', 'key_secret', 'whsec_test');
+
+        $payload = [
+            'razorpay_order_id' => 'order_abc',
+            'razorpay_payment_id' => 'pay_xyz',
+            'razorpay_signature' => 'forged',
+        ];
+        $order = new \App\Models\Order(['order_number' => 'RYM-SEC-1', 'total' => 100]);
+
+        $result = $gateway->verify($order, $payload);
+        $this->assertFalse($result->success);
+
+        // Missing fields
+        $result = $gateway->verify($order, []);
+        $this->assertFalse($result->success);
+    }
 }
