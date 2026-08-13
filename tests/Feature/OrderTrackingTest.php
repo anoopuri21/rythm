@@ -245,4 +245,74 @@ class OrderTrackingTest extends TestCase
             ->get('/admin/orders/create')
             ->assertNotFound();
     }
+    public function test_user_can_cancel_confirmed_order_with_stock_restore(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $product = \App\Models\Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
+        $stockBefore = $product->stock;
+
+        $order = $this->makeOrder(Order::STATUS_CONFIRMED, Order::PAYMENT_PAID);
+        \App\Models\OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'unit_price' => $product->price,
+            'qty' => 2,
+            'total' => (float) $product->price * 2,
+        ]);
+
+        $this->post(route('orders.cancel', $order))
+            ->assertRedirect()
+            ->assertSessionHas('order_success');
+
+        $order->refresh();
+        $this->assertSame(Order::STATUS_CANCELLED, $order->status);
+        $this->assertSame(Order::PAYMENT_REFUNDED, $order->payment_status);
+        // stock restored
+        $this->assertSame($stockBefore + 2, $product->fresh()->stock);
+
+        \Illuminate\Support\Facades\Mail::assertQueued(
+            \App\Mail\OrderStatusMail::class,
+            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        );
+    }
+
+    public function test_cannot_cancel_shipped_order(): void
+    {
+        $order = $this->makeOrder(Order::STATUS_SHIPPED);
+
+        $this->post(route('orders.cancel', $order))
+            ->assertRedirect()
+            ->assertSessionHas('order_error');
+
+        $this->assertSame(Order::STATUS_SHIPPED, $order->fresh()->status);
+    }
+
+    public function test_cannot_cancel_others_order(): void
+    {
+        $other = User::factory()->create();
+        $order = Order::factory()->create(['user_id' => $other->id, 'email' => $other->email, 'status' => Order::STATUS_CONFIRMED]);
+
+        $this->post(route('orders.cancel', $order))->assertForbidden();
+    }
+
+    public function test_cancel_button_shown_on_confirmable_order_page(): void
+    {
+        $order = $this->makeOrder(Order::STATUS_CONFIRMED);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('Cancel order');
+    }
+
+    public function test_cancel_button_hidden_on_shipped_order(): void
+    {
+        $order = $this->makeOrder(Order::STATUS_SHIPPED);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Cancel order');
+    }
 }

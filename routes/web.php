@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccountController;
@@ -48,9 +50,34 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name('register.store');
+
+    // Password reset
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'show'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.email');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.store');
 });
 
 Route::post('/logout', LogoutController::class)->name('logout');
+
+// Email verification (Laravel built-in)
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', \App\Http\Controllers\Auth\VerificationNoticeController::class)->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request): \Illuminate\Http\RedirectResponse {
+        $request->fulfill();
+
+        return redirect()->route('account.index')->with('status', 'Email verified!');
+    })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('status', 'Verification link sent!');
+    })->middleware('throttle:6,1')->name('verification.send');
+});
 
 // Checkout — LOGIN FORCED (guest cart auto-merges on login)
 Route::middleware('auth')->group(function () {
@@ -81,6 +108,7 @@ Route::post('/newsletter', NewsletterSubscriptionController::class)
 
 // Order detail + tracking — owner, signed link, or guest lookup result
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 
 // Guest order lookup (no login needed)

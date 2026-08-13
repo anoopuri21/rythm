@@ -34,6 +34,29 @@
                 </div>
             </div>
 
+            @if(session('order_success'))
+                <p class="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('order_success') }}</p>
+            @endif
+            @if(session('order_error'))
+                <p class="mt-6 rounded-xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand" role="alert">{{ session('order_error') }}</p>
+            @endif
+
+            {{-- Cancel (owner, pending/confirmed) --}}
+            @if(auth()->check() && auth()->id() === $order->user_id && in_array($order->status, ['pending', 'confirmed'], true))
+                <form method="POST" action="{{ route('orders.cancel', $order) }}" class="mt-6" x-data="{ confirm: false }">
+                    @csrf
+                    <button type="submit" x-show="!confirm" @click.prevent="confirm = true"
+                            class="rounded-full border border-brand/30 px-6 py-2.5 text-sm font-semibold text-brand transition hover:bg-brand/5">
+                        Cancel order
+                    </button>
+                    <span x-show="confirm" x-cloak class="inline-flex items-center gap-3 rounded-full bg-brand/10 px-5 py-2.5 text-sm">
+                        <span class="font-semibold text-brand">Sure? Refund in 5–7 days.</span>
+                        <button type="submit" class="rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white">Yes, cancel</button>
+                        <button type="button" @click="confirm = false" class="text-xs font-semibold text-muted">Keep order</button>
+                    </span>
+                </form>
+            @endif
+
             {{-- ===== TRACKING TIMELINE ===== --}}
             <section aria-label="Order tracking" class="mt-10 rounded-3xl border border-ink/10 bg-white p-6 sm:p-10">
                 <h2 class="font-playfair text-xl font-bold text-ink">Tracking</h2>

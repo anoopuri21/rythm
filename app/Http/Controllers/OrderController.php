@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\OrderService;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 final class OrderController extends Controller
@@ -76,6 +78,22 @@ final class OrderController extends Controller
         ]);
 
         return view('orders.invoice', ['order' => $order]);
+    }
+
+    /**
+     * Cancel this order (owner only, pending/confirmed).
+     */
+    public function cancel(Request $request, Order $order, OrderService $orders): RedirectResponse
+    {
+        abort_unless(auth()->check() && auth()->id() === $order->user_id, 403);
+
+        try {
+            $orders->cancelByUser($order);
+        } catch (\RuntimeException $e) {
+            return back()->with('order_error', $e->getMessage());
+        }
+
+        return back()->with('order_success', 'Order cancelled. Refund will be processed within 5–7 business days.');
     }
 
     private function authorizeView(Request $request, Order $order): void

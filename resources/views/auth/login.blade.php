@@ -31,10 +31,13 @@
                     @error('password') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                 </label>
 
-                <label class="flex items-center gap-2.5 text-sm text-ink">
-                    <input type="checkbox" name="remember" value="1" class="h-4 w-4 rounded border-ink/20 text-brand accent-brand focus:ring-brand/40">
-                    Remember me
-                </label>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2.5 text-sm text-ink">
+                        <input type="checkbox" name="remember" value="1" class="h-4 w-4 rounded border-ink/20 text-brand accent-brand focus:ring-brand/40">
+                        Remember me
+                    </label>
+                    <a href="{{ route('password.request') }}" class="text-xs font-semibold text-brand transition hover:text-brand-dark">Forgot password?</a>
+                </div>
 
                 <button type="submit" class="w-full rounded-full bg-brand py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
                     Sign in

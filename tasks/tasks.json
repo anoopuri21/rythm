@@ -186,33 +186,37 @@
         {
             "id": "password-reset",
             "title": "Password reset (forgot \u2192 email \u2192 reset form, design-system UI)",
-            "status": "pending",
+            "status": "done",
             "phase": "P2",
-            "next": true
+            "note": "Forgot password \u2192 email reset link (Laravel broker, throttled) + reset form, design-system UI, login link"
         },
         {
             "id": "email-verification",
             "title": "Email verification on register + verified badge",
-            "status": "pending",
-            "phase": "P2"
+            "status": "done",
+            "phase": "P2",
+            "note": "MustVerifyEmail, verification notice page + resend, signed verify route, register redirects to notice"
         },
         {
             "id": "user-order-cancel",
             "title": "User order cancellation (pending only, stock restore, email)",
-            "status": "pending",
-            "phase": "P2"
+            "status": "done",
+            "phase": "P2",
+            "note": "Cancel pending/confirmed orders (owner-guarded), stock restore, refund status, email, confirm UI"
         },
         {
             "id": "order-invoice",
             "title": "Printable invoice page + download",
-            "status": "pending",
-            "phase": "P2"
+            "status": "done",
+            "phase": "P2",
+            "note": "Printable tax invoice page + print button (built with tracking task)"
         },
         {
             "id": "reviews-system",
             "title": "Product reviews (star rating, verified purchase gate, product page section)",
             "status": "pending",
-            "phase": "P3"
+            "phase": "P3",
+            "next": true
         },
         {
             "id": "admin-reviews",

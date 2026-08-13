@@ -232,4 +232,42 @@ final class OrderService
             }
         });
     }
+
+    /**
+     * Cancel an order as the customer (only pending/confirmed).
+     * Restores stock if the payment was captured, queues a mail.
+     *
+     * @throws RuntimeException when cancellation is not allowed
+     */
+    public function cancelByUser(Order $order): void
+    {
+        if (! in_array($order->status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED], true)) {
+            throw new RuntimeException('This order can no longer be cancelled.');
+        }
+
+        $wasPaid = $order->isPaid();
+
+        DB::transaction(function () use ($order, $wasPaid): void {
+            $from = $order->status;
+
+            $order->update([
+                'status' => Order::STATUS_CANCELLED,
+                'payment_status' => $wasPaid ? Order::PAYMENT_REFUNDED : $order->payment_status,
+            ]);
+
+            $this->transitionStatus($order, Order::STATUS_CANCELLED, 'Cancelled by customer', from: $from);
+
+            if ($wasPaid) {
+                foreach ($order->items as $item) {
+                    if ($item->product_id !== null) {
+                        DB::table('products')->where('id', $item->product_id)->increment('stock', $item->qty);
+                    }
+                }
+            }
+
+            if ($order->email !== null) {
+                Mail::to($order->email)->queue(new OrderStatusMail($order, Order::STATUS_CANCELLED));
+            }
+        });
+    }
 }

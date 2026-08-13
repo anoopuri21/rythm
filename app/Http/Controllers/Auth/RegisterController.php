@@ -32,6 +32,6 @@ final class RegisterController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'));
+        return redirect()->route('verification.notice');
     }
 }

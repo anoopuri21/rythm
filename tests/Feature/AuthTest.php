@@ -35,7 +35,7 @@ class AuthTest extends TestCase
             'email' => 'musician@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
-        ])->assertRedirect('/');
+        ])->assertRedirect('/email/verify');
 
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', ['email' => 'musician@example.com']);
@@ -97,5 +97,84 @@ class AuthTest extends TestCase
             'email' => $user->email,
             'password' => 'password',
         ])->assertRedirect('/checkout');
+    }
+    public function test_forgot_password_page_renders(): void
+    {
+        $this->get('/forgot-password')->assertOk()->assertSee('Reset password');
+    }
+
+    public function test_forgot_password_sends_reset_link(): void
+    {
+        \Illuminate\Support\Facades\Password::shouldReceive('sendResetLink')
+            ->once()
+            ->andReturn(\Illuminate\Support\Facades\Password::RESET_LINK_SENT);
+
+        $this->post('/forgot-password', ['email' => 'test@example.com'])
+            ->assertSessionHas('status');
+    }
+
+    public function test_reset_password_page_renders_with_token(): void
+    {
+        $this->get('/reset-password/fake-token')
+            ->assertOk()
+            ->assertSee('Choose a new password');
+    }
+
+    public function test_reset_password_completes_flow(): void
+    {
+        $user = User::where('email', 'test@example.com')->firstOrFail();
+
+        \Illuminate\Support\Facades\Password::shouldReceive('reset')
+            ->once()
+            ->andReturn(\Illuminate\Support\Facades\Password::PASSWORD_RESET);
+
+        $this->post('/reset-password', [
+            'token' => 'fake-token',
+            'email' => $user->email,
+            'password' => 'brandnew123',
+            'password_confirmation' => 'brandnew123',
+        ])->assertRedirect('/login')->assertSessionHas('status');
+    }
+
+    public function test_reset_password_validates_strength(): void
+    {
+        $this->post('/reset-password', [
+            'token' => 'fake-token',
+            'email' => 'test@example.com',
+            'password' => 'weak',
+            'password_confirmation' => 'weak',
+        ])->assertSessionHasErrors('password');
+    }
+    public function test_verification_notice_requires_auth(): void
+    {
+        auth()->logout();
+
+        $this->get('/email/verify')->assertRedirect('/login');
+    }
+
+    public function test_verification_notice_renders(): void
+    {
+        $user = User::where('email', 'test@example.com')->firstOrFail();
+        $this->actingAs($user);
+
+        $this->get('/email/verify')
+            ->assertOk()
+            ->assertSee('Verify your email')
+            ->assertSee('Resend verification email');
+    }
+
+    public function test_verified_user_can_access_account(): void
+    {
+        $user = User::where('email', 'test@example.com')->firstOrFail();
+        $user->markEmailAsVerified();
+
+        $this->actingAs($user)->get('/account')->assertOk();
+    }
+
+    public function test_new_user_is_not_verified(): void
+    {
+        $user = User::where('email', 'test@example.com')->firstOrFail();
+
+        $this->assertFalse($user->hasVerifiedEmail());
     }
 }
