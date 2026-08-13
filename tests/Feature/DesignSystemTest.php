@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -10,6 +11,7 @@ use Tests\TestCase;
  */
 class DesignSystemTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_no_gold_colors_in_css_tailwind_or_views(): void
     {
         $haystacks = [

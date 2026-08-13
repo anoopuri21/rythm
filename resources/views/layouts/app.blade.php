@@ -15,6 +15,12 @@
     <meta property="og:image" content="@yield('og_image', asset('images/hero-guitar.jpg'))">
     <meta name="theme-color" content="#0A0A0A">
     <script>document.documentElement.classList.add('js');</script>
+    <script>
+        // Shared UI stores (available to all Alpine components)
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('catDrawer', { open: false });
+        });
+    </script>
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">

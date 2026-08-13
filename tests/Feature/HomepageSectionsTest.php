@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -10,6 +11,7 @@ use Tests\TestCase;
  */
 class HomepageSectionsTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_navbar_has_logo_search_icons_and_two_rows(): void
     {
         $this->get('/')

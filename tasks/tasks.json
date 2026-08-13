@@ -79,13 +79,14 @@
         {
             "id": "shop-list",
             "title": "Shop list page + filters v2 + Amazon drawer menu",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "Shop page + Livewire filters (category/brand/price/stock/search/sort) + pagination + skeletons + Amazon-style category drawer (DB-driven, Alpine store) + ProductQueryService + ShopFilters DTO + CategoryService cached tree; tests 48 passed (259 assertions); PR ready"
         },
         {
             "id": "product-detail",
             "title": "Product detail page (gallery, specs, related)",
-            "status": "pending"
+            "status": "pending",
+            "next": true
         },
         {
             "id": "cart-checkout-payment",

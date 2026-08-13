@@ -1,0 +1,140 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\DTOs\ShopFilters;
+use App\Models\Brand;
+use App\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * Single responsibility: build the filtered, sorted, eager-loaded shop
+ * product query. All filters are validated/normalised before hitting SQL.
+ */
+final class ProductQueryService
+{
+    private const PER_PAGE = 12;
+
+    public function shopQuery(ShopFilters $filters): Builder
+    {
+        $query = Product::query()
+            ->active()
+            ->with(['brand', 'category', 'media']);
+
+        $this->applyCategoryFilter($query, $filters->category);
+        $this->applyBrandFilter($query, $filters->brands);
+        $this->applyPriceFilter($query, $filters->minPrice, $filters->maxPrice);
+        $this->applyAvailabilityFilter($query, $filters->inStockOnly);
+        $this->applySearchFilter($query, $filters->search);
+        $this->applySort($query, $filters->sort);
+
+        return $query;
+    }
+
+    public function paginate(Builder $query): LengthAwarePaginator
+    {
+        return $query->paginate(self::PER_PAGE)->withQueryString();
+    }
+
+    /**
+     * Matches a child category directly, or every product inside a
+     * parent category (and its children).
+     */
+    private function applyCategoryFilter(Builder $query, ?string $categorySlug): void
+    {
+        if ($categorySlug === null || $categorySlug === '') {
+            return;
+        }
+
+        $query->whereHas('category', function (Builder $q) use ($categorySlug): void {
+            $q->where('slug', $categorySlug)
+                ->orWhereHas('parent', fn (Builder $parent): Builder => $parent->where('slug', $categorySlug));
+        });
+    }
+
+    /**
+     * @param  string[]  $brandSlugs
+     */
+    private function applyBrandFilter(Builder $query, array $brandSlugs): void
+    {
+        $brandSlugs = array_values(array_filter($brandSlugs));
+
+        if ($brandSlugs === []) {
+            return;
+        }
+
+        $brandIds = Brand::query()
+            ->whereIn('slug', $brandSlugs)
+            ->pluck('id');
+
+        $query->whereIn('brand_id', $brandIds);
+    }
+
+    private function applyPriceFilter(Builder $query, ?int $minPrice, ?int $maxPrice): void
+    {
+        $min = $minPrice !== null ? max(0, $minPrice) : null;
+        $max = $maxPrice !== null ? max(0, $maxPrice) : null;
+
+        if ($min !== null && $max !== null && $min > $max) {
+            [$min, $max] = [$max, $min];
+        }
+
+        if ($min !== null) {
+            $query->where('price', '>=', $min);
+        }
+
+        if ($max !== null) {
+            $query->where('price', '<=', $max);
+        }
+    }
+
+    private function applyAvailabilityFilter(Builder $query, bool $inStockOnly): void
+    {
+        if ($inStockOnly) {
+            $query->where('stock', '>', 0);
+        }
+    }
+
+    private function applySearchFilter(Builder $query, ?string $search): void
+    {
+        $term = trim((string) $search);
+
+        if ($term === '') {
+            return;
+        }
+
+        $query->where(function (Builder $q) use ($term): void {
+            $q->where('name', 'like', "%{$term}%")
+                ->orWhere('sku', 'like', "%{$term}%")
+                ->orWhereHas('brand', fn (Builder $brand): Builder => $brand->where('name', 'like', "%{$term}%"));
+        });
+    }
+
+    private function applySort(Builder $query, string $sort): void
+    {
+        switch ($sort) {
+            case 'price-asc':
+                $query->orderBy('price')->orderBy('id');
+                break;
+
+            case 'price-desc':
+                $query->orderByDesc('price')->orderBy('id');
+                break;
+
+            case 'newest':
+                $query->orderByDesc('created_at')->orderByDesc('id');
+                break;
+
+            case 'discount':
+                // Static expression, zero user input — safe raw sort.
+                $query->orderByRaw('(COALESCE(compare_at_price, 0) - price) DESC')->orderBy('id');
+                break;
+
+            default: // popularity
+                $query->orderByDesc('is_featured')->orderByDesc('id');
+        }
+    }
+}

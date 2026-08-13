@@ -53,8 +53,17 @@
             </div>
         </div>
 
-        {{-- ===== ROW 2 · Main categories with dropdowns (desktop) ===== --}}
+        {{-- ===== ROW 2 · Shop-by-category drawer + main categories with dropdowns (desktop) ===== --}}
         <div class="hidden h-12 items-center justify-between border-t border-black/10 lg:flex">
+            <button type="button"
+                    @click="$store.catDrawer.open = true"
+                    class="mr-6 inline-flex h-8 shrink-0 items-center gap-2 rounded-full bg-rythme-red px-5 text-[13px] font-bold uppercase tracking-[0.08em] text-white transition hover:bg-rythme-red-dark"
+                    aria-haspopup="dialog" aria-controls="category-drawer"
+                    :aria-expanded="$store.catDrawer.open ? 'true' : 'false'">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                All Categories
+            </button>
+
             @foreach($navItems as $index => $item)
                 <div class="relative h-full"
                      @mouseenter="openMenu = {{ $index }}"
@@ -121,6 +130,12 @@
             </form>
         </div>
         <div class="flex-1 overflow-y-auto px-4 py-5">
+            <button type="button"
+                    @click="mobileMenu = false; $store.catDrawer.open = true"
+                    class="mb-2 flex w-full items-center gap-2.5 rounded-xl bg-rythme-red px-4 py-3 text-sm font-bold text-white transition hover:bg-rythme-red-dark">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                Shop by Category
+            </button>
             <a href="{{ route('home') }}" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-rythme-black transition hover:bg-gold/10">Home</a>
             <a href="/shop" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-rythme-black transition hover:bg-gold/10">Shop All</a>
 
@@ -153,4 +168,7 @@
             <a href="/account" @click="mobileMenu = false" class="btn-gold block w-full">Sign in / Register</a>
         </div>
     </div>
+
+    {{-- Amazon-style shop-by-category drawer (DB-driven categories) --}}
+    <x-category-drawer :categories="$navCategories" />
 </nav>
