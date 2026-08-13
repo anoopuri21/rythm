@@ -12,6 +12,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -47,63 +48,65 @@ class ProductResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Section::make('Product details')
-                ->columns(2)
-                ->schema([
-                    TextInput::make('name')->required()->maxLength(255)->columnSpanFull(),
-                    TextInput::make('slug')->required()->maxLength(255)
-                        ->helperText('Leave blank to auto-generate from name.'),
-                    TextInput::make('sku')->required()->maxLength(50)
-                        ->unique(ignoreRecord: true),
-                    Select::make('category_id')->relationship('category', 'name')
-                        ->searchable()->preload(),
-                    Select::make('brand_id')->relationship('brand', 'name')
-                        ->searchable()->preload(),
-                    TextInput::make('price')->numeric()->required()->minValue(0)->prefix('₹'),
-                    TextInput::make('compare_at_price')->numeric()->minValue(0)->prefix('₹')
-                        ->helperText('MRP — shown as strikethrough on the storefront'),
-                    TextInput::make('stock')->numeric()->required()->default(0)->minValue(0),
-                    TextInput::make('low_stock_threshold')->numeric()->default(5)->minValue(0),
-                    Toggle::make('is_active')->default(true),
-                    Toggle::make('is_featured'),
-                    Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
-                    TiptapEditor::make('description')->profile('default')->columnSpanFull(),
-                ]),
-            Section::make('Variants')
-                ->description('Optional — finishes, sizes or configurations.')
-                ->collapsible()
-                ->schema([
-                    Repeater::make('variants')
-                        ->relationship()
-                        ->defaultItems(0)
-                        ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
-                        ->schema([
-                            Grid::make(5)->schema([
-                                TextInput::make('name')->required()->label('Variant name'),
-                                TextInput::make('sku')->required()->unique(ignoreRecord: true),
-                                TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
-                                    ->label('Price override (optional)'),
-                                TextInput::make('stock')->numeric()->default(0)->minValue(0),
+            Tabs::make('Product editor')->tabs([
+                Tabs\Tab::make('Details')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->schema([
+                        Section::make('Product details')
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('name')->required()->maxLength(255)->columnSpanFull(),
+                                TextInput::make('slug')->required()->maxLength(255)
+                                    ->helperText('Leave blank to auto-generate from name.'),
+                                TextInput::make('sku')->required()->maxLength(50)
+                                    ->unique(ignoreRecord: true),
+                                Select::make('category_id')->relationship('category', 'name')
+                                    ->searchable()->preload(),
+                                Select::make('brand_id')->relationship('brand', 'name')
+                                    ->searchable()->preload(),
+                                TextInput::make('price')->numeric()->required()->minValue(0)->prefix('₹'),
+                                TextInput::make('compare_at_price')->numeric()->minValue(0)->prefix('₹')
+                                    ->helperText('MRP — shown as strikethrough on the storefront'),
+                                TextInput::make('stock')->numeric()->required()->default(0)->minValue(0),
+                                TextInput::make('low_stock_threshold')->numeric()->default(5)->minValue(0),
                                 Toggle::make('is_active')->default(true),
+                                Toggle::make('is_featured'),
+                                Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
+                                TiptapEditor::make('description')->profile('default')->columnSpanFull(),
                             ]),
-                        ]),
-                ]),
-            Section::make('Media')
-                ->description('Product images — Bajaao product shots per image rules.')
-                ->collapsible()
-                ->schema([
-                    SpatieMediaLibraryFileUpload::make('gallery')
-                        ->collection('gallery')->multiple()->image()->maxFiles(12),
-                    SpatieMediaLibraryFileUpload::make('og')
-                        ->collection('og')->image()->maxFiles(1)->label('Social share image'),
-                ]),
-            Section::make('SEO')
-                ->collapsible()->collapsed()
-                ->columns(2)
-                ->schema([
-                    TextInput::make('meta_title')->maxLength(70),
-                    Textarea::make('meta_description')->rows(2)->maxLength(160),
-                ]),
+                        Section::make('Variants')
+                            ->description('Optional — finishes, sizes or configurations.')
+                            ->collapsible()
+                            ->schema([
+                                Repeater::make('variants')
+                                    ->relationship()
+                                    ->defaultItems(0)
+                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
+                                    ->schema([
+                                        Grid::make(5)->schema([
+                                            TextInput::make('name')->required()->label('Variant name'),
+                                            TextInput::make('sku')->required()->unique(ignoreRecord: true),
+                                            TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
+                                                ->label('Price override (optional)'),
+                                            TextInput::make('stock')->numeric()->default(0)->minValue(0),
+                                            Toggle::make('is_active')->default(true),
+                                        ]),
+                                    ]),
+                            ]),
+                        Section::make('Media')
+                            ->description('Product images — Bajaao product shots per image rules.')
+                            ->collapsible()
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('gallery')
+                                    ->collection('gallery')->multiple()->image()->maxFiles(12),
+                                SpatieMediaLibraryFileUpload::make('og')
+                                    ->collection('og')->image()->maxFiles(1)->label('Social share image'),
+                            ]),
+                    ]),
+                Tabs\Tab::make('SEO')
+                    ->icon('heroicon-o-magnifying-glass-circle')
+                    ->schema(\App\Filament\Components\SeoFields::schema()),
+            ])->columnSpanFull(),
         ]);
     }
 

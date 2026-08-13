@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -58,6 +59,11 @@ class Product extends Model implements HasMedia
     public function wishlistedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
+    public function seoEntry(): MorphOne
+    {
+        return $this->morphOne(SeoEntry::class, 'seoable');
     }
 
     /** Discount percentage (0 when no compare_at_price). */

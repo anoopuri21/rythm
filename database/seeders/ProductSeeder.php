@@ -354,7 +354,7 @@ class ProductSeeder extends Seeder
                     'low_stock_threshold' => 5,
                     'is_active' => true,
                     'is_featured' => $data['featured'] ?? false,
-                    'meta_title' => "Buy {$data['name']} Online in India | Rythme Music Store",
+                    'meta_title' => "Buy {$data['name']} Online in India | Rhythm Exports",
                     'meta_description' => $data['short'],
                 ],
             );

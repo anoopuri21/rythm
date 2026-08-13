@@ -11,6 +11,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\ShopController;
@@ -22,9 +23,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Static pages
-Route::get('/about', [AboutController::class, 'index'])->name('about');
-Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+// Contact form submission (page itself is dynamic — see catch-all below)
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
@@ -70,3 +69,9 @@ Route::post('/payment/razorpay/webhook', [RazorpayController::class, 'webhook'])
 Route::post('/newsletter', NewsletterSubscriptionController::class)
     ->middleware('throttle:6,1')
     ->name('newsletter.store');
+
+// Dynamic pages (admin-managed URL slugs) — catch-all, must be LAST.
+// Reserved route slugs are blocked at the admin level (Page::RESERVED_SLUGS).
+Route::get('/{slug}', [PageController::class, 'show'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->name('page.show');

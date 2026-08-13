@@ -14,20 +14,23 @@ class AboutContactTest extends TestCase
 
     public function test_about_page_renders(): void
     {
+        $this->seed();
+
         $this->get('/about')
             ->assertOk()
-            ->assertViewIs('about.index')
-            ->assertSee('Music first')
-            ->assertSee('Why Rythme')
+            ->assertViewIs('pages.show')
+            ->assertSee('About Rhythm Exports')
             ->assertSee('Our promise');
     }
 
     public function test_contact_page_renders(): void
     {
+        $this->seed();
+
         $this->get('/contact')
             ->assertOk()
-            ->assertViewIs('contact.index')
-            ->assertSee('Talk to a real musician')
+            ->assertViewIs('pages.show')
+            ->assertSee('Contact Rhythm Exports')
             ->assertSee('Send message');
     }
 

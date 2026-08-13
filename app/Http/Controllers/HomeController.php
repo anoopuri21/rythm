@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\HomepageSection;
+use App\Models\Page;
+use App\Services\SeoService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 final class HomeController extends Controller
 {
+    public function __construct(private readonly SeoService $seo) {}
+
     public function index(): View
     {
         // Hero mode is config-driven (RYTHME_HERO_MODE env): 'slider' | 'video'
@@ -25,6 +29,17 @@ final class HomeController extends Controller
                 ->keyBy('section_key')
                 ->all();
         });
+
+        // Homepage on-page SEO — managed from admin (Page with slug = null).
+        $homePage = Cache::remember('homepage.seo', 3600, fn (): ?Page => Page::query()
+            ->whereNull('slug')
+            ->with('seoEntry')
+            ->first());
+
+        $this->seo->apply(SeoService::fromEntry($homePage?->seoEntry, [
+            'meta_title' => 'Rhythm Exports - Feel The Music, Own The Sound',
+            'meta_description' => 'Shop premium musical instruments at Rhythm Exports. Guitars, Keyboards, Drums, Pro Audio and more from top brands. Free shipping all over India.',
+        ]));
 
         return view('home.index', compact('heroMode', 'homeSections'));
     }
