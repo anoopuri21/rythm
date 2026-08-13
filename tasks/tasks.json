@@ -155,6 +155,12 @@
             "title": "Dynamic website CMS \u2014 admin-managed pages (URL slugs) + polymorphic on-page SEO for all pages/products",
             "status": "done",
             "note": "Pages table + catch-all slug routing (reserved slugs protected), polymorphic seo_entries (meta/OG/canonical/robots/schema JSON/head scripts), SeoService + layout head integration, PageResource & ProductResource Content/SEO tabs, PageSeeder anchors (home/about/contact/shop + support pages). Live verified. Tests 128 passed (531 assertions)."
+        },
+        {
+            "id": "user-account-profile",
+            "title": "User account dashboard \u2014 profile edit, password change, order history, address book",
+            "status": "done",
+            "note": "AccountController (index/profile/password/addresses) + FormRequests (UpdateProfile unique email, UpdatePassword current+strength, StoreAddress) + account view with Alpine tabs (Overview/Orders/Addresses/Settings) + OrderList component + OrderFactory + noindex SEO on account pages + logoutOtherDevices ordering fix. Tests 138 passed (562 assertions)."
         }
     ],
     "git_strategy": {

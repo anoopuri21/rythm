@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
@@ -56,6 +57,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
         ->middleware('signed')
         ->name('checkout.success');
+
+    // Account dashboard — profile, password, addresses, orders
+    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
+    Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
+    Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
+    Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
 });
 
 // Payment callbacks — Razorpay posts here (CSRF excluded in bootstrap/app.php)
