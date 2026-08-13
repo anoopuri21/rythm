@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\DTOs\CheckoutData;
 use App\Mail\OrderConfirmationMail;
+use App\Mail\OrderStatusMail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
@@ -192,5 +193,43 @@ final class OrderService
         return 'RYM-' . now()->format('Y') . '-' . strtoupper(
             substr((string) bin2hex(random_bytes(3)), 0, 6)
         );
+    }
+
+    /**
+     * Move an order to a new status (admin or customer), writing audit
+     * history and queueing a status email for user-facing transitions.
+     *
+     * @throws RuntimeException on invalid transitions
+     */
+    public function changeStatus(Order $order, string $to, ?string $note = null): void
+    {
+        $allowed = match ($order->status) {
+            Order::STATUS_CONFIRMED => [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
+            Order::STATUS_PROCESSING => [Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
+            Order::STATUS_SHIPPED => [Order::STATUS_DELIVERED, Order::STATUS_CANCELLED],
+            default => [],
+        };
+
+        if (! in_array($to, $allowed, true)) {
+            throw new RuntimeException(
+                "Cannot move order from '{$order->status}' to '{$to}'."
+            );
+        }
+
+        $from = $order->status;
+
+        DB::transaction(function () use ($order, $to, $note, $from): void {
+            $order->update(['status' => $to]);
+            $this->transitionStatus($order, $to, $note, from: $from);
+
+            // Queue notification for user-facing statuses.
+            if (in_array($to, [
+                Order::STATUS_SHIPPED,
+                Order::STATUS_DELIVERED,
+                Order::STATUS_CANCELLED,
+            ], true) && $order->email !== null) {
+                Mail::to($order->email)->queue(new OrderStatusMail($order, $to));
+            }
+        });
     }
 }

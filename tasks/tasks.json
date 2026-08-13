@@ -172,15 +172,16 @@
         {
             "id": "order-status-emails",
             "title": "Order status emails (shipped/delivered/cancelled) queued on admin status change",
-            "status": "pending",
+            "status": "done",
             "phase": "P1",
-            "next": true
+            "note": "OrderStatusMail (shipped/delivered/cancelled) queued via Queue::route; OrderService::changeStatus with transition guard (confirmed\u2192processing/shipped/cancelled etc), audit history + email on user-facing statuses. Tests 153 passed."
         },
         {
             "id": "admin-orders-resource",
             "title": "Filament OrderResource \u2014 list/filters/detail/status actions/history + print invoice",
             "status": "pending",
-            "phase": "P1"
+            "phase": "P1",
+            "next": true
         },
         {
             "id": "password-reset",

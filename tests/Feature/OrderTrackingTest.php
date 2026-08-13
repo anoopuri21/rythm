@@ -167,4 +167,44 @@ class OrderTrackingTest extends TestCase
             ->assertOk()
             ->assertSee(route('orders.show', $order), escape: false);
     }
+    public function test_shipped_status_queues_email(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $order = $this->makeOrder(Order::STATUS_CONFIRMED);
+        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_SHIPPED);
+
+        $this->assertSame(Order::STATUS_SHIPPED, $order->fresh()->status);
+        \Illuminate\Support\Facades\Mail::assertQueued(
+            \App\Mail\OrderStatusMail::class,
+            fn ($mail) => $mail->order->is($order) && $mail->newStatus === Order::STATUS_SHIPPED
+        );
+
+        // Audit history has the transition
+        $this->assertDatabaseHas('order_status_history', [
+            'order_id' => $order->id,
+            'to' => 'shipped',
+        ]);
+    }
+
+    public function test_invalid_transition_rejected(): void
+    {
+        $order = $this->makeOrder(Order::STATUS_SHIPPED);
+
+        $this->expectException(\RuntimeException::class);
+        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
+    }
+
+    public function test_cancelled_queues_email(): void
+    {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $order = $this->makeOrder(Order::STATUS_CONFIRMED);
+        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_CANCELLED);
+
+        \Illuminate\Support\Facades\Mail::assertQueued(
+            \App\Mail\OrderStatusMail::class,
+            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        );
+    }
 }
