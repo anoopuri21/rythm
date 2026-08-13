@@ -12,6 +12,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RazorpayController;
@@ -77,6 +78,16 @@ Route::post('/payment/razorpay/webhook', [RazorpayController::class, 'webhook'])
 Route::post('/newsletter', NewsletterSubscriptionController::class)
     ->middleware('throttle:6,1')
     ->name('newsletter.store');
+
+// Order detail + tracking — owner, signed link, or guest lookup result
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+
+// Guest order lookup (no login needed)
+Route::get('/track-order', [OrderController::class, 'lookup'])->name('orders.lookup');
+Route::post('/track-order', [OrderController::class, 'lookupPost'])
+    ->middleware('throttle:5,1')
+    ->name('orders.lookup.post');
 
 // Dynamic pages (admin-managed URL slugs) — catch-all, must be LAST.
 // Reserved route slugs are blocked at the admin level (Page::RESERVED_SLUGS).

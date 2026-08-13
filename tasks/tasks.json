@@ -165,15 +165,16 @@
         {
             "id": "order-tracking",
             "title": "User order tracking page + order detail (timeline from status history, owner-guarded, guest lookup)",
-            "status": "pending",
-            "next": true,
-            "phase": "P1"
+            "status": "done",
+            "phase": "P1",
+            "note": "Order detail + tracking timeline page (placed\u2192confirmed\u2192processing\u2192shipped\u2192delivered + cancelled) from status history; owner/signed-link/guest-lookup guard (redirect login for guests); guest lookup by order number+email (/track-order); printable invoice page; account order links; footer Track link. Tests 150 passed (593 assertions)."
         },
         {
             "id": "order-status-emails",
             "title": "Order status emails (shipped/delivered/cancelled) queued on admin status change",
             "status": "pending",
-            "phase": "P1"
+            "phase": "P1",
+            "next": true
         },
         {
             "id": "admin-orders-resource",

@@ -89,4 +89,70 @@ class Order extends Model
     {
         return $this->status === self::STATUS_CANCELLED;
     }
+
+    /**
+     * Ordered tracking steps for the user timeline — each with a
+     * human label, description and the timestamp it was reached.
+     *
+     * @return array<int, array{key:string, label:string, desc:string, done:bool, at:?\Illuminate\Support\Carbon}>
+     */
+    public function trackingTimeline(): array
+    {
+        $reached = collect($this->statusHistory)
+            ->keyBy('to')
+            ->map(fn ($entry) => $entry->created_at);
+
+        $steps = [
+            'placed' => ['label' => 'Order placed', 'desc' => 'We have received your order.'],
+            'confirmed' => ['label' => 'Payment confirmed', 'desc' => 'Your payment was captured and the order is confirmed.'],
+            'processing' => ['label' => 'Processing', 'desc' => 'Your instruments are being packed with care.'],
+            'shipped' => ['label' => 'Shipped', 'desc' => 'Your order is on its way to your address.'],
+            'delivered' => ['label' => 'Delivered', 'desc' => 'Enjoy your new sound!'],
+        ];
+
+        $timeline = [];
+
+        foreach ($steps as $key => $step) {
+            $timeline[] = [
+                'key' => $key,
+                'label' => $step['label'],
+                'desc' => $step['desc'],
+                'done' => $reached->has($key) || $this->isPastStep($key, $reached),
+                'at' => $reached->get($key),
+            ];
+        }
+
+        if ($this->isCancelled()) {
+            $timeline[] = [
+                'key' => 'cancelled',
+                'label' => 'Cancelled',
+                'desc' => 'This order was cancelled.',
+                'done' => true,
+                'at' => $reached->get('cancelled'),
+            ];
+        }
+
+        return $timeline;
+    }
+
+    private function isPastStep(string $key, \Illuminate\Support\Collection $reached): bool
+    {
+        $steps = ['placed', 'confirmed', 'processing', 'shipped', 'delivered'];
+
+        if (! in_array($key, $steps, true)) {
+            return false;
+        }
+
+        return $reached->get($key) !== null || $this->stepIndex($key) <= $this->currentStepIndex();
+    }
+
+    private function stepIndex(string $key): int
+    {
+        return (int) array_search($key, ['placed', 'confirmed', 'processing', 'shipped', 'delivered'], true);
+    }
+
+    private function currentStepIndex(): int
+    {
+        return $this->stepIndex($this->status);
+    }
 }

@@ -121,6 +121,7 @@
             <nav aria-labelledby="footer-help">
                 <h3 id="footer-help" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Help</h3>
                 <ul class="mt-6 space-y-3.5">
+                    <li><a href="/track-order" class="footer-link text-sm text-white/45">Track your order</a></li>
                     <li><a href="/faqs" class="footer-link text-sm text-white/45">Help centre</a></li>
                     <li><a href="/cart" class="footer-link text-sm text-white/45">View cart</a></li>
                     <li><a href="/wishlist" class="footer-link text-sm text-white/45">Wishlist</a></li>
