@@ -2,7 +2,7 @@
     "project": "SOUNDSCAPE \u2014 Rhythm Exports",
     "repo": "anoopuri21/rythm",
     "branch": "feature/dev",
-    "task_mode": false,
+    "task_mode": true,
     "locked_features": [
         "Header",
         "Footer"
@@ -161,6 +161,139 @@
             "title": "User account dashboard \u2014 profile edit, password change, order history, address book",
             "status": "done",
             "note": "AccountController (index/profile/password/addresses) + FormRequests (UpdateProfile unique email, UpdatePassword current+strength, StoreAddress) + account view with Alpine tabs (Overview/Orders/Addresses/Settings) + OrderList component + OrderFactory + noindex SEO on account pages + logoutOtherDevices ordering fix. Tests 138 passed (562 assertions)."
+        },
+        {
+            "id": "order-tracking",
+            "title": "User order tracking page + order detail (timeline from status history, owner-guarded, guest lookup)",
+            "status": "pending",
+            "next": true,
+            "phase": "P1"
+        },
+        {
+            "id": "order-status-emails",
+            "title": "Order status emails (shipped/delivered/cancelled) queued on admin status change",
+            "status": "pending",
+            "phase": "P1"
+        },
+        {
+            "id": "admin-orders-resource",
+            "title": "Filament OrderResource \u2014 list/filters/detail/status actions/history + print invoice",
+            "status": "pending",
+            "phase": "P1"
+        },
+        {
+            "id": "password-reset",
+            "title": "Password reset (forgot \u2192 email \u2192 reset form, design-system UI)",
+            "status": "pending",
+            "phase": "P2"
+        },
+        {
+            "id": "email-verification",
+            "title": "Email verification on register + verified badge",
+            "status": "pending",
+            "phase": "P2"
+        },
+        {
+            "id": "user-order-cancel",
+            "title": "User order cancellation (pending only, stock restore, email)",
+            "status": "pending",
+            "phase": "P2"
+        },
+        {
+            "id": "order-invoice",
+            "title": "Printable invoice page + download",
+            "status": "pending",
+            "phase": "P2"
+        },
+        {
+            "id": "reviews-system",
+            "title": "Product reviews (star rating, verified purchase gate, product page section)",
+            "status": "pending",
+            "phase": "P3"
+        },
+        {
+            "id": "admin-reviews",
+            "title": "ReviewResource moderation (approve/reject/delete)",
+            "status": "pending",
+            "phase": "P3"
+        },
+        {
+            "id": "coupons-system",
+            "title": "Coupons (percent/fixed, min order, expiry, usage limits) + checkout apply",
+            "status": "pending",
+            "phase": "P4"
+        },
+        {
+            "id": "admin-coupons",
+            "title": "CouponResource CRUD + usage stats",
+            "status": "pending",
+            "phase": "P4"
+        },
+        {
+            "id": "admin-customers",
+            "title": "CustomerResource (users, orders, spend)",
+            "status": "pending",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-contact-messages",
+            "title": "ContactMessageResource (new/read/replied workflow)",
+            "status": "pending",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-newsletter",
+            "title": "NewsletterSubscriberResource + CSV export",
+            "status": "pending",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-dashboard-widgets",
+            "title": "Dashboard widgets (revenue, orders, low-stock, latest orders)",
+            "status": "pending",
+            "phase": "P5"
+        },
+        {
+            "id": "site-settings",
+            "title": "Site settings model+resource (shipping, GST, contact, social) cached",
+            "status": "pending",
+            "phase": "P5"
+        },
+        {
+            "id": "seo-sitemap",
+            "title": "Dynamic sitemap.xml + robots.txt",
+            "status": "pending",
+            "phase": "P6"
+        },
+        {
+            "id": "prod-queue",
+            "title": "Production queue worker setup docs + composer dev update",
+            "status": "pending",
+            "phase": "P6"
+        },
+        {
+            "id": "shop-caching",
+            "title": "Tagged shop query caching with invalidation",
+            "status": "pending",
+            "phase": "P6"
+        },
+        {
+            "id": "gst-shipping",
+            "title": "GST + shipping rules applied in OrderService totals",
+            "status": "pending",
+            "phase": "P6"
+        },
+        {
+            "id": "error-pages",
+            "title": "Custom 404/500 pages (design system)",
+            "status": "pending",
+            "phase": "P6"
+        },
+        {
+            "id": "final-regression",
+            "title": "Final regression + security scan + handover",
+            "status": "pending",
+            "phase": "P6"
         }
     ],
     "git_strategy": {
@@ -169,5 +302,7 @@
         "pr": "ONE open PR #22 (feature/dev -> main) \u2014 auto-updates on every push",
         "rule": "NEVER create new branches or new PRs. All work lands on feature/dev. User reviews/merges PR #22 once."
     },
-    "note": "Autonomous session complete (user offline). All roadmap tasks done. Next session: any new directives."
+    "note": "Autonomous session complete (user offline). All roadmap tasks done. Next session: any new directives.",
+    "phase": "Phase 1/6 \u2014 Order Management Core",
+    "roadmap_doc": "docs/architecture/03-scale-up-roadmap.md"
 }
