@@ -228,21 +228,23 @@
         {
             "id": "coupons-system",
             "title": "Coupons (percent/fixed, min order, expiry, usage limits) + checkout apply",
-            "status": "pending",
+            "status": "done",
             "phase": "P4",
-            "next": true
+            "note": "Coupons table+model+factory, CouponService (percent/fixed, min order, max cap, expiry, usage limits), checkout apply/remove UI, discount in order totals + note + usage increment"
         },
         {
             "id": "admin-coupons",
             "title": "CouponResource CRUD + usage stats",
-            "status": "pending",
-            "phase": "P4"
+            "status": "done",
+            "phase": "P4",
+            "note": "CouponResource (COMMERCE): CRUD, type/value/uses/expiry columns, active toggle"
         },
         {
             "id": "admin-customers",
             "title": "CustomerResource (users, orders, spend)",
             "status": "pending",
-            "phase": "P5"
+            "phase": "P5",
+            "next": true
         },
         {
             "id": "admin-contact-messages",

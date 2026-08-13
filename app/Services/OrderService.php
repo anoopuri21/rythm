@@ -64,7 +64,7 @@ final class OrderService
                 'currency' => $data->currency,
                 'shipping_address' => $data->shippingAddress,
                 'billing_address' => $data->billingAddress,
-                'notes' => $data->notes,
+                'notes' => trim(($data->notes ?? '').($data->couponCode !== null ? " [Coupon: {$data->couponCode}]" : '')),
                 'placed_at' => now(),
             ]);
 

@@ -8,6 +8,7 @@ use App\DTOs\CheckoutData;
 use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\CouponService;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
@@ -44,6 +45,14 @@ final class CheckoutWizard extends Component
     public ?string $error = null;
 
     public ?string $paymentError = null;
+
+    public ?string $couponCode = null;
+
+    public ?string $couponError = null;
+
+    public float $couponDiscount = 0.0;
+
+    public ?string $appliedCoupon = null;
 
     public ?int $orderId = null;
 
@@ -97,6 +106,31 @@ final class CheckoutWizard extends Component
         $this->step = 2;
     }
 
+    public function applyCoupon(CouponService $coupons): void
+    {
+        $this->couponError = null;
+
+        try {
+            $totals = app(CartService::class)->totals();
+            $result = $coupons->validateAndApply((string) $this->couponCode, $totals['subtotal']);
+
+            $this->appliedCoupon = $result['coupon']->code;
+            $this->couponDiscount = $result['discount'];
+            $this->couponCode = null;
+        } catch (RuntimeException $e) {
+            $this->couponError = $e->getMessage();
+            $this->appliedCoupon = null;
+            $this->couponDiscount = 0.0;
+        }
+    }
+
+    public function removeCoupon(): void
+    {
+        $this->appliedCoupon = null;
+        $this->couponDiscount = 0.0;
+        $this->couponError = null;
+    }
+
     public function backToAddresses(): void
     {
         $this->step = 1;
@@ -136,10 +170,11 @@ final class CheckoutWizard extends Component
                 shippingAddress: $addresses->snapshot($address),
                 billingAddress: $addresses->snapshot($address),
                 subtotal: $totals['subtotal'],
-                discount: 0.0,
+                discount: $this->couponDiscount,
                 shippingFee: (float) config('rythme.shipping.flat_fee', 0),
                 tax: 0.0,
                 currency: 'INR',
+                couponCode: $this->appliedCoupon,
             );
 
             $order = $orders->createFromCheckout($cartModel, $data, $user->id);
@@ -196,6 +231,14 @@ final class CheckoutWizard extends Component
             }
 
             $orders->markPaid($order, $result, $this->gatewayOrderId);
+
+            if ($this->appliedCoupon !== null) {
+                $coupon = \App\Models\Coupon::where('code', $this->appliedCoupon)->first();
+                if ($coupon !== null) {
+                    app(CouponService::class)->incrementUsage($coupon);
+                }
+            }
+
             $cart->clear();
 
             $this->dispatch('cart-updated');

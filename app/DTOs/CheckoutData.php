@@ -23,5 +23,6 @@ final readonly class CheckoutData
         public float $tax = 0.0,
         public string $currency = 'INR',
         public ?string $notes = null,
+        public ?string $couponCode = null,
     ) {}
 }

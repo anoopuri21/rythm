@@ -178,9 +178,9 @@
 
                         <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
                                 class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-                                aria-label="Pay ₹{{ number_format($totals['subtotal']) }}">
+                                aria-label="Pay ₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
-                                Pay ₹{{ number_format($totals['subtotal']) }} securely
+                                Pay ₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }} securely
                             </span>
                             <span wire:loading wire:target="placeOrder,confirmPayment" class="inline-flex items-center gap-2">
                                 <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
@@ -223,18 +223,44 @@
                     @endforelse
                 </div>
 
+                {{-- Coupon --}}
+                <div class="mt-5 border-t border-ink/10 pt-5">
+                    @if($appliedCoupon)
+                        <div class="flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
+                            <p class="text-sm font-bold text-emerald-700">{{ $appliedCoupon }} applied</p>
+                            <button type="button" wire:click="removeCoupon" class="text-xs font-semibold text-emerald-700 underline">Remove</button>
+                        </div>
+                    @else
+                        <div class="flex gap-2">
+                            <input type="text" wire:model="couponCode" placeholder="Coupon code" maxlength="30"
+                                   class="h-10 flex-1 rounded-full border border-ink/15 bg-paper px-4 text-xs font-semibold uppercase tracking-wide text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                            <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
+                                    class="rounded-full bg-ink px-5 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-60">Apply</button>
+                        </div>
+                        @if($couponError)
+                            <p class="mt-2 text-xs font-semibold text-brand" role="alert">{{ $couponError }}</p>
+                        @endif
+                    @endif
+                </div>
+
                 <dl class="mt-5 space-y-3 border-t border-ink/10 pt-5 text-sm">
                     <div class="flex items-center justify-between">
                         <dt class="text-ink/70">Subtotal</dt>
                         <dd class="font-semibold text-ink">₹{{ number_format($totals['subtotal']) }}</dd>
                     </div>
+                    @if($couponDiscount > 0)
+                        <div class="flex items-center justify-between">
+                            <dt class="text-ink/70">Coupon ({{ $appliedCoupon }})</dt>
+                            <dd class="font-semibold text-brand">−₹{{ number_format($couponDiscount) }}</dd>
+                        </div>
+                    @endif
                     <div class="flex items-center justify-between">
                         <dt class="text-ink/70">Shipping</dt>
                         <dd class="font-semibold text-emerald-600">FREE</dd>
                     </div>
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">
                         <dt class="font-bold text-ink">Total</dt>
-                        <dd class="text-2xl font-bold text-ink">₹{{ number_format($totals['subtotal']) }}</dd>
+                        <dd class="text-2xl font-bold text-ink">₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }}</dd>
                     </div>
                 </dl>
             </div>
