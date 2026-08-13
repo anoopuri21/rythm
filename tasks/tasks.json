@@ -149,6 +149,12 @@
                 "Final sanity re-review of ALL changes before push",
                 "Push to feature/dev only (PR #22 auto-updates)"
             ]
+        },
+        {
+            "id": "dynamic-website-cms",
+            "title": "Dynamic website CMS \u2014 admin-managed pages (URL slugs) + polymorphic on-page SEO for all pages/products",
+            "status": "done",
+            "note": "Pages table + catch-all slug routing (reserved slugs protected), polymorphic seo_entries (meta/OG/canonical/robots/schema JSON/head scripts), SeoService + layout head integration, PageResource & ProductResource Content/SEO tabs, PageSeeder anchors (home/about/contact/shop + support pages). Live verified. Tests 128 passed (531 assertions)."
         }
     ],
     "git_strategy": {
