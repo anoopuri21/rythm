@@ -214,21 +214,23 @@
         {
             "id": "reviews-system",
             "title": "Product reviews (star rating, verified purchase gate, product page section)",
-            "status": "pending",
+            "status": "done",
             "phase": "P3",
-            "next": true
+            "note": "Reviews table+model+factory, verified-purchase gate, duplicate guard, moderation (approve before visible), star summary + bars, ReviewSection Livewire on product page, pagination"
         },
         {
             "id": "admin-reviews",
             "title": "ReviewResource moderation (approve/reject/delete)",
-            "status": "pending",
-            "phase": "P3"
+            "status": "done",
+            "phase": "P3",
+            "note": "ReviewResource (COMMERCE): rating badges, approved filter, edit toggle, delete"
         },
         {
             "id": "coupons-system",
             "title": "Coupons (percent/fixed, min order, expiry, usage limits) + checkout apply",
             "status": "pending",
-            "phase": "P4"
+            "phase": "P4",
+            "next": true
         },
         {
             "id": "admin-coupons",

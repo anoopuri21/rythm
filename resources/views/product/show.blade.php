@@ -177,6 +177,9 @@
                 </div>
             </div>
 
+            {{-- ===== REVIEWS ===== --}}
+            <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
+
             {{-- ===== RELATED ===== --}}
             @if($related->isNotEmpty())
                 <section aria-label="Related products" class="mt-20">
