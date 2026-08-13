@@ -70,7 +70,7 @@
         },
         {
             "id": "admin-homepage-filament",
-            "title": "Filament admin: homepage sections manager (5 sections, TiptapEditor, multi-group sidebar)",
+            "title": "Filament admin: homepage sections manager (TextInput + TiptapEditor, multi-group sidebar)",
             "status": "done",
             "note": "HomepageSection model + migration + seeder (13 sections) + Filament resource (HOME group, TextInput kicker/title/accent + TiptapEditor content + Toggle + sort) + HomeController cached wiring + DB-driven kicker/title in 12 partials with fallback (cache flush via observer). Tests 104 passed (446 assertions)"
         },
@@ -107,30 +107,46 @@
         {
             "id": "footer-5-column",
             "title": "Footer 5-column redesign (locked until this task)",
-            "status": "pending"
-        },
-        {
-            "id": "admin-homepage-filament",
-            "title": "Filament admin: homepage sections manager (TextInput + TiptapEditor, multi-group sidebar)",
-            "status": "done",
-            "note": "HomepageSection model + migration + seeder (13 sections) + Filament resource (HOME group, TextInput kicker/title/accent + TiptapEditor content + Toggle + sort) + HomeController cached wiring + DB-driven kicker/title in 12 partials with fallback (cache flush via observer). Tests 104 passed (446 assertions)"
+            "status": "pending",
+            "on_hold": true,
+            "hold_reason": "Covered by website-completion (held) \u2014 user directive 2026-08-13"
         },
         {
             "id": "website-completion",
             "title": "Complete remaining storefront (footer 5-column unlock+redesign, polish, gaps)",
             "status": "pending",
-            "next": true
+            "on_hold": true,
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes"
         },
         {
             "id": "optimize-performance",
             "title": "Code optimization + performance (query N+1 sweep, caching, asset size, pagination, eager loading audit)",
-            "status": "pending"
+            "status": "pending",
+            "on_hold": true,
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes"
         },
         {
             "id": "security-review",
             "title": "TOP-NOTCH cyber security review \u2014 OWASP Top 10 audit, auth hardening, payment/webhook crypto, headers, rate limits, secrets, dependency scanning, session security",
             "status": "pending",
-            "priority": "HIGH \u2014 e-commerce platform, security is first-class"
+            "priority": "HIGH \u2014 e-commerce platform, security is first-class",
+            "on_hold": true,
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes"
+        },
+        {
+            "id": "codebase-quality-audit",
+            "title": "Full codebase audit & improvement \u2014 validate/verify/review EVERY file one-by-one (code quality + best practices), apply safe improvements, sanity re-review, then push",
+            "status": "pending",
+            "next": true,
+            "note": "User directive: har file ko ek-ek karke validate + verify + review karna hai. Code quality aur practices check karni hai; jahan improvement possible hai karni hai \u2014 lekin DHYAAN SE: koi functionality disturb nahi honi chahiye, koi bug nahi banana. Improvement ke baad changes ko dobara review karke sanity check karna hai, tab push (feature/dev \u2192 PR #22 auto-updates).",
+            "checklist": [
+                "Ek-ek file review: app/, database/, routes/, config/, resources/views/, resources/js/, tests/",
+                "Code quality: strict_types, typed returns, readonly DTOs, model attributes, service pattern, N+1, magic numbers",
+                "Improve only where safe \u2014 functionality untouched, no new bugs",
+                "Har improvement ke baad: npm run build + php artisan test green",
+                "Final sanity re-review of ALL changes before push",
+                "Push to feature/dev only (PR #22 auto-updates)"
+            ]
         }
     ],
     "git_strategy": {

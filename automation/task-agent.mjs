@@ -44,7 +44,8 @@ log(`branch OK: ${branch}`);
 let state;
 try { state = JSON.parse(readFileSync(TASKS, 'utf-8')); } catch (e) { log(`FAIL: cannot read tasks.json: ${e.message}`); process.exit(1); }
 
-const next = state.tasks.find((t) => t.status === 'pending' && t.next) ?? state.tasks.find((t) => t.status === 'pending');
+const actionable = state.tasks.filter((t) => t.status === 'pending' && !t.on_hold);
+const next = actionable.find((t) => t.next) ?? actionable[0];
 if (!next) {
     log('no pending tasks — all done. waiting for new directives.');
     process.exit(0);
