@@ -30,9 +30,12 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /** Effective price: variant override or parent product price. */
-    public function effectivePrice(): string
+    /**
+     * Effective price: variant override or parent product price.
+     * The parent product is passed explicitly to avoid lazy loading.
+     */
+    public function effectivePrice(Product $product): string
     {
-        return $this->price_override ?? $this->product->price;
+        return $this->price_override ?? (string) $product->price;
     }
 }

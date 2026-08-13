@@ -111,7 +111,7 @@ class ProductPageTest extends TestCase
             'product_id' => $product->id,
             'product_variant_id' => $variant->id,
             'qty' => 1,
-            'unit_price' => (float) $variant->effectivePrice(),
+            'unit_price' => (float) $variant->effectivePrice($product),
         ]);
     }
 

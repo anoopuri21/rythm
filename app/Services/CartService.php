@@ -79,7 +79,7 @@ final class CartService
 
         $stock = $variant !== null ? $variant->stock : $product->stock;
         $unitPrice = $variant !== null
-            ? $variant->effectivePrice()
+            ? $variant->effectivePrice($product)
             : (string) $product->price;
 
         $cart = $this->getOrCreateCart();

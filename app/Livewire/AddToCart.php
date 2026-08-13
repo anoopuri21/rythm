@@ -78,7 +78,7 @@ final class AddToCart extends Component
             : null;
 
         $stock = $variant !== null ? $variant->stock : $this->product->stock;
-        $price = $variant !== null ? (float) $variant->effectivePrice() : (float) $this->product->price;
+        $price = $variant !== null ? (float) $variant->effectivePrice($this->product) : (float) $this->product->price;
         $compareAt = $variant !== null
             ? (float) ($variant->price_override !== null ? $this->product->compare_at_price ?? 0 : 0)
             : (float) ($this->product->compare_at_price ?? 0);
