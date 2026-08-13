@@ -96,7 +96,7 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('class="btn-gold btn-shine"', escape: false);
     }
 
-    public function test_categories_section_is_explore_by_category_with_bajaao_images(): void
+    public function test_categories_section_is_pinned_horizontal_scroll_with_bajaao_images(): void
     {
         $this->get('/')
             ->assertOk()
@@ -104,8 +104,11 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Find your')
             ->assertSee('aria-label="Guitars — 480+ instruments"', escape: false)
             ->assertSee('bajaao.com/cdn/shop/files', escape: false)
-            ->assertSee('class="cat-card group"', escape: false)
-            ->assertSee('class="cat-card-img"', escape: false);
+            ->assertSee('class="pin relative', escape: false)
+            ->assertSee('id="cat-track"', escape: false)
+            ->assertSee('class="gcard"', escape: false)
+            ->assertSee('id="pin-progress"', escape: false)
+            ->assertSee('class="pin__hint"', escape: false);
     }
 
     public function test_instrument_decor_background_shapes_present(): void
@@ -200,7 +203,7 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
-            ->assertSee('class="cat-grid"', escape: false)               // categories (custom CSS grid)
+            ->assertSee('class="pin__track"', escape: false)              // categories (pinned horizontal scroll)
             ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
             ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
