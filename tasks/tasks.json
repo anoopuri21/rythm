@@ -85,13 +85,14 @@
         {
             "id": "product-detail",
             "title": "Product detail page (gallery, specs, related)",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "Product detail page: gallery (Alpine), Flipkart-style price box (MRP/%, EMI), variant selector, qty stepper, AddToCart Livewire (CartService session cart + price snapshot + stock guard + wire:loading), tabs (description/specs), related products, JSON-LD Product, breadcrumbs, single h1, 404 for inactive/unknown"
         },
         {
             "id": "cart-checkout-payment",
             "title": "Cart + Checkout + Payment (Razorpay test)",
-            "status": "pending"
+            "status": "pending",
+            "next": true
         },
         {
             "id": "wishlist-about-contact",

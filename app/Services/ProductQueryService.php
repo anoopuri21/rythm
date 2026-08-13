@@ -40,6 +40,28 @@ final class ProductQueryService
     }
 
     /**
+     * Related products: same category (or parent category), excluding self,
+     * highest discount first. Eager-loaded, capped.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
+     */
+    public function related(Product $product, int $take = 4): \Illuminate\Database\Eloquent\Collection
+    {
+        return Product::query()
+            ->active()
+            ->whereKeyNot($product->id)
+            ->where(function (Builder $q) use ($product): void {
+                $q->where('category_id', $product->category_id)
+                    ->orWhereHas('category', fn (Builder $c): Builder => $c->where('parent_id', $product->category?->parent_id));
+            })
+            ->with(['brand', 'media'])
+            ->orderByRaw('(COALESCE(compare_at_price, 0) - price) DESC')
+            ->orderByDesc('id')
+            ->limit($take)
+            ->get();
+    }
+
+    /**
      * Matches a child category directly, or every product inside a
      * parent category (and its children).
      */
