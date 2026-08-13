@@ -49,4 +49,26 @@ return [
         'RYTHME_VIDEO_URL',
         'https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4'
     ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payments — Razorpay (test mode by default)
+    |--------------------------------------------------------------------------
+    | When keys are missing the app falls back to FakePaymentGateway so the
+    | full checkout flow works locally / in preview. Production must set:
+    |   RYTHME_RAZORPAY_KEY_ID=rzp_test_xxx
+    |   RYTHME_RAZORPAY_KEY_SECRET=xxx
+    |   RYTHME_RAZORPAY_WEBHOOK_SECRET=xxx   (for async webhooks)
+    |--------------------------------------------------------------------------
+    */
+    'razorpay' => [
+        'key_id' => env('RYTHME_RAZORPAY_KEY_ID'),
+        'key_secret' => env('RYTHME_RAZORPAY_KEY_SECRET'),
+        'webhook_secret' => env('RYTHME_RAZORPAY_WEBHOOK_SECRET'),
+    ],
+
+    'shipping' => [
+        'flat_fee' => 0,        // free shipping (INR)
+        'free_above' => 0,      // always free
+    ],
 ];

@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Razorpay posts to these endpoints without a CSRF token
+        // (crypto-verified server-side instead).
+        $middleware->validateCsrfTokens(except: [
+            'payment/razorpay/callback',
+            'payment/razorpay/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

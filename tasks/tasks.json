@@ -91,13 +91,14 @@
         {
             "id": "cart-checkout-payment",
             "title": "Cart + Checkout + Payment (Razorpay test)",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "Cart (session+user, snapshot prices, stock guard, merge-on-login) + CartDrawer/CartBadge/CartPage Livewire + cart page + storefront auth (login/register/logout, intended redirect) + checkout wizard 2-step (address \u2192 payment) + OrderService (snapshots, order number, status history audit, optimistic stock lock) + PaymentGateway interface (Razorpay signature/HMAC verify + FakeGateway fallback) + RazorpayController callback/webhook (CSRF-excepted, crypto-verified) + queued OrderConfirmationMail (Queue::route emails) + signed success page. Tests 85 passed (376 assertions)"
         },
         {
             "id": "wishlist-about-contact",
             "title": "Wishlist + About + Contact pages",
-            "status": "pending"
+            "status": "pending",
+            "next": true
         },
         {
             "id": "automation-system",

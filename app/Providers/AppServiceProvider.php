@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Services\CartService;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -27,5 +28,20 @@ class AppServiceProvider extends ServiceProvider
         View::composer('components.navbar', function ($view): void {
             $view->with('navCategories', app(CategoryService::class)->tree());
         });
+
+        // Merge the guest session cart into the user's cart on login.
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            function (\Illuminate\Auth\Events\Login $event): void {
+                $sessionId = session()->get('rythme.cart.session');
+
+                if ($sessionId !== null) {
+                    app(CartService::class)->mergeGuestCart($sessionId);
+                }
+            },
+        );
+
+        // Route non-blocking email jobs to the 'emails' queue.
+        \Illuminate\Support\Facades\Queue::route(\App\Mail\OrderConfirmationMail::class, 'emails');
     }
 }

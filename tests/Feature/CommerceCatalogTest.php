@@ -135,7 +135,7 @@ class CommerceCatalogTest extends TestCase
     {
         $this->assertSame('products', (new Product)->getTable());
         $this->assertSame('categories', (new Category)->getTable());
-        $this->assertSame('order_status_histories', (new \App\Models\OrderStatusHistory)->getTable());
+        $this->assertSame('order_status_history', (new \App\Models\OrderStatusHistory)->getTable());
         $this->assertSame('newsletter_subscribers', (new \App\Models\NewsletterSubscriber)->getTable());
     }
 }
