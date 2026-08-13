@@ -1,3 +1,4 @@
+@php $sec = $homeSections['bestsellers'] ?? null; @endphp
 @php
     $tabs = [
         'all' => 'All hits',
@@ -17,7 +18,7 @@
     <div class="pointer-events-none absolute -right-40 top-0 h-96 w-96 rounded-full bg-rythme-red/10 blur-[120px]"></div>
     <div class="mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mb-12 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
-            <div><p class="section-kicker">Played. Loved. Recommended.</p><h2 class="section-title text-white">The sound everyone is <em>talking about.</em></h2></div>
+            <div><p class="section-kicker">{{ $sec->kicker ?? 'Played. Loved. Recommended.' }}</p><h2 class="section-title text-white">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else The sound everyone is <em>talking about.</em>@endif</h2></div>
             <div class="flex flex-wrap gap-2" role="tablist" aria-label="Filter best sellers">
                 @foreach($tabs as $value => $label)
                     <button type="button" @click="tab = '{{ $value }}'" :class="tab === '{{ $value }}' ? 'bg-gold text-white border-gold' : 'border-white/15 text-white/60 hover:text-white'" class="rounded-full border px-5 py-2.5 text-xs font-bold transition">{{ $label }}</button>

@@ -1,3 +1,4 @@
+@php $sec = $homeSections['video-showcase'] ?? null; @endphp
 {{--
     ============================================================
     s11 · Video Showcase — "Feel the music. Live the moment."

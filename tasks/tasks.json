@@ -71,7 +71,8 @@
         {
             "id": "admin-homepage-filament",
             "title": "Filament admin: homepage sections manager (5 sections, TiptapEditor, multi-group sidebar)",
-            "status": "pending"
+            "status": "done",
+            "note": "HomepageSection model + migration + seeder (13 sections) + Filament resource (HOME group, TextInput kicker/title/accent + TiptapEditor content + Toggle + sort) + HomeController cached wiring + DB-driven kicker/title in 12 partials with fallback (cache flush via observer). Tests 104 passed (446 assertions)"
         },
         {
             "id": "shop-list",
@@ -111,13 +112,14 @@
         {
             "id": "admin-homepage-filament",
             "title": "Filament admin: homepage sections manager (TextInput + TiptapEditor, multi-group sidebar)",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "HomepageSection model + migration + seeder (13 sections) + Filament resource (HOME group, TextInput kicker/title/accent + TiptapEditor content + Toggle + sort) + HomeController cached wiring + DB-driven kicker/title in 12 partials with fallback (cache flush via observer). Tests 104 passed (446 assertions)"
         },
         {
             "id": "website-completion",
             "title": "Complete remaining storefront (footer 5-column unlock+redesign, polish, gaps)",
-            "status": "pending"
+            "status": "pending",
+            "next": true
         },
         {
             "id": "optimize-performance",

@@ -1,3 +1,4 @@
+@php $sec = $homeSections['categories'] ?? null; @endphp
 @php
     $categories = config('catalog.categories', []);
 @endphp
@@ -8,8 +9,8 @@
     <div class="relative z-[1] relative z-[1] mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end" data-reveal="up">
             <div>
-                <p class="section-kicker">Explore by category</p>
-                <h2 class="section-title">Find your <em>instrument.</em></h2>
+                <p class="section-kicker">{{ $sec->kicker ?? 'Explore by category' }}</p>
+                <h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Find your <em>instrument.</em>@endif</h2>
                 <p class="mt-5 max-w-xl text-base leading-7 text-rythme-warm-gray">From your first chord to your hundredth gig — shop real gear from the brands musicians trust.</p>
             </div>
             <a href="/shop" class="text-link shrink-0">View all products <span>↗</span></a>

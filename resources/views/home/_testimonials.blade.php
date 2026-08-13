@@ -1,3 +1,4 @@
+@php $sec = $homeSections['testimonials'] ?? null; @endphp
 @php
     $testimonials = [
         [
@@ -37,8 +38,8 @@
 
     <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mx-auto mb-14 max-w-3xl text-center">
-            <p class="section-kicker justify-center text-gold-light">Stories from the Rhythm Exports community</p>
-            <h2 class="section-title mx-auto text-white">Made for musicians.<br><em class="text-gold-light">Loved by musicians.</em></h2>
+            <p class="section-kicker justify-center text-gold-light">{{ $sec->kicker ?? 'Stories from the Rhythm Exports community' }}</p>
+            <h2 class="section-title mx-auto text-white">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Made for musicians.<br><em class="text-gold-light">Loved by musicians.</em>@endif</h2>
             <div class="mt-6 flex items-center justify-center gap-3 text-sm text-white/55">
                 <span class="tracking-[0.2em] text-gold" aria-label="5 out of 5 stars">★★★★★</span>
                 <span><strong class="text-white">4.9</strong> from 2,400+ verified reviews</span>

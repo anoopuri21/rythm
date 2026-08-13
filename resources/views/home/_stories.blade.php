@@ -1,3 +1,4 @@
+@php $sec = $homeSections['stories'] ?? null; @endphp
 @php
     $stories = [
         ['category'=>'Studio guide','title'=>'Build a home studio that inspires your best work','excerpt'=>'A practical room-by-room guide to choosing monitors, interfaces and acoustic treatment without overcomplicating it.','image'=>'images/story-studio.jpg','date'=>'August 02, 2026','read'=>'8 min read'],
@@ -9,7 +10,7 @@
 <section id="stories" class="relative overflow-hidden bg-rythme-cream py-24 sm:py-32">
     @include('components.instrument-decor')
     <div class="relative z-[1] mx-auto max-w-7xl px-5 sm:px-8">
-        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">The Rhythm Exports journal</p><h2 class="section-title">Ideas for a life<br><em>lived in music.</em></h2></div><a href="/stories" class="text-link">Read all stories <span>↗</span></a></div>
+        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">{{ $sec->kicker ?? 'The Rhythm Exports journal' }}</p><h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Ideas for a life<br><em>lived in music.</em>@endif</h2></div><a href="/stories" class="text-link">Read all stories <span>↗</span></a></div>
         <div class="grid gap-8 md:grid-cols-3">
             @foreach($stories as $story)
                 <article class="reveal-section story-card group">
