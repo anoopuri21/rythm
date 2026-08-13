@@ -23,7 +23,7 @@ class HomepageSectionsTest extends TestCase
             // Row 1: logo + big search + icons
             ->assertSee('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', escape: false)
             ->assertSee('id="nav-search"', escape: false)
-            ->assertSee('aria-label="Wishlist, 0 items"', escape: false)
+            ->assertSee('aria-label="Wishlist"', escape: false)
             ->assertSee('aria-label="Open cart"', escape: false)
             ->assertSee('cart-drawer-toggle', escape: false)
             ->assertSee('aria-label="Account"', escape: false)

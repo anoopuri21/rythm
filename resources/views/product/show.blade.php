@@ -107,6 +107,11 @@
                     {{-- Livewire price box + variant + qty + add-to-cart --}}
                     <livewire:add-to-cart :product="$product" :key="'atc-' . $product->id" />
 
+                    <div class="mt-4">
+                        <livewire:wishlist-button :product-id="$product->id" :variant="'page'"
+                                                  wire:key="wl-page-{{ $product->id }}" />
+                    </div>
+
                     {{-- Trust strip --}}
                     <div class="mt-8 grid grid-cols-3 gap-3 rounded-2xl border border-ink/10 bg-white p-4 text-center">
                         <div class="flex flex-col items-center gap-1.5">

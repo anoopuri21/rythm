@@ -30,6 +30,9 @@
             </span>
         @endif
 
+        <livewire:wishlist-button :product-id="$product->id" :variant="'card'"
+                                  wire:key="wl-{{ $product->id }}" />
+
         <a href="{{ $href }}"
            class="absolute inset-x-3 bottom-3 translate-y-14 rounded-full bg-ink/90 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur transition duration-300 group-hover:translate-y-0 hover:bg-brand"
            aria-label="View {{ $product->name }}">

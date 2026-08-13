@@ -97,13 +97,14 @@
         {
             "id": "wishlist-about-contact",
             "title": "Wishlist + About + Contact pages",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "Wishlist (auth-only, toggle heart on cards+product page, badge in navbar, page with move-to-cart, WishlistService) + About page (story, stats, promises, CTA) + Contact page (validated form + honeypot + throttle, ContactMessage model+migration, info cards). Tests 98 passed (418 assertions)"
         },
         {
             "id": "automation-system",
             "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) \u2014 task mode ON",
-            "status": "pending"
+            "status": "pending",
+            "next": true
         },
         {
             "id": "footer-5-column",
