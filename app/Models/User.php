@@ -32,6 +32,16 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return true;
     }
 
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

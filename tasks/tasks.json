@@ -242,39 +242,39 @@
         {
             "id": "admin-customers",
             "title": "CustomerResource (users, orders, spend)",
-            "status": "pending",
-            "phase": "P5",
-            "next": true
+            "status": "done",
+            "phase": "P5"
         },
         {
             "id": "admin-contact-messages",
             "title": "ContactMessageResource (new/read/replied workflow)",
-            "status": "pending",
+            "status": "done",
             "phase": "P5"
         },
         {
             "id": "admin-newsletter",
             "title": "NewsletterSubscriberResource + CSV export",
-            "status": "pending",
+            "status": "done",
             "phase": "P5"
         },
         {
             "id": "admin-dashboard-widgets",
             "title": "Dashboard widgets (revenue, orders, low-stock, latest orders)",
-            "status": "pending",
+            "status": "done",
             "phase": "P5"
         },
         {
             "id": "site-settings",
             "title": "Site settings model+resource (shipping, GST, contact, social) cached",
-            "status": "pending",
+            "status": "done",
             "phase": "P5"
         },
         {
             "id": "seo-sitemap",
             "title": "Dynamic sitemap.xml + robots.txt",
             "status": "pending",
-            "phase": "P6"
+            "phase": "P6",
+            "next": true
         },
         {
             "id": "prod-queue",
