@@ -1,14 +1,11 @@
 {
     "project": "SOUNDSCAPE \u2014 Rhythm Exports",
     "repo": "anoopuri21/rythm",
-    "branch": "arena/019fe1bf-rythm",
-    "task_mode": false,
+    "branch": "feature/dev",
+    "task_mode": true,
     "locked_features": [
         "Header",
-        "Footer",
-        "Cart",
-        "Wishlist",
-        "Checkout/Payment"
+        "Footer"
     ],
     "tasks": [
         {
@@ -103,13 +100,41 @@
         {
             "id": "automation-system",
             "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) \u2014 task mode ON",
-            "status": "pending",
-            "next": true
+            "status": "done",
+            "note": "Single-branch workflow (feature/dev) + single PR #22; 17 stale merged branches deleted; scaffolding: automation/config.json + task-agent.mjs + CI workflow. task_mode: ON"
         },
         {
             "id": "footer-5-column",
             "title": "Footer 5-column redesign (locked until this task)",
             "status": "pending"
+        },
+        {
+            "id": "admin-homepage-filament",
+            "title": "Filament admin: homepage sections manager (TextInput + TiptapEditor, multi-group sidebar)",
+            "status": "pending",
+            "next": true
+        },
+        {
+            "id": "website-completion",
+            "title": "Complete remaining storefront (footer 5-column unlock+redesign, polish, gaps)",
+            "status": "pending"
+        },
+        {
+            "id": "optimize-performance",
+            "title": "Code optimization + performance (query N+1 sweep, caching, asset size, pagination, eager loading audit)",
+            "status": "pending"
+        },
+        {
+            "id": "security-review",
+            "title": "TOP-NOTCH cyber security review \u2014 OWASP Top 10 audit, auth hardening, payment/webhook crypto, headers, rate limits, secrets, dependency scanning, session security",
+            "status": "pending",
+            "priority": "HIGH \u2014 e-commerce platform, security is first-class"
         }
-    ]
+    ],
+    "git_strategy": {
+        "single_branch": true,
+        "branch": "feature/dev",
+        "pr": "ONE open PR #22 (feature/dev -> main) \u2014 auto-updates on every push",
+        "rule": "NEVER create new branches or new PRs. All work lands on feature/dev. User reviews/merges PR #22 once."
+    }
 }

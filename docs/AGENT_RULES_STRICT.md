@@ -167,3 +167,31 @@ No other sources (no random web hotlinks, no copyrighted images).
   keep PHPUnit, not Pest) covering success + exception boundaries.
 - Existing gates stay: `npm run build` + `php artisan test` green before
   marking any task done.
+
+---
+
+## 10. Git Workflow STRICT — Single Branch, Single PR (user directive 2026-08-13)
+
+- **ONE long-lived branch: `feature/dev`.** All development, every task, every commit lands here.
+- **ONE open PR: #22 (`feature/dev` → `main`)** — it auto-updates on every push. User reviews & merges ONCE.
+- **NEVER** create a new branch (`task/<id>`, `feature/<x>`, etc.) and NEVER open a new PR.
+- Never commit to `main` directly. Push only to `feature/dev`.
+- Stale/merged branches are deleted immediately when noticed.
+- Task agent (`automation/task-agent.mjs`) enforces: branch check before any commit.
+
+## 11. Security Mandate — TOP-NOTCH (user directive 2026-08-13)
+
+> This is an e-commerce platform. **Security is a first-class, non-negotiable concern** in EVERY line of code and architecture decision — never an afterthought.
+
+1. **OWASP Top 10 aware** — every feature considered against: broken access control, injection, XSS, insecure design, misconfig, vulnerable components, auth failures, crypto failures, SSRF, logging issues.
+2. **Input**: every input via FormRequest validation; never trust client data (prices, totals, ids, ownership).
+3. **Output**: Blade auto-escaping; no raw `{!! !!}` unless trusted Tiptap content sanitized; CSP headers where feasible.
+4. **AuthZ**: ownership checks (Policies or inline `user_id` guards) on every resource — orders, wishlist, addresses. Signed URLs for sensitive pages.
+5. **Payments**: Razorpay callback + webhook ALWAYS cryptographically verified (signature/HMAC) before state change; amount-match checks; CSRF-excepted routes verified server-side only.
+6. **SQLi**: Eloquent/Query-Builder only; raw SQL only with bound params and zero user input.
+7. **Mass assignment**: model attributes (`#[Fillable]`) strictly; no `*` guard.
+8. **Secrets**: env-only; never commit keys; `.env` gitignored.
+9. **Rate limiting** on all auth + form POST routes (login, register, contact, newsletter, cart, checkout).
+10. **Dependencies**: `composer audit` + `npm audit` checked in CI; no known-vulnerable packages.
+11. **Session/cookies**: secure cookie flags in production; session regeneration on login.
+12. **Security review task is QUEUED** (`security-review` in tasks.json) — full audit after site completion; until then every new code passes the checklist above.
