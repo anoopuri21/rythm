@@ -178,9 +178,9 @@
 
                         <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
                                 class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-                                aria-label="Pay ₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }}">
+                                aria-label="Pay ₹{{ number_format($grandTotal) }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
-                                Pay ₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }} securely
+                                Pay ₹{{ number_format($grandTotal) }} securely
                             </span>
                             <span wire:loading wire:target="placeOrder,confirmPayment" class="inline-flex items-center gap-2">
                                 <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
@@ -258,6 +258,7 @@
                         <dt class="text-ink/70">Shipping</dt>
                         <dd class="font-semibold text-emerald-600">FREE</dd>
                     </div>
+
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">
                         <dt class="font-bold text-ink">Total</dt>
                         <dd class="text-2xl font-bold text-ink">₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }}</dd>

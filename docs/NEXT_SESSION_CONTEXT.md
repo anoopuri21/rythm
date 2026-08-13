@@ -186,3 +186,29 @@ Bottom line: tum aur mai same ho — `admin-homepage-filament` se shuru karna ha
 - Everything on `feature/dev`; single PR **#22** open (feature/dev → main) — review & merge once.
 - `task_mode: false` — re-enable on user command.
 - Next candidate tasks (user-directed when they return): real product images via admin media library, blog/journal, reviews, coupons, Postgres/pgvector semantic search, WebAuthn passkeys (Fortify) — all gated on user approval.
+
+---
+
+## PRODUCTION OPERATIONS (Phase 6 — 2026-08-13)
+
+### Queue worker (emails, order notifications)
+```bash
+# .env
+QUEUE_CONNECTION=database
+# then run worker (one per app server; retry failed jobs):
+php artisan queue:work --tries=3 --timeout=90
+# supervisor/systemd recommended for long-running; failed jobs: php artisan queue:retry all
+```
+
+### Caching decisions (senior review)
+- Cached: category tree (forever+observer), brand counts (1h+observer), homepage sections (1h+observer), homepage SEO (1h), site settings (forever+flush on save)
+- Shop product queries: NOT response-cached (dynamic filters + pagination) — queries are eager-loaded, indexed, paginated; revisit only if metrics demand
+
+### GST & shipping (admin Settings page)
+- shipping_flat_fee · shipping_free_above · tax_rate (%) — applied server-side in checkout totals (grand total = subtotal − coupon + shipping + GST)
+
+### Sitemap
+- /sitemap.xml (home, shop, pages, categories, products) · /robots.txt (admin/cart/checkout/account disallowed)
+
+### Error pages
+- Custom 404 / 500 (design system) — resources/views/errors/

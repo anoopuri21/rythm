@@ -19,6 +19,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -116,6 +117,10 @@ Route::get('/track-order', [OrderController::class, 'lookup'])->name('orders.loo
 Route::post('/track-order', [OrderController::class, 'lookupPost'])
     ->middleware('throttle:5,1')
     ->name('orders.lookup.post');
+
+// SEO: sitemap + robots (before catch-all)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // Dynamic pages (admin-managed URL slugs) — catch-all, must be LAST.
 // Reserved route slugs are blocked at the admin level (Page::RESERVED_SLUGS).

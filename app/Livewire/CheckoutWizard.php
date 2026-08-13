@@ -9,6 +9,7 @@ use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
+use App\Services\SiteSettingsService;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
@@ -140,7 +141,7 @@ final class CheckoutWizard extends Component
     /**
      * Create the order + payment initiation, then return gateway info.
      */
-    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses): void
+    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses, SiteSettingsService $settings): void
     {
         $this->placing = true;
         $this->paymentError = null;
@@ -171,8 +172,8 @@ final class CheckoutWizard extends Component
                 billingAddress: $addresses->snapshot($address),
                 subtotal: $totals['subtotal'],
                 discount: $this->couponDiscount,
-                shippingFee: (float) config('rythme.shipping.flat_fee', 0),
-                tax: 0.0,
+                shippingFee: $this->shippingFeeFor($totals['subtotal'], $settings),
+                tax: $this->taxFor($totals['subtotal'] - $this->couponDiscount, $settings),
                 currency: 'INR',
                 couponCode: $this->appliedCoupon,
             );
@@ -251,7 +252,7 @@ final class CheckoutWizard extends Component
         }
     }
 
-    public function render(AddressService $addresses, CartService $cart): View
+    public function render(AddressService $addresses, CartService $cart, SiteSettingsService $settings): View
     {
         $cartItems = $cart->items();
         $totals = $cart->totals();
@@ -260,12 +261,38 @@ final class CheckoutWizard extends Component
             $this->step = 1;
         }
 
+        $discounted = max(0.0, $totals['subtotal'] - $this->couponDiscount);
+        $shippingFee = $this->shippingFeeFor($totals['subtotal'], $settings);
+        $tax = $this->taxFor($discounted, $settings);
+
         return view('livewire.checkout-wizard', [
             'addresses' => $addresses->forUser(auth()->id()),
             'cartItems' => $cartItems,
             'totals' => $totals,
+            'shippingFee' => $shippingFee,
+            'tax' => $tax,
+            'grandTotal' => round($discounted + $shippingFee + $tax, 2),
             'razorpayConfigured' => RazorpayGateway::isConfigured(),
         ]);
+    }
+
+    private function shippingFeeFor(float $subtotal, SiteSettingsService $settings): float
+    {
+        $flat = $settings->getFloat('shipping_flat_fee', 0.0);
+        $freeAbove = $settings->getFloat('shipping_free_above', 0.0);
+
+        if ($freeAbove > 0 && $subtotal >= $freeAbove) {
+            return 0.0;
+        }
+
+        return $flat;
+    }
+
+    private function taxFor(float $discountedSubtotal, SiteSettingsService $settings): float
+    {
+        $rate = $settings->getFloat('tax_rate', 0.0);
+
+        return round($discountedSubtotal * ($rate / 100), 2);
     }
 
     private function resetFormFields(): void
