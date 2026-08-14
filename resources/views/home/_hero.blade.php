@@ -35,7 +35,7 @@
                     Handpicked guitars, keyboards, drums and studio gear — set up by musicians, delivered with care across India.
                 </p>
                 <div class="mt-9 flex flex-wrap items-center gap-5" data-reveal="up">
-                    <a href="/shop" class="btn-gold btn-shine">Explore instruments <span aria-hidden="true">→</span></a>
+                    <a href="/shop" class="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-white/85">Explore instruments <span aria-hidden="true">→</span></a>
                     <a href="#categories" class="btn-ghost-light">Browse categories</a>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                                 @endif
                                 <p class="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">{{ $slide['copy'] }}</p>
                                 <div class="mt-9 flex flex-wrap items-center gap-5">
-                                    <a href="{{ $slide['cta_href'] }}" class="btn-gold btn-shine">{{ $slide['cta'] }} <span aria-hidden="true">→</span></a>
+                                    <a href="{{ $slide['cta_href'] }}" class="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-white/85">{{ $slide['cta'] }} <span aria-hidden="true">→</span></a>
                                     <a href="#categories" class="inline-flex items-center gap-3 text-sm font-semibold text-white transition hover:text-gold">
                                         Browse collections <span aria-hidden="true">→</span>
                                     </a>

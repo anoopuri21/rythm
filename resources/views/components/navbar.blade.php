@@ -57,10 +57,10 @@
         <div class="hidden h-12 items-center justify-between border-t border-black/10 lg:flex">
             <button type="button"
                     @click="$store.catDrawer.open = true"
-                    class="mr-6 inline-flex h-8 shrink-0 items-center gap-2 rounded-full bg-rythme-red px-5 text-[13px] font-bold uppercase tracking-[0.08em] text-white transition hover:bg-rythme-red-dark"
+                    class="mr-6 inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-black/15 px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-rythme-black transition hover:border-black"
                     aria-haspopup="dialog" aria-controls="category-drawer"
                     :aria-expanded="$store.catDrawer.open ? 'true' : 'false'">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 All Categories
             </button>
 
@@ -132,7 +132,7 @@
         <div class="flex-1 overflow-y-auto px-4 py-5">
             <button type="button"
                     @click="mobileMenu = false; $store.catDrawer.open = true"
-                    class="mb-2 flex w-full items-center gap-2.5 rounded-xl bg-rythme-red px-4 py-3 text-sm font-bold text-white transition hover:bg-rythme-red-dark">
+                    class="mb-2 flex w-full items-center gap-2.5 rounded-xl border border-black/15 px-4 py-3 text-sm font-bold text-rythme-black transition hover:border-black">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 Shop by Category
             </button>
