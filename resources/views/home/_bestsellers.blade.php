@@ -1,22 +1,12 @@
 @php $sec = $homeSections['bestsellers'] ?? null; @endphp
 @php
-    $tabs = [
-        'all' => 'All hits',
-        'guitars' => 'Guitars',
-        'keys' => 'Keys',
-        'drums' => 'Drums',
-        'pro-audio' => 'Pro Audio',
-    ];
-    $categoryByBrand = [
-        'Fender' => 'guitars', 'Ibanez' => 'guitars', 'Casio' => 'keys', 'Roland' => 'keys',
-        'Alesis' => 'drums', 'Focusrite' => 'pro-audio', 'Shure' => 'pro-audio', 'Beyerdynamic' => 'pro-audio',
-    ];
-    $products = array_map(fn ($p) => $p + ['category' => $categoryByBrand[$p['brand']] ?? 'all'], config('catalog.featured'));
+    // BESTSELLERS — admin-driven: products with is_featured + featured_rank
+    $products = $homepage['bestsellers'] ?? collect();
+    $tabGroups = ['Guitars', 'Keyboards', 'Drums', 'Pro Audio'];
 @endphp
 
 {{-- ============================================================
-     BEST SELLERS — "Discover Top Picks" (reference minimal-tech)
-     Light gray section · white cards · minimal underline tabs
+     BEST SELLERS — "Discover Top Picks" (admin-driven products)
      ============================================================ --}}
 <section id="bestsellers" class="bg-rythme-cream-dark py-20 sm:py-28" x-data="{ tab: 'all' }">
     <div class="mx-auto max-w-7xl px-5 sm:px-8">
@@ -29,20 +19,28 @@
                 </p>
             </div>
             <div class="flex flex-wrap gap-6" role="tablist" aria-label="Filter best sellers">
-                @foreach($tabs as $value => $label)
-                    <button type="button" @click="tab = '{{ $value }}'"
-                            :class="tab === '{{ $value }}' ? 'border-black text-black' : 'border-transparent text-rythme-warm-gray hover:text-black'"
-                            class="border-b-2 pb-1.5 text-[13px] font-semibold transition">{{ $label }}</button>
+                <button type="button" @click="tab = 'all'"
+                        :class="tab === 'all' ? 'border-black text-black' : 'border-transparent text-rythme-warm-gray hover:text-black'"
+                        class="border-b-2 pb-1.5 text-[13px] font-semibold transition">All</button>
+                @foreach($tabGroups as $group)
+                    <button type="button" @click="tab = '{{ Str::slug($group) }}'"
+                            :class="tab === '{{ Str::slug($group) }}' ? 'border-black text-black' : 'border-transparent text-rythme-warm-gray hover:text-black'"
+                            class="border-b-2 pb-1.5 text-[13px] font-semibold transition">{{ $group }}</button>
                 @endforeach
             </div>
         </div>
 
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            @foreach($products as $product)
-                <div x-show="tab === 'all' || tab === '{{ $product['category'] }}'" x-transition.opacity>
+            @forelse($products as $product)
+                @php
+                    $groupSlug = Str::slug($product->category?->parent?->name ?? $product->category?->name ?? 'Other');
+                @endphp
+                <div x-show="tab === 'all' || tab === '{{ $groupSlug }}'" x-transition.opacity>
                     <x-minimal-product-card :product="$product" />
                 </div>
-            @endforeach
+            @empty
+                <p class="text-sm text-rythme-warm-gray">No featured products yet — mark products as Featured in admin.</p>
+            @endforelse
         </div>
 
         <div class="mt-12 text-center">

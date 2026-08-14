@@ -34,6 +34,8 @@ class Product extends Model implements HasMedia
         'low_stock_threshold' => 'integer',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'featured_rank' => 'integer',
+        'is_trending' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -101,6 +103,11 @@ class Product extends Model implements HasMedia
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
+    }
+
+    public function scopeTrending(Builder $query): Builder
+    {
+        return $query->where('is_trending', true);
     }
 
     public function scopeWhereCategory(Builder $query, int|string $category): Builder

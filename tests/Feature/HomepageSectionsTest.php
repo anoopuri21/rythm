@@ -14,6 +14,13 @@ use Tests\TestCase;
 class HomepageSectionsTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
     public function test_navbar_has_logo_search_icons_and_two_rows(): void
     {
         $this->get('/')
@@ -55,7 +62,7 @@ class HomepageSectionsTest extends TestCase
             ->assertOk()
             ->assertSee('hero-swiper swiper', escape: false)
             ->assertSee('hero-slide-image', escape: false)
-            ->assertSee('class="btn-gold btn-shine"', escape: false)
+            ->assertSee('rounded-full bg-white px-7 py-4', escape: false)
             ->assertSee('hero-pagination', escape: false);
     }
 
@@ -130,13 +137,11 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('products-next', escape: false)
             ->assertSee('products-pagination', escape: false)
             ->assertSee('Popular right')
-            // Real Bajaao products (same-to-same)
-            ->assertSee('Squier Sonic Stratocaster Electric Guitar')
-            ->assertSee('Yamaha F310 Dreadnought Acoustic Guitar')
-            ->assertSee('Kala Makala MK-S Soprano Ukulele')
-            ->assertSee('Focusrite Scarlett 2i2')
-            ->assertSee('KRK Classic 7')
-            ->assertSee('Hohner M254001S Ocean Star', escape: false)
+            // Real DB trending products
+            ->assertSee('Yamaha F310 Acoustic Guitar')
+            ->assertSee('Squier Affinity Stratocaster HSS')
+            ->assertSee('Roland FP-30X Digital Piano')
+            ->assertSee('Shure SM58 Vocal Microphone')
             ->assertSee('bajaao.com/cdn/shop/files', escape: false);
     }
 
@@ -144,12 +149,12 @@ class HomepageSectionsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Squier Sonic Stratocaster')
-            ->assertSee('Roland FP-30X')
-            ->assertSee('Alesis Nitro Max')
-            ->assertSee('Focusrite Scarlett 2i2')
+            ->assertSee('Yamaha F310 Acoustic Guitar')
+            ->assertSee('Squier Affinity Stratocaster HSS')
+            ->assertSee('Roland FP-30X Digital Piano')
+            ->assertSee('Shure SM58 Vocal Microphone')
             ->assertSee('role="tablist"', escape: false)
-            ->assertSee('All hits')
+            ->assertSee('>All<', escape: false)
             ->assertSee('Pro Audio')
             ->assertSee('Shop all best sellers');
     }
@@ -159,9 +164,9 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('lg:sticky lg:top-32', escape: false)
-            ->assertSee('The Rhythm Exports standard')
-            ->assertSee('Expertly inspected')
-            ->assertSee('Complimentary setup')
+            ->assertSee('The Rythme standard')
+            ->assertSee('Free expert setup')
+            ->assertSee('Easy returns')
             ->assertDontSee('why-media', escape: false);
     }
 
@@ -204,7 +209,7 @@ class HomepageSectionsTest extends TestCase
             ->assertOk()
             ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
             ->assertSee('class="pin__track"', escape: false)              // categories (pinned horizontal scroll)
-            ->assertSee('min-grid grid', escape: false)                   // new arrivals (minimal grid)
+            ->assertSee('id="new-arrivals"', escape: false)             // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
             ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)

@@ -7,11 +7,17 @@
     ============================================================
 --}}
 @php
-    $ugcPosts = [
-        ['image' => 'images/ugc/studio-vocalist.jpg', 'handle' => '@ria.makes.music', 'caption' => 'Tracking vocals on her first Rhythm Exports studio bundle.'],
-        ['image' => 'images/ugc/guitar-corner.jpg', 'handle' => '@akash.plays', 'caption' => 'Sunday mornings with the CS11 and a window seat.'],
-        ['image' => 'images/ugc/dj-desk.jpg', 'handle' => '@decks.by.dev', 'caption' => 'Weekend sets on a Rhythm Exports-sourced rig.'],
-    ];
+    // ADMIN-DRIVEN: homepage_blocks (section_key=ugc) — title=handle, content=caption
+    $ugcPosts = $homepage['ugc']->map(fn ($b, $i) => [
+        'image' => $b->getFirstMediaUrl('image') ?: ['images/ugc/studio-vocalist.jpg','images/ugc/guitar-corner.jpg','images/ugc/dj-desk.jpg'][$i % 3],
+        'handle' => $b->title ?: '@rhythme.family',
+        'caption' => $b->content ?: 'Part of the #RythmeFamily.',
+    ])->all();
+    if (empty($ugcPosts)) {
+        $ugcPosts = [
+            ['image' => 'images/ugc/studio-vocalist.jpg', 'handle' => '@ria.makes.music', 'caption' => 'Tracking vocals on her first Rhythm Exports studio bundle.'],
+        ];
+    }
 @endphp
 
 <section id="ugc" class="relative overflow-hidden bg-rythme-black py-24 text-white sm:py-32">

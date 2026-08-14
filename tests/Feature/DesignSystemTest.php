@@ -15,6 +15,13 @@ use Tests\TestCase;
 class DesignSystemTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
     public function test_no_gold_colors_in_css_tailwind_or_views(): void
     {
         $haystacks = [

@@ -1,5 +1,9 @@
 @php $sec = $homeSections['brands'] ?? null; @endphp
-@php $brands = ['FENDER','YAMAHA','GIBSON','ROLAND','CASIO','MARSHALL','IBANEZ','SHURE']; @endphp
+@php
+    // ADMIN-DRIVEN: brands table
+    $brands = \App\Models\Brand::query()->where('is_active', true)->orderBy('sort_order')->pluck('name')->map(fn ($n) => strtoupper((string) $n))->all();
+    if (empty($brands)) { $brands = ['FENDER','YAMAHA','GIBSON','ROLAND','CASIO','MARSHALL','IBANEZ','SHURE']; }
+@endphp
 
 <section id="brands" class="overflow-hidden bg-white py-24 sm:py-32">
     <div class="mx-auto max-w-7xl px-5 sm:px-8">

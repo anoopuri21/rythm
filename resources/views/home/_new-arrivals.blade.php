@@ -1,13 +1,12 @@
 @php $sec = $homeSections['new-arrivals'] ?? null; @endphp
 @php
-    $featured = config('catalog.featured');
-    // Reference-style clean grid: editor pick + fresh arrivals
-    $arrivals = [$featured[0], $featured[7], $featured[5], $featured[6]];
+    // NEW ARRIVALS — admin-driven: latest active products (created_at desc)
+    $arrivals = $homepage['newArrivals'] ?? collect();
+    $arrivals = $arrivals->take(8);
 @endphp
 
 {{-- ============================================================
-     NEW ARRIVALS — reference minimal-tech grid
-     White section · 4 clean product cards · view-all link
+     NEW ARRIVALS — admin-driven clean grid
      ============================================================ --}}
 <section id="new-arrivals" class="bg-white py-20 sm:py-28">
     <div class="mx-auto max-w-7xl px-5 sm:px-8">
@@ -22,10 +21,12 @@
             <a href="/shop?sort=newest" class="text-link">See everything new <span aria-hidden="true">↗</span></a>
         </div>
 
-        <div class="min-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            @foreach($arrivals as $product)
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            @forelse($arrivals as $product)
                 <x-minimal-product-card :product="$product" />
-            @endforeach
+            @empty
+                <p class="text-sm text-rythme-warm-gray">No products yet — add products in admin.</p>
+            @endforelse
         </div>
     </div>
 </section>
