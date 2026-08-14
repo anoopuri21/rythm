@@ -16,6 +16,6 @@
                 <a href="/deals" class="btn-gold btn-shine mt-9"><span class="relative z-10">Shop the sale</span><span class="relative z-10">↗</span></a>
             </div>
         </div>
-        <div class="absolute right-8 top-8 z-10 hidden h-28 w-28 rotate-12 items-center justify-center rounded-full bg-rythme-red text-center font-bebas text-2xl leading-none text-white shadow-2xl sm:flex">UP TO<br><span class="text-4xl">35%</span><br>OFF</div>
+        <div class="absolute right-8 top-8 z-10 hidden h-28 w-28 rotate-12 items-center justify-center rounded-full bg-black text-center font-bebas text-2xl leading-none text-white shadow-2xl sm:flex">UP TO<br><span class="text-4xl">35%</span><br>OFF</div>
     </article>
 </section>

@@ -204,7 +204,7 @@ class HomepageSectionsTest extends TestCase
             ->assertOk()
             ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
             ->assertSee('class="pin__track"', escape: false)              // categories (pinned horizontal scroll)
-            ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
+            ->assertSee('min-grid grid', escape: false)                   // new arrivals (minimal grid)
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
             ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)

@@ -74,7 +74,7 @@
                        @click="openMenu = openMenu === {{ $index }} ? null : {{ $index }}"
                        :aria-expanded="openMenu === {{ $index }} ? 'true' : 'false'" aria-haspopup="true">
                         @if(!empty($item['hot']))
-                            <span class="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-rythme-red" aria-hidden="true"></span>
+                            <span class="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-black" aria-hidden="true"></span>
                         @endif
                         {{ $item['name'] }}
                         <svg class="h-3 w-3 opacity-70 transition-transform duration-300" :class="openMenu === {{ $index }} ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M19 9l-7 7-7-7" /></svg>
@@ -146,7 +146,7 @@
                         <button type="button" @click="openCat = openCat === {{ $index }} ? null : {{ $index }}"
                                 class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-rythme-black transition hover:bg-gold/10"
                                 :aria-expanded="openCat === {{ $index }} ? 'true' : 'false'">
-                            @if(!empty($item['hot']))<span class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-rythme-red" aria-hidden="true"></span>@endif
+                            @if(!empty($item['hot']))<span class="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-black" aria-hidden="true"></span>@endif
                             {{ $item['name'] }}
                             <svg class="h-4 w-4 text-gold-dark transition-transform duration-300" :class="openCat === {{ $index }} ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </button>

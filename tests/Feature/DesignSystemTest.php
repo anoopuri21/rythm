@@ -74,14 +74,16 @@ class DesignSystemTest extends TestCase
             ->assertSee('products-swiper swiper', escape: false)
             ->assertSee('object-contain p-5', escape: false)
             ->assertSee('Bestseller', escape: false)
-            ->assertSee('object-contain p-6', escape: false); // product-card too
+            ->assertSee('mcard__img-el', escape: false); // minimal product card
     }
 
-    public function test_red_buttons_render(): void
+    public function test_minimal_black_buttons_and_cards_render(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('bg-rythme-red', escape: false)
-            ->assertSee('hover:bg-rythme-red-dark', escape: false);
+            ->assertSee('mcard', escape: false)
+            ->assertSee('bg-black', escape: false)
+            ->assertDontSee('hover:bg-rythme-red-dark', escape: false)
+            ->assertDontSee('bg-rythme-red', escape: false);
     }
 }
