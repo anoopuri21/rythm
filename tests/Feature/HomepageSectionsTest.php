@@ -25,33 +25,22 @@ class HomepageSectionsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            // White, sticky (in flow — NOT over hero), full width + 30px padding
-            ->assertSee('id="navbar" class="sticky top-0 z-50 w-full border-b border-black/5 bg-white', escape: false)
-            ->assertSee('px-[30px]', escape: false)
-            ->assertDontSee('navbar-transparent', escape: false)
-            // Row 1: logo + big search + icons
+            // Prototype-style navbar: white blur, sticky, two rows
+            ->assertSee('id="navbar" class="nav"', escape: false)
+            ->assertSee('nav__row1', escape: false)
+            ->assertSee('nav__menu', escape: false)
+            // Row 1: logo + pill search + icons
             ->assertSee('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', escape: false)
             ->assertSee('id="nav-search"', escape: false)
             ->assertSee('aria-label="Wishlist"', escape: false)
             ->assertSee('aria-label="Open cart"', escape: false)
             ->assertSee('cart-drawer-toggle', escape: false)
             ->assertSee('aria-label="Account"', escape: false)
-            // Row 2: main categories (user-specified taxonomy, Other/Deals removed)
-            ->assertSee('>Guitars<', escape: false)
-            ->assertSee('>Ukuleles &amp; Violins<', escape: false)
-            ->assertSee('>Keyboards &amp; Pianos<', escape: false)
-            ->assertSee('>Studio &amp; Recording<', escape: false)
-            ->assertSee('>Drums &amp; Percussion<', escape: false)
-            ->assertSee('>Software &amp; Plugins<', escape: false)
-            ->assertSee('>More<', escape: false)
-            ->assertDontSee('/category/other', escape: false)
-            ->assertDontSee('/category/deals', escape: false)
+            // Row 2: centered menu
+            ->assertSee('>Shop<', escape: false)
+            ->assertSee('>About<', escape: false)
+            ->assertSee('>Contact<', escape: false)
             // sub-category dropdowns (no svg in sub-menu lists) + mobile drawer
-            ->assertSee('aria-haspopup="true"', escape: false)
-            ->assertSee('>Violins<', escape: false)
-            ->assertSee('>MIDI Controllers<', escape: false)
-            ->assertSee('>Plugins &amp; Effects<', escape: false)
-            ->assertSee('class="block rounded-lg px-2.5 py-2 text-sm', escape: false) // sub-menu child (no svg)
             ->assertSee('id="mobile-menu"', escape: false)
             ->assertSee('id="nav-search-mobile"', escape: false);
     }

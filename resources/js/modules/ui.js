@@ -2,9 +2,9 @@ function initNavbar() {
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
 
-    // Navbar is white & sticky (in flow, above hero) — only add a soft shadow on scroll.
+    // Prototype-style: white blur navbar gains a soft shadow on scroll.
     const render = () => {
-        navbar.classList.toggle('navbar-scrolled', window.scrollY > 10);
+        navbar.classList.toggle('scrolled', window.scrollY > 8);
     };
 
     render();
