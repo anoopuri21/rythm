@@ -1,17 +1,20 @@
 @php
     $brand = config('rythme.brand_name');
+    // Each slide: `image` = desktop large banner · `mobile_image` = mobile-optimized
+    // portrait banner (AI Generated — [AI Generated], project rule: hero/banner only).
+    // Mobile images render via <picture media="(max-width:767px)">.
     $slides = [
-        ['image' => 'https://www.bajaao.com/cdn/shop/files/FEN-0373152506.jpg?v=1779349747', 'eyebrow' => 'High quality · Best sellers', 'title' => 'Premium gear.', 'accent' => 'Zero compromise.', 'copy' => 'Every instrument we ship is inspected, set up and ready to perform — from beginner favourites to stage-ready pro models. Real products, real quality.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
-        ['image' => 'https://www.bajaao.com/cdn/shop/files/ROL-FP30XBK.jpg?v=1779349747', 'eyebrow' => 'High quality · Keys & pianos', 'title' => 'Play the piano.', 'accent' => 'Feel every note.', 'copy' => 'Digital pianos with weighted keys and rich, expressive sound — crafted for practice rooms and stages alike.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
-        ['image' => 'images/hero-guitar.jpg', 'eyebrow' => 'Craft your signature sound', 'title' => 'Feel the music.', 'accent' => 'Own the sound.', 'copy' => 'Handpicked instruments, expertly set up and delivered with care anywhere in India.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
-        ['image' => 'images/hero-piano.jpg', 'eyebrow' => 'The keys to expression', 'title' => 'Every note.', 'accent' => 'Entirely yours.', 'copy' => 'From first melodies to concert stages, discover keys that move with your ambition.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
-        ['image' => 'images/hero-studio.jpg', 'eyebrow' => 'Build your perfect studio', 'title' => 'Capture the moment.', 'accent' => 'Keep it forever.', 'copy' => 'Professional recording essentials selected for clarity, character and lasting performance.', 'cta' => 'Explore pro audio', 'cta_href' => '/category/pro-audio'],
+        ['image' => 'https://www.bajaao.com/cdn/shop/files/FEN-0373152506.jpg?v=1779349747', 'mobile_image' => 'images/hero/mobile-fender.jpg', 'eyebrow' => 'High quality · Best sellers', 'title' => 'Premium gear.', 'accent' => 'Zero compromise.', 'copy' => 'Every instrument we ship is inspected, set up and ready to perform — from beginner favourites to stage-ready pro models. Real products, real quality.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
+        ['image' => 'https://www.bajaao.com/cdn/shop/files/ROL-FP30XBK.jpg?v=1779349747', 'mobile_image' => 'images/hero/mobile-piano.jpg', 'eyebrow' => 'High quality · Keys & pianos', 'title' => 'Play the piano.', 'accent' => 'Feel every note.', 'copy' => 'Digital pianos with weighted keys and rich, expressive sound — crafted for practice rooms and stages alike.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
+        ['image' => 'images/hero-guitar.jpg', 'mobile_image' => 'images/hero/mobile-guitar.jpg', 'eyebrow' => 'Craft your signature sound', 'title' => 'Feel the music.', 'accent' => 'Own the sound.', 'copy' => 'Handpicked instruments, expertly set up and delivered with care anywhere in India.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
+        ['image' => 'images/hero-piano.jpg', 'mobile_image' => 'images/hero/mobile-keys.jpg', 'eyebrow' => 'The keys to expression', 'title' => 'Every note.', 'accent' => 'Entirely yours.', 'copy' => 'From first melodies to concert stages, discover keys that move with your ambition.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
+        ['image' => 'images/hero-studio.jpg', 'mobile_image' => 'images/hero/mobile-studio.jpg', 'eyebrow' => 'Build your perfect studio', 'title' => 'Capture the moment.', 'accent' => 'Keep it forever.', 'copy' => 'Professional recording essentials selected for clarity, character and lasting performance.', 'cta' => 'Explore pro audio', 'cta_href' => '/category/pro-audio'],
     ];
     $heroMode = $heroMode ?? config('rythme.hero_mode', 'slider');
 @endphp
 
 @if($heroMode === 'video')
-    {{-- ============ HERO MODE 2 · VIDEO BANNER (theme-matched, dark + gold) ============ --}}
+    {{-- ============ HERO MODE 2 · VIDEO BANNER ============ --}}
     {{-- Video source: Pexels free license (CC0) — https://www.pexels.com/video/man-playing-guitar-854924/ --}}
     <section id="hero" class="relative flex h-[calc(100svh-4rem)] min-h-[560px] w-full items-center overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collection video">
         <video class="hero-video absolute inset-0 h-full w-full object-cover opacity-80"
@@ -49,13 +52,27 @@
         </span>
     </section>
 @else
-    {{-- ============ HERO MODE 1 · CINEMATIC SLIDER ============ --}}
+    {{-- ============ HERO MODE 1 · CINEMATIC SLIDER (dual-mode imagery) ============ --}}
     <section id="hero" class="relative h-[calc(100svh-4rem)] min-h-[560px] w-full overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collections">
         <div class="hero-swiper swiper h-full">
             <div class="swiper-wrapper">
                 @foreach($slides as $slide)
                     <article class="swiper-slide relative overflow-hidden">
-                        <img src="{{ asset($slide['image']) }}" alt="" width="1376" height="768" class="hero-slide-image absolute inset-0 h-full w-full object-cover" loading="{{ $loop->first ? 'eager' : 'lazy' }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
+                        {{--
+                            DUAL-MODE HERO IMAGERY:
+                            Desktop (≥768px)  → large banner image (`image`)
+                            Mobile (<768px)   → mobile-optimized portrait image (`mobile_image`)
+                            Mobile images: AI Generated — [AI Generated]
+                        --}}
+                        <picture class="absolute inset-0">
+                            <source media="(max-width: 767px)"
+                                    srcset="{{ asset($slide['mobile_image']) }}"
+                                    width="900" height="1200">
+                            <img src="{{ asset($slide['image']) }}" alt="" width="1376" height="768"
+                                 class="hero-slide-image absolute inset-0 h-full w-full object-cover"
+                                 loading="{{ $loop->first ? 'eager' : 'lazy' }}"
+                                 fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
+                        </picture>
                         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/10"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/30"></div>
                         <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-12">
