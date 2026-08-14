@@ -36,15 +36,15 @@
 
             {{-- Icons --}}
             <div class="flex items-center gap-0.5 sm:gap-1.5">
-                <a href="/wishlist" class="nav-link relative flex h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5" aria-label="Wishlist, 0 items">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                    <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rythme-red text-[10px] font-bold text-white">0</span>
+                <a href="{{ auth()->check() ? route('wishlist.index') : route('login') }}" class="nav-link relative flex h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5" aria-label="Wishlist">
+                    <livewire:wishlist-badge :key="'wish-badge-' . (auth()->id() ?? 'guest')" />
                 </a>
-                <a href="/cart" class="nav-link relative flex h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5" aria-label="Cart, 0 items">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                    <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rythme-red text-[10px] font-bold text-white">0</span>
-                </a>
-                <a href="/account" class="nav-link hidden h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5 sm:flex" aria-label="Account">
+                <button type="button" @click="Livewire.dispatch('cart-drawer-toggle')"
+                        class="nav-link relative flex h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5"
+                        aria-label="Open cart">
+                    <livewire:cart-badge :key="'badge-' . auth()->id() ?? 'guest'" />
+                </button>
+                <a href="{{ auth()->check() ? '/account' : route('login') }}" class="nav-link hidden h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5 sm:flex" aria-label="Account">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </a>
                 <button type="button" @click="mobileMenu = true" class="flex h-10 w-10 items-center justify-center rounded-full text-rythme-black transition-colors duration-300 hover:bg-black/5 lg:hidden" aria-label="Open navigation menu" aria-controls="mobile-menu">
@@ -53,8 +53,17 @@
             </div>
         </div>
 
-        {{-- ===== ROW 2 · Main categories with dropdowns (desktop) ===== --}}
+        {{-- ===== ROW 2 · Shop-by-category drawer + main categories with dropdowns (desktop) ===== --}}
         <div class="hidden h-12 items-center justify-between border-t border-black/10 lg:flex">
+            <button type="button"
+                    @click="$store.catDrawer.open = true"
+                    class="mr-6 inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-black/15 px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-rythme-black transition hover:border-black"
+                    aria-haspopup="dialog" aria-controls="category-drawer"
+                    :aria-expanded="$store.catDrawer.open ? 'true' : 'false'">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                All Categories
+            </button>
+
             @foreach($navItems as $index => $item)
                 <div class="relative h-full"
                      @mouseenter="openMenu = {{ $index }}"
@@ -121,6 +130,12 @@
             </form>
         </div>
         <div class="flex-1 overflow-y-auto px-4 py-5">
+            <button type="button"
+                    @click="mobileMenu = false; $store.catDrawer.open = true"
+                    class="mb-2 flex w-full items-center gap-2.5 rounded-xl border border-black/15 px-4 py-3 text-sm font-bold text-rythme-black transition hover:border-black">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                Shop by Category
+            </button>
             <a href="{{ route('home') }}" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-rythme-black transition hover:bg-gold/10">Home</a>
             <a href="/shop" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-rythme-black transition hover:bg-gold/10">Shop All</a>
 
@@ -150,7 +165,18 @@
             </div>
         </div>
         <div class="border-t border-black/5 px-6 py-4">
-            <a href="/account" @click="mobileMenu = false" class="btn-gold block w-full">Sign in / Register</a>
+            @auth
+                <p class="mb-2 truncate px-2 text-xs font-semibold text-rythme-warm-gray">{{ auth()->user()->name }}</p>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn-gold block w-full">Sign out</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" @click="mobileMenu = false" class="btn-gold block w-full">Sign in / Register</a>
+            @endauth
         </div>
     </div>
+
+    {{-- Amazon-style shop-by-category drawer (DB-driven categories) --}}
+    <x-category-drawer :categories="$navCategories" />
 </nav>

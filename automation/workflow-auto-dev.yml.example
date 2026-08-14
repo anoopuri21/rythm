@@ -1,0 +1,60 @@
+name: CI — feature/dev
+
+# Single-branch workflow: every push to feature/dev runs build + tests.
+# This workflow NEVER opens PRs — the single PR #22 auto-updates instead.
+
+on:
+  push:
+    branches: [feature/dev]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/dev
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, curl, zip, sqlite3, gd, bcmath, intl
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP deps
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Security audit (composer)
+        run: composer audit --no-interaction || true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install JS deps
+        run: npm ci --no-audit --no-fund
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Security audit (npm)
+        run: npm audit --audit-level=high || true
+
+      - name: Test
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: php artisan test

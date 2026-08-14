@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -10,6 +13,7 @@ use Tests\TestCase;
  */
 class HomepageSectionsTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_navbar_has_logo_search_icons_and_two_rows(): void
     {
         $this->get('/')
@@ -21,8 +25,9 @@ class HomepageSectionsTest extends TestCase
             // Row 1: logo + big search + icons
             ->assertSee('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', escape: false)
             ->assertSee('id="nav-search"', escape: false)
-            ->assertSee('aria-label="Wishlist, 0 items"', escape: false)
-            ->assertSee('aria-label="Cart, 0 items"', escape: false)
+            ->assertSee('aria-label="Wishlist"', escape: false)
+            ->assertSee('aria-label="Open cart"', escape: false)
+            ->assertSee('cart-drawer-toggle', escape: false)
             ->assertSee('aria-label="Account"', escape: false)
             // Row 2: main categories (user-specified taxonomy, Other/Deals removed)
             ->assertSee('>Guitars<', escape: false)
@@ -91,7 +96,7 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('class="btn-gold btn-shine"', escape: false);
     }
 
-    public function test_categories_section_is_explore_by_category_with_bajaao_images(): void
+    public function test_categories_section_is_pinned_horizontal_scroll_with_bajaao_images(): void
     {
         $this->get('/')
             ->assertOk()
@@ -99,8 +104,11 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Find your')
             ->assertSee('aria-label="Guitars — 480+ instruments"', escape: false)
             ->assertSee('bajaao.com/cdn/shop/files', escape: false)
-            ->assertSee('class="cat-card group"', escape: false)
-            ->assertSee('class="cat-card-img"', escape: false);
+            ->assertSee('class="pin relative', escape: false)
+            ->assertSee('id="cat-track"', escape: false)
+            ->assertSee('class="gcard"', escape: false)
+            ->assertSee('id="pin-progress"', escape: false)
+            ->assertSee('class="pin__hint"', escape: false);
     }
 
     public function test_instrument_decor_background_shapes_present(): void
@@ -174,7 +182,8 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('your sound?')
             ->assertSee('Talk to an expert')
             ->assertSee('WhatsApp us')
-            ->assertSee('About Rhythm Exports')
+            ->assertSee('Top brands')
+            ->assertSee('Customer care')
             ->assertDontSee('newsletter-email', escape: false)
             ->assertDontSee('Join the list')
             ->assertDontSee('newsletter-form', escape: false);
@@ -194,10 +203,10 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
-            ->assertSee('class="cat-grid"', escape: false)               // categories (custom CSS grid)
+            ->assertSee('class="pin__track"', escape: false)              // categories (pinned horizontal scroll)
             ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
-            ->assertSee('lg:grid-cols-[1.25fr_repeat(3,1fr)]', escape: false) // footer
+            ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)
             ->assertSee('lg:h-[calc(100svh-7.5rem)]', escape: false);  // hero = 100vh - navbar (desktop)
     }

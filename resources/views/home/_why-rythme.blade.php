@@ -1,3 +1,4 @@
+@php $sec = $homeSections['why-rythme'] ?? null; @endphp
 @php
     $promises = [
         ['icon'=>'✦','title'=>'Expertly inspected','copy'=>'Every instrument passes a detailed 35-point quality check before dispatch.'],
@@ -23,8 +24,8 @@
         </div>
         <div>
             <div class="reveal-section" data-reveal="up">
-                <p class="section-kicker">The Rhythm Exports standard</p>
-                <h2 class="section-title">More than a store.<br><em>Your partner in music.</em></h2>
+                <p class="section-kicker">{{ $sec->kicker ?? 'The Rhythm Exports standard' }}</p>
+                <h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else More than a store.<br><em>Your partner in music.</em>@endif</h2>
                 <p class="mt-6 max-w-xl leading-7 text-rythme-warm-gray">Great instruments deserve great care. From expert selection to thoughtful delivery, every detail is designed around the musician.</p>
             </div>
             <div class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2">

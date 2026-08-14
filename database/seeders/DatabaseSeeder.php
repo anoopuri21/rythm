@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -25,5 +27,13 @@ class DatabaseSeeder extends Seeder
             ['email' => 'test@example.com'],
             ['name' => 'Test User', 'password' => bcrypt('password')],
         );
+
+        $this->call([
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ProductSeeder::class,
+            HomepageSectionSeeder::class,
+            PageSeeder::class,
+        ]);
     }
 }

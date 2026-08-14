@@ -1,3 +1,4 @@
+@php $sec = $homeSections['new-arrivals'] ?? null; @endphp
 @php
     $featured = config('catalog.featured');
     $editorPick = $featured[0]; // Squier Sonic Stratocaster
@@ -7,7 +8,7 @@
 <section id="new-arrivals" class="relative overflow-hidden bg-rythme-cream py-24 sm:py-32">
     @include('components.instrument-decor')
     <div class="relative z-[1] mx-auto max-w-7xl px-5 sm:px-8">
-        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">Fresh from the flight case</p><h2 class="section-title">Meet the <em>new arrivals.</em></h2></div><a href="/shop?sort=newest" class="text-link">See everything new <span>↗</span></a></div>
+        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">{{ $sec->kicker ?? 'Fresh from the flight case' }}</p><h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Meet the <em>new arrivals.</em>@endif</h2></div><a href="/shop?sort=newest" class="text-link">See everything new <span>↗</span></a></div>
         <div class="grid gap-5 lg:grid-cols-2">
             <article class="reveal-section group relative min-h-[620px] overflow-hidden rounded-[2rem] bg-rythme-black text-white">
                 {{-- Image: Bajaao real product photo --}}

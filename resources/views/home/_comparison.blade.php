@@ -1,3 +1,4 @@
+@php $sec = $homeSections['comparison'] ?? null; @endphp
 {{--
     ============================================================
     s13 · Comparison — "Rhythm Exports vs. the rest."
@@ -21,8 +22,8 @@
     <div class="pointer-events-none absolute -right-24 top-0 select-none font-playfair text-[16rem] leading-none text-rythme-black/[0.03]" aria-hidden="true">vs</div>
     <div class="relative mx-auto max-w-6xl px-5 sm:px-8">
         <div class="mx-auto mb-14 max-w-2xl text-center" data-reveal="up">
-            <p class="section-kicker justify-center">The Rhythm Exports difference</p>
-            <h2 class="section-title">Rhythm Exports vs. <em>the rest.</em></h2>
+            <p class="section-kicker justify-center">{{ $sec->kicker ?? 'The Rhythm Exports difference' }}</p>
+            <h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Rhythm Exports vs. <em>the rest.</em>@endif</h2>
             <p class="mt-5 text-base leading-7 text-rythme-black/60">
                 We built Rhythm Exports around the questions musicians actually ask before buying. Here is how we answer them — compared, honestly.
             </p>
