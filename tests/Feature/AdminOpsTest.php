@@ -22,7 +22,6 @@ class AdminOpsTest extends TestCase
 
         $this->admin = User::where('email', 'admin@rythme.test')->firstOrFail();
     }
-
     public function test_admin_customers_resource_renders(): void
     {
         $this->actingAs($this->admin)
@@ -120,4 +119,38 @@ class AdminOpsTest extends TestCase
         $this->assertSame('0', $service->get('shipping_flat_fee'));
         $this->assertSame('support@rythme.store', $service->get('contact_email'));
     }
+
+    public function test_admin_hero_slides_resource(): void
+    {
+        $this->actingAs($this->admin)
+            ->get('/admin/hero-slides')
+            ->assertOk()
+            ->assertSee('Premium gear.');
+    }
+
+    public function test_admin_homepage_blocks_resource(): void
+    {
+        $this->actingAs($this->admin)
+            ->get('/admin/homepage-blocks')
+            ->assertOk()
+            ->assertSee('Free expert setup');
+    }
+
+    public function test_admin_faqs_resource(): void
+    {
+        $this->actingAs($this->admin)
+            ->get('/admin/faqs')
+            ->assertOk()
+            ->assertSee('How long does delivery take');
+    }
+
+    public function test_products_show_trending_and_rank_columns(): void
+    {
+        $this->actingAs($this->admin)
+            ->get('/admin/products')
+            ->assertOk()
+            ->assertSee('Trending')
+            ->assertSee('Featured');
+    }
+
 }

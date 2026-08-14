@@ -71,6 +71,10 @@ class ProductResource extends Resource
                                 TextInput::make('low_stock_threshold')->numeric()->default(5)->minValue(0),
                                 Toggle::make('is_active')->default(true),
                                 Toggle::make('is_featured'),
+                                Toggle::make('is_trending')->label('Trending (homepage carousel)'),
+                                TextInput::make('featured_rank')->numeric()->minValue(0)
+                                    ->label('Featured rank')
+                                    ->helperText('Order in homepage Best Sellers (0 = first).'),
                                 Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
                                 TiptapEditor::make('description')->profile('default')->columnSpanFull(),
                             ]),
@@ -124,7 +128,9 @@ class ProductResource extends Resource
                     ->badge()
                     ->color(fn ($state) => $state <= 5 ? 'danger' : 'success')
                     ->sortable(),
-                IconColumn::make('is_featured')->boolean()->sortable(),
+                IconColumn::make('is_featured')->boolean()->sortable()->label('Featured'),
+                ToggleColumn::make('is_trending')->sortable()->label('Trending'),
+                TextColumn::make('featured_rank')->sortable()->label('Rank')->toggleable(),
                 ToggleColumn::make('is_active')->sortable(),
             ])
             ->filters([
@@ -132,6 +138,7 @@ class ProductResource extends Resource
                 SelectFilter::make('brand')->relationship('brand', 'name')->searchable(),
                 TernaryFilter::make('is_active'),
                 TernaryFilter::make('is_featured'),
+                TernaryFilter::make('is_trending'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
