@@ -1,4 +1,15 @@
 @php $sec = $homeSections['comparison'] ?? null; @endphp
+@php
+    // ADMIN-DRIVEN: homepage_blocks (section_key=comparison) — title=feature, content=us, subtitle=them
+    $comparisons = $homepage['comparison']->map(fn ($b) => [
+        'feature' => $b->title,
+        'us' => $b->content,
+        'them' => $b->subtitle,
+    ])->all();
+    if (empty($comparisons)) {
+        $comparisons = [['feature' => 'Expert setup included', 'us' => 'Rythme', 'them' => 'Most online stores']];
+    }
+@endphp
 {{--
     ============================================================
     s13 · Comparison — "Rhythm Exports vs. the rest."

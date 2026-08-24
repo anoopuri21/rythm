@@ -51,14 +51,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @stack('head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     @stack('styles')
 </head>
-<body class="font-inter bg-rythme-cream text-rythme-black antialiased overflow-x-hidden">
+<body class="font-inter bg-rythme-cream text-rythme-black antialiased overflow-x-clip">
     <a href="#main-content" class="skip-link">Skip to content</a>
     <div class="scroll-progress" aria-hidden="true"><span></span></div>
 

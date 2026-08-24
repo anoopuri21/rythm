@@ -1,13 +1,14 @@
 @php $sec = $homeSections['why-rythme'] ?? null; @endphp
 @php
-    $promises = [
-        ['icon'=>'✦','title'=>'Expertly inspected','copy'=>'Every instrument passes a detailed 35-point quality check before dispatch.'],
-        ['icon'=>'♬','title'=>'Musician-led advice','copy'=>'Real guidance from players who understand your sound, level and goals.'],
-        ['icon'=>'↺','title'=>'Easy 7-day returns','copy'=>'Changed your mind? Our straightforward returns keep the experience stress-free.'],
-        ['icon'=>'⌁','title'=>'Safe nationwide delivery','copy'=>'Performance-grade packaging and insured shipping across India.'],
-        ['icon'=>'✓','title'=>'100% authentic','copy'=>'Authorised products with genuine manufacturer warranties, always.'],
-        ['icon'=>'⚙','title'=>'Complimentary setup','copy'=>'Guitars are tuned, action-checked and stage-ready right out of the box.'],
-    ];
+    // ADMIN-DRIVEN: homepage_blocks (section_key=usp) — title, content=copy
+    $promises = $homepage['usps']->map(fn ($b) => [
+        'icon' => mb_substr((string) $b->title, 0, 1),
+        'title' => $b->title,
+        'copy' => $b->content,
+    ])->all();
+    if (empty($promises)) {
+        $promises = [['icon'=>'✦','title'=>'Expertly inspected','copy'=>'Every instrument passes a detailed 35-point quality check before dispatch.']];
+    }
 @endphp
 
 <section id="why-rythme" class="why-section bg-rythme-cream py-24 sm:py-32">

@@ -310,6 +310,18 @@
             "status": "done",
             "phase": "P6",
             "note": "201 tests (709 assertions) green, build ok, composer+npm audits 0 vulns, live smoke all 200/404, ops docs written."
+        },
+        {
+            "id": "ui-redesign-minimal-tech",
+            "title": "UI redesign v2 \u2014 Minimal-Tech (client approved): monochrome palette, Inter, sharp minimal components",
+            "status": "done",
+            "note": "Design system v2: brand\u2192#111 monochrome, paper\u2192white, Inter font; buttons black (no glow), cards 1px border, sharp headings; hero CTAs white-on-image; navbar pill minimal; emails monochrome; 0 red/gold left in css+views; DesignSystemTest updated; 202 tests green; screenshots 55-59."
+        },
+        {
+            "id": "homepage-admin-driven",
+            "title": "Homepage fully admin-driven (content + products) with easy/compact admin panel",
+            "status": "done",
+            "note": "Phase A: hero_slides + homepage_blocks + faqs tables, products featured_rank+is_trending, HomepageDataService cached (observer flush). Phase B: ALL sections DB-driven (hero dual-mode images via media, bestsellers by featured rank, new-arrivals by created_at, carousel by trending, testimonials/stories/ugc/numbers/usps/comparison via blocks, faq table, brands table). Phase C: HeroSlideResource (2 tabs content/images, reorderable), HomepageBlockResource (section filter+select), FaqResource, ProductResource quick toggles (trending/rank/filters), HOMEPAGE nav group. Tests 206 passed (739 assertions)."
         }
     ],
     "git_strategy": {

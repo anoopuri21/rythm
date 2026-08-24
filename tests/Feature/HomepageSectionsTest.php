@@ -14,37 +14,33 @@ use Tests\TestCase;
 class HomepageSectionsTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
     public function test_navbar_has_logo_search_icons_and_two_rows(): void
     {
         $this->get('/')
             ->assertOk()
-            // White, sticky (in flow — NOT over hero), full width + 30px padding
-            ->assertSee('id="navbar" class="sticky top-0 z-50 w-full border-b border-black/5 bg-white', escape: false)
-            ->assertSee('px-[30px]', escape: false)
-            ->assertDontSee('navbar-transparent', escape: false)
-            // Row 1: logo + big search + icons
+            // Prototype-style navbar: white blur, sticky, two rows
+            ->assertSee('id="navbar" class="nav"', escape: false)
+            ->assertSee('nav__row1', escape: false)
+            ->assertSee('nav__menu', escape: false)
+            // Row 1: logo + pill search + icons
             ->assertSee('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', escape: false)
             ->assertSee('id="nav-search"', escape: false)
             ->assertSee('aria-label="Wishlist"', escape: false)
             ->assertSee('aria-label="Open cart"', escape: false)
             ->assertSee('cart-drawer-toggle', escape: false)
             ->assertSee('aria-label="Account"', escape: false)
-            // Row 2: main categories (user-specified taxonomy, Other/Deals removed)
-            ->assertSee('>Guitars<', escape: false)
-            ->assertSee('>Ukuleles &amp; Violins<', escape: false)
-            ->assertSee('>Keyboards &amp; Pianos<', escape: false)
-            ->assertSee('>Studio &amp; Recording<', escape: false)
-            ->assertSee('>Drums &amp; Percussion<', escape: false)
-            ->assertSee('>Software &amp; Plugins<', escape: false)
-            ->assertSee('>More<', escape: false)
-            ->assertDontSee('/category/other', escape: false)
-            ->assertDontSee('/category/deals', escape: false)
+            // Row 2: centered menu
+            ->assertSee('>Shop<', escape: false)
+            ->assertSee('>About<', escape: false)
+            ->assertSee('>Contact<', escape: false)
             // sub-category dropdowns (no svg in sub-menu lists) + mobile drawer
-            ->assertSee('aria-haspopup="true"', escape: false)
-            ->assertSee('>Violins<', escape: false)
-            ->assertSee('>MIDI Controllers<', escape: false)
-            ->assertSee('>Plugins &amp; Effects<', escape: false)
-            ->assertSee('class="block rounded-lg px-2.5 py-2 text-sm', escape: false) // sub-menu child (no svg)
             ->assertSee('id="mobile-menu"', escape: false)
             ->assertSee('id="nav-search-mobile"', escape: false);
     }
@@ -55,7 +51,7 @@ class HomepageSectionsTest extends TestCase
             ->assertOk()
             ->assertSee('hero-swiper swiper', escape: false)
             ->assertSee('hero-slide-image', escape: false)
-            ->assertSee('class="btn-gold btn-shine"', escape: false)
+            ->assertSee('rounded-full bg-white px-7 py-4', escape: false)
             ->assertSee('hero-pagination', escape: false);
     }
 
@@ -96,7 +92,7 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('class="btn-gold btn-shine"', escape: false);
     }
 
-    public function test_categories_section_is_explore_by_category_with_bajaao_images(): void
+    public function test_categories_section_is_pinned_horizontal_scroll_with_bajaao_images(): void
     {
         $this->get('/')
             ->assertOk()
@@ -104,8 +100,11 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Find your')
             ->assertSee('aria-label="Guitars — 480+ instruments"', escape: false)
             ->assertSee('bajaao.com/cdn/shop/files', escape: false)
-            ->assertSee('class="cat-card group"', escape: false)
-            ->assertSee('class="cat-card-img"', escape: false);
+            ->assertSee('class="pin relative', escape: false)
+            ->assertSee('id="cat-track"', escape: false)
+            ->assertSee('class="gcard"', escape: false)
+            ->assertSee('id="pin-progress"', escape: false)
+            ->assertSee('class="pin__hint"', escape: false);
     }
 
     public function test_instrument_decor_background_shapes_present(): void
@@ -127,13 +126,11 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('products-next', escape: false)
             ->assertSee('products-pagination', escape: false)
             ->assertSee('Popular right')
-            // Real Bajaao products (same-to-same)
-            ->assertSee('Squier Sonic Stratocaster Electric Guitar')
-            ->assertSee('Yamaha F310 Dreadnought Acoustic Guitar')
-            ->assertSee('Kala Makala MK-S Soprano Ukulele')
-            ->assertSee('Focusrite Scarlett 2i2')
-            ->assertSee('KRK Classic 7')
-            ->assertSee('Hohner M254001S Ocean Star', escape: false)
+            // Real DB trending products
+            ->assertSee('Yamaha F310 Acoustic Guitar')
+            ->assertSee('Squier Affinity Stratocaster HSS')
+            ->assertSee('Roland FP-30X Digital Piano')
+            ->assertSee('Shure SM58 Vocal Microphone')
             ->assertSee('bajaao.com/cdn/shop/files', escape: false);
     }
 
@@ -141,12 +138,12 @@ class HomepageSectionsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Squier Sonic Stratocaster')
-            ->assertSee('Roland FP-30X')
-            ->assertSee('Alesis Nitro Max')
-            ->assertSee('Focusrite Scarlett 2i2')
+            ->assertSee('Yamaha F310 Acoustic Guitar')
+            ->assertSee('Squier Affinity Stratocaster HSS')
+            ->assertSee('Roland FP-30X Digital Piano')
+            ->assertSee('Shure SM58 Vocal Microphone')
             ->assertSee('role="tablist"', escape: false)
-            ->assertSee('All hits')
+            ->assertSee('>All<', escape: false)
             ->assertSee('Pro Audio')
             ->assertSee('Shop all best sellers');
     }
@@ -156,9 +153,9 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('lg:sticky lg:top-32', escape: false)
-            ->assertSee('The Rhythm Exports standard')
-            ->assertSee('Expertly inspected')
-            ->assertSee('Complimentary setup')
+            ->assertSee('The Rythme standard')
+            ->assertSee('Free expert setup')
+            ->assertSee('Easy returns')
             ->assertDontSee('why-media', escape: false);
     }
 
@@ -200,8 +197,8 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('sm:grid-cols-2 lg:grid-cols-4', escape: false)   // bestsellers
-            ->assertSee('class="cat-grid"', escape: false)               // categories (custom CSS grid)
-            ->assertSee('lg:grid-cols-2', escape: false)                   // new arrivals
+            ->assertSee('class="pin__track"', escape: false)              // categories (pinned horizontal scroll)
+            ->assertSee('id="new-arrivals"', escape: false)             // new arrivals
             ->assertSee('lg:grid-cols-[0.9fr_1.1fr]', escape: false)      // why section
             ->assertSee('lg:grid-cols-5', escape: false) // footer 5-column
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)

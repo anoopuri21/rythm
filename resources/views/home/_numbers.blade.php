@@ -1,11 +1,21 @@
 @php $sec = $homeSections['numbers'] ?? null; @endphp
 @php
-    $stats = [
-        ['value'=>15,'suffix'=>'+','label'=>'Years of expertise'],
-        ['value'=>12000,'suffix'=>'+','label'=>'Musicians served'],
-        ['value'=>50,'suffix'=>'+','label'=>'World-class brands'],
-        ['value'=>4.9,'suffix'=>'/5','label'=>'Average customer rating','decimals'=>1],
-    ];
+    // ADMIN-DRIVEN: homepage_blocks (section_key=number) — title="12+", content=label
+    $stats = $homepage['numbers']->map(function ($b) {
+        $raw = (string) $b->title;
+        preg_match('/^([0-9.,]+)/', $raw, $m);
+        $value = $m[1] ?? '0';
+        $suffix = trim(substr($raw, strlen($m[1] ?? '0'))) ?: '+';
+        return [
+            'value' => (float) str_replace(',', '', $value),
+            'suffix' => $suffix,
+            'label' => $b->content,
+            'decimals' => str_contains($value, '.') ? 1 : 0,
+        ];
+    })->all();
+    if (empty($stats)) {
+        $stats = [['value'=>15,'suffix'=>'+','label'=>'Years of expertise']];
+    }
 @endphp
 
 <section id="numbers" class="numbers-section parallax-section relative overflow-hidden bg-rythme-black py-28 text-white sm:py-36" style="background-image: linear-gradient(rgba(10,10,10,.88), rgba(10,10,10,.94)), url('{{ asset('images/hero-studio.jpg') }}')">

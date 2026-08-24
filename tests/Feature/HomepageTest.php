@@ -10,6 +10,12 @@ use Tests\TestCase;
 class HomepageTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
     public function test_homepage_renders_all_completed_sections(): void
     {
         $response = $this->get('/');
@@ -56,6 +62,6 @@ class HomepageTest extends TestCase
             ->assertSee('Explore instruments')
             ->assertSee('Shop the sale')
             ->assertSee('Read all stories')
-            ->assertSee('Made for musicians.');
+            ->assertSee('Loved by players,');
     }
 }

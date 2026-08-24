@@ -8,6 +8,7 @@ import { initCarousels } from './modules/carousels';
 import { initMotion } from './modules/motion';
 import { initUi } from './modules/ui';
 import { initCinema } from './modules/cinema';
+import { initCategoriesPin } from './modules/categories-pin';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -16,4 +17,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initCarousels(reducedMotion);
     const lenis = initMotion(reducedMotion);
     initCinema(reducedMotion, lenis);
+    initCategoriesPin(reducedMotion);
 });

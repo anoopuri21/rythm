@@ -24,7 +24,7 @@ class HomepageSectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-home-modern';
 
-    protected static ?string $navigationGroup = 'HOME';
+    protected static ?string $navigationGroup = 'HOMEPAGE';
 
     protected static ?int $navigationSort = 1;
 

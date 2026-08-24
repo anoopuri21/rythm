@@ -8,13 +8,13 @@
         body { font-family: Poppins, Arial, sans-serif; background: #FFFDF7; color: #0A0A0A; margin: 0; padding: 32px 16px; }
         .card { max-width: 560px; margin: 0 auto; background: #fff; border: 1px solid rgba(10,10,10,.08); border-radius: 20px; padding: 32px; }
         h1 { font-size: 22px; margin: 0 0 8px; }
-        .brand { color: #D50808; font-weight: 700; letter-spacing: .06em; }
+        .brand { color: #111111; font-weight: 700; letter-spacing: .06em; }
         .meta { color: #6B6B6B; font-size: 13px; line-height: 1.7; }
         .order-no { font-family: monospace; font-size: 18px; font-weight: 700; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         td { padding: 10px 0; border-bottom: 1px solid rgba(10,10,10,.06); font-size: 14px; }
         .total td { border-bottom: none; padding-top: 16px; font-weight: 700; font-size: 16px; }
-        .btn { display: inline-block; margin-top: 24px; background: #D50808; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 999px; font-size: 14px; font-weight: 700; }
+        .btn { display: inline-block; margin-top: 24px; background: #111111; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 999px; font-size: 14px; font-weight: 700; }
     </style>
 </head>
 <body>

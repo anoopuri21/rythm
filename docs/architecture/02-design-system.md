@@ -1,3 +1,50 @@
+# RYTHME Design System **v2 — MINIMAL-TECH** (2026-08-13, client approved)
+
+> Reference: https://xstore.8theme.com/elementor3/minimal-tech/ (concept only — code is ours).
+> Client requirement: clean + big imagery, minimal colour, minimal text/borders,
+> sharp text, sharp design, responsive. **Monochrome only** — no red/gold/yellow.
+
+## v2 Tokens (single source: `@theme` in app.css + tailwind.config.js)
+
+| Token | v1 (old) | v2 (now) |
+|---|---|---|
+| `brand` | #D50808 red | **#111111** (near-black — CTAs) |
+| `brand-dark` | #A30404 | **#000000** |
+| `brand-light` | #FF5252 | **#3A3A3A** |
+| `brand-soft` | #FF6B6B | **#555555** |
+| `ink` | #0A0A0A | #111111 |
+| `paper` | #FFFDF7 | **#FFFFFF** |
+| `paper-dark` | #F5F5F5 | #F6F6F6 |
+| `muted` | #6B6B6B | #6B6B6B |
+| Font | Poppins | **Inter** (all families) |
+
+Legacy `gold*`/`rythme-*` aliases all map to the monochrome scale — old classes
+keep working, no file-level renames needed.
+
+## v2 Style rules
+- Buttons: solid black (#111) pill, white text, hover #000 + 1px lift — no glows,
+  no gradients, no shine effects.
+- Cards: white bg, **1px #E8E8E8 border**, subtle shadow — glass/frost replaced by crisp white.
+- Headings: Inter 700, tight -0.03em, clamp(2.4rem,4.5vw,4.2rem); em accent = gray.
+- Kickers: gray, 0.28em tracking, thin black rule.
+- Borders: 1px rgba(17,17,17,.08–.15) — minimal.
+- Badges/sale tags: black bg white text.
+- Hero CTA on imagery: **white button, black text** (minimal-tech style).
+- Emphasis accents (text-gold-gradient / text-red-gradient): gray gradient.
+- Dark sections: #111 ink blocks remain (monochrome), text white/60.
+- Scrollbars, swiper bullets, focus rings, progress bars: monochrome.
+
+## v1 → v2 migration notes
+- Changed: `@theme` tokens, tailwind.config.js colors+fonts, font link (Inter),
+  component classes (.btn-gold*, .section-title, .section-kicker, .gcard, scrollbar,
+  swiper, focus, gradients), hero CTAs, navbar pill (red → bordered text).
+- Kept: layout structure, all functionality, pinned categories scroll, livewire flows.
+- Tests updated: DesignSystemTest now asserts monochrome + Inter only.
+
+---
+
+## (v1 archive below — original system, superseded)
+
 # RYTHME Design System v1 — "Rythme Red"
 
 > **Homepage theme = the design system.** Every page (shop, product, cart, wishlist, checkout, auth, admin) follows these tokens. Single source of truth:
