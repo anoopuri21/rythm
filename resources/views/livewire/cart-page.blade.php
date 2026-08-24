@@ -32,8 +32,8 @@
                 @foreach($items as $item)
                     <div class="flex gap-4 border-b border-ink/10 py-6 sm:gap-6" wire:key="page-item-{{ $item->id }}">
                         <a href="/product/{{ $item->product->slug }}" class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl border border-ink/10 bg-white p-2 sm:h-32 sm:w-32">
-                            @if($item->product->getFirstMediaUrl('gallery'))
-                                <img src="{{ $item->product->getFirstMediaUrl('gallery') }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
+                            @if($item->product->heroImage())
+                                <img src="{{ $item->product->heroImage() }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
                             @else
                                 <div class="flex h-full w-full items-center justify-center bg-paper-dark p-2 text-center text-[9px] font-bold uppercase tracking-widest text-muted">{{ $item->product->brand?->name ?? 'Rythme' }}</div>
                             @endif
@@ -109,7 +109,7 @@
                     </p>
 
                     <a href="{{ route('checkout.index') }}"
-                       class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
+                       class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
                         Proceed to checkout
                     </a>
 

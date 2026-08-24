@@ -1,32 +1,25 @@
-@php $sec = $homeSections['new-arrivals'] ?? null; @endphp
 @php
-    // NEW ARRIVALS — admin-driven: latest active products (created_at desc)
-    $arrivals = $homepage['newArrivals'] ?? collect();
-    $arrivals = $arrivals->take(8);
+    $sec = $homeSections['new-arrivals'] ?? null;
+    $products = $homepage['newArrivals'] ?? collect();
 @endphp
 
 {{-- ============================================================
-     NEW ARRIVALS — admin-driven clean grid
+     NEW ARRIVAL PRODUCTS — centered heading + responsive grid
+     Desktop 5 cols · 1024: 4 · 640: 3 · mobile: 2
+     Uses shared <x-mega-product-card> (same card reused in later
+     product sections, mega-market style).
      ============================================================ --}}
-<section id="new-arrivals" class="bg-white py-20 sm:py-28">
-    <div class="mx-auto max-w-7xl px-5 sm:px-8">
-        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div>
-                <p class="section-kicker">{{ $sec->kicker ?? 'Fresh from the flight case' }}</p>
-                <h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Meet the <em>new arrivals.</em>@endif</h2>
-                <p class="mt-4 max-w-xl text-sm leading-6 text-rythme-warm-gray">
-                    Newly stocked instruments, set up and ready to play.
-                </p>
-            </div>
-            <a href="/shop?sort=newest" class="text-link">See everything new <span aria-hidden="true">↗</span></a>
-        </div>
+<section id="new-arrivals" class="prod-mm" aria-label="New arrival products">
+    <div class="prod-mm__inner">
+        <h2 class="prod-mm__title">
+            @if($sec?->title){{ $sec->title }}@if($sec?->title_accent) {{ $sec->title_accent }}@endif
+            @else New Arrival Products @endif
+        </h2>
 
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            @forelse($arrivals as $product)
-                <x-minimal-product-card :product="$product" />
-            @empty
-                <p class="text-sm text-rythme-warm-gray">No products yet — add products in admin.</p>
-            @endforelse
+        <div class="prod-mm__grid">
+            @foreach($products as $product)
+                <x-mega-product-card :product="$product" />
+            @endforeach
         </div>
     </div>
 </section>

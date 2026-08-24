@@ -115,6 +115,19 @@
                 <p class="mt-2 text-xs text-muted {{ $inStockOnly ? '' : 'opacity-60' }}">In stock only</p>
             </div>
 
+            {{-- Deals --}}
+            <div class="border-b border-ink/10 py-6">
+                <button type="button" wire:click="toggleOnSale"
+                        class="flex w-full items-center justify-between py-1"
+                        :aria-pressed="{{ $onSale ? 'true' : 'false' }}">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Offers</h2>
+                    <span class="relative inline-flex h-6 w-11 items-center rounded-full transition {{ $onSale ? 'bg-brand' : 'bg-ink/15' }}">
+                        <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition {{ $onSale ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                    </span>
+                </button>
+                <p class="mt-2 text-xs text-muted {{ $onSale ? '' : 'opacity-60' }}">On sale only (Deals)</p>
+            </div>
+
             {{-- Clear all --}}
             @if($activeFilterCount > 0)
                 <button type="button" wire:click="clearFilters"

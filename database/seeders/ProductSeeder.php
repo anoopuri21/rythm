@@ -372,5 +372,27 @@ class ProductSeeder extends Seeder
                 );
             }
         }
+
+        // ── Curated sale set ──────────────────────────────────────────
+        // "On sale" must mean a real, visible discount (Deals nav link +
+        // /shop?on_sale=1 rely on it). Everything else sells at MRP.
+        $saleSet = [
+            'boss-katana-50-mkii' => 39999,              // 30% off
+            'shure-sm58-vocal-microphone' => 14999,      // 27% off
+            'focusrite-scarlett-solo-3rd-gen' => 17999,  // 28% off
+            'alesis-nitro-mesh-kit' => 44999,            // 29% off
+            'yamaha-f310-acoustic-guitar' => 9999,       // 15% off
+            'squier-affinity-stratocaster-hss' => 44999, // 22% off
+            'yamaha-p-145-digital-piano' => 68999,       // 16% off
+            'pioneer-dj-ddj-flx4-controller' => 49999,   // 16% off
+            'akg-k240-studio-headphones' => 9499,        // 21% off
+            'yamaha-psr-e373-portable-keyboard' => 23999,// 21% off
+        ];
+
+        Product::query()->update(['compare_at_price' => null]);
+
+        foreach ($saleSet as $slug => $compareAt) {
+            Product::query()->where('slug', $slug)->update(['compare_at_price' => $compareAt]);
+        }
     }
 }

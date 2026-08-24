@@ -177,7 +177,7 @@
                         </div>
 
                         <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
-                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
                                 aria-label="Pay ₹{{ number_format($grandTotal) }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
                                 Pay ₹{{ number_format($grandTotal) }} securely
@@ -205,8 +205,8 @@
                     @forelse($cartItems as $item)
                         <div class="flex items-center gap-3">
                             <div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-paper p-1.5">
-                                @if($item->product->getFirstMediaUrl('gallery'))
-                                    <img src="{{ $item->product->getFirstMediaUrl('gallery') }}" alt="" class="h-full w-full object-contain">
+                                @if($item->product->heroImage())
+                                    <img src="{{ $item->product->heroImage() }}" alt="" class="h-full w-full object-contain">
                                 @else
                                     <div class="flex h-full w-full items-center justify-center text-[8px] font-bold uppercase text-muted">{{ $item->product->brand?->name ?? 'R' }}</div>
                                 @endif

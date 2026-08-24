@@ -29,10 +29,10 @@ class HomepageDataSeeder extends Seeder
     {
         $slides = [
             ['eyebrow' => 'High quality · Best sellers', 'title' => 'Premium gear.', 'accent' => 'Zero compromise.', 'copy' => 'Every instrument we ship is inspected, set up and ready to perform — from beginner favourites to stage-ready pro models. Real products, real quality.', 'cta_label' => 'Explore instruments', 'cta_href' => '/shop'],
-            ['eyebrow' => 'High quality · Keys & pianos', 'title' => 'Play the piano.', 'accent' => 'Feel every note.', 'copy' => 'Digital pianos with weighted keys and rich, expressive sound — crafted for practice rooms and stages alike.', 'cta_label' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
+            ['eyebrow' => 'High quality · Keys & pianos', 'title' => 'Play the piano.', 'accent' => 'Feel every note.', 'copy' => 'Digital pianos with weighted keys and rich, expressive sound — crafted for practice rooms and stages alike.', 'cta_label' => 'Shop keyboards', 'cta_href' => '/shop?category=keyboards-pianos'],
             ['eyebrow' => 'Craft your signature sound', 'title' => 'Feel the music.', 'accent' => 'Own the sound.', 'copy' => 'Handpicked instruments, expertly set up and delivered with care anywhere in India.', 'cta_label' => 'Explore instruments', 'cta_href' => '/shop'],
-            ['eyebrow' => 'The keys to expression', 'title' => 'Every note.', 'accent' => 'Entirely yours.', 'copy' => 'From first melodies to concert stages, discover keys that move with your ambition.', 'cta_label' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
-            ['eyebrow' => 'Build your perfect studio', 'title' => 'Capture the moment.', 'accent' => 'Keep it forever.', 'copy' => 'Professional recording essentials selected for clarity, character and lasting performance.', 'cta_label' => 'Explore pro audio', 'cta_href' => '/category/pro-audio'],
+            ['eyebrow' => 'The keys to expression', 'title' => 'Every note.', 'accent' => 'Entirely yours.', 'copy' => 'From first melodies to concert stages, discover keys that move with your ambition.', 'cta_label' => 'Shop keyboards', 'cta_href' => '/shop?category=keyboards-pianos'],
+            ['eyebrow' => 'Build your perfect studio', 'title' => 'Capture the moment.', 'accent' => 'Keep it forever.', 'copy' => 'Professional recording essentials selected for clarity, character and lasting performance.', 'cta_label' => 'Explore pro audio', 'cta_href' => '/shop?category=pro-audio'],
         ];
 
         foreach ($slides as $i => $slide) {

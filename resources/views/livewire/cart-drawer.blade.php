@@ -40,8 +40,8 @@
             @forelse($items as $item)
                 <div class="flex gap-4 border-b border-ink/5 py-5 first:pt-0" wire:key="drawer-item-{{ $item->id }}">
                     <a href="/product/{{ $item->product->slug }}" class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-white p-2">
-                        @if($item->product->getFirstMediaUrl('gallery'))
-                            <img src="{{ $item->product->getFirstMediaUrl('gallery') }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
+                        @if($item->product->heroImage())
+                            <img src="{{ $item->product->heroImage() }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
                         @else
                             <div class="flex h-full w-full items-center justify-center bg-paper-dark text-[9px] font-bold uppercase tracking-widest text-muted">{{ $item->product->brand?->name ?? 'Rythme' }}</div>
                         @endif
@@ -91,7 +91,7 @@
                 <a href="{{ route('cart.index') }}" class="mb-2.5 block w-full rounded-full bg-ink py-3.5 text-center text-sm font-bold text-white transition hover:bg-ink-soft">
                     View full cart
                 </a>
-                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
+                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
                     Proceed to checkout
                 </a>
             </div>
