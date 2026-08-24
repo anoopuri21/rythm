@@ -1350,3 +1350,221 @@ input:focus-visible { outline: none; }
     .prod-mm__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .pcard__view { opacity: 1; transform: none; } /* always visible on touch */
 }
+
+/* ============================================================
+   PROMO BANNERS — two wide cards
+   ============================================================ */
+.promo-mm { padding: 56px 0 8px; }
+.promo-mm__inner {
+    max-width: 1520px; margin: 0 auto; padding: 0 30px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.promo-mm__card {
+    position: relative; display: flex; align-items: center;
+    min-height: 300px; border-radius: 14px; overflow: hidden;
+    background-size: cover; background-position: center right;
+    transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s;
+}
+.promo-mm__card:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -24px rgba(0,0,0,.4); }
+.promo-mm__scrim { position: absolute; inset: 0; }
+.promo-mm__scrim--light { background: linear-gradient(90deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 38%, rgba(255,255,255,0) 68%); }
+.promo-mm__scrim--dark { background: linear-gradient(90deg, rgba(8,8,8,.82) 0%, rgba(8,8,8,.55) 40%, rgba(8,8,8,0) 70%); }
+.promo-mm__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 36px 40px; }
+.promo-mm__kicker {
+    font-size: .7rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--color-muted);
+}
+.promo-mm__kicker--gold { color: var(--color-brand); }
+.promo-mm__title { font-size: 2.1rem; font-weight: 800; line-height: 1.08; letter-spacing: -.02em; color: var(--color-ink); }
+.promo-mm__title--light { color: #fff; }
+.promo-mm__cta {
+    margin-top: 6px; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--color-ink); border-bottom: 2px solid var(--color-brand); padding-bottom: 3px;
+    transition: color .3s;
+}
+.promo-mm__cta--light { color: #fff; }
+.promo-mm__card:hover .promo-mm__cta { color: var(--color-brand); }
+.promo-mm__card:hover .promo-mm__cta--light { color: var(--color-brand); }
+
+/* ============================================================
+   OUR ADVANTAGES — 8 numbered text items
+   ============================================================ */
+.adv-mm { padding: 64px 0 8px; }
+.adv-mm__inner { max-width: 1520px; margin: 0 auto; padding: 0 30px; }
+.adv-mm__title { text-align: center; font-size: 1.9rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-ink); margin-bottom: 36px; }
+.adv-mm__grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    border-left: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+.adv-mm__item {
+    padding: 26px 26px 30px;
+    border-right: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    transition: background .3s;
+}
+.adv-mm__item:hover { background: color-mix(in srgb, var(--color-brand) 5%, var(--color-paper)); }
+.adv-mm__num { font-size: .72rem; font-weight: 800; letter-spacing: .12em; color: var(--color-brand); }
+.adv-mm__item-title { margin-top: 10px; font-size: .95rem; font-weight: 700; color: var(--color-ink); }
+.adv-mm__item-desc { margin-top: 6px; font-size: .8rem; line-height: 1.55; color: var(--color-muted); }
+
+/* ============================================================
+   DEALS OF THE DAY — pcard + stock meter + countdown
+   ============================================================ */
+.deal-mm { padding: 64px 0 8px; }
+.deal-mm__inner { max-width: 1520px; margin: 0 auto; padding: 0 30px; }
+.deal-mm__title { text-align: center; font-size: 1.9rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-ink); margin-bottom: 36px; }
+.deal-mm__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.dealcard__stock {
+    margin-top: 12px; display: flex; justify-content: space-between;
+    font-size: .72rem; color: var(--color-muted);
+}
+.dealcard__stock b { color: var(--color-ink); font-weight: 700; }
+.dealcard__bar {
+    margin-top: 6px; height: 6px; border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+    overflow: hidden;
+}
+.dealcard__bar span { display: block; height: 100%; border-radius: 999px; background: var(--color-brand); }
+.dealcard__timer { margin-top: 12px; display: flex; gap: 6px; }
+.dealcard__timer span {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+    padding: 7px 2px; border-radius: 9px;
+    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+    font-size: .58rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--color-muted);
+}
+.dealcard__timer b { font-size: .95rem; font-weight: 800; color: var(--color-ink); line-height: 1.1; }
+/* price sits above meter, not pushed to bottom in deal cards */
+.dealcard .pcard__price { margin-top: 8px; padding-top: 0; }
+.dealcard .pcard__body { padding-bottom: 18px; }
+
+/* ============================================================
+   CATEGORY BANNERS — three cards
+   ============================================================ */
+.catban-mm { padding: 56px 0 8px; }
+.catban-mm__inner {
+    max-width: 1520px; margin: 0 auto; padding: 0 30px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.catban-mm__card {
+    position: relative; display: flex; align-items: flex-end;
+    min-height: 230px; border-radius: 14px; overflow: hidden;
+    background-size: cover; background-position: center;
+    transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s;
+}
+.catban-mm__card:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -24px rgba(0,0,0,.4); }
+.catban-mm__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,8,8,0) 30%, rgba(8,8,8,.78) 100%); }
+.catban-mm__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 24px 26px; }
+.catban-mm__kicker { font-size: .66rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--color-brand); }
+.catban-mm__name { font-size: 1.3rem; font-weight: 800; letter-spacing: -.01em; color: #fff; }
+.catban-mm__cta {
+    margin-top: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: #fff; border-bottom: 2px solid var(--color-brand); padding-bottom: 2px; transition: color .3s;
+}
+.catban-mm__card:hover .catban-mm__cta { color: var(--color-brand); }
+
+/* ============================================================
+   RECENTLY LAUNCHED — banner + category list + product grid
+   ============================================================ */
+.launch-mm { padding: 64px 0 8px; }
+.launch-mm__inner { max-width: 1520px; margin: 0 auto; padding: 0 30px; }
+.launch-mm__title { text-align: center; font-size: 1.9rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-ink); margin-bottom: 36px; }
+.launch-mm__layout { display: grid; grid-template-columns: 290px 230px 1fr; gap: 14px; align-items: stretch; }
+.launch-mm__banner {
+    position: relative; display: flex; align-items: flex-start;
+    border-radius: 14px; overflow: hidden; min-height: 480px;
+    background-size: cover; background-position: 30% center;
+    transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s;
+}
+.launch-mm__banner:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -24px rgba(0,0,0,.4); }
+.launch-mm__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,8,8,.72) 0%, rgba(8,8,8,.18) 55%, rgba(8,8,8,.4) 100%); }
+.launch-mm__banner-content { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 28px 26px; }
+.launch-mm__kicker { font-size: .66rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--color-brand); }
+.launch-mm__banner-title { font-size: 1.6rem; font-weight: 800; line-height: 1.12; letter-spacing: -.01em; color: #fff; }
+.launch-mm__cta {
+    margin-top: 4px; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: #fff; border-bottom: 2px solid var(--color-brand); padding-bottom: 2px; transition: color .3s;
+}
+.launch-mm__banner:hover .launch-mm__cta { color: var(--color-brand); }
+.launch-mm__list {
+    display: flex; flex-direction: column;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    border-radius: 14px; padding: 10px; background: var(--color-paper);
+}
+.launch-mm__list a {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 12px; border-radius: 9px;
+    font-size: .84rem; font-weight: 600; color: var(--color-ink);
+    transition: background .25s, color .25s;
+}
+.launch-mm__list a:hover { background: color-mix(in srgb, var(--color-brand) 7%, transparent); }
+.launch-mm__list a b {
+    font-size: .68rem; font-weight: 700; color: var(--color-muted);
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+    border-radius: 999px; padding: 2px 9px; min-width: 28px; text-align: center;
+}
+.launch-mm__list .launch-mm__all {
+    margin-top: auto; justify-content: flex-start;
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--color-brand);
+}
+.launch-mm__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+/* ============================================================
+   POPULAR BRANDS — wordmark strip
+   ============================================================ */
+.brand-mm { padding: 64px 0 72px; }
+.brand-mm__inner { max-width: 1520px; margin: 0 auto; padding: 0 30px; }
+.brand-mm__title { text-align: center; font-size: 1.9rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-ink); margin-bottom: 30px; }
+.brand-mm__strip {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    border-left: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+.brand-mm__strip li { flex: 1 1 12.5%; min-width: 150px; list-style: none; }
+.brand-mm__strip a {
+    display: flex; align-items: center; justify-content: center;
+    padding: 26px 18px; height: 100%;
+    border-right: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+    font-size: 1.02rem; font-weight: 800; letter-spacing: .02em;
+    color: color-mix(in srgb, var(--color-ink) 38%, transparent);
+    transition: color .3s, background .3s;
+}
+.brand-mm__strip a:hover { color: var(--color-ink); background: color-mix(in srgb, var(--color-brand) 5%, transparent); }
+
+/* ============================================================
+   Responsive — promo/advantages/deals/banners/launch/brands
+   ============================================================ */
+@media (max-width: 1199px) {
+    .launch-mm__layout { grid-template-columns: 280px 1fr; }
+    .launch-mm__banner { grid-row: 1 / 3; }
+    .launch-mm__list { grid-column: 2; flex-direction: row; flex-wrap: wrap; gap: 2px; }
+    .launch-mm__list a { flex: 1 1 40%; }
+    .launch-mm__grid { grid-column: 2; grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 1023px) {
+    .promo-mm, .adv-mm, .deal-mm, .catban-mm, .launch-mm { padding-top: 48px; }
+    .promo-mm__inner, .adv-mm__inner, .deal-mm__inner, .catban-mm__inner, .launch-mm__inner, .brand-mm__inner { padding-left: 16px; padding-right: 16px; }
+    .adv-mm__title, .deal-mm__title, .launch-mm__title, .brand-mm__title { font-size: 1.55rem; margin-bottom: 26px; }
+    .promo-mm__card { min-height: 240px; }
+    .promo-mm__title { font-size: 1.7rem; }
+    .adv-mm__grid { grid-template-columns: repeat(2, 1fr); }
+    .deal-mm__grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .catban-mm__inner { grid-template-columns: 1fr; }
+    .launch-mm__layout { grid-template-columns: 1fr; }
+    .launch-mm__banner { grid-row: auto; min-height: 300px; }
+    .launch-mm__list, .launch-mm__grid { grid-column: auto; }
+    .launch-mm__grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .brand-mm__strip li { flex-basis: 25%; min-width: 120px; }
+    .brand-mm__strip a { font-size: .9rem; padding: 20px 12px; }
+}
+@media (max-width: 639px) {
+    .promo-mm__inner { grid-template-columns: 1fr; }
+    .promo-mm__content { padding: 26px 24px; }
+    .adv-mm__item { padding: 18px 16px 22px; }
+    .deal-mm__grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dealcard__timer { gap: 4px; }
+    .launch-mm__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .launch-mm__list a { flex-basis: 100%; }
+    .brand-mm__strip li { flex-basis: 50%; min-width: 0; }
+}

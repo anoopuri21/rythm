@@ -58,9 +58,43 @@ final class HomepageDataService
                 'trending' => Product::query()->active()->trending()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByDesc('updated_at')->limit(8)->get(),
+                'dealsOfDay' => $this->curatedProducts([
+                    'boss-katana-50-mkii',
+                    'shure-sm58-vocal-microphone',
+                    'focusrite-scarlett-solo-3rd-gen',
+                    'alesis-nitro-mesh-kit',
+                ]),
+                'recentlyLaunched' => $this->curatedProducts([
+                    'pioneer-dj-ddj-flx4-controller',
+                    'yamaha-p-145-digital-piano',
+                    'squier-affinity-stratocaster-hss',
+                    'yamaha-psr-e373-portable-keyboard',
+                    'yamaha-trbx174-bass-guitar',
+                    'yamaha-f310-acoustic-guitar',
+                ]),
+                'brandNames' => \App\Models\Brand::query()->orderBy('name')->limit(16)->pluck('name'),
                 'popularCategories' => $this->popularCategories(),
             ];
         });
+    }
+
+    /**
+     * Fetch products by slug, preserving the curated order.
+     *
+     * @param  list<string>  $slugs
+     * @return Collection<int, Product>
+     */
+    private function curatedProducts(array $slugs): Collection
+    {
+        $products = Product::query()->active()
+            ->whereIn('slug', $slugs)
+            ->with(['brand', 'category.parent', 'media'])
+            ->get();
+
+        return collect($slugs)
+            ->map(fn (string $slug) => $products->firstWhere('slug', $slug))
+            ->filter()
+            ->values();
     }
 
     /**
