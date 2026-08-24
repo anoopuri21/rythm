@@ -23,7 +23,7 @@
             </button>
 
             <a href="{{ route('home') }}" class="nav__logo" aria-label="{{ $brand }} home">
-                <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434"
+                <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434"
                      class="nav__logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                 <span class="nav__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>

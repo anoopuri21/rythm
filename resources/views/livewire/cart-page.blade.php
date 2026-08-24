@@ -109,7 +109,7 @@
                     </p>
 
                     <a href="{{ route('checkout.index') }}"
-                       class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
+                       class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
                         Proceed to checkout
                     </a>
 

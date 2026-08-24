@@ -177,7 +177,7 @@
                         </div>
 
                         <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
-                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
                                 aria-label="Pay ₹{{ number_format($grandTotal) }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
                                 Pay ₹{{ number_format($grandTotal) }} securely

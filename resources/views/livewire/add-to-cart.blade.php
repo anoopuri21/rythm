@@ -73,7 +73,7 @@
     <div class="mt-6 grid gap-3 sm:grid-cols-2">
         <button type="button" wire:click="add" wire:loading.attr="disabled" wire:target="add"
                 @if($stock === 0) disabled @endif
-                class="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+                class="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Add {{ $product->name }} to cart">
             <span wire:loading.remove wire:target="add" class="inline-flex items-center gap-2">
                 <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>

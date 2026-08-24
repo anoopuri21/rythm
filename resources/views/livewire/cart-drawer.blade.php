@@ -91,7 +91,7 @@
                 <a href="{{ route('cart.index') }}" class="mb-2.5 block w-full rounded-full bg-ink py-3.5 text-center text-sm font-bold text-white transition hover:bg-ink-soft">
                     View full cart
                 </a>
-                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
+                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
                     Proceed to checkout
                 </a>
             </div>

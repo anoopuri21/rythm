@@ -52,9 +52,20 @@ final class HomepageDataService
                 'bestsellers' => Product::query()->active()->featured()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
-                'newArrivals' => Product::query()->active()
-                    ->with(['brand', 'category.parent', 'media'])
-                    ->orderByDesc('created_at')->limit(10)->get(),
+                // Curated (not pure created_at): deterministic set, every product
+                // has a hero image, and order never drifts when new rows are seeded.
+                'newArrivals' => $this->curatedProducts([
+                    'yamaha-f310-acoustic-guitar',
+                    'squier-affinity-stratocaster-hss',
+                    'yamaha-trbx174-bass-guitar',
+                    'yamaha-p-145-digital-piano',
+                    'yamaha-psr-e373-portable-keyboard',
+                    'alesis-nitro-mesh-kit',
+                    'shure-sm58-vocal-microphone',
+                    'pioneer-dj-ddj-flx4-controller',
+                    'boss-katana-50-mkii',
+                    'focusrite-scarlett-solo-3rd-gen',
+                ]),
                 'trending' => Product::query()->active()->trending()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByDesc('updated_at')->limit(8)->get(),
@@ -64,13 +75,15 @@ final class HomepageDataService
                     'focusrite-scarlett-solo-3rd-gen',
                     'alesis-nitro-mesh-kit',
                 ]),
+                // Distinct set from New Arrivals (reference uses a separate pool) —
+                // fresh gear that has just landed in the store.
                 'recentlyLaunched' => $this->curatedProducts([
-                    'pioneer-dj-ddj-flx4-controller',
-                    'yamaha-p-145-digital-piano',
-                    'squier-affinity-stratocaster-hss',
-                    'yamaha-psr-e373-portable-keyboard',
-                    'yamaha-trbx174-bass-guitar',
-                    'yamaha-f310-acoustic-guitar',
+                    'roland-fp-30x-digital-piano',
+                    'krk-rokit-5-g4-studio-monitor-single',
+                    'akg-k240-studio-headphones',
+                    'fender-mustang-lt25-modelling-amp',
+                    'casio-ct-s300-portable-keyboard',
+                    'numark-mixtrack-pro-fx',
                 ]),
                 'brandNames' => \App\Models\Brand::query()->orderBy('name')->limit(16)->pluck('name'),
                 'popularCategories' => $this->popularCategories(),
