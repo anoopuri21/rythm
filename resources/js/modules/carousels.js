@@ -30,8 +30,31 @@ export function initCarousels(reducedMotion) {
         });
     }
 
-    const testimonials = document.querySelector('.testimonial-swiper');
-    if (testimonials) {
+    // Popular categories — multi-card carousel with side arrows
+    const cats = document.querySelector('.cat-swiper');
+    if (cats) {
+        new Swiper(cats, {
+            modules: commonModules,
+            speed: reducedMotion ? 0 : 600,
+            spaceBetween: 14,
+            slidesPerView: 2.3,
+            watchOverflow: true,
+            navigation: {
+                nextEl: '.cat-next',
+                prevEl: '.cat-prev',
+            },
+            keyboard: { enabled: true, onlyInViewport: true },
+            a11y: { enabled: true },
+            breakpoints: {
+                640: { slidesPerView: 3 },
+                768: { slidesPerView: 4 },
+                1024: { slidesPerView: 5 },
+                1400: { slidesPerView: 6 },
+            },
+        });
+    }
+
+    const testimonials = document.querySelector('.testimonial-swiper');    if (testimonials) {
         new Swiper(testimonials, {
             modules: commonModules,
             speed: reducedMotion ? 0 : 750,

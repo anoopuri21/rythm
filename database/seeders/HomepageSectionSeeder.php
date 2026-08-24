@@ -17,12 +17,12 @@ class HomepageSectionSeeder extends Seeder
     public function run(): void
     {
         $sections = [
-            ['categories', 'Explore by category', 'Find your', 'sound.', 'Choose from acoustic and electric guitars, digital pianos, drums, pro audio and accessories from the world\'s most trusted makers.', 1],
+            ['categories', 'Explore by category', 'Popular', 'Categories', 'Choose from acoustic and electric guitars, digital pianos, drums, pro audio and accessories from the world\'s most trusted makers.', 1],
             ['bestsellers', 'Played. Loved. Recommended.', 'The sound everyone is', 'talking about.', 'Our most-loved instruments — handpicked and road-tested by the Rythme team.', 2],
             ['why-rythme', 'The Rythme standard', 'Why musicians', 'choose Rythme.', 'Every instrument is set up, intonated and inspected before it ships — because the right feel matters.', 3],
             ['brands', 'The names behind the music', 'Legendary makers.', 'One trusted destination.', 'Fender, Yamaha, Roland, Shure and more — the brands that shaped popular music, all under one roof.', 4],
             ['numbers', 'In tune with India', 'A community that keeps', 'growing.', 'Thousands of musicians across India trust Rythme for their first chord and their hundredth gig.', 5],
-            ['new-arrivals', 'Fresh from the flight case', 'Meet the', 'new arrivals.', 'The latest instruments and gear, unboxed, tested and ready to play.', 6],
+            ['new-arrivals', 'Fresh from the flight case', 'New Arrival', 'Products', 'The latest instruments and gear, unboxed, tested and ready to play.', 6],
             ['deals', 'The encore sale', 'Deals that', 'sing.', 'Limited-time offers on guitars, keyboards and pro audio — while stock lasts.', 7],
             ['video-showcase', 'Rythme Sound', 'Feel the music.', 'Live the moment.', 'Watch what happens when the right instrument meets the right hands.', 8],
             ['stories', 'The Rythme journal', 'Ideas for a life', 'lived in music.', 'Practice tips, gear guides and stories from the Rythme community.', 9],

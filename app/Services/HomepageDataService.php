@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Category;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
@@ -32,6 +33,7 @@ final class HomepageDataService
      *   bestsellers: Collection<int, Product>,
      *   newArrivals: Collection<int, Product>,
      *   trending: Collection<int, Product>,
+     *   popularCategories: Collection<int, array{name:string, slug:string, count:int}>,
      * }
      */
     public function all(): array
@@ -52,11 +54,53 @@ final class HomepageDataService
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
                 'newArrivals' => Product::query()->active()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->orderByDesc('created_at')->limit(8)->get(),
+                    ->orderByDesc('created_at')->limit(10)->get(),
                 'trending' => Product::query()->active()->trending()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByDesc('updated_at')->limit(8)->get(),
+                'popularCategories' => $this->popularCategories(),
             ];
         });
+    }
+
+    /**
+     * Category cards for the "Popular Categories" carousel —
+     * curated order: 6 roots + 4 popular subcategories.
+     * Root counts include products from all child categories.
+     *
+     * @return Collection<int, array{name:string, slug:string, count:int}>
+     */
+    private function popularCategories(): Collection
+    {
+        $order = [
+            'guitars', 'electric-guitars', 'acoustic-guitars',
+            'keyboards-pianos', 'digital-pianos',
+            'drums-percussion', 'pro-audio',
+            'dj-stage', 'dj-controllers', 'accessories',
+        ];
+
+        $categories = Category::query()
+            ->whereIn('slug', $order)
+            ->where('is_active', true)
+            ->with('children:id,parent_id')
+            ->get(['id', 'parent_id', 'name', 'slug']);
+
+        return collect($order)
+            ->map(function (string $slug) use ($categories): ?array {
+                $category = $categories->firstWhere('slug', $slug);
+                if ($category === null) {
+                    return null;
+                }
+
+                $ids = $category->children->pluck('id')->push($category->id);
+
+                return [
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'count' => Product::query()->active()->whereIn('category_id', $ids)->count(),
+                ];
+            })
+            ->filter()
+            ->values();
     }
 }
