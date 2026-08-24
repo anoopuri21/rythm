@@ -6,7 +6,7 @@
 {{-- ============================================================
      NAVBAR — mega-market style (2-row header)
      Row 1 (paper): logo | pill search + submit btn | help phone | icons
-     Row 2 (paper-dark): All Categories dropdown | menu | lang·currency | sale pill
+     Row 2 (paper-dark): All Categories dropdown | menu | currency · sale pill
      Sticky with shadow on scroll. Mobile (≤1024px): single row —
      burger + logo + search toggle + cart; off-canvas drawer with
      Menu / Categories tabs; collapsible search bar.
@@ -136,19 +136,8 @@
                 <a href="/contact" class="nav__link">Contact</a>
             </nav>
 
-            {{-- Right meta: language · currency · sale pill --}}
+            {{-- Right meta: currency · sale pill --}}
             <div class="nav__meta">
-                <div class="nav__meta-dd" x-data="{ open: false }" @click.outside="open = false">
-                    <button type="button" :aria-expanded="open" @click="open = !open">
-                        English
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <ul x-cloak x-show="open" x-transition.origin.top>
-                        <li><button type="button" @click="open = false">English</button></li>
-                        <li><button type="button" @click="open = false">हिन्दी</button></li>
-                    </ul>
-                </div>
-                <span class="nav__meta-sep" aria-hidden="true"></span>
                 <div class="nav__meta-dd" x-data="{ open: false }" @click.outside="open = false">
                     <button type="button" :aria-expanded="open" @click="open = !open">
                         INR ₹

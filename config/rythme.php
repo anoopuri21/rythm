@@ -12,7 +12,7 @@ return [
     'brand_short' => 'RHYTHM',
     'logo_url' => env(
         'RYTHME_LOGO_URL',
-        '/images/logo-rythme.svg'
+        'https://www.rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'
     ),
 
     /*
