@@ -1,10 +1,10 @@
-# NEXT SESSION CONTEXT — SOUNDSCAPE Project Continue (FINAL — 2026-08-09)
+# NEXT SESSION CONTEXT — Rhythm Project Continue (FINAL — 2026-08-09)
 
 > Read this FIRST. God Mode ON. Isi point se continue karna hai — bilkul zero-to-hero setup guide.
 
 ---
 
-## God Mode ON — SOUNDSCAPE Project Continue
+## God Mode ON — Rhythm Project Continue
 
 **Workspace:** `/home/user/rythm` (repo `anoopuri21/rythm` — **PUBLIC**)
 **Current base:** **`main`** (PR #1 MERGED — full Laravel 13 project main me hai) · HEAD main = `843731b`
@@ -23,17 +23,17 @@
 
 Workspace snapshot sirf `/home/user` persist karta hai. **System packages + tools (repo ke bahar) WIPE ho jate hain:**
 
-| Tool | Kahan tha | New session me |
-|---|---|---|
-| PHP 8.4 + extensions (intl, mbstring, xml, curl, zip, gd, sqlite3, bcmath, dom, tokenizer, xmlwriter, simplexml) | `/usr/bin` (apt) | ❌ wipe → **reinstall (step 1)** |
-| Composer 2.10.2 | `/usr/local/bin/composer` | ❌ wipe → **reinstall (step 2)** |
-| Node 20 + npm | system | ✅ present (only Node survives) |
-| `vendor/` | **`/tmp/vendor`** (workspace me sirf symlink) | ❌ `/tmp` bhi wipe → `mkdir -p /tmp/vendor` + symlink (step 4) |
-| `node_modules/` + `public/build/` | project | ❌ excluded → `npm install && npm run build` |
-| `.env` (secrets) | project | ❌ gitignored → recreate |
-| `database/database.sqlite` | project | ❌ gitignored → recreate |
-| `.git/config` (remote URL) | project | ❌ reset → `git remote add origin` |
-| git identity (auto-agent) | global config | ❌ reset → set again |
+| Tool                                                                                                             | Kahan tha                                     | New session me                                                 |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------- |
+| PHP 8.4 + extensions (intl, mbstring, xml, curl, zip, gd, sqlite3, bcmath, dom, tokenizer, xmlwriter, simplexml) | `/usr/bin` (apt)                              | ❌ wipe → **reinstall (step 1)**                               |
+| Composer 2.10.2                                                                                                  | `/usr/local/bin/composer`                     | ❌ wipe → **reinstall (step 2)**                               |
+| Node 20 + npm                                                                                                    | system                                        | ✅ present (only Node survives)                                |
+| `vendor/`                                                                                                        | **`/tmp/vendor`** (workspace me sirf symlink) | ❌ `/tmp` bhi wipe → `mkdir -p /tmp/vendor` + symlink (step 4) |
+| `node_modules/` + `public/build/`                                                                                | project                                       | ❌ excluded → `npm install && npm run build`                   |
+| `.env` (secrets)                                                                                                 | project                                       | ❌ gitignored → recreate                                       |
+| `database/database.sqlite`                                                                                       | project                                       | ❌ gitignored → recreate                                       |
+| `.git/config` (remote URL)                                                                                       | project                                       | ❌ reset → `git remote add origin`                             |
+| git identity (auto-agent)                                                                                        | global config                                 | ❌ reset → set again                                           |
 
 **Ye steps har naye session me FIRST run karne hain (poora block):**
 
@@ -79,7 +79,7 @@ php artisan migrate --force
 
 # ── STEP 6: Git identity + remote (config wipe ho jata hai) ──
 git config --global user.name  "auto-agent"
-git config --global user.email "auto-agent@soundscape.local"
+git config --global user.email "auto-agent@Rhythm.local"
 git remote add origin https://github.com/anoopuri21/rythm.git
 
 # ── STEP 7: Verify everything ──
@@ -115,19 +115,19 @@ Laravel 13 (PHP 8.3.30+ — lock resolved for 8.3.30; sandbox runs 8.4) + Blade 
 
 ## Task System (`tasks/tasks.json` — source of truth)
 
-| Task | Status |
-|---|---|
-| laravel-13-upgrade | ✅ done |
-| soundscape-docs | ✅ done |
-| page-home-10-sections (hero…footer) | ✅ done (10/10) |
-| homepage-cinematic-v2 (s11 video, s12 testimonials, s13 comparison, s14 UGC, s15 FAQ, s16 scroll FX) | ✅ done (6/6) |
-| **admin-homepage-filament** (5 sections, TiptapEditor, multi-group sidebar) | ⏳ **pending — NEXT** |
-| shop-list (+ Amazon drawer menu) | pending |
-| product-detail | pending |
-| cart-checkout-payment (Razorpay test) | pending |
-| wishlist-about-contact | pending |
-| automation-system | pending (recreate + task mode ON, user approval pe) |
-| footer-5-column | pending (footer locked until this task) |
+| Task                                                                                                 | Status                                              |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| laravel-13-upgrade                                                                                   | ✅ done                                             |
+| Rhythm-docs                                                                                          | ✅ done                                             |
+| page-home-10-sections (hero…footer)                                                                  | ✅ done (10/10)                                     |
+| homepage-cinematic-v2 (s11 video, s12 testimonials, s13 comparison, s14 UGC, s15 FAQ, s16 scroll FX) | ✅ done (6/6)                                       |
+| **admin-homepage-filament** (5 sections, TiptapEditor, multi-group sidebar)                          | ⏳ **pending — NEXT**                               |
+| shop-list (+ Amazon drawer menu)                                                                     | pending                                             |
+| product-detail                                                                                       | pending                                             |
+| cart-checkout-payment (Razorpay test)                                                                | pending                                             |
+| wishlist-about-contact                                                                               | pending                                             |
+| automation-system                                                                                    | pending (recreate + task mode ON, user approval pe) |
+| footer-5-column                                                                                      | pending (footer locked until this task)             |
 
 ## Automation System (recreate ONLY jab user task mode ON bole — same rules)
 
@@ -177,12 +177,14 @@ Bottom line: tum aur mai same ho — `admin-homepage-filament` se shuru karna ha
 5. **security-review** — `SecurityHeaders` middleware (CSP, X-Content-Type-Options, X-Frame-Options SAMEORIGIN, Referrer-Policy, Permissions-Policy, HSTS over HTTPS); `.env.example` → APP_DEBUG=false; session cookies auto-secure; `composer audit` 0 + `npm audit` 0 vulns; webhook/callback crypto signature tests; security header tests; CSRF default + honeypot + throttle + mass-assignment verified.
 
 ### Final gates
+
 - **128 tests / 531 assertions — all green**
 - `npm run build` passes
 - Live verified: / , /shop, /product, /about, /contact, /shipping, /terms (all 200 + SEO titles), guest /checkout → 302 login
 - Screenshots: `rythme-design-snapshots/` 33–39 (admin pages list, content tab, SEO tab, product details, product SEO, footer 5-col, support page)
 
 ### For next session
+
 - Everything on `feature/dev`; single PR **#22** open (feature/dev → main) — review & merge once.
 - `task_mode: false` — re-enable on user command.
 - Next candidate tasks (user-directed when they return): real product images via admin media library, blog/journal, reviews, coupons, Postgres/pgvector semantic search, WebAuthn passkeys (Fortify) — all gated on user approval.
@@ -192,6 +194,7 @@ Bottom line: tum aur mai same ho — `admin-homepage-filament` se shuru karna ha
 ## PRODUCTION OPERATIONS (Phase 6 — 2026-08-13)
 
 ### Queue worker (emails, order notifications)
+
 ```bash
 # .env
 QUEUE_CONNECTION=database
@@ -201,14 +204,18 @@ php artisan queue:work --tries=3 --timeout=90
 ```
 
 ### Caching decisions (senior review)
+
 - Cached: category tree (forever+observer), brand counts (1h+observer), homepage sections (1h+observer), homepage SEO (1h), site settings (forever+flush on save)
 - Shop product queries: NOT response-cached (dynamic filters + pagination) — queries are eager-loaded, indexed, paginated; revisit only if metrics demand
 
 ### GST & shipping (admin Settings page)
+
 - shipping_flat_fee · shipping_free_above · tax_rate (%) — applied server-side in checkout totals (grand total = subtotal − coupon + shipping + GST)
 
 ### Sitemap
+
 - /sitemap.xml (home, shop, pages, categories, products) · /robots.txt (admin/cart/checkout/account disallowed)
 
 ### Error pages
+
 - Custom 404 / 500 (design system) — resources/views/errors/
