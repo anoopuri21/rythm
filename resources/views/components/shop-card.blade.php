@@ -1,7 +1,7 @@
 @props(['product'])
 
 @php
-    $image = $product->getFirstMediaUrl('gallery');
+    $image = $product->heroImage();
     $discount = $product->discountPercent();
     $price = number_format((float) $product->price);
     $old = $product->compare_at_price !== null ? number_format((float) $product->compare_at_price) : null;

@@ -90,6 +90,39 @@ class Product extends Model implements HasMedia
             ->singleFile();
     }
 
+    /**
+     * Best available product image URL.
+     *
+     * 1. Spatie media (admin-uploaded / attached), if any.
+     * 2. Committed public asset: public/images/products/{slug}.jpg
+     *    (reset-proof — travels with the git repo, needs no storage disk).
+     * 3. null — caller decides the final placeholder.
+     */
+    public function heroImage(): ?string
+    {
+        if ($media = $this->getFirstMediaUrl('gallery')) {
+            return $media;
+        }
+
+        $file = 'images/products/' . $this->slug . '.jpg';
+        return is_file(public_path($file)) ? '/' . $file : null;
+    }
+
+    /** Gallery image URLs (media first, committed fallback, else []). */
+    public function galleryImages(): array
+    {
+        $urls = $this->getMedia('gallery')
+            ->map(fn ($m) => $m->getUrl())
+            ->values()
+            ->all();
+
+        if ($urls === [] && ($fallback = $this->heroImage()) !== null) {
+            $urls = [$fallback];
+        }
+
+        return $urls;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

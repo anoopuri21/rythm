@@ -18,7 +18,7 @@
         <div class="deal-mm__grid">
             @foreach($deals as $product)
                 @php
-                    $image = $product->getFirstMediaUrl('gallery');
+                    $image = $product->heroImage();
                     $available = max((int) $product->stock, 0);
                     $sold = (($product->id * 13) % 45) + 5; // deterministic demo counter until order data exists
                     $pct = $available + $sold > 0 ? (int) round($sold / ($available + $sold) * 100) : 0;
