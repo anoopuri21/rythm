@@ -19,6 +19,7 @@ final readonly class ShopFilters
         public ?int $maxPrice = null,
         public string $sort = 'popularity',
         public bool $inStockOnly = false,
+        public bool $onSale = false,
         public ?string $search = null,
     ) {}
 }

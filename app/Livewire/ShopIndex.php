@@ -36,6 +36,9 @@ final class ShopIndex extends Component
     #[Url(as: 'instock', history: true)]
     public bool $inStockOnly = false;
 
+    #[Url(as: 'on_sale', history: true)]
+    public bool $onSale = false;
+
     #[Url(as: 'q', history: true)]
     public ?string $search = null;
 
@@ -77,9 +80,15 @@ final class ShopIndex extends Component
         $this->resetPage();
     }
 
+    public function toggleOnSale(): void
+    {
+        $this->onSale = ! $this->onSale;
+        $this->resetPage();
+    }
+
     public function clearFilters(): void
     {
-        $this->reset('category', 'selectedBrands', 'minPrice', 'maxPrice', 'inStockOnly', 'search');
+        $this->reset('category', 'selectedBrands', 'minPrice', 'maxPrice', 'inStockOnly', 'onSale', 'search');
         $this->sort = 'popularity';
         $this->resetPage();
     }
@@ -106,6 +115,7 @@ final class ShopIndex extends Component
             maxPrice: $this->maxPrice,
             sort: $this->sort,
             inStockOnly: $this->inStockOnly,
+            onSale: $this->onSale,
             search: $this->search,
         );
     }
@@ -118,6 +128,7 @@ final class ShopIndex extends Component
             $this->minPrice !== null,
             $this->maxPrice !== null,
             $this->inStockOnly,
+            $this->onSale,
             trim((string) $this->search) !== '',
         ]));
     }
