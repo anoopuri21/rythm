@@ -1,17 +1,12 @@
 @php
     $brand = config('rythme.brand_name');
-    $slides = [
-        ['image' => 'https://www.bajaao.com/cdn/shop/files/FEN-0373152506.jpg?v=1779349747', 'eyebrow' => 'High quality · Best sellers', 'title' => 'Premium gear.', 'accent' => 'Zero compromise.', 'copy' => 'Every instrument we ship is inspected, set up and ready to perform — from beginner favourites to stage-ready pro models. Real products, real quality.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
-        ['image' => 'https://www.bajaao.com/cdn/shop/files/ROL-FP30XBK.jpg?v=1779349747', 'eyebrow' => 'High quality · Keys & pianos', 'title' => 'Play the piano.', 'accent' => 'Feel every note.', 'copy' => 'Digital pianos with weighted keys and rich, expressive sound — crafted for practice rooms and stages alike.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
-        ['image' => 'images/hero-guitar.jpg', 'eyebrow' => 'Craft your signature sound', 'title' => 'Feel the music.', 'accent' => 'Own the sound.', 'copy' => 'Handpicked instruments, expertly set up and delivered with care anywhere in India.', 'cta' => 'Explore instruments', 'cta_href' => '/shop'],
-        ['image' => 'images/hero-piano.jpg', 'eyebrow' => 'The keys to expression', 'title' => 'Every note.', 'accent' => 'Entirely yours.', 'copy' => 'From first melodies to concert stages, discover keys that move with your ambition.', 'cta' => 'Shop keyboards', 'cta_href' => '/category/keyboards-pianos'],
-        ['image' => 'images/hero-studio.jpg', 'eyebrow' => 'Build your perfect studio', 'title' => 'Capture the moment.', 'accent' => 'Keep it forever.', 'copy' => 'Professional recording essentials selected for clarity, character and lasting performance.', 'cta' => 'Explore pro audio', 'cta_href' => '/category/pro-audio'],
-    ];
+    // HERO SLIDES — admin-driven (hero_slides table + desktop/mobile media collections).
+    $slides = $homepage['heroSlides'] ?? collect();
     $heroMode = $heroMode ?? config('rythme.hero_mode', 'slider');
 @endphp
 
 @if($heroMode === 'video')
-    {{-- ============ HERO MODE 2 · VIDEO BANNER (theme-matched, dark + gold) ============ --}}
+    {{-- ============ HERO MODE 2 · VIDEO BANNER ============ --}}
     {{-- Video source: Pexels free license (CC0) — https://www.pexels.com/video/man-playing-guitar-854924/ --}}
     <section id="hero" class="relative flex h-[calc(100svh-4rem)] min-h-[560px] w-full items-center overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collection video">
         <video class="hero-video absolute inset-0 h-full w-full object-cover opacity-80"
@@ -35,7 +30,7 @@
                     Handpicked guitars, keyboards, drums and studio gear — set up by musicians, delivered with care across India.
                 </p>
                 <div class="mt-9 flex flex-wrap items-center gap-5" data-reveal="up">
-                    <a href="/shop" class="btn-gold btn-shine">Explore instruments <span aria-hidden="true">→</span></a>
+                    <a href="/shop" class="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-white/85">Explore instruments <span aria-hidden="true">→</span></a>
                     <a href="#categories" class="btn-ghost-light">Browse categories</a>
                 </div>
             </div>
@@ -49,32 +44,47 @@
         </span>
     </section>
 @else
-    {{-- ============ HERO MODE 1 · CINEMATIC SLIDER ============ --}}
+    {{-- ============ HERO MODE 1 · CINEMATIC SLIDER (dual-mode imagery) ============ --}}
     <section id="hero" class="relative h-[calc(100svh-4rem)] min-h-[560px] w-full overflow-hidden bg-rythme-black lg:h-[calc(100svh-7.5rem)]" aria-label="Featured collections">
         <div class="hero-swiper swiper h-full">
             <div class="swiper-wrapper">
                 @foreach($slides as $slide)
                     <article class="swiper-slide relative overflow-hidden">
-                        <img src="{{ asset($slide['image']) }}" alt="" width="1376" height="768" class="hero-slide-image absolute inset-0 h-full w-full object-cover" loading="{{ $loop->first ? 'eager' : 'lazy' }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
+                        {{--
+                            HERO SLIDE (admin-driven):
+                            Desktop (≥768px) → desktop_image (large banner)
+                            Mobile  (<768px) → mobile_image (portrait, AI Generated)
+                        --}}
+                        <picture class="absolute inset-0">
+                            @if($slide->getFirstMediaUrl('mobile_image'))
+                                <source media="(max-width: 767px)"
+                                        srcset="{{ $slide->getFirstMediaUrl('mobile_image') }}"
+                                        width="900" height="1200">
+                            @endif
+                            <img src="{{ $slide->getFirstMediaUrl('desktop_image') ?: asset('images/hero-guitar.jpg') }}" alt="" width="1376" height="768"
+                                 class="hero-slide-image absolute inset-0 h-full w-full object-cover"
+                                 loading="{{ $loop->first ? 'eager' : 'lazy' }}"
+                                 fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
+                        </picture>
                         <div class="absolute inset-0 bg-gradient-to-r from-black via-black/65 to-black/10"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/30"></div>
                         <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 sm:px-8 lg:px-12">
                             <div class="hero-copy max-w-3xl text-white">
                                 <p class="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-gold-light">
-                                    <span class="h-px w-10 bg-gold"></span>{{ $slide['eyebrow'] }}
+                                    <span class="h-px w-10 bg-gold"></span>{{ $slide->eyebrow }}
                                 </p>
                                 @if($loop->first)
                                     <h1 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
-                                        {{ $slide['title'] }}<br><em class="font-normal text-red-gradient">{{ $slide['accent'] }}</em>
+                                        {{ $slide->title }}<br><em class="font-normal text-red-gradient">{{ $slide->accent }}</em>
                                     </h1>
                                 @else
                                     <h2 class="font-playfair text-5xl leading-[0.98] sm:text-7xl lg:text-[6.4rem]">
-                                        {{ $slide['title'] }}<br><em class="font-normal text-red-gradient">{{ $slide['accent'] }}</em>
+                                        {{ $slide->title }}<br><em class="font-normal text-red-gradient">{{ $slide->accent }}</em>
                                     </h2>
                                 @endif
-                                <p class="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">{{ $slide['copy'] }}</p>
+                                <p class="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">{{ $slide->copy }}</p>
                                 <div class="mt-9 flex flex-wrap items-center gap-5">
-                                    <a href="{{ $slide['cta_href'] }}" class="btn-gold btn-shine">{{ $slide['cta'] }} <span aria-hidden="true">→</span></a>
+                                    <a href="{{ $slide->cta_href }}" class="inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-bold text-rythme-black transition hover:bg-white/85">{{ $slide->cta_label ?: 'Explore' }} <span aria-hidden="true">→</span></a>
                                     <a href="#categories" class="inline-flex items-center gap-3 text-sm font-semibold text-white transition hover:text-gold">
                                         Browse collections <span aria-hidden="true">→</span>
                                     </a>

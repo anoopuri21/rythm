@@ -1,15 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Design system guard rails: RED (#d50808) / BLACK / WHITE only — no gold/yellow,
- * Poppins font only, product slider images use object-fit: contain.
+ * Design system guard rails (v2 MINIMAL-TECH): MONOCHROME (black/white/grays)
+ * only — no red/gold/yellow anywhere; Inter font only; product slider images
+ * use object-fit: contain.
  */
 class DesignSystemTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
     public function test_no_gold_colors_in_css_tailwind_or_views(): void
     {
         $haystacks = [
@@ -25,23 +37,40 @@ class DesignSystemTest extends TestCase
         }
     }
 
-    public function test_tailwind_theme_is_red_black_white(): void
+    public function test_tailwind_theme_is_monochrome_black_white(): void
     {
         $config = file_get_contents(base_path('tailwind.config.js'));
 
-        $this->assertStringContainsString("DEFAULT: '#d50808'", $config);
-        $this->assertStringContainsString("black: '#000000'", $config);
+        $this->assertStringContainsString("DEFAULT: '#111111'", $config);
+        $this->assertStringContainsString("black: '#111111'", $config);
         $this->assertStringContainsString("cream: '#ffffff'", $config);
-        $this->assertStringNotContainsString('#C41E3A', $config); // old red gone
+        // No red/gold anywhere in the theme
+        $this->assertStringNotContainsString('d50808', $config);
+        $this->assertStringNotContainsString('FF5252', $config);
+        $this->assertStringNotContainsString('a30404', $config);
     }
 
-    public function test_poppins_is_the_only_loaded_font(): void
+    public function test_no_red_or_gold_colors_in_css_or_views(): void
+    {
+        $haystacks = [
+            file_get_contents(resource_path('css/app.css')),
+            implode("\n", array_map('file_get_contents', glob(resource_path('views/**/*.blade.php')))),
+        ];
+
+        foreach (['#D50808', '#FF5252', '#A30404', '#D4A843', '#F5D061', '#B8860B', 'rgba(213, 8, 8', 'rgba(212, 168, 67'] as $red) {
+            foreach ($haystacks as $i => $haystack) {
+                $this->assertStringNotContainsString($red, $haystack, "red token $red found in source #$i");
+            }
+        }
+    }
+
+    public function test_inter_is_the_only_loaded_font(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('family=Poppins', escape: false)
+            ->assertSee('family=Inter', escape: false)
+            ->assertDontSee('family=Poppins', escape: false)
             ->assertDontSee('family=Playfair', escape: false)
-            ->assertDontSee('family=Inter', escape: false)
             ->assertDontSee('family=Bebas', escape: false);
     }
 
@@ -52,14 +81,16 @@ class DesignSystemTest extends TestCase
             ->assertSee('products-swiper swiper', escape: false)
             ->assertSee('object-contain p-5', escape: false)
             ->assertSee('Bestseller', escape: false)
-            ->assertSee('object-contain p-6', escape: false); // product-card too
+            ->assertSee('mcard__img-el', escape: false); // minimal product card
     }
 
-    public function test_red_buttons_render(): void
+    public function test_minimal_black_buttons_and_cards_render(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('bg-rythme-red', escape: false)
-            ->assertSee('hover:bg-rythme-red-dark', escape: false);
+            ->assertSee('mcard', escape: false)
+            ->assertSee('bg-black', escape: false)
+            ->assertDontSee('hover:bg-rythme-red-dark', escape: false)
+            ->assertDontSee('bg-rythme-red', escape: false);
     }
 }

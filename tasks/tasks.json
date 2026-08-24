@@ -1,19 +1,16 @@
 {
-    "project": "SOUNDSCAPE — Rhythm Exports",
+    "project": "SOUNDSCAPE \u2014 Rhythm Exports",
     "repo": "anoopuri21/rythm",
-    "branch": "arena/019fe1bf-rythm",
+    "branch": "feature/dev",
     "task_mode": false,
     "locked_features": [
         "Header",
-        "Footer",
-        "Cart",
-        "Wishlist",
-        "Checkout/Payment"
+        "Footer"
     ],
     "tasks": [
         {
             "id": "laravel-13-upgrade",
-            "title": "Upgrade Laravel 12 → 13.24.0 + Tiptap + MediaLibrary",
+            "title": "Upgrade Laravel 12 \u2192 13.24.0 + Tiptap + MediaLibrary",
             "status": "done",
             "note": "php artisan --version = 13.24.0; filament 3.3.54, tiptap 3.5.16, medialibrary 11.23.4, livewire 3.8.3, mary 2.9.9; cloudinary removed (illuminate ^11|^12 only)"
         },
@@ -42,7 +39,7 @@
         },
         {
             "id": "homepage-cinematic-v2",
-            "title": "Homepage cinematic sections s11–s16",
+            "title": "Homepage cinematic sections s11\u2013s16",
             "status": "done",
             "sections": [
                 "s11 video-showcase (modal + poster)",
@@ -55,45 +52,285 @@
         },
         {
             "id": "homepage-cinematic-v3",
-            "title": "Homepage cinematic v3 — film opening, grain, vignette, letterbox, focus pulls + responsive/SEO fixes",
+            "title": "Homepage cinematic v3 \u2014 film opening, grain, vignette, letterbox, focus pulls + responsive/SEO fixes",
             "status": "done",
             "note": "cinema.js module; h-svh hero fix; single h1; npm build + php artisan test pass; PR #3 (feature/next-sections-pages)"
         },
         {
+            "id": "commerce-phase-a",
+            "title": "Commerce Phase A \u2014 domain foundation: 12 migrations, 12 models, factories, Bajaao seeders (32 categories, 24 brands, 33 products, 17 variants), Filament Product/Category/Brand resources",
+            "status": "done",
+            "note": "migrate:fresh --seed clean; admin CRUD works (/admin/products, /admin/categories, /admin/brands); FilamentUser added to User; spatie plugin pkg installed; tiptap namespace FilamentTiptapEditor; tests 32 passed (201 assertions)"
+        },
+        {
+            "id": "engineering-enterprise-rules",
+            "title": "Adopt enterprise engineering rules (strict types, model attributes, DTOs, FormRequests, PreventRequestForgery, Cache::touch, Queue::route, testing gates)",
+            "status": "done",
+            "note": "Verified against Laravel 13.24.0: #[Table]/#[Fillable]/#[Hidden] attributes read by framework; no #[Casts] attribute (keep $casts property); PreventRequestForgery is default CSRF; Cache::touch + Queue::route + whereVectorSimilarTo present; Fortify + laravel/ai NOT installed (future decisions). Encoded in AGENT_RULES_STRICT.md \u00a79."
+        },
+        {
             "id": "admin-homepage-filament",
-            "title": "Filament admin: homepage sections manager (5 sections, TiptapEditor, multi-group sidebar)",
-            "status": "pending",
-            "next": true
+            "title": "Filament admin: homepage sections manager (TextInput + TiptapEditor, multi-group sidebar)",
+            "status": "done",
+            "note": "HomepageSection model + migration + seeder (13 sections) + Filament resource (HOME group, TextInput kicker/title/accent + TiptapEditor content + Toggle + sort) + HomeController cached wiring + DB-driven kicker/title in 12 partials with fallback (cache flush via observer). Tests 104 passed (446 assertions)"
         },
         {
             "id": "shop-list",
             "title": "Shop list page + filters v2 + Amazon drawer menu",
-            "status": "pending"
+            "status": "done",
+            "note": "Shop page + Livewire filters (category/brand/price/stock/search/sort) + pagination + skeletons + Amazon-style category drawer (DB-driven, Alpine store) + ProductQueryService + ShopFilters DTO + CategoryService cached tree; tests 48 passed (259 assertions); PR ready"
         },
         {
             "id": "product-detail",
             "title": "Product detail page (gallery, specs, related)",
-            "status": "pending"
+            "status": "done",
+            "note": "Product detail page: gallery (Alpine), Flipkart-style price box (MRP/%, EMI), variant selector, qty stepper, AddToCart Livewire (CartService session cart + price snapshot + stock guard + wire:loading), tabs (description/specs), related products, JSON-LD Product, breadcrumbs, single h1, 404 for inactive/unknown"
         },
         {
             "id": "cart-checkout-payment",
             "title": "Cart + Checkout + Payment (Razorpay test)",
-            "status": "pending"
+            "status": "done",
+            "note": "Cart (session+user, snapshot prices, stock guard, merge-on-login) + CartDrawer/CartBadge/CartPage Livewire + cart page + storefront auth (login/register/logout, intended redirect) + checkout wizard 2-step (address \u2192 payment) + OrderService (snapshots, order number, status history audit, optimistic stock lock) + PaymentGateway interface (Razorpay signature/HMAC verify + FakeGateway fallback) + RazorpayController callback/webhook (CSRF-excepted, crypto-verified) + queued OrderConfirmationMail (Queue::route emails) + signed success page. Tests 85 passed (376 assertions)"
         },
         {
             "id": "wishlist-about-contact",
             "title": "Wishlist + About + Contact pages",
-            "status": "pending"
+            "status": "done",
+            "note": "Wishlist (auth-only, toggle heart on cards+product page, badge in navbar, page with move-to-cart, WishlistService) + About page (story, stats, promises, CTA) + Contact page (validated form + honeypot + throttle, ContactMessage model+migration, info cards). Tests 98 passed (418 assertions)"
         },
         {
             "id": "automation-system",
-            "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) — task mode ON",
-            "status": "pending"
+            "title": "Recreate automation (config.json, task-agent.mjs, task-loop, workflow) \u2014 task mode ON",
+            "status": "done",
+            "note": "Single-branch workflow (feature/dev) + single PR #22; 17 stale merged branches deleted; scaffolding: automation/config.json + task-agent.mjs + CI workflow. task_mode: ON"
         },
         {
             "id": "footer-5-column",
             "title": "Footer 5-column redesign (locked until this task)",
-            "status": "pending"
+            "status": "done",
+            "on_hold": true,
+            "hold_reason": "Covered by website-completion (held) \u2014 user directive 2026-08-13",
+            "note": "Delivered inside website-completion: global 5-column footer component (DB-driven), support pages seeded, single footer on all pages."
+        },
+        {
+            "id": "website-completion",
+            "title": "Complete remaining storefront (footer 5-column unlock+redesign, polish, gaps)",
+            "status": "done",
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
+            "note": "Footer 5-column redesign (global component on ALL pages, DB-driven categories/brands, support-page links), support pages seeded (shipping/returns/warranty/faqs/terms/privacy with SEO), footer test coverage. Tests 120 passed (502 assertions)."
+        },
+        {
+            "id": "optimize-performance",
+            "title": "Code optimization + performance (query N+1 sweep, caching, asset size, pagination, eager loading audit)",
+            "status": "done",
+            "on_hold": true,
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
+            "note": "preventLazyLoading ON (caught+fixed ProductVariant N+1), BrandService counts cached 1h + observer flush, category tree + homepage sections/seo cached earlier, eager loading verified all services, dead code removed, indexes audited. 120 tests green."
+        },
+        {
+            "id": "security-review",
+            "title": "TOP-NOTCH cyber security review \u2014 OWASP Top 10 audit, auth hardening, payment/webhook crypto, headers, rate limits, secrets, dependency scanning, session security",
+            "status": "done",
+            "priority": "HIGH \u2014 e-commerce platform, security is first-class",
+            "on_hold": true,
+            "hold_reason": "User directive 2026-08-13: hold until codebase quality audit completes",
+            "note": "OWASP hardening: SecurityHeaders middleware (CSP/nosniff/SAMEORIGIN/referrer/permissions/HSTS), .env.example prod-safe (APP_DEBUG=false), session cookie auto-secure, composer audit 0 + npm audit 0 vulns, webhook+callback crypto tests, security header tests, CSRF default verified, honeypot/throttle/mass-assignment verified by tests. 128 tests (531 assertions)."
+        },
+        {
+            "id": "codebase-quality-audit",
+            "title": "Full codebase audit & improvement \u2014 validate/verify/review EVERY file one-by-one (code quality + best practices), apply safe improvements, sanity re-review, then push",
+            "status": "done",
+            "note": "Audited all 116 PHP files + views + routes + config: syntax 100% OK; added strict_types to 75 files; removed dead welcome.blade.php; verified: no debug leftovers, no TODO/FIXME, only 2 static orderByRaw (no user input), no unescaped blade beyond Tiptap content, all services eager-load (no N+1), throttle on all form routes, models consistent (attributes+casts). 104 tests green. User was offline \u2014 proceeding to dynamic-website task per directive.",
+            "checklist": [
+                "Ek-ek file review: app/, database/, routes/, config/, resources/views/, resources/js/, tests/",
+                "Code quality: strict_types, typed returns, readonly DTOs, model attributes, service pattern, N+1, magic numbers",
+                "Improve only where safe \u2014 functionality untouched, no new bugs",
+                "Har improvement ke baad: npm run build + php artisan test green",
+                "Final sanity re-review of ALL changes before push",
+                "Push to feature/dev only (PR #22 auto-updates)"
+            ]
+        },
+        {
+            "id": "dynamic-website-cms",
+            "title": "Dynamic website CMS \u2014 admin-managed pages (URL slugs) + polymorphic on-page SEO for all pages/products",
+            "status": "done",
+            "note": "Pages table + catch-all slug routing (reserved slugs protected), polymorphic seo_entries (meta/OG/canonical/robots/schema JSON/head scripts), SeoService + layout head integration, PageResource & ProductResource Content/SEO tabs, PageSeeder anchors (home/about/contact/shop + support pages). Live verified. Tests 128 passed (531 assertions)."
+        },
+        {
+            "id": "user-account-profile",
+            "title": "User account dashboard \u2014 profile edit, password change, order history, address book",
+            "status": "done",
+            "note": "AccountController (index/profile/password/addresses) + FormRequests (UpdateProfile unique email, UpdatePassword current+strength, StoreAddress) + account view with Alpine tabs (Overview/Orders/Addresses/Settings) + OrderList component + OrderFactory + noindex SEO on account pages + logoutOtherDevices ordering fix. Tests 138 passed (562 assertions)."
+        },
+        {
+            "id": "order-tracking",
+            "title": "User order tracking page + order detail (timeline from status history, owner-guarded, guest lookup)",
+            "status": "done",
+            "phase": "P1",
+            "note": "Order detail + tracking timeline page (placed\u2192confirmed\u2192processing\u2192shipped\u2192delivered + cancelled) from status history; owner/signed-link/guest-lookup guard (redirect login for guests); guest lookup by order number+email (/track-order); printable invoice page; account order links; footer Track link. Tests 150 passed (593 assertions)."
+        },
+        {
+            "id": "order-status-emails",
+            "title": "Order status emails (shipped/delivered/cancelled) queued on admin status change",
+            "status": "done",
+            "phase": "P1",
+            "note": "OrderStatusMail (shipped/delivered/cancelled) queued via Queue::route; OrderService::changeStatus with transition guard (confirmed\u2192processing/shipped/cancelled etc), audit history + email on user-facing statuses. Tests 153 passed."
+        },
+        {
+            "id": "admin-orders-resource",
+            "title": "Filament OrderResource \u2014 list/filters/detail/status actions/history + print invoice",
+            "status": "done",
+            "phase": "P1",
+            "note": "OrderResource: list (order no/customer/total/status/payment filters), view infolist (items, addresses, payment, status history timeline), status actions (processing/shipped/delivered/cancelled with confirmation + OrderService::changeStatus + emails), print invoice link, create disabled. Tests 156 passed (605 assertions). PHASE 1 COMPLETE."
+        },
+        {
+            "id": "password-reset",
+            "title": "Password reset (forgot \u2192 email \u2192 reset form, design-system UI)",
+            "status": "done",
+            "phase": "P2",
+            "note": "Forgot password \u2192 email reset link (Laravel broker, throttled) + reset form, design-system UI, login link"
+        },
+        {
+            "id": "email-verification",
+            "title": "Email verification on register + verified badge",
+            "status": "done",
+            "phase": "P2",
+            "note": "MustVerifyEmail, verification notice page + resend, signed verify route, register redirects to notice"
+        },
+        {
+            "id": "user-order-cancel",
+            "title": "User order cancellation (pending only, stock restore, email)",
+            "status": "done",
+            "phase": "P2",
+            "note": "Cancel pending/confirmed orders (owner-guarded), stock restore, refund status, email, confirm UI"
+        },
+        {
+            "id": "order-invoice",
+            "title": "Printable invoice page + download",
+            "status": "done",
+            "phase": "P2",
+            "note": "Printable tax invoice page + print button (built with tracking task)"
+        },
+        {
+            "id": "reviews-system",
+            "title": "Product reviews (star rating, verified purchase gate, product page section)",
+            "status": "done",
+            "phase": "P3",
+            "note": "Reviews table+model+factory, verified-purchase gate, duplicate guard, moderation (approve before visible), star summary + bars, ReviewSection Livewire on product page, pagination"
+        },
+        {
+            "id": "admin-reviews",
+            "title": "ReviewResource moderation (approve/reject/delete)",
+            "status": "done",
+            "phase": "P3",
+            "note": "ReviewResource (COMMERCE): rating badges, approved filter, edit toggle, delete"
+        },
+        {
+            "id": "coupons-system",
+            "title": "Coupons (percent/fixed, min order, expiry, usage limits) + checkout apply",
+            "status": "done",
+            "phase": "P4",
+            "note": "Coupons table+model+factory, CouponService (percent/fixed, min order, max cap, expiry, usage limits), checkout apply/remove UI, discount in order totals + note + usage increment"
+        },
+        {
+            "id": "admin-coupons",
+            "title": "CouponResource CRUD + usage stats",
+            "status": "done",
+            "phase": "P4",
+            "note": "CouponResource (COMMERCE): CRUD, type/value/uses/expiry columns, active toggle"
+        },
+        {
+            "id": "admin-customers",
+            "title": "CustomerResource (users, orders, spend)",
+            "status": "done",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-contact-messages",
+            "title": "ContactMessageResource (new/read/replied workflow)",
+            "status": "done",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-newsletter",
+            "title": "NewsletterSubscriberResource + CSV export",
+            "status": "done",
+            "phase": "P5"
+        },
+        {
+            "id": "admin-dashboard-widgets",
+            "title": "Dashboard widgets (revenue, orders, low-stock, latest orders)",
+            "status": "done",
+            "phase": "P5"
+        },
+        {
+            "id": "site-settings",
+            "title": "Site settings model+resource (shipping, GST, contact, social) cached",
+            "status": "done",
+            "phase": "P5"
+        },
+        {
+            "id": "seo-sitemap",
+            "title": "Dynamic sitemap.xml + robots.txt",
+            "status": "done",
+            "phase": "P6",
+            "note": "/sitemap.xml (home/shop/pages/categories/products) + /robots.txt (admin/private disallowed)"
+        },
+        {
+            "id": "prod-queue",
+            "title": "Production queue worker setup docs + composer dev update",
+            "status": "done",
+            "phase": "P6",
+            "note": "QUEUE_CONNECTION=database docs + queue:work command + failed retry + supervisor note"
+        },
+        {
+            "id": "shop-caching",
+            "title": "Tagged shop query caching with invalidation",
+            "status": "done",
+            "phase": "P6",
+            "note": "Evaluated: eager-loaded+indexed+paginated queries, tree/brands/settings cached; response-caching deferred (dynamic filters)"
+        },
+        {
+            "id": "gst-shipping",
+            "title": "GST + shipping rules applied in OrderService totals",
+            "status": "done",
+            "phase": "P6",
+            "note": "Settings-driven flat fee / free-above threshold / GST% applied server-side in checkout totals + order"
+        },
+        {
+            "id": "error-pages",
+            "title": "Custom 404/500 pages (design system)",
+            "status": "done",
+            "phase": "P6",
+            "note": "Custom 404/500 pages (design system, brand voice)"
+        },
+        {
+            "id": "final-regression",
+            "title": "Final regression + security scan + handover",
+            "status": "done",
+            "phase": "P6",
+            "note": "201 tests (709 assertions) green, build ok, composer+npm audits 0 vulns, live smoke all 200/404, ops docs written."
+        },
+        {
+            "id": "ui-redesign-minimal-tech",
+            "title": "UI redesign v2 \u2014 Minimal-Tech (client approved): monochrome palette, Inter, sharp minimal components",
+            "status": "done",
+            "note": "Design system v2: brand\u2192#111 monochrome, paper\u2192white, Inter font; buttons black (no glow), cards 1px border, sharp headings; hero CTAs white-on-image; navbar pill minimal; emails monochrome; 0 red/gold left in css+views; DesignSystemTest updated; 202 tests green; screenshots 55-59."
+        },
+        {
+            "id": "homepage-admin-driven",
+            "title": "Homepage fully admin-driven (content + products) with easy/compact admin panel",
+            "status": "done",
+            "note": "Phase A: hero_slides + homepage_blocks + faqs tables, products featured_rank+is_trending, HomepageDataService cached (observer flush). Phase B: ALL sections DB-driven (hero dual-mode images via media, bestsellers by featured rank, new-arrivals by created_at, carousel by trending, testimonials/stories/ugc/numbers/usps/comparison via blocks, faq table, brands table). Phase C: HeroSlideResource (2 tabs content/images, reorderable), HomepageBlockResource (section filter+select), FaqResource, ProductResource quick toggles (trending/rank/filters), HOMEPAGE nav group. Tests 206 passed (739 assertions)."
         }
-    ]
+    ],
+    "git_strategy": {
+        "single_branch": true,
+        "branch": "feature/dev",
+        "pr": "ONE open PR #22 (feature/dev -> main) \u2014 auto-updates on every push",
+        "rule": "NEVER create new branches or new PRs. All work lands on feature/dev. User reviews/merges PR #22 once."
+    },
+    "note": "Scale-up roadmap complete: 6/6 phases done (2026-08-13). Next: user directives.",
+    "phase": "Phase 1/6 \u2014 Order Management Core",
+    "roadmap_doc": "docs/architecture/03-scale-up-roadmap.md"
 }

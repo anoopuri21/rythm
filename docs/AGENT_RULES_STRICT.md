@@ -96,3 +96,102 @@ No other sources (no random web hotlinks, no copyrighted images).
 - Badges/CTAs hamesha images ke UPAR (z-index), peeche kabhi nahi.
 - Navbar: 2-row, white, sticky in-flow; mega menu container-width (full-width nahi).
 - Naye design ideas prototype me pehle, approval ke baad Laravel me port.
+
+---
+
+## 8. Design System STRICT
+
+- **Homepage theme = the site-wide design system** ("Rythme Red"). Source of truth: `@theme` tokens in `resources/css/app.css` + `tailwind.config.js` + `docs/architecture/02-design-system.md`.
+- Every new page/section (shop, product, cart, wishlist, checkout, auth) MUST use design-system tokens/utilities (`bg-brand`, `text-ink`, `bg-paper`, `font-sans`, `section-title`, `section-kicker`) — NEVER ad-hoc hex colors or new fonts.
+- **User color/font change → agent updates the design system ITSELF**: tokens → tailwind.config.js → 02-design-system.md → sweep hardcoded hex → `npm run build` + `php artisan test` green → commit. No user follow-up needed.
+- Fonts: **Poppins only**. No new families without a design-system update.
+- Legacy `gold*`/`rythme*` class names are valid aliases (same values) — do not rename them (breaking change).
+
+---
+
+## 9. Enterprise Rules (user directive 2026-08-13 — ALL future tasks)
+
+> Verified against installed Laravel 13.24.0 (2026-08-13). Where the framework
+> does not support a rule literally, the ADJUSTED form below is binding.
+
+### 9.1 Code style (binding, all new PHP files)
+- `declare(strict_types=1);` as the FIRST line of every new PHP file.
+- Strict scalar/union/intersection type hints on params + returns everywhere;
+  `readonly` classes/properties for immutable data (DTOs).
+- **Model attributes over legacy properties** — verified supported in 13.24:
+  `#[Table('products')]`, `#[Fillable([...])]`, `#[Hidden([...])]`,
+  `#[Guarded([...])]`, `#[Visible([...])]`. Do NOT declare `$fillable`,
+  `$hidden`, `$table` properties on new models.
+- ADJUSTED: **no `#[Casts]` attribute exists** in 13.24 → keep `$casts`
+  property on models (verified: no Casts attribute in Eloquent\Attributes).
+- Controllers ≤ 30 lines: business logic lives in single-responsibility
+  Services/Actions; DTOs between controller ↔ service; custom `FormRequest`
+  classes with `$request->validated()` — never inline validation.
+- **Zero placeholders**: no `// TODO`, no incomplete stubs.
+
+### 9.2 Security (binding)
+- CSRF: Laravel 13's origin-aware `PreventRequestForgery` is the default
+  middleware (verified) — do not downgrade to legacy token-only checks;
+  use `PreventRequestForgery::except()` only for verified webhook routes.
+- Payment webhooks: cryptographic signature verification ALWAYS before
+  acting on payloads (Razorpay HMAC plan — commerce arch §5).
+- Queries: Eloquent builders only; raw SQL only with bound parameters.
+- Passkeys/WebAuthn (Fortify): NOT installed — future task, requires user
+  decision before adding the dependency. Do not add silently.
+
+### 9.3 Performance (binding)
+- Eager loading (`with()`) or lazy-eager (`load()`) on every relational
+  query; prevent N+1.
+- `Cache::touch()` (verified) to extend TTL of cached product state —
+  never rewrite whole cache blocks.
+- Every migration FK/slug/SKU/status column gets an index.
+- Non-blocking workflows (order emails, invoices, shipping webhooks) →
+  queued jobs routed via `Queue::route()` (verified).
+
+### 9.4 UI/UX (binding)
+- Mobile-first responsive Tailwind; dark sections follow design system.
+- Zero-refresh interactions (mini-cart, filters, qty) via Livewire 3.
+- Network feedback: `wire:loading` states, skeleton UI, disabled submit
+  during payment.
+
+### 9.5 E-commerce intelligence (conditional — needs infra/user decision)
+- Laravel AI SDK (`laravel/ai`): NOT installed; add when recommendations/
+  support/search task begins (user approval).
+- Semantic search `whereVectorSimilarTo()`: verified present in 13.24
+  Builder, but requires **PostgreSQL + pgvector** — project DB is SQLite
+  (dev) / MySQL (prod plan). Decision needed: Postgres migration or
+  keyword search fallback. Do not implement on SQLite.
+
+### 9.6 Testing (binding)
+- PHPUnit suite for every Action/endpoint/component (project uses PHPUnit —
+  keep PHPUnit, not Pest) covering success + exception boundaries.
+- Existing gates stay: `npm run build` + `php artisan test` green before
+  marking any task done.
+
+---
+
+## 10. Git Workflow STRICT — Single Branch, Single PR (user directive 2026-08-13)
+
+- **ONE long-lived branch: `feature/dev`.** All development, every task, every commit lands here.
+- **ONE open PR: #22 (`feature/dev` → `main`)** — it auto-updates on every push. User reviews & merges ONCE.
+- **NEVER** create a new branch (`task/<id>`, `feature/<x>`, etc.) and NEVER open a new PR.
+- Never commit to `main` directly. Push only to `feature/dev`.
+- Stale/merged branches are deleted immediately when noticed.
+- Task agent (`automation/task-agent.mjs`) enforces: branch check before any commit.
+
+## 11. Security Mandate — TOP-NOTCH (user directive 2026-08-13)
+
+> This is an e-commerce platform. **Security is a first-class, non-negotiable concern** in EVERY line of code and architecture decision — never an afterthought.
+
+1. **OWASP Top 10 aware** — every feature considered against: broken access control, injection, XSS, insecure design, misconfig, vulnerable components, auth failures, crypto failures, SSRF, logging issues.
+2. **Input**: every input via FormRequest validation; never trust client data (prices, totals, ids, ownership).
+3. **Output**: Blade auto-escaping; no raw `{!! !!}` unless trusted Tiptap content sanitized; CSP headers where feasible.
+4. **AuthZ**: ownership checks (Policies or inline `user_id` guards) on every resource — orders, wishlist, addresses. Signed URLs for sensitive pages.
+5. **Payments**: Razorpay callback + webhook ALWAYS cryptographically verified (signature/HMAC) before state change; amount-match checks; CSRF-excepted routes verified server-side only.
+6. **SQLi**: Eloquent/Query-Builder only; raw SQL only with bound params and zero user input.
+7. **Mass assignment**: model attributes (`#[Fillable]`) strictly; no `*` guard.
+8. **Secrets**: env-only; never commit keys; `.env` gitignored.
+9. **Rate limiting** on all auth + form POST routes (login, register, contact, newsletter, cart, checkout).
+10. **Dependencies**: `composer audit` + `npm audit` checked in CI; no known-vulnerable packages.
+11. **Session/cookies**: secure cookie flags in production; session regeneration on login.
+12. **Security review task is QUEUED** (`security-review` in tasks.json) — full audit after site completion; until then every new code passes the checklist above.

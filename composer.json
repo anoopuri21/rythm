@@ -9,12 +9,13 @@
     ],
     "license": "MIT",
     "require": {
+        "php": "^8.3",
         "awcodes/filament-tiptap-editor": "^3.5",
         "filament/filament": "^3.2",
+        "filament/spatie-laravel-media-library-plugin": "^3.3",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^3.0",
-        "php": "^8.3",
         "razorpay/razorpay": "^2.9",
         "robsontenorio/mary": "^2.0",
         "spatie/laravel-medialibrary": "^11.23"

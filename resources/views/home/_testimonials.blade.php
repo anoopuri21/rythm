@@ -1,34 +1,13 @@
+@php $sec = $homeSections['testimonials'] ?? null; @endphp
 @php
-    $testimonials = [
-        [
-            'quote' => 'The guitar arrived perfectly set up—low action, spot-on intonation, and packed like it was touring the country. It felt personal, not transactional.',
-            'name' => 'Aarav Mehta',
-            'role' => 'Guitarist · Mumbai',
-            'initials' => 'AM',
-            'purchase' => 'Fender Player II Stratocaster',
-        ],
-        [
-            'quote' => 'I was building my first home studio and the advice was refreshingly honest. Rhythm Exports helped me spend where it mattered and save where it did not.',
-            'name' => 'Naina Kapoor',
-            'role' => 'Singer-songwriter · Delhi',
-            'initials' => 'NK',
-            'purchase' => 'Studio recording bundle',
-        ],
-        [
-            'quote' => 'From the first call to delivery, everyone spoke the language of musicians. My keyboard reached Bengaluru ahead of schedule and was ready for rehearsal.',
-            'name' => 'Rohan Iyer',
-            'role' => 'Keys player · Bengaluru',
-            'initials' => 'RI',
-            'purchase' => 'Yamaha CK61 Stage Keyboard',
-        ],
-        [
-            'quote' => 'Finding an authentic tabla set online felt risky. The detailed consultation, careful tuning, and beautiful instrument changed my mind completely.',
-            'name' => 'Ishita Sen',
-            'role' => 'Classical musician · Kolkata',
-            'initials' => 'IS',
-            'purchase' => 'Professional brass tabla set',
-        ],
-    ];
+    // ADMIN-DRIVEN: homepage_blocks (section_key=testimonial) — title=name, subtitle=role, content=quote
+    $testimonials = $homepage['testimonials']->map(fn ($b) => [
+        'quote' => $b->content,
+        'name' => $b->title,
+        'role' => $b->subtitle ?: 'Verified buyer',
+        'initials' => collect(explode(' ', (string) $b->title))->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->implode(''),
+        'purchase' => 'Rythme instrument',
+    ])->all();
 @endphp
 
 <section id="testimonials" class="testimonial-section relative overflow-hidden bg-rythme-black-soft py-24 text-white sm:py-32">
@@ -37,8 +16,8 @@
 
     <div class="relative mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mx-auto mb-14 max-w-3xl text-center">
-            <p class="section-kicker justify-center text-gold-light">Stories from the Rhythm Exports community</p>
-            <h2 class="section-title mx-auto text-white">Made for musicians.<br><em class="text-gold-light">Loved by musicians.</em></h2>
+            <p class="section-kicker justify-center text-gold-light">{{ $sec->kicker ?? 'Stories from the Rhythm Exports community' }}</p>
+            <h2 class="section-title mx-auto text-white">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Made for musicians.<br><em class="text-gold-light">Loved by musicians.</em>@endif</h2>
             <div class="mt-6 flex items-center justify-center gap-3 text-sm text-white/55">
                 <span class="tracking-[0.2em] text-gold" aria-label="5 out of 5 stars">★★★★★</span>
                 <span><strong class="text-white">4.9</strong> from 2,400+ verified reviews</span>

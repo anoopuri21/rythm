@@ -1,0 +1,14 @@
+{
+    "interval_seconds": 1800,
+    "branch": "feature/dev",
+    "single_branch_rule": "NEVER create new branches or new PRs — all work lands on feature/dev, single open PR #22",
+    "health": [
+        "php artisan --version",
+        "php artisan config:clear",
+        "npm run build"
+    ],
+    "gates": [
+        "php artisan test"
+    ],
+    "logs_dir": "logs"
+}

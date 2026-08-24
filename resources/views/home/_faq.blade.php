@@ -1,17 +1,15 @@
+@php $sec = $homeSections['faq'] ?? null; @endphp
 {{--
     ============================================================
     s15 · FAQ — Alpine accordion + FAQPage JSON-LD (SEO)
     ============================================================
 --}}
 @php
-    $faqs = [
-        ['q' => 'How long does delivery take across India?', 'a' => 'Metro cities receive orders in 2–4 working days; most other locations in 4–7 working days. Every order ships with tracking and signature-on-delivery, and shipping is free above ₹999.'],
-        ['q' => 'Can I return an instrument if I change my mind?', 'a' => 'Yes — you have 7 days from delivery for easy, no-questions returns on unused products in original packaging. Instruments that are played and then returned are covered by our separate 7-day play-trial policy for select guitars and keyboards.'],
-        ['q' => 'What warranty do the instruments carry?', 'a' => 'All products include the manufacturer warranty, and select premium instruments carry up to 3 years of extended cover through Rhythm Exports. Warranty support is handled directly by our service partners with doorstep pickup where available.'],
-        ['q' => 'Do you offer EMI or easy payment options?', 'a' => 'Yes — no-cost EMI is available on leading credit cards, and we support UPI, net banking, wallets and cash on delivery for eligible orders. The full list of options appears at checkout.'],
-        ['q' => 'Are instruments set up before shipping?', 'a' => 'Every guitar, bass, ukulele and keyboard is inspected, tuned and set up by our in-house technicians before dispatch — free of charge. This includes action, intonation and string checks.'],
-        ['q' => 'How do I get expert buying advice?', 'a' => 'Call or WhatsApp our team of working musicians for honest, product-specific advice — no scripts. We will help you compare models, plan upgrades and even recommend the right cable.'],
-    ];
+    // ADMIN-DRIVEN: faqs table
+    $faqs = $homepage['faqs']->map(fn ($f) => ['q' => $f->question, 'a' => $f->answer])->all();
+    if (empty($faqs)) {
+        $faqs = [['q' => 'How long does delivery take across India?', 'a' => 'Metro cities receive orders in 2–4 working days.']];
+    }
     $faqSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'FAQPage',
@@ -31,8 +29,8 @@
     @include('components.instrument-decor')
     <div class="relative z-[1] mx-auto max-w-3xl px-5 sm:px-8">
         <div class="mb-12 text-center" data-reveal="up">
-            <p class="section-kicker justify-center">Good to know</p>
-            <h2 class="section-title">Frequently asked <em>questions.</em></h2>
+            <p class="section-kicker justify-center">{{ $sec->kicker ?? 'Good to know' }}</p>
+            <h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Frequently asked <em>questions.</em>@endif</h2>
         </div>
 
         <div class="space-y-4" x-data="{ open: 0 }">

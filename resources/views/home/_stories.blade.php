@@ -1,5 +1,15 @@
+@php $sec = $homeSections['stories'] ?? null; @endphp
 @php
-    $stories = [
+    // ADMIN-DRIVEN: homepage_blocks (section_key=story) — title, content=excerpt
+    $stories = $homepage['stories']->map(fn ($b, $i) => [
+        'category' => 'Journal',
+        'title' => $b->title,
+        'excerpt' => $b->content,
+        'image' => $b->getFirstMediaUrl('image') ?: ['images/story-studio.jpg','images/story-guitar.jpg','images/hero-piano.jpg'][$i % 3],
+        'date' => $b->updated_at?->format('F d, Y'),
+        'read' => '5 min read',
+    ])->all();
+    $storiesFallback = [
         ['category'=>'Studio guide','title'=>'Build a home studio that inspires your best work','excerpt'=>'A practical room-by-room guide to choosing monitors, interfaces and acoustic treatment without overcomplicating it.','image'=>'images/story-studio.jpg','date'=>'August 02, 2026','read'=>'8 min read'],
         ['category'=>'Care & craft','title'=>'How to make your guitar feel new again','excerpt'=>'Simple maintenance rituals every player should know—from fresh strings and fret care to perfect humidity.','image'=>'images/story-guitar.jpg','date'=>'July 26, 2026','read'=>'6 min read'],
         ['category'=>'Buying guide','title'=>'Your first digital piano: what truly matters','excerpt'=>'Key action, sound engines, pedals and connectivity explained in plain language for confident first-time buyers.','image'=>'images/hero-piano.jpg','date'=>'July 18, 2026','read'=>'7 min read'],
@@ -9,7 +19,7 @@
 <section id="stories" class="relative overflow-hidden bg-rythme-cream py-24 sm:py-32">
     @include('components.instrument-decor')
     <div class="relative z-[1] mx-auto max-w-7xl px-5 sm:px-8">
-        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">The Rhythm Exports journal</p><h2 class="section-title">Ideas for a life<br><em>lived in music.</em></h2></div><a href="/stories" class="text-link">Read all stories <span>↗</span></a></div>
+        <div class="reveal-section mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p class="section-kicker">{{ $sec->kicker ?? 'The Rhythm Exports journal' }}</p><h2 class="section-title">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em>{{ $sec->title_accent }}</em>@endif@else Ideas for a life<br><em>lived in music.</em>@endif</h2></div><a href="/stories" class="text-link">Read all stories <span>↗</span></a></div>
         <div class="grid gap-8 md:grid-cols-3">
             @foreach($stories as $story)
                 <article class="reveal-section story-card group">

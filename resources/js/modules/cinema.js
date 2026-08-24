@@ -2,14 +2,12 @@
  * ============================================================
  * cinema.js — Cinematic "movie" scroll experience (s17)
  * ------------------------------------------------------------
- * Adds the missing filmic layers to the homepage:
+ * Adds the filmic layers to the homepage:
  *   1. Film opening — fade-from-black curtain lift on load,
  *      like a movie title card starting.
  *   2. Film grain — animated analog noise over the whole page.
  *   3. Vignette — soft cinematic darkening of the edges.
- *   4. Letterbox bars — widescreen top/bottom bars that appear
- *      while scrolling (velocity-driven) and fade when idle,
- *      like fast-forwarding a reel.
+ * (Letterbox bars were REMOVED per user request 2026-08-13.)
  * All overlays are aria-hidden, pointer-events: none, and
  * respect prefers-reduced-motion.
  * ============================================================
@@ -24,8 +22,6 @@ function injectOverlays() {
     overlays.innerHTML = [
         '<div class="film-grain"></div>',
         '<div class="film-vignette"></div>',
-        '<div class="letterbox-bar letterbox-top"></div>',
-        '<div class="letterbox-bar letterbox-bottom"></div>',
     ].join('');
 
     document.body.appendChild(overlays);
@@ -49,38 +45,7 @@ function initFilmOpening(reducedMotion) {
     });
 }
 
-/** Widescreen bars that respond to scroll velocity. */
-function initLetterbox(lenis) {
-    const top = document.querySelector('.letterbox-top');
-    const bottom = document.querySelector('.letterbox-bottom');
-    if (!top || !bottom) return;
-
-    let hideTimer = null;
-    const show = () => {
-        document.body.classList.add('is-scrolling-fast');
-        window.clearTimeout(hideTimer);
-        hideTimer = window.setTimeout(() => {
-            document.body.classList.remove('is-scrolling-fast');
-        }, 900);
-    };
-
-    if (lenis) {
-        lenis.on('scroll', ({ velocity }) => {
-            if (Math.abs(velocity) > 0.35) show();
-        });
-    }
-
-    // Fallback for native scroll environments.
-    let lastY = window.scrollY;
-    window.addEventListener('scroll', () => {
-        const delta = Math.abs(window.scrollY - lastY);
-        lastY = window.scrollY;
-        if (delta > 2) show();
-    }, { passive: true });
-}
-
-export function initCinema(reducedMotion, lenis) {
+export function initCinema(reducedMotion) {
     injectOverlays();
     initFilmOpening(reducedMotion);
-    initLetterbox(lenis);
 }
