@@ -99,7 +99,8 @@ Forward rollout creates independent tables first, then adds nullable columns. It
 - Full regression: **225 tests / 753 assertions passed**.
 - Changed PHP syntax and Pint: passed.
 - Composer audit: no security advisories.
-- Exact MySQL identifier review: custom index/constraint names remain below the 64-character limit.
+- Exact MySQL identifier review: after the owner's first run exposed an overlong framework-generated pivot foreign-key name, every catalog foreign key was explicitly named; the longest catalog identifier is now 31 characters.
+- Failed-DDL recovery: migration `000004` safely removes only its own new, unlogged partial catalog tables before retrying, preserving every pre-existing application table and row.
 
 ### Remaining gate
 

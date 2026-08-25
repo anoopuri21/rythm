@@ -154,6 +154,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 2 status: BLOCKED** — Requires owner-run non-destructive `php artisan migrate --force` and `migrate:status` on persistent MySQL 8.4.3 `rhythm_db`.
 - **Auto Mode active → Paused at genuine external MySQL blocker** — Agent 10 remains inactive.
 
+## 25 August 2026 — Phase 2 MySQL Identifier Recovery
+
+- **SQLite-compatible generated foreign-key names → Explicit MySQL-safe names** — Owner's first MySQL forward migration exposed a generated pivot foreign-key identifier longer than MySQL's 64-character limit.
+- **Failed MySQL DDL recovery added** — Migration `000004` now drops only its brand-new, unlogged Phase 2 catalog tables before recreating them, because MySQL can retain partial DDL after a failed migration. Existing application tables and data are never dropped.
+- **All catalog foreign keys explicitly named** — Custom identifiers are bounded below 64 characters; no application/data model scope changed.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.
