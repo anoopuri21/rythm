@@ -204,4 +204,28 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('h-[calc(100svh-4rem)]', escape: false)         // hero = 100vh - navbar (mobile)
             ->assertSee('lg:h-[calc(100svh-7.5rem)]', escape: false);  // hero = 100vh - navbar (desktop)
     }
+    public function test_promo_banners_render_from_admin_blocks(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="promos"', escape: false)
+            ->assertSee('Enjoy studio-grade sound')
+            ->assertSee('Keys for every stage')
+            ->assertSee('Up to 35% off accessories')
+            ->assertSee('/category/pro-audio', escape: false)
+            ->assertSee('Shop now');
+    }
+
+    public function test_all_products_have_committed_images(): void
+    {
+        $products = \App\Models\Product::all();
+
+        foreach ($products as $product) {
+            $this->assertTrue(
+                is_file(public_path('images/products/'.$product->slug.'.jpg')),
+                "Missing image for {$product->slug}"
+            );
+        }
+    }
 }
+

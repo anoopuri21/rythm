@@ -9,6 +9,7 @@
 
 @section('content')
     @include('home._hero', ['heroMode' => $heroMode, 'homepage' => $homepage])
+    @include('home._promos', ['homepage' => $homepage])
     @include('home._categories', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._bestsellers', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._why-rythme', ['homeSections' => $homeSections, 'homepage' => $homepage])
