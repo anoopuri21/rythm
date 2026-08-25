@@ -25,7 +25,7 @@
 | 3 | Homepage and Shop frontend qualification | Storefront programme | COMPLETE |
 | 4 | Accounts, cart, wishlist, checkout and orders | E1, E2 | COMPLETE |
 | 5 | Verified reviews, moderated product Q&A and coupons | E3 | COMPLETE |
-| 6 | Controlled catalogue acquisition and import pipeline | Catalog acquisition prerequisite absent from legacy roadmap | PENDING |
+| 6 | Controlled catalogue acquisition and import pipeline | Catalog acquisition prerequisite absent from legacy roadmap | IN PROGRESS |
 | 7 | Admin governance, staff RBAC and auditability | E7 | PENDING |
 | 8 | Payment, refund and financial reconciliation operations | E2 | PENDING |
 | 9 | Central notifications and external-integration event architecture | E4 | PENDING |
@@ -67,10 +67,10 @@
 - **Phase 10 requires professional business approval:** GST, HSN, shipping, return, replacement and warranty rules cannot be invented by implementation agents.
 - **Phases 12–17 are mandatory release gates:** they cannot be collapsed into deployment.
 
-## Decisions required before Phase 6 activation
+## Phase 6 activation decisions — RESOLVED 26 August 2026
 
-1. Scraper implementation language: PHP or Python.
-2. Confirmation that the pipeline may be developed against reference data while commercial rights to competitor text/images remain unresolved.
+1. Scraper implementation language: **PHP**.
+2. The pipeline may be developed against bounded public reference data while commercial rights to competitor text/images remain unresolved.
 3. Source-access constraints: public pages only, no authentication bypass, no CAPTCHA bypass and respectful rate limiting.
 
-Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures.
+Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures. The owner additionally authorized continuous sequential Agent 0 execution through Phase 11 under `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; this does not waive gates or activate Agent 10.

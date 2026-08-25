@@ -253,13 +253,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Initial audit exposed mandatory fixes** — Guest tracking redirects to an unsigned protected URL; variant quantity updates check the wrong field; email changes retain stale verification; address CRUD/default behavior is incomplete; checkout order idempotency is not wired; cart/checkout/order surfaces contain unsupported shipping, warranty, dispatch, refund-timing and provider claims.
 - **Safety boundary retained** — Persistent `rhythm_db` remains protected from destructive tests and sample seeding; uploaded evidence retention remains prohibited; Agent 10 remains inactive.
 
-## Active Decisions Still Needed
+## Active External Decisions/Gates Still Needed
 
-- Phase 5 interaction scope is resolved: verified-purchase reviews plus moderated product Q&A; no blog comments.
-- PHP versus Python scraper before canonical Phase 6 activation.
-- Permission to build Phase 6 against bounded public reference data while commercial content/image rights remain unresolved.
-- Confirm Phase 6 public-page-only access, no authentication/CAPTCHA bypass and respectful rate limiting.
 - Product content/image commercial rights before production data launch.
+- Real Razorpay test-mode credentials/evidence for Phase 8 acceptance.
+- Qualified tax/legal approval and exact seller/business policy values for Phase 10 publication.
+- Owner-side manual UAT after pulling the resulting commits.
 
 ## 26 August 2026 — Phase 4 Commerce Acceptance
 
@@ -306,3 +305,15 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Canonical next phase resolved** — Phase 6 is controlled catalogue acquisition and import because realistic normalized catalogue/media evidence is required before meaningful search, merchandising and performance qualification.
 - **No implicit activation** — Auto Mode remains paused after Phase 5. Phase 6 requires its recorded language/source-boundary decisions. Agent 10 and Phase 18 remain inactive until explicit deployment activation after Phase 17 acceptance.
 - **No production sign-off** — Reconciliation changes governance only; every production gate remains pending.
+
+## 26 August 2026 — Continuous Phase 6–11 Authority and Phase 6 Activation
+
+- **Phase 6 pre-activation decisions resolved** — Owner selected PHP, permitted bounded public reference-data development while commercial rights remain unresolved, and confirmed public pages only with no authentication/CAPTCHA bypass and respectful rate limiting.
+- **Routine phase confirmations waived through Phase 11** — Agent 0 has continuous sequential execution authority for canonical Phases 6–11. Quality gates, truthful statuses, data safety and genuine-blocker pauses remain mandatory.
+- **External gates remain truthful** — Missing Razorpay test credentials, professional tax/legal approval or owner manual UAT may leave affected phases in `QA`/`BLOCKED`; they cannot be falsely marked `COMPLETE`, while independent later work may continue.
+- **Phase 7–8 defaults approved** — Six least-privilege staff roles, TOTP 2FA, reasoned/audited sensitive actions and finance-authorized full/partial refunds/reconciliation.
+- **Phase 9 bounded to transactional email** — In-app/database notifications and SMS/WhatsApp are excluded from the approved delivery scope; centralized idempotent logged cron-safe email remains required.
+- **Phase 10 safe boundary approved** — Build configurable manual fulfillment/shipment/RMA/tax structures without publishing invented legal, tax, warranty, shipping or return rules and without assuming a carrier integration.
+- **Phase 11 shared-host baseline approved** — MySQL-safe search/facets, recently viewed, related/complementary administration, back-in-stock subscriptions and truthful states; no persistent search daemon, gift cards, abandoned-cart marketing or price-drop promises.
+- **Workspace capacity guard locked** — Large raw responses, media, generated catalogues, test databases, dependencies and browser/build artefacts stay disposable/outside the repository and are cleaned after compact evidence extraction.
+- **Phase 6 `PENDING` → `IN PROGRESS`** — Agents 5, 4, 8, 9 and 15 activated under Agent 0. Agent 10 remains inactive; no production sign-off is implied.

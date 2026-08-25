@@ -4,7 +4,7 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current phase:** Phase 5 — Reviews, product Q&A and coupons COMPLETE
-**Overall status:** PHASE 5 COMPLETE / AUTO MODE PAUSED AT FULL-PHASE CHECKPOINT / NOT PRODUCTION-READY
+**Overall status:** PHASE 6 IN PROGRESS / CONTINUOUS AUTO MODE AUTHORIZED THROUGH PHASE 11 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** PAUSED — Phase 5 full-phase checkpoint reached
 
@@ -65,7 +65,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
 | 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
-| 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | PENDING | Approved language/source contract; validation, deduplication, resumability and media report pass |
+| 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | IN PROGRESS | PHP/public-source contract approved; validation, deduplication, resumability and media report must pass |
 | 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | PENDING | Least-privilege role matrix, sensitive-action audit and admin UAT pass |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | PENDING | Real test-mode payment/refund/retry/reconciliation evidence passes |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
@@ -330,6 +330,6 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 ## 14. Canonical Next Action
 
-The post-Phase-5 numbering conflict is resolved by `tasks/CANONICAL_PHASE_SEQUENCE.md`. The next delivery phase is **Phase 6 — Controlled catalogue acquisition and import pipeline**. It remains `PENDING` and is not activated by this governance reconciliation.
+The post-Phase-5 numbering conflict is resolved by `tasks/CANONICAL_PHASE_SEQUENCE.md`. **Phase 6 — Controlled catalogue acquisition and import pipeline** is now `IN PROGRESS` after the owner selected PHP, approved bounded public reference-data development and confirmed the no-authentication/no-CAPTCHA-bypass respectful-rate-limit boundary.
 
-Before activation, Agent 0 requires the recorded scraper-language and bounded public-source/access decisions. Commercial competitor text/image rights remain a separate production-data gate. All subsequent work must use canonical Delivery Phases 7–18; Agent 10 and Phase 18 remain inactive until the explicit deployment boundary is satisfied.
+The owner authorized Agent 0 to execute canonical Phases 6–11 sequentially without routine inter-phase confirmation under `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`. Missing external credentials, professional approvals or owner manual UAT must remain truthful `QA`/`BLOCKED` gates; they cannot be reported as passed. Commercial competitor text/image rights remain a separate production-data gate. Agent 10 and Phase 18 remain inactive.

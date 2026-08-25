@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 5 complete; canonical Phase 6 not activated
+**Status:** ACTIVE — Phase 6 in progress; continuous authority through Phase 11
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -13,7 +13,8 @@
 - Auto Mode activates only when the user explicitly issues `ACTIVATE AUTO MODE`.
 - Merely discussing or documenting Auto Mode does not activate it.
 - `PAUSE AUTO MODE` immediately returns control to ask-first mode.
-- Auto Mode pauses automatically at a genuine blocker or at the completion of a full roadmap phase.
+- Auto Mode normally pauses automatically at a genuine blocker or at the completion of a full roadmap phase.
+- On 26 August 2026 the owner explicitly authorized continuous sequential execution from canonical Phase 6 through Phase 11 without routine inter-phase confirmation. Mandatory phase gates and truthful `QA`/`BLOCKED` statuses still apply; genuine blockers and unsafe/destructive actions still pause work.
 - Agent 0 remains accountable for plan, sequencing, integration and quality in both modes.
 
 ---
@@ -148,9 +149,10 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — paused automatically at the completed Phase 5 full-phase checkpoint.
+- **Active:** Yes — owner-authorized continuous sequential execution through Phase 11.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, Phase 4 Accounts/Commerce, and Phase 5 Reviews/Product Q&A/Coupons (`COMPLETE`).
-- **Current phase:** Phase 5 — Verified reviews, moderated product Q&A and coupons (`COMPLETE`); the canonical next phase is Phase 6 controlled catalogue acquisition/import, pending its pre-activation decisions.
+- **Current phase:** Phase 6 — Controlled catalogue acquisition and import pipeline (`IN PROGRESS`).
+- **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.
 - **Sequence authority:** `tasks/CANONICAL_PHASE_SEQUENCE.md` controls delivery order; `tasks/MASTER_PROJECT_TRACKER.md` controls status; enterprise-roadmap E-series IDs are capability workstreams only.
 - **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates and the owner-reported exact MySQL 8.4.3 UAT forward migrations passed.
 - **Owner-locked interaction scope:** verified-purchase reviews plus moderated product Q&A; no blog comments.
