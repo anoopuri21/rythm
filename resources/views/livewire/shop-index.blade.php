@@ -1,21 +1,49 @@
-<div class="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12">
-    <div class="lg:grid lg:grid-cols-[270px_minmax(0,1fr)] lg:gap-12"
-         x-data="{ mobileFilters: false }">
+<div class="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8" x-data="{ mobileFilters: false }"
+     @keydown.escape.window="if (mobileFilters) { mobileFilters = false; $nextTick(() => $refs.filterTrigger.focus()) }">
+    <section class="mb-8 border-b border-ink/10 pb-8" aria-labelledby="shop-shortcuts-title">
+        <div class="mb-5 flex items-end justify-between gap-4">
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-brand">Start with a sound</p>
+                <h2 id="shop-shortcuts-title" class="mt-1 text-xl font-extrabold text-ink sm:text-2xl">Shop popular categories</h2>
+            </div>
+            @if($category !== null)
+                <button type="button" wire:click="setCategory(null)" class="text-sm font-bold text-brand underline underline-offset-4">View all</button>
+            @endif
+        </div>
+        <div class="shop-shortcuts" role="list">
+            @foreach(array_slice($categories, 0, 8) as $shortcut)
+                <button type="button" role="listitem" wire:click="setCategory('{{ $shortcut['slug'] }}')"
+                        class="shop-shortcut {{ $category === $shortcut['slug'] ? 'is-active' : '' }}"
+                        aria-pressed="{{ $category === $shortcut['slug'] ? 'true' : 'false' }}">
+                    <span class="shop-shortcut__image">
+                        <img src="{{ asset('images/categories/'.$shortcut['slug'].'.jpg') }}" alt="" width="160" height="160" loading="lazy" decoding="async">
+                    </span>
+                    <span>{{ $shortcut['name'] }}</span>
+                </button>
+            @endforeach
+        </div>
+    </section>
+
+    <div class="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8 xl:gap-10">
 
         {{-- ===== FILTER SIDEBAR ===== --}}
         {{-- Mobile overlay --}}
         <div x-cloak x-show="mobileFilters" x-transition.opacity.duration.200ms
-             class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden" @click="mobileFilters = false" aria-hidden="true"></div>
+             class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden"
+             @click="mobileFilters = false; $nextTick(() => $refs.filterTrigger.focus())" aria-hidden="true"></div>
 
-        <aside x-cloak
-               :class="mobileFilters ? 'translate-x-0' : '-translate-x-full'"
+        <aside id="shop-filter-panel" x-cloak x-trap.inert.noscroll="mobileFilters"
+               :class="mobileFilters ? 'translate-x-0 visible' : '-translate-x-full invisible lg:visible'"
                x-transition:enter="transition ease-out duration-300"
                x-transition:leave="transition ease-in duration-200"
                class="fixed inset-y-0 left-0 z-[70] w-[86%] max-w-sm overflow-y-auto bg-paper p-6 shadow-2xl transition-transform duration-300 lg:static lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:overflow-visible lg:bg-transparent lg:p-0 lg:shadow-none"
+               :role="mobileFilters ? 'dialog' : 'region'" :aria-modal="mobileFilters ? 'true' : null"
                aria-label="Shop filters">
             <div class="mb-6 flex items-center justify-between lg:hidden">
                 <h2 class="font-bold text-ink">Filters</h2>
-                <button type="button" @click="mobileFilters = false" class="rounded-full p-2 text-ink transition hover:bg-ink/5" aria-label="Close filters">
+                <button x-ref="filterClose" type="button"
+                        @click="mobileFilters = false; $nextTick(() => $refs.filterTrigger.focus())"
+                        class="rounded-full p-2 text-ink transition hover:bg-ink/5" aria-label="Close filters">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -26,14 +54,24 @@
                     <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Category</h2>
                     <svg class="h-4 w-4 text-muted transition-transform duration-200" :class="catOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                <div x-cloak x-show="catOpen" class="mt-3 space-y-2.5">
+                <div x-cloak x-show="catOpen" class="mt-3 space-y-2.5" x-data="{ categorySearch: '' }">
+                    <label class="block">
+                        <span class="sr-only">Search categories</span>
+                        <input type="search" x-model="categorySearch" placeholder="Search categories"
+                               class="h-10 w-full rounded-lg border border-ink/15 bg-white px-3 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/30">
+                    </label>
                     <button type="button" wire:click="setCategory(null)"
+                            x-show="categorySearch === '' || 'all categories'.includes(categorySearch.toLowerCase())"
                             class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-sm transition hover:bg-ink/5 {{ $category === null ? 'font-bold text-ink' : 'text-muted' }}">
                         All categories
                         <span class="text-xs text-muted/70">{{ $products->total() }}</span>
                     </button>
                     @foreach($categories as $parent)
-                        <div class="rounded-lg {{ $category !== null && str_starts_with($category, $parent['slug']) ? 'bg-brand/5' : '' }}">
+                        @php
+                            $categorySearchText = strtolower($parent['name'].' '.collect($parent['children'])->pluck('name')->implode(' '));
+                        @endphp
+                        <div x-show="categorySearch === '' || @js($categorySearchText).includes(categorySearch.toLowerCase())"
+                             class="rounded-lg {{ $category !== null && str_starts_with($category, $parent['slug']) ? 'bg-brand/5' : '' }}">
                             <button type="button" wire:click="setCategory('{{ $parent['slug'] }}')"
                                     class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-sm transition hover:bg-ink/5 {{ $category === $parent['slug'] ? 'font-bold text-brand' : 'text-ink' }}">
                                 {{ $parent['name'] }}
@@ -62,9 +100,16 @@
                     <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Brand</h2>
                     <svg class="h-4 w-4 text-muted transition-transform duration-200" :class="brandOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
-                <div x-cloak x-show="brandOpen" class="mt-3 max-h-72 space-y-1.5 overflow-y-auto pr-1">
+                <div x-cloak x-show="brandOpen" class="mt-3" x-data="{ brandSearch: '' }">
+                    <label class="mb-3 block">
+                        <span class="sr-only">Search brands</span>
+                        <input type="search" x-model="brandSearch" placeholder="Search brands"
+                               class="h-10 w-full rounded-lg border border-ink/15 bg-white px-3 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/30">
+                    </label>
+                    <div class="max-h-72 space-y-1.5 overflow-y-auto pr-1">
                     @foreach($brands as $brand)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-1.5 text-sm transition hover:bg-ink/5">
+                        <label x-show="brandSearch === '' || @js(strtolower($brand->name)).includes(brandSearch.toLowerCase())"
+                               class="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-1.5 text-sm transition hover:bg-ink/5">
                             <input type="checkbox"
                                    class="h-4 w-4 rounded border-ink/20 text-brand accent-brand focus:ring-brand/40"
                                    wire:click="toggleBrand('{{ $brand->slug }}')"
@@ -74,6 +119,7 @@
                             <span class="ml-auto text-xs text-muted/70">{{ $brand->products_count }}</span>
                         </label>
                     @endforeach
+                    </div>
                 </div>
             </div>
 
@@ -101,6 +147,53 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Rating --}}
+            <div class="border-b border-ink/10 py-6" x-data="{ ratingOpen: true }">
+                <button type="button" @click="ratingOpen = !ratingOpen" class="flex w-full items-center justify-between py-1" :aria-expanded="ratingOpen ? 'true' : 'false'">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Customer rating</h2>
+                    <svg class="h-4 w-4 text-muted transition-transform duration-200" :class="ratingOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div x-cloak x-show="ratingOpen" class="mt-3 space-y-1">
+                    @foreach([4, 3, 2, 1] as $rating)
+                        <button type="button" wire:click="setMinRating({{ $rating }})"
+                                class="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-sm transition hover:bg-ink/5 {{ $minRating === $rating ? 'font-bold text-brand' : 'text-muted' }}"
+                                aria-pressed="{{ $minRating === $rating ? 'true' : 'false' }}">
+                            <span class="text-brand" aria-hidden="true">★★★★★</span>
+                            <span>{{ $rating }} &amp; up</span>
+                        </button>
+                    @endforeach
+                    @if($minRating !== null)
+                        <button type="button" wire:click="setMinRating(null)" class="min-h-10 px-2.5 text-xs font-bold text-brand underline underline-offset-4">Any rating</button>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Category-aware normalized attributes --}}
+            @foreach($attributeFacets as $attribute)
+                <div class="border-b border-ink/10 py-6" x-data="{ attributeOpen: true }">
+                    <button type="button" @click="attributeOpen = !attributeOpen" class="flex w-full items-center justify-between py-1" :aria-expanded="attributeOpen ? 'true' : 'false'">
+                        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">{{ $attribute->name }}</h2>
+                        <svg class="h-4 w-4 text-muted transition-transform duration-200" :class="attributeOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    <div x-cloak x-show="attributeOpen" class="mt-3 space-y-1.5">
+                        @foreach($attribute->values as $value)
+                            @php
+                                $attributeSelected = in_array($value->slug, $attributeSelections[$attribute->slug] ?? [], true);
+                            @endphp
+                            <label class="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2.5 text-sm transition hover:bg-ink/5">
+                                <input type="checkbox" wire:click="toggleAttribute('{{ $attribute->slug }}', '{{ $value->slug }}')"
+                                       class="h-4 w-4 rounded border-ink/20 text-brand accent-brand focus:ring-brand/40"
+                                       @checked($attributeSelected)>
+                                @if($value->color_hex)
+                                    <span class="h-4 w-4 rounded-full border border-ink/15" style="background-color: {{ $value->color_hex }}" aria-hidden="true"></span>
+                                @endif
+                                <span class="{{ $attributeSelected ? 'font-semibold text-ink' : 'text-muted' }}">{{ $value->value }}@if($attribute->unit) {{ $attribute->unit }}@endif</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
 
             {{-- Availability --}}
             <div class="border-b border-ink/10 py-6">
@@ -142,8 +235,10 @@
         <section aria-label="Products">
             {{-- Mobile toolbar --}}
             <div class="mb-6 flex items-center gap-3 lg:hidden">
-                <button type="button" @click="mobileFilters = true"
-                        class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                <button x-ref="filterTrigger" type="button"
+                        @click="mobileFilters = true; $nextTick(() => $refs.filterClose.focus())"
+                        :aria-expanded="mobileFilters" aria-controls="shop-filter-panel"
+                        class="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m-7-7h2m10 0h2M5 12a7 7 0 1114 0 7 7 0 01-14 0z" /></svg>
                     Filters
                     @if($activeFilterCount > 0)
@@ -153,7 +248,7 @@
                 <label class="ml-auto">
                     <span class="sr-only">Sort products</span>
                     <select wire:model.live="sort" class="h-10 rounded-full border border-ink/15 bg-white px-4 text-sm font-semibold text-ink outline-none focus:border-brand">
-                        <option value="popularity">Popularity</option>
+                        <option value="featured">Featured</option>
                         <option value="newest">Newest</option>
                         <option value="price-asc">Price: Low → High</option>
                         <option value="price-desc">Price: High → Low</option>
@@ -164,7 +259,7 @@
 
             {{-- Sort bar (desktop) + result count --}}
             <div class="mb-6 hidden items-center justify-between gap-4 lg:flex">
-                <p class="text-sm text-muted">
+                <p class="text-sm text-muted" role="status" aria-live="polite" aria-atomic="true">
                     <span class="font-bold text-ink">{{ $products->total() }}</span> instruments
                     @if($this->category !== null)
                         <span class="text-muted">in selected category</span>
@@ -172,7 +267,7 @@
                 </p>
                 <div class="flex items-center gap-1.5" role="group" aria-label="Sort products">
                     @foreach([
-                        'popularity' => 'Popularity',
+                        'featured' => 'Featured',
                         'newest' => 'Newest',
                         'price-asc' => 'Price ↑',
                         'price-desc' => 'Price ↓',
@@ -186,6 +281,7 @@
                     @endforeach
                 </div>
             </div>
+            <p class="sr-only lg:hidden" role="status" aria-live="polite" aria-atomic="true">{{ $products->total() }} instruments found</p>
 
             {{-- Active filter chips --}}
             @if($activeFilterCount > 0)
@@ -222,6 +318,28 @@
                             </button>
                         </span>
                     @endif
+                    @if($minRating !== null)
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">
+                            {{ $minRating }}+ stars
+                            <button type="button" wire:click="setMinRating(null)" class="transition hover:text-brand-dark" aria-label="Remove rating filter">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </span>
+                    @endif
+                    @foreach($attributeSelections as $attributeSlug => $valueSlugs)
+                        @foreach($valueSlugs as $valueSlug)
+                            @php
+                                $facet = $attributeFacets->firstWhere('slug', $attributeSlug);
+                                $facetValue = $facet?->values?->firstWhere('slug', $valueSlug);
+                            @endphp
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">
+                                {{ $facet?->name ?? Str::headline($attributeSlug) }}: {{ $facetValue?->value ?? Str::headline($valueSlug) }}
+                                <button type="button" wire:click="toggleAttribute('{{ $attributeSlug }}', '{{ $valueSlug }}')" class="transition hover:text-brand-dark" aria-label="Remove {{ $valueSlug }} filter">
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </span>
+                        @endforeach
+                    @endforeach
                     @if(trim((string) $this->search) !== '')
                         <span class="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">
                             “{{ $this->search }}”
@@ -235,7 +353,7 @@
 
             {{-- Skeleton while filtering --}}
             <div wire:loading.delay.shortest aria-hidden="true">
-                <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3">
+                <div class="shop-product-grid">
                     @for($i = 0; $i < 6; $i++)
                         <div class="rounded-2xl border border-ink/10 bg-white p-4">
                             <div class="aspect-square animate-pulse rounded-xl bg-paper-dark"></div>
@@ -262,7 +380,7 @@
                         </button>
                     </div>
                 @else
-                    <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3">
+                    <div class="shop-product-grid">
                         @foreach($products as $product)
                             <x-shop-card :product="$product" />
                         @endforeach

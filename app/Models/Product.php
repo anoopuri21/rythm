@@ -61,6 +61,11 @@ class Product extends Model implements HasMedia
         return $this->hasMany(InventoryMovement::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);

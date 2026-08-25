@@ -190,6 +190,16 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Request-time debug writes → Removed** — Deleted obsolete homepage service instrumentation that wrote schema/database details to a local log on every request.
 - **Chunk 2 gates passed** — Homepage/CMS suite: 37 tests / 157 assertions; production build, changed-PHP syntax/Pint and diff checks passed.
 
+## 25 August 2026 — Phase 3 Chunk 3 Shop Marketplace
+
+- **Narrow three-column Shop → Shared wide marketplace composition** — Shop now uses the 1520px storefront container, four results beside the desktop sidebar at reference width, two cards from 360px and a 320px one-column fallback.
+- **No Shop shortcuts → Responsive category shortcut rail/grid** — Added DB-driven popular-category shortcuts with current selection state and mobile horizontal scrolling.
+- **Long facets → Searchable category and brand facets** — Added labelled client-side search while preserving canonical Livewire filter state.
+- **Unsupported Popularity → Truthful Featured ordering** — Default order remains featured-first/newest fallback but is no longer mislabeled as popularity.
+- **Missing post-Phase-2 facets → Rating and category-aware attributes** — Approved-review averages drive the rating facet/card summary; normalized product and variant attribute assignments drive category-applicable facets only when real assigned values exist.
+- **Visual mobile filter panel → Accessible drawer behavior** — Added focus entry/restoration, Escape handling, focus/scroll trapping, result status announcements and 44px mobile card actions.
+- **Chunk 3 gates passed** — 28 tests / 108 assertions, Blade compilation, production build, npm production audit, changed-PHP syntax/Pint and diff checks passed.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.
