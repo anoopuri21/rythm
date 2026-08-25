@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -79,6 +80,35 @@ class CartTest extends TestCase
 
         $service->removeItem($item);
         $this->assertSame(0, $service->count());
+    }
+
+    public function test_variant_quantity_update_uses_variant_stock(): void
+    {
+        $service = app(CartService::class);
+        $variant = ProductVariant::query()
+            ->where('is_active', true)
+            ->where('stock', '>=', 2)
+            ->with('product')
+            ->firstOrFail();
+        $variant->product->update(['stock' => $variant->stock + 50]);
+        $item = $service->addItem($variant->product, $variant, 1);
+
+        $service->updateQty($item, $variant->stock);
+        $this->assertSame($variant->stock, $item->fresh()->qty);
+
+        $this->expectException(\RuntimeException::class);
+        $service->updateQty($item->fresh(), $variant->stock + 1);
+    }
+
+    public function test_inactive_variant_cannot_be_updated(): void
+    {
+        $service = app(CartService::class);
+        $variant = ProductVariant::query()->where('is_active', true)->with('product')->firstOrFail();
+        $item = $service->addItem($variant->product, $variant, 1);
+        $variant->update(['is_active' => false]);
+
+        $this->expectException(\RuntimeException::class);
+        $service->updateQty($item->fresh(), 1);
     }
 
     public function test_totals_calculate_subtotal(): void

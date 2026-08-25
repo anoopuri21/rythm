@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Your Cart — Rythme Music Store')
-@section('meta_description', 'Review your cart at Rythme Music Store. Free shipping all over India, 1-year warranty and secure payments.')
+@section('meta_description', 'Review selected instruments and current cart prices before checkout at Rhythm Exports.')
 
 @section('content')
     <div class="bg-paper">

@@ -246,8 +246,26 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 3 `BLOCKED` → `COMPLETE`** — Agent 0 accepted Phase 3 on 26 August 2026 with **233 tests / 811 assertions** and all recorded automated/rendered gates. This is not production sign-off.
 - **Auto Mode paused at full-phase checkpoint** — Phase 4 requires a new explicit activation. Agent 10 remains inactive.
 
+## 26 August 2026 — Phase 4 Auto Mode Activated
+
+- **Phase 4 `PENDING` → `IN PROGRESS`** — Owner issued exact `ACTIVATE AUTO MODE`; Agents 3, 4, 9, 11, 12 and 14 activated under Agent 0.
+- **Five-chunk plan approved** — Commerce truthfulness/safety, account/cart/wishlist correctness, checkout/order lifecycle, responsive QA and the independent phase gate are sequenced in `tasks/AUTO_MODE_PHASE_4_PLAN.md`.
+- **Initial audit exposed mandatory fixes** — Guest tracking redirects to an unsigned protected URL; variant quantity updates check the wrong field; email changes retain stale verification; address CRUD/default behavior is incomplete; checkout order idempotency is not wired; cart/checkout/order surfaces contain unsupported shipping, warranty, dispatch, refund-timing and provider claims.
+- **Safety boundary retained** — Persistent `rhythm_db` remains protected from destructive tests and sample seeding; uploaded evidence retention remains prohibited; Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.
 - PHP versus Python scraper before Phase 6.
 - Product content/image commercial rights before production data launch.
+
+## 26 August 2026 — Phase 4 Commerce Acceptance
+
+- **Five chunks completed** — Existing account, address, cart, wishlist, checkout, payment, order, tracking, cancellation/refund-initiation and invoice paths were audited, remediated and independently gated.
+- **Commerce integrity closed** — Variant stock/availability checks, email reverification, transactional address defaults, checkout UUID idempotency with concurrent unique-key arbitration, initiated-payment reuse, configured Razorpay launch, invalid-callback immutability and persisted monetary displays are implemented.
+- **Protected journeys closed** — Guest lookup now redirects to a 15-minute signed detail URL; guest invoice links are signed; account/address/order/payment ownership boundaries have regression coverage.
+- **Truthfulness closed** — Unsupported shipping, warranty, dispatch, encryption, payment-certification and refund-timeline language was removed; paid cancellation reports only a pending refund request.
+- **Responsive/accessibility remediation closed** — Chromium findings for footer contrast, Google Fonts CSP and 320px checkout/order overflow were fixed. Final 1440/768/390/320 evidence reports zero axe violations, horizontal overflows and console/page errors across 17 authenticated journey/page combinations.
+- **Independent gate passed** — Focused Phase 4 regression: **93 tests / 280 assertions**. Full regression: **244 tests / 858 assertions**. Production Vite build, Blade compilation, changed-file syntax/Pint, claim scan, Composer audit and npm production audit passed.
+- **Data safety retained** — Browser evidence used a disposable isolated SQLite file. Persistent `rhythm_db` was not connected to, reset, migrated, seeded or targeted by tests.
+- **Phase 4 `IN PROGRESS` → `COMPLETE`** — Agent 0 accepted Phase 4 on 26 August 2026. Auto Mode paused at the full-phase checkpoint; Agent 10 remains inactive; no production sign-off was issued.

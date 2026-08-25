@@ -51,7 +51,7 @@
                     <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                     <span class="mt-2 hidden text-[9px] tracking-[0.35em] text-gold" style="display:none" aria-hidden="true">RHYTHM EXPORTS</span>
                 </a>
-                <p class="mx-auto mt-5 max-w-md text-sm leading-7 text-white/45 lg:mx-0">Browse musical instruments, studio gear and accessories through the Rhythm Exports catalogue.</p>
+                <p class="mx-auto mt-5 max-w-md text-sm leading-7 text-white/60 lg:mx-0">Browse musical instruments, studio gear and accessories through the Rhythm Exports catalogue.</p>
             </div>
 
         </div>
@@ -65,7 +65,7 @@
                 <h3 id="footer-shop" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Shop</h3>
                 <ul class="mt-6 space-y-3.5">
                     @foreach(array_slice($cats, 0, 5) as $cat)
-                        <li><a href="/shop?category={{ $cat['slug'] }}" class="footer-link text-sm text-white/45">{{ $cat['name'] }}</a></li>
+                        <li><a href="/shop?category={{ $cat['slug'] }}" class="footer-link text-sm text-white/60">{{ $cat['name'] }}</a></li>
                     @endforeach
                     <li><a href="/shop" class="footer-link text-sm font-semibold text-white/60">All products <span aria-hidden="true">→</span></a></li>
                 </ul>
@@ -77,7 +77,7 @@
                     <h3 id="footer-brands" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Top brands</h3>
                     <ul class="mt-6 space-y-3.5">
                         @foreach($brands->take(5) as $brandItem)
-                            <li><a href="/shop?brand[]={{ $brandItem->slug }}" class="footer-link text-sm text-white/45">{{ $brandItem->name }}</a></li>
+                            <li><a href="/shop?brand[]={{ $brandItem->slug }}" class="footer-link text-sm text-white/60">{{ $brandItem->name }}</a></li>
                         @endforeach
                     </ul>
                 </nav>
@@ -87,7 +87,7 @@
             <nav aria-labelledby="footer-care">
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/contact" class="footer-link text-sm text-white/45">Contact us</a></li>
+                    <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
                 </ul>
             </nav>
 
@@ -95,9 +95,9 @@
             <nav aria-labelledby="footer-company">
                 <h3 id="footer-company" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Company</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/about" class="footer-link text-sm text-white/45">Our story</a></li>
-                    <li><a href="/terms" class="footer-link text-sm text-white/45">Terms &amp; conditions</a></li>
-                    <li><a href="/privacy" class="footer-link text-sm text-white/45">Privacy policy</a></li>
+                    <li><a href="/about" class="footer-link text-sm text-white/60">Our story</a></li>
+                    <li><a href="/terms" class="footer-link text-sm text-white/60">Terms &amp; conditions</a></li>
+                    <li><a href="/privacy" class="footer-link text-sm text-white/60">Privacy policy</a></li>
                 </ul>
             </nav>
 
@@ -105,10 +105,10 @@
             <nav aria-labelledby="footer-help">
                 <h3 id="footer-help" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Help</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/track-order" class="footer-link text-sm text-white/45">Track your order</a></li>
-                    <li><a href="/cart" class="footer-link text-sm text-white/45">View cart</a></li>
-                    <li><a href="/wishlist" class="footer-link text-sm text-white/45">Wishlist</a></li>
-                    <li><a href="/login" class="footer-link text-sm text-white/45">My account</a></li>
+                    <li><a href="/track-order" class="footer-link text-sm text-white/60">Track your order</a></li>
+                    <li><a href="/cart" class="footer-link text-sm text-white/60">View cart</a></li>
+                    <li><a href="/wishlist" class="footer-link text-sm text-white/60">Wishlist</a></li>
+                    <li><a href="/login" class="footer-link text-sm text-white/60">My account</a></li>
                 </ul>
             </nav>
         </div>
@@ -116,11 +116,11 @@
 
     {{-- ============ Bottom bar + trust badges ============ --}}
     <div class="border-t border-white/10">
-        <div class="mx-auto flex max-w-[1520px] flex-col gap-5 px-5 py-7 text-[11px] text-white/35 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <div class="mx-auto flex max-w-[1520px] flex-col gap-5 px-5 py-7 text-[11px] text-white/60 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p>© {{ date('Y') }} {{ $brand }}. All rights reserved.</p>
             <p class="inline-flex items-center gap-2"><span class="text-gold">●</span> Server-verified checkout totals</p>
         </div>
     </div>
 
-    <p class="pointer-events-none -mb-[0.16em] select-none text-center font-bebas text-[20vw] leading-[0.72] tracking-[0.02em] text-white/[0.025]" aria-hidden="true">RHYTHM</p>
+
 </footer>

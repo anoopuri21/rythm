@@ -121,7 +121,15 @@ final class CartService
     {
         $qty = max(1, min(99, $qty));
 
-        $stock = $item->variant_id !== null
+        if ($item->product === null || ! $item->product->is_active) {
+            throw new RuntimeException('This product is no longer available.');
+        }
+
+        if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active)) {
+            throw new RuntimeException('This product option is no longer available.');
+        }
+
+        $stock = $item->product_variant_id !== null
             ? $item->variant->stock
             : $item->product->stock;
 

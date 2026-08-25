@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 3 complete; full-phase checkpoint
+**Status:** ACTIVE — Phase 4 accounts/commerce execution
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -148,15 +148,16 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — Auto Mode automatically paused after Agent 0 completed and accepted the full Phase 3 gate.
-- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, and Phase 3 Homepage + Shop Frontend (`COMPLETE`).
-- **Current phase:** Phase 3 complete; Phase 4 has not been activated.
+- **Active:** No — paused automatically at the completed Phase 4 full-phase checkpoint.
+- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, and Phase 4 Accounts/Commerce (`COMPLETE`).
+- **Current phase:** Phase 4 — Accounts, cart, wishlist, checkout and orders (`COMPLETE`).
+- **Execution/evidence:** `tasks/AUTO_MODE_PHASE_4_PLAN.md` and `tasks/PHASE_4_COMMERCE_QA.md`; all five chunks accepted by Agent 0.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
 - **Automated Phase 3 evidence:** **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories passed after remediation.
 - **Rendered Phase 3 evidence:** exact-width Homepage/Shop empty/static evidence at 1440/768/390/320 plus isolated populated Homepage/Shop evidence at 1440/390 was reviewed and accepted.
 - **Visual result:** populated Homepage sections, six-across desktop Homepage products, four-across desktop Shop results, two-across 390px cards, category shortcuts, facets, sorting, pagination and responsive shared surfaces were evidenced without observed horizontal canvas expansion.
 - **Evidence handling:** uploaded originals were deleted immediately after metadata and findings were recorded; no upload was committed or retained.
-- **Persistent data safety:** isolated SQLite evidence did not connect to, reset or seed persistent `rhythm_db`.
-- **Next activation:** explicit `ACTIVATE AUTO MODE` is required to begin Phase 4 planning/execution.
-- **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; final QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
+- **Persistent data safety:** isolated SQLite evidence did not connect to, reset or seed persistent `rhythm_db`; Phase 4 destructive suites remain isolated-only.
+- **Phase 4 evidence:** full regression passed at 244 tests / 858 assertions; 17 isolated Chromium commerce page/viewport combinations at 1440/768/390/320 passed with zero axe violations, horizontal overflow or console/page errors; production build and dependency audits passed.
+- **Phase 4 closed findings:** signed guest tracking/invoices, variant stock, email reverification, transactional address defaults, checkout idempotency, Razorpay checkout launch/invalid-callback safety, persisted totals and unsupported claim removal are implemented and regression-covered.
 - **Deployment:** Agent 10 remains inactive; no production sign-off is implied.

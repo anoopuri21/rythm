@@ -70,7 +70,7 @@
 ::-webkit-scrollbar-thumb { background: var(--color-brand); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-brand-dark); }
 
-html { scroll-behavior: auto; scroll-padding-top: 8.5rem; }
+html { overflow-x: clip; scroll-behavior: auto; scroll-padding-top: 8.5rem; }
 
 .swiper-pagination-bullet {
     width: 12px !important;

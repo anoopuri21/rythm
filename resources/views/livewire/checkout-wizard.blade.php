@@ -1,4 +1,18 @@
-<div class="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
+<div
+    class="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14 lg:px-12"
+    x-data="{
+        openRazorpay(event) {
+            if (typeof window.Razorpay === 'undefined') {
+                window.alert('The payment window could not load. Check your connection and try again.');
+                return;
+            }
+
+            const checkout = new window.Razorpay(event.detail.options);
+            checkout.open();
+        }
+    }"
+    x-on:razorpay-open.window="openRazorpay($event)"
+>
     <nav aria-label="Breadcrumb" class="mb-8 flex items-center gap-2 text-xs text-muted">
         <a href="{{ route('home') }}" class="transition hover:text-brand">Home</a>
         <span aria-hidden="true" class="text-ink/30">/</span>
@@ -23,8 +37,8 @@
         </li>
     </ol>
 
-    <div class="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-12">
-        <div>
+    <div class="mt-10 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-12">
+        <div class="min-w-0">
             {{-- ===== STEP 1 · ADDRESS ===== --}}
             @if($step === 1)
                 <section aria-label="Delivery address">
@@ -167,14 +181,15 @@
                             <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('rythme.razorpay.key_id') }}" defer></script>
                         @endif
 
-                        <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                            @foreach(['UPI', 'Cards', 'Netbanking', 'Wallets'] as $method)
-                                <div class="flex flex-col items-center gap-1.5 rounded-xl border border-ink/10 bg-paper px-3 py-4 text-center">
-                                    <span class="text-xl" aria-hidden="true">{{ ['UPI' => '📱', 'Cards' => '💳', 'Netbanking' => '🏦', 'Wallets' => '👛'][$method] }}</span>
-                                    <span class="text-[11px] font-semibold text-ink">{{ $method }}</span>
-                                </div>
-                            @endforeach
-                        </div>
+                        @if($razorpayConfigured)
+                            <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
+                                The payment methods available for this order will be displayed by Razorpay.
+                            </p>
+                        @else
+                            <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
+                                Local test mode uses the fake gateway and does not create a real charge.
+                            </p>
+                        @endif
 
                         <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
                                 class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
@@ -190,7 +205,7 @@
 
                         <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Secured with 256-bit encryption · Razorpay Trusted Business
+                            Payment details are handled by the configured gateway; order totals are verified by the application.
                         </p>
                     </div>
                 </section>
@@ -198,7 +213,7 @@
         </div>
 
         {{-- ===== ORDER SUMMARY ===== --}}
-        <aside class="lg:sticky lg:top-28 lg:self-start">
+        <aside class="min-w-0 lg:sticky lg:top-28 lg:self-start">
             <div class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-7">
                 <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-muted">Order summary</h2>
                 <div class="mt-5 max-h-72 space-y-4 overflow-y-auto pr-1">
@@ -233,9 +248,9 @@
                     @else
                         <div class="flex gap-2">
                             <input type="text" wire:model="couponCode" placeholder="Coupon code" maxlength="30"
-                                   class="h-10 flex-1 rounded-full border border-ink/15 bg-paper px-4 text-xs font-semibold uppercase tracking-wide text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                                   class="h-10 min-w-0 flex-1 rounded-full border border-ink/15 bg-paper px-4 text-xs font-semibold uppercase tracking-wide text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
                             <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
-                                    class="rounded-full bg-ink px-5 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-60">Apply</button>
+                                    class="shrink-0 rounded-full bg-ink px-4 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-60">Apply</button>
                         </div>
                         @if($couponError)
                             <p class="mt-2 text-xs font-semibold text-brand" role="alert">{{ $couponError }}</p>
@@ -256,12 +271,18 @@
                     @endif
                     <div class="flex items-center justify-between">
                         <dt class="text-ink/70">Shipping</dt>
-                        <dd class="font-semibold text-emerald-600">FREE</dd>
+                        <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
                     </div>
+                    @if($tax > 0)
+                        <div class="flex items-center justify-between">
+                            <dt class="text-ink/70">Tax</dt>
+                            <dd class="font-semibold text-ink">₹{{ number_format($tax, 2) }}</dd>
+                        </div>
+                    @endif
 
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">
                         <dt class="font-bold text-ink">Total</dt>
-                        <dd class="text-2xl font-bold text-ink">₹{{ number_format(max(0, $totals['subtotal'] - $couponDiscount)) }}</dd>
+                        <dd class="text-2xl font-bold text-ink">₹{{ number_format($grandTotal, 2) }}</dd>
                     </div>
                 </dl>
             </div>

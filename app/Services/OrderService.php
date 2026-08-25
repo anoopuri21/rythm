@@ -13,7 +13,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusHistory;
 use App\Models\Payment;
+use App\Models\User;
 use App\Payment\PaymentResult;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use RuntimeException;
@@ -34,92 +36,129 @@ final class OrderService
 
     public function createFromCheckout(Cart $cart, CheckoutData $data, int $userId): Order
     {
-        return DB::transaction(function () use ($cart, $data, $userId): Order {
-            $items = $cart->items()
-                ->with(['product', 'variant'])
-                ->lockForUpdate()
-                ->get();
+        try {
+            return DB::transaction(function () use ($cart, $data, $userId): Order {
+                if ($data->idempotencyKey !== null && $data->idempotencyKey !== '') {
+                    $existing = Order::query()
+                        ->where('idempotency_key', $data->idempotencyKey)
+                        ->lockForUpdate()
+                        ->first();
 
-            if ($items->isEmpty()) {
-                throw new RuntimeException('Your cart is empty.');
-            }
+                    if ($existing !== null) {
+                        if ($existing->user_id !== $userId) {
+                            throw new RuntimeException('Checkout attempt does not belong to this account.');
+                        }
 
-            // Prices, coupon, shipping and tax are all derived on the server
-            // inside this transaction. Livewire properties are display state,
-            // never a trusted source of money values.
-            $subtotal = 0.0;
-            $unitPrices = [];
-
-            foreach ($items as $item) {
-                if ($item->product === null || ! $item->product->is_active) {
-                    throw new RuntimeException('A product in your cart is no longer available.');
+                        return $existing;
+                    }
                 }
 
-                if ($item->variant !== null && ! $item->variant->is_active) {
-                    throw new RuntimeException("{$item->product->name} option is no longer available.");
+                $items = $cart->items()
+                    ->with(['product', 'variant'])
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($items->isEmpty()) {
+                    throw new RuntimeException('Your cart is empty.');
                 }
 
-                $availableStock = $item->variant?->stock ?? $item->product->stock;
-                if ($availableStock < $item->qty) {
-                    throw new RuntimeException("Not enough stock for {$item->product->name}.");
+                // Prices, coupon, shipping and tax are all derived on the server
+                // inside this transaction. Livewire properties are display state,
+                // never a trusted source of money values.
+                $subtotal = 0.0;
+                $unitPrices = [];
+
+                foreach ($items as $item) {
+                    if ($item->product === null || ! $item->product->is_active) {
+                        throw new RuntimeException('A product in your cart is no longer available.');
+                    }
+
+                    if ($item->variant !== null && ! $item->variant->is_active) {
+                        throw new RuntimeException("{$item->product->name} option is no longer available.");
+                    }
+
+                    $availableStock = $item->variant?->stock ?? $item->product->stock;
+                    if ($availableStock < $item->qty) {
+                        throw new RuntimeException("Not enough stock for {$item->product->name}.");
+                    }
+
+                    $unitPrice = (float) ($item->variant?->effectivePrice($item->product) ?? $item->product->price);
+                    $unitPrices[$item->id] = $unitPrice;
+                    $subtotal += $unitPrice * $item->qty;
                 }
 
-                $unitPrice = (float) ($item->variant?->effectivePrice($item->product) ?? $item->product->price);
-                $unitPrices[$item->id] = $unitPrice;
-                $subtotal += $unitPrice * $item->qty;
-            }
+                $subtotal = round($subtotal, 2);
+                $discount = 0.0;
+                $couponCode = $data->couponCode !== null ? strtoupper(trim($data->couponCode)) : null;
 
-            $subtotal = round($subtotal, 2);
-            $discount = 0.0;
-            $couponCode = $data->couponCode !== null ? strtoupper(trim($data->couponCode)) : null;
+                if ($couponCode !== null && $couponCode !== '') {
+                    $discount = $this->coupons->validateAndApply($couponCode, $subtotal, lockForUpdate: true)['discount'];
+                }
 
-            if ($couponCode !== null && $couponCode !== '') {
-                $discount = $this->coupons->validateAndApply($couponCode, $subtotal, lockForUpdate: true)['discount'];
-            }
+                $shippingFee = $this->shippingFeeFor($subtotal);
+                $tax = $this->taxFor($subtotal - $discount);
+                $total = max(0.0, round($subtotal - $discount + $shippingFee + $tax, 2));
 
-            $shippingFee = $this->shippingFeeFor($subtotal);
-            $tax = $this->taxFor($subtotal - $discount);
-            $total = max(0.0, round($subtotal - $discount + $shippingFee + $tax, 2));
-
-            $order = Order::create([
-                'order_number' => $this->generateOrderNumber(),
-                'user_id' => $userId,
-                'email' => auth()->user()?->email,
-                'status' => Order::STATUS_PENDING,
-                'payment_status' => Order::PAYMENT_UNPAID,
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'coupon_code' => $couponCode,
-                'shipping_fee' => $shippingFee,
-                'tax' => $tax,
-                'total' => $total,
-                'currency' => $data->currency,
-                'shipping_address' => $data->shippingAddress,
-                'billing_address' => $data->billingAddress,
-                'notes' => trim(($data->notes ?? '').($couponCode !== null && $couponCode !== '' ? " [Coupon: {$couponCode}]" : '')),
-                'placed_at' => now(),
-            ]);
-
-            foreach ($items as $item) {
-                $unitPrice = $unitPrices[$item->id];
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'name' => $item->product->name,
-                    'sku' => $item->variant?->sku ?? $item->product->sku,
-                    'options' => $item->variant?->options,
-                    'unit_price' => $unitPrice,
-                    'qty' => $item->qty,
-                    'total' => round($unitPrice * $item->qty, 2),
+                $order = Order::create([
+                    'order_number' => $this->generateOrderNumber(),
+                    'idempotency_key' => $data->idempotencyKey,
+                    'user_id' => $userId,
+                    'email' => User::query()->find($userId)?->email,
+                    'status' => Order::STATUS_PENDING,
+                    'payment_status' => Order::PAYMENT_UNPAID,
+                    'subtotal' => $subtotal,
+                    'discount' => $discount,
+                    'coupon_code' => $couponCode,
+                    'shipping_fee' => $shippingFee,
+                    'tax' => $tax,
+                    'total' => $total,
+                    'currency' => $data->currency,
+                    'shipping_address' => $data->shippingAddress,
+                    'billing_address' => $data->billingAddress,
+                    'notes' => trim(($data->notes ?? '').($couponCode !== null && $couponCode !== '' ? " [Coupon: {$couponCode}]" : '')),
+                    'placed_at' => now(),
                 ]);
+
+                foreach ($items as $item) {
+                    $unitPrice = $unitPrices[$item->id];
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'product_variant_id' => $item->product_variant_id,
+                        'name' => $item->product->name,
+                        'sku' => $item->variant?->sku ?? $item->product->sku,
+                        'options' => $item->variant?->options,
+                        'unit_price' => $unitPrice,
+                        'qty' => $item->qty,
+                        'total' => round($unitPrice * $item->qty, 2),
+                    ]);
+                }
+
+                $this->transitionStatus($order, Order::STATUS_PENDING, 'Order placed');
+
+                return $order;
+            });
+        } catch (QueryException $exception) {
+            // Two requests can race before either absent idempotency row can
+            // be locked. The unique index is the final arbiter; after the
+            // losing transaction rolls back, return the winner's order.
+            if ($data->idempotencyKey !== null && $data->idempotencyKey !== '') {
+                $existing = Order::query()
+                    ->where('idempotency_key', $data->idempotencyKey)
+                    ->first();
+
+                if ($existing !== null) {
+                    if ($existing->user_id !== $userId) {
+                        throw new RuntimeException('Checkout attempt does not belong to this account.');
+                    }
+
+                    return $existing;
+                }
             }
 
-            $this->transitionStatus($order, Order::STATUS_PENDING, 'Order placed');
-
-            return $order;
-        });
+            throw $exception;
+        }
     }
 
     public function recordPaymentInitiation(Order $order, string $gatewayOrderId): Payment

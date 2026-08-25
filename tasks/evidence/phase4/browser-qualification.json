@@ -1,0 +1,210 @@
+{
+  "generatedAt": "2026-08-25T19:22:19.973Z",
+  "base": "http://127.0.0.1:8010",
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "consoleErrors": [],
+    "pages": [
+      {
+        "page": "account",
+        "url": "http://127.0.0.1:8010/account",
+        "overflow": {
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "cart",
+        "url": "http://127.0.0.1:8010/cart",
+        "overflow": {
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "checkout-payment",
+        "url": "http://127.0.0.1:8010/checkout",
+        "overflow": {
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "checkout-success",
+        "url": "http://127.0.0.1:8010/checkout/success/1?signature=1b0a52682b7da1756f5a7b5e1a73b9cf0e87625523eda3a5aea29648acc0046a",
+        "overflow": {
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "order-detail",
+        "url": "http://127.0.0.1:8010/orders/1",
+        "overflow": {
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "overflowing": false
+        },
+        "violations": []
+      }
+    ]
+  },
+  "tablet": {
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "consoleErrors": [],
+    "pages": [
+      {
+        "page": "account",
+        "url": "http://127.0.0.1:8010/account",
+        "overflow": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "cart",
+        "url": "http://127.0.0.1:8010/cart",
+        "overflow": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "checkout-payment",
+        "url": "http://127.0.0.1:8010/checkout",
+        "overflow": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "order-detail",
+        "url": "http://127.0.0.1:8010/orders/1",
+        "overflow": {
+          "scrollWidth": 768,
+          "clientWidth": 768,
+          "overflowing": false
+        },
+        "violations": []
+      }
+    ]
+  },
+  "mobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "consoleErrors": [],
+    "pages": [
+      {
+        "page": "account",
+        "url": "http://127.0.0.1:8010/account",
+        "overflow": {
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "cart",
+        "url": "http://127.0.0.1:8010/cart",
+        "overflow": {
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "checkout-payment",
+        "url": "http://127.0.0.1:8010/checkout",
+        "overflow": {
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "order-detail",
+        "url": "http://127.0.0.1:8010/orders/1",
+        "overflow": {
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "overflowing": false
+        },
+        "violations": []
+      }
+    ]
+  },
+  "narrow": {
+    "viewport": {
+      "width": 320,
+      "height": 700
+    },
+    "consoleErrors": [],
+    "pages": [
+      {
+        "page": "account",
+        "url": "http://127.0.0.1:8010/account",
+        "overflow": {
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "cart",
+        "url": "http://127.0.0.1:8010/cart",
+        "overflow": {
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "checkout-payment",
+        "url": "http://127.0.0.1:8010/checkout",
+        "overflow": {
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "overflowing": false
+        },
+        "violations": []
+      },
+      {
+        "page": "order-detail",
+        "url": "http://127.0.0.1:8010/orders/1",
+        "overflow": {
+          "scrollWidth": 320,
+          "clientWidth": 320,
+          "overflowing": false
+        },
+        "violations": []
+      }
+    ]
+  }
+}

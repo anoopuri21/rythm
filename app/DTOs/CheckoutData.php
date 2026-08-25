@@ -20,5 +20,6 @@ final readonly class CheckoutData
         public string $currency = 'INR',
         public ?string $notes = null,
         public ?string $couponCode = null,
+        public ?string $idempotencyKey = null,
     ) {}
 }

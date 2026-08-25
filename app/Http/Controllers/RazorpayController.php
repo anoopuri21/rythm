@@ -43,9 +43,15 @@ final class RazorpayController extends Controller
             $result = $gateway->verify($order, $payload);
 
             if (! $result->success) {
-                $orders->markFailed($order, $result);
+                // An untrusted or incomplete browser callback must not mutate
+                // payment state. A verified webhook or a later valid callback
+                // can still reconcile this initiated payment safely.
+                Log::warning('Razorpay callback verification failed', [
+                    'order_id' => $order->id,
+                    'message' => $result->message,
+                ]);
 
-                return redirect()->route('checkout.index')->with('cart-error', $result->message ?? 'Payment failed.');
+                return redirect()->route('checkout.index')->with('cart-error', 'We could not verify your payment. Please try again or check your order status.');
             }
 
             $orders->markPaid($order, $result, (string) $payment->gateway_order_id);

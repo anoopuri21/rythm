@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AccountTest extends TestCase
@@ -63,6 +64,31 @@ class AccountTest extends TestCase
         ]);
     }
 
+    public function test_changing_email_requires_reverification(): void
+    {
+        $this->user->forceFill(['email_verified_at' => now()])->save();
+
+        $this->patch('/account/profile', [
+            'name' => $this->user->name,
+            'email' => 'verify-again@example.com',
+        ])->assertRedirect()->assertSessionHas('profile_success');
+
+        $this->assertNull($this->user->fresh()->email_verified_at);
+    }
+
+    public function test_keeping_email_preserves_verification(): void
+    {
+        $verifiedAt = now()->startOfSecond();
+        $this->user->forceFill(['email_verified_at' => $verifiedAt])->save();
+
+        $this->patch('/account/profile', [
+            'name' => 'Updated Name',
+            'email' => $this->user->email,
+        ])->assertRedirect();
+
+        $this->assertTrue($this->user->fresh()->email_verified_at->equalTo($verifiedAt));
+    }
+
     public function test_profile_email_must_be_unique(): void
     {
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
@@ -91,7 +117,7 @@ class AccountTest extends TestCase
         ])->assertRedirect()->assertSessionHas('password_success');
 
         $this->assertTrue(
-            \Illuminate\Support\Facades\Hash::check('newsecret123', $this->user->fresh()->password)
+            Hash::check('newsecret123', $this->user->fresh()->password)
         );
     }
 
@@ -112,6 +138,56 @@ class AccountTest extends TestCase
 
         $this->delete('/account/addresses/'.$address->id)->assertRedirect();
         $this->assertDatabaseMissing('addresses', ['id' => $address->id]);
+    }
+
+    public function test_address_update_default_and_default_replacement(): void
+    {
+        $first = Address::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'First Address',
+            'is_default' => true,
+        ]);
+        $second = Address::factory()->create([
+            'user_id' => $this->user->id,
+            'name' => 'Second Address',
+            'is_default' => false,
+        ]);
+
+        $this->patch(route('account.addresses.update', $second), [
+            'name' => 'Updated Address',
+            'phone' => '9876543210',
+            'line1' => '99 Music Road',
+            'city' => 'Delhi',
+            'state' => 'Delhi',
+            'pincode' => '110001',
+        ])->assertRedirect()->assertSessionHas('address_success');
+
+        $this->assertSame('Updated Address', $second->fresh()->name);
+
+        $this->patch(route('account.addresses.default', $second))
+            ->assertRedirect()
+            ->assertSessionHas('address_success');
+        $this->assertFalse($first->fresh()->is_default);
+        $this->assertTrue($second->fresh()->is_default);
+
+        $this->delete(route('account.addresses.destroy', $second))->assertRedirect();
+        $this->assertTrue($first->fresh()->is_default);
+    }
+
+    public function test_cannot_update_or_default_others_address(): void
+    {
+        $other = User::factory()->create();
+        $address = Address::factory()->create(['user_id' => $other->id]);
+
+        $this->patch(route('account.addresses.update', $address), [
+            'name' => 'Tampered',
+            'phone' => '9876543210',
+            'line1' => '99 Music Road',
+            'city' => 'Delhi',
+            'state' => 'Delhi',
+            'pincode' => '110001',
+        ])->assertForbidden();
+        $this->patch(route('account.addresses.default', $address))->assertForbidden();
     }
 
     public function test_cannot_delete_others_address(): void

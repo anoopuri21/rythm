@@ -9,6 +9,7 @@ use App\Services\OrderService;
 use App\Services\SeoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 final class OrderController extends Controller
@@ -60,7 +61,11 @@ final class OrderController extends Controller
             return back()->withErrors(['order_number' => 'No order matches that number and email.'])->withInput();
         }
 
-        return redirect()->route('orders.show', $order);
+        return redirect(URL::temporarySignedRoute(
+            'orders.show',
+            now()->addMinutes(15),
+            ['order' => $order],
+        ));
     }
 
     /**

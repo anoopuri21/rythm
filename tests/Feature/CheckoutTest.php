@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\DTOs\CheckoutData;
 use App\Livewire\CheckoutWizard;
 use App\Mail\OrderConfirmationMail;
 use App\Models\InventoryMovement;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\SiteSetting;
 use App\Models\User;
 use App\Payment\FakePaymentGateway;
 use App\Payment\PaymentResult;
@@ -18,6 +21,7 @@ use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
@@ -104,6 +108,83 @@ class CheckoutTest extends TestCase
         // Status history audit trail written (pending → confirmed)
         $this->assertSame(1, $order->statusHistory()->count());
         $this->assertSame('confirmed', $order->statusHistory()->first()->to);
+    }
+
+    public function test_server_totals_are_persisted_and_rendered_consistently(): void
+    {
+        SiteSetting::query()->updateOrCreate(['key' => 'shipping_flat_fee'], ['value' => '50']);
+        SiteSetting::query()->updateOrCreate(['key' => 'shipping_free_above'], ['value' => '0']);
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '10']);
+        Cache::forget('site.settings');
+
+        $this->fillCart(2);
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::query()->firstOrFail();
+        $this->assertSame(798.0, (float) $order->subtotal);
+        $this->assertSame(50.0, (float) $order->shipping_fee);
+        $this->assertSame(79.8, (float) $order->tax);
+        $this->assertSame(927.8, (float) $order->total);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('798.00')
+            ->assertSee('50.00')
+            ->assertSee('79.80')
+            ->assertSee('927.80');
+        $this->get(URL::signedRoute('orders.invoice', ['order' => $order]))
+            ->assertOk()
+            ->assertSee('798.00')
+            ->assertSee('50.00')
+            ->assertSee('79.80')
+            ->assertSee('927.80');
+    }
+
+    public function test_checkout_order_creation_is_idempotent_per_attempt(): void
+    {
+        $this->fillCart(2);
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'checkout-attempt-123',
+        );
+        $cart = app(CartService::class)->getOrCreateCart();
+        $orders = app(OrderService::class);
+
+        $first = $orders->createFromCheckout($cart, $data, $this->user->id);
+        $second = $orders->createFromCheckout($cart, $data, $this->user->id);
+
+        $this->assertTrue($first->is($second));
+        $this->assertSame(1, Order::query()->where('idempotency_key', 'checkout-attempt-123')->count());
+        $this->assertSame(1, Order::query()->count());
+    }
+
+    public function test_checkout_idempotency_key_cannot_cross_accounts(): void
+    {
+        $this->fillCart();
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'account-bound-attempt',
+        );
+        $cart = app(CartService::class)->getOrCreateCart();
+        app(OrderService::class)->createFromCheckout($cart, $data, $this->user->id);
+
+        $this->expectException(\RuntimeException::class);
+        app(OrderService::class)->createFromCheckout($cart, $data, User::factory()->create()->id);
     }
 
     public function test_place_order_with_empty_cart_errors(): void
@@ -340,6 +421,38 @@ class CheckoutTest extends TestCase
         $this->assertTrue($gateway->verifyWebhookSignature($body, $valid));
         $this->assertFalse($gateway->verifyWebhookSignature($body, 'tampered'));
         $this->assertFalse($gateway->verifyWebhookSignature($body, ''));
+    }
+
+    public function test_invalid_razorpay_callback_cannot_mutate_payment_state(): void
+    {
+        config()->set('rythme.razorpay.key_id', 'rzp_test_key');
+        config()->set('rythme.razorpay.key_secret', 'test_secret');
+
+        $this->fillCart();
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'invalid-callback-attempt',
+        );
+        $order = app(OrderService::class)->createFromCheckout(
+            app(CartService::class)->getOrCreateCart(),
+            $data,
+            $this->user->id,
+        );
+        $payment = app(OrderService::class)->recordPaymentInitiation($order, 'order_gateway_123');
+
+        $this->post(route('payment.razorpay.callback'), [
+            'razorpay_payment_id' => 'pay_untrusted',
+            'razorpay_order_id' => 'order_gateway_123',
+            'razorpay_signature' => 'invalid',
+        ])->assertRedirect(route('checkout.index'));
+
+        $this->assertSame(Payment::STATUS_INITIATED, $payment->fresh()->status);
+        $this->assertSame(Order::PAYMENT_UNPAID, $order->fresh()->payment_status);
     }
 
     public function test_razorpay_callback_signature_verification(): void

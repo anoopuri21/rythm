@@ -100,6 +100,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
     Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
     Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
+    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
+    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('account.addresses.default');
     Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
 });
 

@@ -115,6 +115,19 @@ class OrderTrackingTest extends TestCase
             ->assertSee($order->order_number);
     }
 
+    public function test_signed_invoice_link_allows_guest_access(): void
+    {
+        auth()->logout();
+
+        $order = $this->makeOrder();
+        $signed = URL::signedRoute('orders.invoice', ['order' => $order]);
+
+        $this->get($signed)
+            ->assertOk()
+            ->assertSee('Tax invoice')
+            ->assertSee($order->order_number);
+    }
+
     public function test_guest_lookup_page_renders(): void
     {
         auth()->logout();
@@ -130,10 +143,18 @@ class OrderTrackingTest extends TestCase
 
         $order = $this->makeOrder();
 
-        $this->post('/track-order', [
+        $response = $this->post('/track-order', [
             'order_number' => $order->order_number,
             'email' => $this->user->email,
-        ])->assertRedirect(route('orders.show', $order));
+        ]);
+
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringContainsString('/orders/'.$order->id, $location);
+        $this->assertStringContainsString('signature=', $location);
+
+        $this->get($location)
+            ->assertOk()
+            ->assertSee($order->order_number);
     }
 
     public function test_guest_lookup_rejects_mismatch(): void

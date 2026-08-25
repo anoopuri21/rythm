@@ -17,7 +17,7 @@
                     <td class="px-6 py-4 font-mono text-xs font-bold text-ink"><a href="{{ route('orders.show', $order) }}" class="transition hover:text-brand">{{ $order->order_number }}</a></td>
                     <td class="px-6 py-4 text-ink/70">{{ $order->created_at?->format('d M Y') }}</td>
                     <td class="px-6 py-4 text-ink/70">{{ $order->items_count }} {{ Str::plural('item', $order->items_count) }}</td>
-                    <td class="px-6 py-4 font-bold text-ink">₹{{ number_format((float) $order->total) }}</td>
+                    <td class="px-6 py-4 font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</td>
                     <td class="px-6 py-4">
                         @php
                             $colors = [

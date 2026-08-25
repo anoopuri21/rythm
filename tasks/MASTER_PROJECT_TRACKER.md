@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 3 COMPLETE — Phase 4 not activated
-**Overall status:** PHASE 3 ACCEPTED 26 AUGUST 2026 / FULL-PHASE CHECKPOINT / NOT PRODUCTION-READY
+**Current phase:** Phase 4 — Accounts, cart, wishlist, checkout and orders COMPLETE
+**Overall status:** PHASE 4 COMPLETE / AUTO MODE PAUSED AT FULL-PHASE CHECKPOINT / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — Phase 3 full-phase checkpoint
+**Auto Mode:** PAUSED — Phase 4 full-phase checkpoint reached
 
 ---
 
@@ -62,7 +62,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | COMPLETE | Accepted 25 Aug 2026: structure, four viewport captures, Rythme Red, accessibility/SEO contract |
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | COMPLETE | Accepted 25 Aug 2026: 225 tests / 753 assertions plus owner-reported MySQL 8.4.3 forward migration/status |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
-| 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | PENDING | Functional, authorization and integration tests pass |
+| 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
 | 5 | Agent 3, 6, 9, 14 | Reviews, ratings, comments/Q&A and coupons | PENDING | Moderation, security and workflow tests pass |
 | 6 | Agent 5, 4, 8, 15 | Bajaao catalog scraper/import pipeline | PENDING | Validated import, deduplication and media report |
 | 7 | Agent 6, 3, 4, 11 | Filament resources, dashboards and RBAC | PENDING | Role matrix and admin UAT pass |
@@ -289,3 +289,17 @@ Agent 0 accepts Phase 3 as `COMPLETE` on 26 August 2026 based on:
 Bounded Phase 3 limitations remain recorded in `tasks/PHASE_3_FRONTEND_QA.md`: the browser height cap on the populated 390px Homepage capture is supplemented by earlier mobile footer evidence; missing fixture media exercises fallback rendering; production catalogue media/content rights remain a Phase 6 gate.
 
 Auto Mode is paused at the Phase 3 full-phase checkpoint. The next eligible action is explicit `ACTIVATE AUTO MODE` to begin Phase 4 planning/execution. Deployment remains inactive and this is not production sign-off.
+
+## 12. Phase 4 Acceptance and Recommended Next Action
+
+Agent 0 accepts Phase 4 as `COMPLETE` on 26 August 2026 based on `tasks/PHASE_4_COMMERCE_QA.md`:
+
+- Account email reverification and transactional, ownership-scoped address lifecycle passed.
+- Variant cart stock/availability, guest merge and wishlist regression passed.
+- Server-authoritative pricing/totals, checkout-attempt idempotency, payment initiation/finalization replay controls, invalid callback immutability, inventory, coupon, cancellation and pending-refund behavior passed.
+- Guest tracking and invoice journeys use bounded signed URLs; authenticated ownership boundaries passed.
+- Full regression passed at **244 tests / 858 assertions**, alongside production build, Blade compilation, changed-file syntax/Pint and zero Composer/npm advisories.
+- Isolated Chromium evidence covered 17 authenticated commerce page/viewport combinations at 1440, 768, 390 and 320 CSS px with zero axe violations, horizontal overflow or console/page errors.
+- Persistent `rhythm_db` remained untouched by destructive tests and the disposable browser fixture.
+
+Auto Mode pauses at this full-phase checkpoint. Phase 5 requires a new explicit `ACTIVATE AUTO MODE` and the product Q&A/comments scope decision. Agent 10 remains inactive. This is not production sign-off.
