@@ -160,6 +160,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Failed MySQL DDL recovery added** — Migration `000004` now drops only its brand-new, unlogged Phase 2 catalog tables before recreating them, because MySQL can retain partial DDL after a failed migration. Existing application tables and data are never dropped.
 - **All catalog foreign keys explicitly named** — Custom identifiers are bounded below 64 characters; no application/data model scope changed.
 
+## 25 August 2026 — Phase 2 Accepted
+
+- **MySQL forward-migration blocker → Closed** — Owner reported migrations `000004`, `000005`, and `000006` completed successfully on persistent MySQL Community Server 8.4.3 `rhythm_db` after the identifier correction; `migrate:status` showed all migrations as `Ran`.
+- **Phase 2 `BLOCKED` → `COMPLETE`** — Agent 0 accepted the owner-reported exact MySQL evidence together with the independently passed 225 tests / 753 assertions, isolated rollback/forward cycle, syntax/style checks, and Composer audit.
+- **Auto Mode paused at phase checkpoint** — Phase 3 remains `PENDING` until the owner issues exact `ACTIVATE AUTO MODE`. Agent 10 remains inactive and no production sign-off is implied.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

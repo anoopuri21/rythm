@@ -1,7 +1,7 @@
 # Phase 2 — MySQL Schema and Domain Architecture
 
 **Date:** 25 August 2026
-**Status:** INDEPENDENT IMPLEMENTATION COMPLETE / MYSQL FORWARD-MIGRATION EVIDENCE PENDING
+**Status:** COMPLETE — accepted by Agent 0 on 25 August 2026
 **Target:** MySQL Community Server 8.4.3 with Laravel 13.24.0
 
 ## 1. Locked Invariants
@@ -102,6 +102,6 @@ Forward rollout creates independent tables first, then adds nullable columns. It
 - Exact MySQL identifier review: after the owner's first run exposed an overlong framework-generated pivot foreign-key name, every catalog foreign key was explicitly named; the longest catalog identifier is now 31 characters.
 - Failed-DDL recovery: migration `000004` safely removes only its own new, unlogged partial catalog tables before retrying, preserving every pre-existing application table and row.
 
-### Remaining gate
+### Exact MySQL Gate — Accepted
 
-The owner must run only `php artisan migrate --force` followed by `php artisan migrate:status` against persistent MySQL 8.4.3 `rhythm_db`. Do not run seeders or destructive test commands. Agent 0 cannot mark Phase 2 complete until that forward-migration output is supplied.
+The owner reported successful non-destructive execution of all three Phase 2 migrations using `php artisan migrate --force` on persistent MySQL Community Server 8.4.3 `rhythm_db`, followed by `php artisan migrate:status` showing all migrations as `Ran`. No seeders or destructive test commands were run. This closes the Phase 2 forward-migration gate; the evidence is owner-reported because Agent 0 cannot directly inspect localhost.
