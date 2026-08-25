@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 1 — Homepage + Shop Design Specifications COMPLETE; paused at full-phase boundary
-**Overall status:** PHASE 1 ACCEPTED / PHASE 2 PENDING / NOT PRODUCTION-READY
+**Current phase:** Phase 2 — MySQL Schema and Domain Architecture BLOCKED on exact MySQL forward migration
+**Overall status:** PHASE 2 INDEPENDENT GATES PASSED / MYSQL MIGRATION EVIDENCE PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — Phase 1 full-phase boundary reached
+**Auto Mode:** PAUSED — genuine Phase 2 external MySQL evidence blocker
 
 ---
 
@@ -59,7 +59,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 0A | Agent 0, 3, 4, 8, 9, 11, 12 | Critical admin/payment/discount/inventory/refund safety remediation | COMPLETE | Accepted 25 Aug 2026: 221 tests / 739 assertions; build and dependency audits green |
 | 0B | Agent 0, 2, 6, 8, 9, 11 | Stack alignment: dependency review, Filament 5, exact MySQL 8 migration, cron strategy | COMPLETE | Accepted 25 Aug 2026: all independent gates plus owner-reported MySQL 8.4.3 forward migration |
 | 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | COMPLETE | Accepted 25 Aug 2026: structure, four viewport captures, Rythme Red, accessibility/SEO contract |
-| 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | PENDING | Schema review, migrations and DB tests pass |
+| 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | BLOCKED | Independent gates pass: 225 tests / 753 assertions; persistent MySQL 8.4.3 forward migration required |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | PENDING | Side-by-side desktop/mobile verification |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | PENDING | Functional, authorization and integration tests pass |
 | 5 | Agent 3, 6, 9, 14 | Reviews, ratings, comments/Q&A and coupons | PENDING | Moderation, security and workflow tests pass |
@@ -196,7 +196,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 |---|---|
 | Existing codebase qualification | Phase 0 audit and Phase 0A safety remediation complete; later phase gates remain |
 | Reference-page measurements/screenshots | PASSED: four owner-supplied DPR-2 captures measured; hashes recorded without committing third-party images |
-| MySQL connection for migration verification | Phase 0B forward migration accepted; Phase 2 schema-specific evidence remains required |
+| MySQL connection for migration verification | BLOCKED: Phase 2 migrations require owner-run non-destructive forward migration on persistent `rhythm_db` |
 | Final brand logo/colors/assets | Phase 1 direction accepted: current logo + Rythme Red `#B20202`; final production assets still require later QA |
 | Comment scope | Must decide product Q&A only vs. review/blog comments before Phase 5 |
 | Product scraper language | PHP or Python decision required before Phase 6 |
@@ -267,4 +267,4 @@ Sample/development seeders and destructive automated suites were intentionally n
 
 ## 10. Recommended Next Action
 
-Phase 1 autonomous planning and all independent specification work are complete. See `tasks/PHASE_1_REFERENCE_EVIDENCE.md` and `tasks/PHASE_1_HOMEPAGE_SHOP_DESIGN_SPEC.md`. Phase 1 is blocked until current 1440px/390px Homepage and Shop reference screenshots plus final brand treatment are supplied. Deployment remains inactive.
+Phase 2 independent implementation is complete. See `tasks/AUTO_MODE_PHASE_2_PLAN.md` and `tasks/PHASE_2_DOMAIN_ARCHITECTURE.md`. The owner must run only `php artisan migrate --force` and `php artisan migrate:status` on persistent MySQL 8.4.3 `rhythm_db`; sample seeders and destructive test commands remain prohibited. Deployment remains inactive.

@@ -39,4 +39,9 @@ class Payment extends Model
     {
         return $this->hasMany(Refund::class);
     }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(PaymentEvent::class);
+    }
 }

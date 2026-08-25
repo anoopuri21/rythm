@@ -29,6 +29,7 @@ final class OrderService
         private readonly CouponService $coupons,
         private readonly SiteSettingsService $settings,
         private readonly RefundService $refunds,
+        private readonly InventoryService $inventory,
     ) {}
 
     public function createFromCheckout(Cart $cart, CheckoutData $data, int $userId): Order
@@ -200,27 +201,9 @@ final class OrderService
                 'status' => Payment::STATUS_PAID,
             ]);
 
-            // Inventory is changed only inside this first paid transition.
+            // Inventory is changed and ledgered only inside this first paid transition.
             foreach ($lockedOrder->items()->with(['product', 'variant'])->get() as $item) {
-                if ($item->product_variant_id !== null) {
-                    $updated = DB::table('product_variants')
-                        ->where('id', $item->product_variant_id)
-                        ->where('is_active', true)
-                        ->where('stock', '>=', $item->qty)
-                        ->decrement('stock', $item->qty);
-                } elseif ($item->product_id !== null) {
-                    $updated = DB::table('products')
-                        ->where('id', $item->product_id)
-                        ->where('is_active', true)
-                        ->where('stock', '>=', $item->qty)
-                        ->decrement('stock', $item->qty);
-                } else {
-                    continue;
-                }
-
-                if ($updated !== 1) {
-                    throw new RuntimeException("Not enough stock for {$item->name}.");
-                }
+                $this->inventory->capture($lockedOrder, $item);
             }
 
             $fromStatus = $lockedOrder->status;
@@ -355,11 +338,7 @@ final class OrderService
                 $this->refunds->requestForCancellation($lockedOrder);
 
                 foreach ($lockedOrder->items as $item) {
-                    if ($item->product_variant_id !== null) {
-                        DB::table('product_variants')->where('id', $item->product_variant_id)->increment('stock', $item->qty);
-                    } elseif ($item->product_id !== null) {
-                        DB::table('products')->where('id', $item->product_id)->increment('stock', $item->qty);
-                    }
+                    $this->inventory->restoreForCancellation($lockedOrder, $item);
                 }
             } else {
                 $this->releaseCouponUsage($lockedOrder);

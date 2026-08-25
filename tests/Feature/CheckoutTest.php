@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Livewire\CheckoutWizard;
 use App\Mail\OrderConfirmationMail;
+use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -209,6 +210,14 @@ class CheckoutTest extends TestCase
         $this->assertSame($stockAfterFirstCapture, $product->fresh()->stock);
         $this->assertSame(1, $order->payments()->count());
         $this->assertSame(1, $order->statusHistory()->where('to', Order::STATUS_CONFIRMED)->count());
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'type' => InventoryMovement::TYPE_ORDER_CAPTURE,
+            'quantity_delta' => -2,
+            'balance_after' => $stockAfterFirstCapture,
+        ]);
+        $this->assertSame(1, $order->inventoryMovements()->count());
         Mail::assertQueued(OrderConfirmationMail::class, 1);
     }
 
@@ -246,6 +255,15 @@ class CheckoutTest extends TestCase
         $this->assertFalse($replayed);
         $this->assertSame($variantStockBefore - 2, $variant->fresh()->stock);
         $this->assertSame($productStockBefore, $product->fresh()->stock);
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => null,
+            'product_variant_id' => $variant->id,
+            'type' => InventoryMovement::TYPE_ORDER_CAPTURE,
+            'quantity_delta' => -2,
+            'balance_after' => $variantStockBefore - 2,
+        ]);
+        $this->assertSame(1, $order->inventoryMovements()->count());
     }
 
     public function test_checkout_rejects_stock_that_changed_after_cart_add(): void

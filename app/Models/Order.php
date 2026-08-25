@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 #[Table('orders')]
-#[Fillable(['order_number', 'user_id', 'email', 'status', 'payment_status', 'subtotal', 'discount', 'coupon_code', 'coupon_usage_recorded_at', 'coupon_usage_released_at', 'shipping_fee', 'tax', 'total', 'currency', 'shipping_address', 'billing_address', 'notes', 'placed_at'])]
+#[Fillable(['order_number', 'idempotency_key', 'user_id', 'email', 'status', 'payment_status', 'subtotal', 'discount', 'coupon_code', 'coupon_usage_recorded_at', 'coupon_usage_released_at', 'shipping_fee', 'tax', 'total', 'currency', 'shipping_address', 'billing_address', 'notes', 'placed_at'])]
 class Order extends Model
 {
     use HasFactory;
@@ -92,6 +92,16 @@ class Order extends Model
     public function refunds(): HasMany
     {
         return $this->hasMany(Refund::class);
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function paymentEvents(): HasMany
+    {
+        return $this->hasMany(PaymentEvent::class);
     }
 
     public function statusHistory(): HasMany

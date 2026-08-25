@@ -143,6 +143,17 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Scope limited to color system** — Logo, typography, layout, responsive contract, accessibility/SEO requirements and Phase 1 acceptance remain unchanged.
 - **Implementation gates passed** — Full regression: **222 tests / 733 assertions**; production Vite build passed; npm audit reported zero vulnerabilities; changed PHP tests passed Pint.
 
+## 25 August 2026 — Phase 2 Domain Foundations Implemented / MySQL Gate Blocked
+
+- **Flat product options → Normalized category-aware facets** — Added attribute definitions, values, category applicability and product/variant assignment pivots; color remains one optional attribute type rather than a universal hardcoded field.
+- **Mutable stock only → Atomic stock plus immutable movement ledger** — Paid capture and paid-cancellation restoration now write signed, balance-after, idempotency-keyed inventory movements inside the existing order transaction.
+- **Gateway payment rows only → Redacted payment-event foundation** — Added unique gateway event identity, SHA-256 payload hash, redacted metadata and processing state without retaining unrestricted webhook payloads.
+- **Order retries without schema key → Nullable unique order idempotency foundation** — Existing rows remain untouched; Phase 4 will integrate request keys into checkout behavior.
+- **Policy-dependent schemas deferred** — Shipping, GST/HSN, partial refunds, Q&A, RBAC and import staging remain in later phases because their business/professional inputs are not approved.
+- **Independent gates passed** — Isolated migration/seed and three-migration rollback/forward passed; targeted **43 tests / 144 assertions** and full **225 tests / 753 assertions** passed; changed PHP Pint/syntax and Composer audit passed.
+- **Phase 2 status: BLOCKED** — Requires owner-run non-destructive `php artisan migrate --force` and `migrate:status` on persistent MySQL 8.4.3 `rhythm_db`.
+- **Auto Mode active → Paused at genuine external MySQL blocker** — Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

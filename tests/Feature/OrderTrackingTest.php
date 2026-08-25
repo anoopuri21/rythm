@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Mail\OrderStatusMail;
+use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -297,10 +298,18 @@ class OrderTrackingTest extends TestCase
         $this->assertSame(Payment::STATUS_PAID, $payment->fresh()->status);
         // Stock restoration is immediate, while the financial refund remains truthful and pending.
         $this->assertSame($stockBefore + 2, $product->fresh()->stock);
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'type' => InventoryMovement::TYPE_ORDER_CANCELLATION,
+            'quantity_delta' => 2,
+            'balance_after' => $stockBefore + 2,
+        ]);
 
         $this->post(route('orders.cancel', $order))
             ->assertSessionHas('order_error');
         $this->assertDatabaseCount('refunds', 1);
+        $this->assertSame(1, $order->inventoryMovements()->count());
         $this->assertSame($stockBefore + 2, $product->fresh()->stock);
 
         Mail::assertQueued(

@@ -25,8 +25,6 @@ class Product extends Model implements HasMedia
     use InteractsWithMedia;
     use SoftDeletes;
 
-    
-
     protected $casts = [
         'price' => 'decimal:2',
         'compare_at_price' => 'decimal:2',
@@ -51,6 +49,16 @@ class Product extends Model implements HasMedia
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function attributeValues(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductAttributeValue::class, 'product_attribute_value_product');
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
     }
 
     public function cartItems(): HasMany
@@ -104,8 +112,9 @@ class Product extends Model implements HasMedia
             return $media;
         }
 
-        $file = 'images/products/' . $this->slug . '.jpg';
-        return is_file(public_path($file)) ? '/' . $file : null;
+        $file = 'images/products/'.$this->slug.'.jpg';
+
+        return is_file(public_path($file)) ? '/'.$file : null;
     }
 
     /** Gallery image URLs (media first, committed fallback, else []). */
