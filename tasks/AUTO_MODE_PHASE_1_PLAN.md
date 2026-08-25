@@ -46,4 +46,4 @@ Phase 1 completes only when the reference structure and measurable visual geomet
 
 ## Current Blocker
 
-The live semantic structure and four owner-supplied DPR-2 viewport screenshots were inspected and measured. “Current Logo First” and measured Reference Teal (`#00796B`) are locked. Agent 0 accepted the responsive, accessibility, SEO and Phase 3 implementation specification. Auto Mode pauses at this completed full-phase boundary.
+The live semantic structure and four owner-supplied DPR-2 viewport screenshots were inspected and measured. “Current Logo First” and owner-approved Rythme Red (`#B20202`) are locked. Agent 0 accepted the responsive, accessibility, SEO and Phase 3 implementation specification. Auto Mode pauses at this completed full-phase boundary.

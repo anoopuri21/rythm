@@ -65,7 +65,7 @@ Exact anti-aliased text colors vary at edge pixels. Token implementation must us
 |---|---|---|---|
 | Width/density | Near-full-width desktop marketplace | Homepage max 1520px; Shop max `7xl` and therefore narrower | Keep Homepage width; widen Shop to the shared marketplace container after regression checks |
 | Hero proportions | Dominant panel plus three supporting campaigns | Existing 2fr/1fr/1fr composition | Retain structure; tune proportions/crops against screenshot |
-| Accent | Teal `#00796B` | Provisional monochrome `#111111` | Owner decision required; logo remains current |
+| Accent | Measured reference teal `#00796B` | Previously monochrome | Owner intentionally overrides reference color with Rythme Red `#B20202`; current logo remains |
 | Homepage section order | Matches active Rythme through Popular Brands | Strong structural match | Retain and restyle; do not activate fake editorial/newsletter content |
 | Product density | Six across in full-width Homepage sections | Current sections vary by component | Target measured density while preserving readable musical-instrument names/prices |
 | Shop shortcuts | Prominent circular shortcuts above results | Missing | Add in Phase 3 |
@@ -76,4 +76,4 @@ Exact anti-aliased text colors vary at edge pixels. Token implementation must us
 
 ## 5. Screenshot Gate Decision
 
-The required desktop/mobile visual references are accepted. They now support proportional and responsive implementation targets, but not third-party content copying. The owner selected the measured teal accent (`#00796B`) while retaining the current Rythme / Rhythm Exports logo. The screenshot and color gates are accepted for Phase 1; implementation fidelity remains a Phase 3 verification requirement.
+The required desktop/mobile visual references are accepted. They now support proportional and responsive implementation targets, but not third-party content copying. The screenshot gate is accepted. After reviewing the measured teal reference, the owner explicitly selected Rythme Red (`#B20202`) with strong state `#930303` while retaining the current Rythme / Rhythm Exports logo. This intentional brand-color deviation is authoritative; implementation fidelity remains a Phase 3 verification requirement.

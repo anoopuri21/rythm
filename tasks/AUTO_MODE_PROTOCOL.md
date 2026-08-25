@@ -150,7 +150,7 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - **Active:** No — automatically paused at the completed Phase 1 boundary
 - **Completed phases:** Phase 0B Stack Alignment and Phase 1 Homepage + Shop Design Specifications (`COMPLETE`)
 - **Phase 1 evidence:** live semantic reference inspection; four owner-supplied DPR-2 Homepage/Shop screenshots at 1440px and 390px; responsive gap matrix; accessibility/SEO contract; Phase 3 handoff.
-- **Brand direction:** retain current logo; Reference Teal `#00796B` selected, with accessible strong/soft token guidance.
+- **Brand direction:** retain current logo; Rythme Red `#B20202` selected, with accessible strong/soft token guidance.
 - **Next phase:** Phase 2 — MySQL Schema, Migrations and Domain Architecture (`PENDING`).
 - **Resume action:** owner must issue exact `ACTIVATE AUTO MODE` to begin Phase 2 planning.
 - **Deployment:** Agent 10 remains inactive.

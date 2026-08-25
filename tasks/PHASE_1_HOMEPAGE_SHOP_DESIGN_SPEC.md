@@ -9,7 +9,7 @@
 
 Use the XStore Electronic Mega Market references for information hierarchy, marketplace density and component composition. Retain Rythme identity, Indian currency/context and musical-instrument taxonomy. Do not reproduce reference products, imagery, copy, trademarks or theme code.
 
-The owner confirmed **Current Logo First** and then selected **Reference Teal** after screenshot comparison. Retain the existing Rythme / Rhythm Exports logo treatment and use the measured teal accent in the storefront visual system. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
+The owner confirmed **Current Logo First**, initially reviewed the measured reference teal, and then explicitly replaced it with **Rythme Red**. Retain the existing Rythme / Rhythm Exports logo treatment and use the owner-approved deep-red accent in the storefront visual system. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
 
 ## 2. Responsive Verification Viewports
 
@@ -125,12 +125,12 @@ Do not activate the existing Stories partial just to mimic reference density. It
 
 ## 6. Approved Design-token Direction
 
-The owner selected the measured **Reference Teal** direction while retaining the current logo. Phase 3 must implement these as semantic tokens and may tune only secondary shades during contrast/visual regression review:
+The owner selected the **Rythme Red** direction while retaining the current logo. This is an intentional brand-color deviation from the measured teal reference. Phase 3 must implement these as semantic tokens and may tune only secondary shades during contrast/visual regression review:
 
 | Role | Approved value/direction |
 |---|---|
-| Primary accent | `#00796B` |
-| Accent hover/strong | `#005F55` |
+| Primary accent | `#B20202` |
+| Accent hover/strong | `#930303` |
 | Accent soft surface | `#E7F4F1` |
 | Main text / dark footer | `#222222` |
 | Main surface | `#FFFFFF` |
@@ -138,7 +138,7 @@ The owner selected the measured **Reference Teal** direction while retaining the
 | Neutral border | `#E5E7EB` |
 | Focus indication | high-contrast teal/dark ring with at least 3:1 adjacent contrast |
 
-White on `#00796B` measures approximately **5.32:1**, and white on `#005F55` approximately **7.59:1**, passing WCAG AA for normal text. Main `#222222` text on white measures approximately **15.91:1**.
+White on `#B20202` measures approximately **7.24:1**, and white on `#930303` approximately **9.31:1**, passing WCAG AA for normal text. Main `#222222` text on white measures approximately **15.91:1**.
 
 Additional Phase 3 token work:
 
@@ -205,7 +205,7 @@ Additional Phase 3 token work:
 - [x] Phase 2/3 dependencies identified.
 - [x] Desktop and mobile reference screenshots supplied and measured.
 - [x] Current Rythme / Rhythm Exports logo treatment retained (owner: “Current Logo First”).
-- [x] Final color direction confirmed: Reference Teal `#00796B`.
+- [x] Final color direction confirmed: Rythme Red `#B20202`.
 - [x] Design-token direction updated from evidence with WCAG contrast checks.
 - [x] Agent 0 final design-spec acceptance.
 

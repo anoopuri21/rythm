@@ -10,7 +10,7 @@ use Tests\TestCase;
 /**
  * Per-section UI test cases — matches the MAIN (arena) homepage design:
  * mega-market layout (hero-mm, cat-mm, prod-mm, promo-mm, adv-mm, deal-mm,
- * catban-mm, launch-mm, brand-mm) with monochrome styling.
+ * catban-mm, launch-mm, brand-mm) with token-backed Rythme styling.
  */
 class HomepageSectionsTest extends TestCase
 {

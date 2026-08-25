@@ -58,7 +58,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 0 | Agent 0, 8, 9, 11 | Existing codebase status audit | COMPLETE | Evidence accepted; `PHASE_0_STATUS_AUDIT.md` |
 | 0A | Agent 0, 3, 4, 8, 9, 11, 12 | Critical admin/payment/discount/inventory/refund safety remediation | COMPLETE | Accepted 25 Aug 2026: 221 tests / 739 assertions; build and dependency audits green |
 | 0B | Agent 0, 2, 6, 8, 9, 11 | Stack alignment: dependency review, Filament 5, exact MySQL 8 migration, cron strategy | COMPLETE | Accepted 25 Aug 2026: all independent gates plus owner-reported MySQL 8.4.3 forward migration |
-| 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | COMPLETE | Accepted 25 Aug 2026: structure, four viewport captures, Reference Teal, accessibility/SEO contract |
+| 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | COMPLETE | Accepted 25 Aug 2026: structure, four viewport captures, Rythme Red, accessibility/SEO contract |
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | PENDING | Schema review, migrations and DB tests pass |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | PENDING | Side-by-side desktop/mobile verification |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | PENDING | Functional, authorization and integration tests pass |
@@ -197,7 +197,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | Existing codebase qualification | Phase 0 audit and Phase 0A safety remediation complete; later phase gates remain |
 | Reference-page measurements/screenshots | PASSED: four owner-supplied DPR-2 captures measured; hashes recorded without committing third-party images |
 | MySQL connection for migration verification | Phase 0B forward migration accepted; Phase 2 schema-specific evidence remains required |
-| Final brand logo/colors/assets | Phase 1 direction accepted: current logo + Reference Teal `#00796B`; final production assets still require later QA |
+| Final brand logo/colors/assets | Phase 1 direction accepted: current logo + Rythme Red `#B20202`; final production assets still require later QA |
 | Comment scope | Must decide product Q&A only vs. review/blog comments before Phase 5 |
 | Product scraper language | PHP or Python decision required before Phase 6 |
 | Commercial rights to source product content/images | Must be resolved before production catalog launch |

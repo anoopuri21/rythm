@@ -135,11 +135,16 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Specification acceptance ≠ current pixel match** — Phase 3 must implement and prove side-by-side desktop/mobile visual regression. No claim is made that the current storefront already matches.
 - **Auto Mode active → Paused at full-phase boundary** — Next phase is Phase 2 MySQL schema/migrations/domain architecture. Agent 10 remains inactive.
 
+## 25 August 2026 — Phase 1 Color Direction Corrected to Rythme Red
+
+- **Reference Teal → Owner-approved Rythme Red** — Owner explicitly replaced the earlier teal decision with primary `#B20202` and strong/hover `#930303`, while retaining soft surface `#E7F4F1` and all approved neutral tokens.
+- **Brand fidelity overrides reference color** — XStore teal remains recorded only as measured reference evidence; Rythme implementation must use the approved red accent.
+- **Accessibility values corrected from calculation** — White on `#B20202` is **7.24:1**, white on `#930303` is **9.31:1**, and `#222222` on white is **15.91:1**. The first two values differ from the copied teal ratios and are the authoritative computed results.
+- **Scope limited to color system** — Logo, typography, layout, responsive contract, accessibility/SEO requirements and Phase 1 acceptance remain unchanged.
+- **Implementation gates passed** — Full regression: **222 tests / 733 assertions**; production Vite build passed; npm audit reported zero vulnerabilities; changed PHP tests passed Pint.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.
 - PHP versus Python scraper before Phase 6.
-- Commercial content/image rights before production catalog migration.
-- PHP versus Python scraper before Phase 6.
-- Final approved brand assets and design tokens during Phase 1.
 - Product content/image commercial rights before production data launch.

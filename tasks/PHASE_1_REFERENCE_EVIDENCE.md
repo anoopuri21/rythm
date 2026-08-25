@@ -113,7 +113,7 @@ These values must not be treated as approved reference values until screenshot c
 
 The four requested viewport captures were supplied and accepted. PNG widths are exactly 2880 and 780 physical pixels, consistent with the requested 1440px and 390px viewports at DPR 2. The mobile Homepage capture is capped at 16384 physical pixels but contains every active reference section required for the Rythme Homepage contract through Popular Brands.
 
-The owner retained the current logo and selected the measured Reference Teal accent (`#00796B`). Screenshot/reference evidence is sufficient for Phase 1 specification acceptance. Exact font rendering and pixel accuracy will be validated during Phase 3 visual implementation rather than inferred from raster anti-aliasing.
+The owner retained the current logo and explicitly selected the Rythme Red accent (`#B20202`) instead of the measured reference teal. Screenshot/reference evidence is sufficient for Phase 1 specification acceptance. Exact font rendering and pixel accuracy will be validated during Phase 3 visual implementation rather than inferred from raster anti-aliasing.
 
 ## 6. Legal/Content Boundary
 
