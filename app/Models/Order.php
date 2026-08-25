@@ -8,26 +8,39 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 #[Table('orders')]
-#[Fillable(['order_number', 'user_id', 'email', 'status', 'payment_status', 'subtotal', 'discount', 'shipping_fee', 'tax', 'total', 'currency', 'shipping_address', 'billing_address', 'notes', 'placed_at'])]
+#[Fillable(['order_number', 'user_id', 'email', 'status', 'payment_status', 'subtotal', 'discount', 'coupon_code', 'coupon_usage_recorded_at', 'coupon_usage_released_at', 'shipping_fee', 'tax', 'total', 'currency', 'shipping_address', 'billing_address', 'notes', 'placed_at'])]
 class Order extends Model
 {
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_CONFIRMED = 'confirmed';
+
     public const STATUS_PROCESSING = 'processing';
+
     public const STATUS_SHIPPED = 'shipped';
+
     public const STATUS_DELIVERED = 'delivered';
+
     public const STATUS_CANCELLED = 'cancelled';
+
     public const STATUS_REFUNDED = 'refunded';
 
     public const PAYMENT_UNPAID = 'unpaid';
+
     public const PAYMENT_PAID = 'paid';
+
     public const PAYMENT_FAILED = 'failed';
+
+    public const PAYMENT_REFUND_PENDING = 'refund_pending';
+
     public const PAYMENT_REFUNDED = 'refunded';
 
     public const STATUSES = [
@@ -44,10 +57,9 @@ class Order extends Model
         self::PAYMENT_UNPAID,
         self::PAYMENT_PAID,
         self::PAYMENT_FAILED,
+        self::PAYMENT_REFUND_PENDING,
         self::PAYMENT_REFUNDED,
     ];
-
-    
 
     protected $casts = [
         'subtotal' => 'decimal:2',
@@ -58,6 +70,8 @@ class Order extends Model
         'shipping_address' => 'array',
         'billing_address' => 'array',
         'placed_at' => 'datetime',
+        'coupon_usage_recorded_at' => 'datetime',
+        'coupon_usage_released_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -73,6 +87,11 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class);
     }
 
     public function statusHistory(): HasMany
@@ -94,7 +113,7 @@ class Order extends Model
      * Ordered tracking steps for the user timeline — each with a
      * human label, description and the timestamp it was reached.
      *
-     * @return array<int, array{key:string, label:string, desc:string, done:bool, at:?\Illuminate\Support\Carbon}>
+     * @return array<int, array{key:string, label:string, desc:string, done:bool, at:?Carbon}>
      */
     public function trackingTimeline(): array
     {
@@ -135,7 +154,7 @@ class Order extends Model
         return $timeline;
     }
 
-    private function isPastStep(string $key, \Illuminate\Support\Collection $reached): bool
+    private function isPastStep(string $key, Collection $reached): bool
     {
         $steps = ['placed', 'confirmed', 'processing', 'shipped', 'delivered'];
 

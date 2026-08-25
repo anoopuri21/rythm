@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Services\SiteSettingsService;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class Settings extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationGroup = 'SETTINGS';
+    protected static string|\UnitEnum|null $navigationGroup = 'SETTINGS';
 
     protected static ?int $navigationSort = 1;
 
-    protected static string $view = 'filament.pages.settings';
+    protected string $view = 'filament.pages.settings';
 
     public array $data = [];
 
@@ -32,7 +32,7 @@ class Settings extends Page implements HasForms
         $this->form->fill($settings->all());
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([

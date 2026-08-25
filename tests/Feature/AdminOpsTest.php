@@ -6,8 +6,10 @@ namespace Tests\Feature;
 
 use App\Models\ContactMessage;
 use App\Models\NewsletterSubscriber;
+use App\Models\Order;
 use App\Models\User;
 use App\Services\SiteSettingsService;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,6 +24,7 @@ class AdminOpsTest extends TestCase
 
         $this->admin = User::where('email', 'admin@rythme.test')->firstOrFail();
     }
+
     public function test_admin_customers_resource_renders(): void
     {
         $this->actingAs($this->admin)
@@ -71,7 +74,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_dashboard_renders_with_widgets_registered(): void
     {
-        $panel = \Filament\Facades\Filament::getCurrentPanel();
+        $panel = Filament::getPanel('admin');
         $widgets = array_map(fn ($w) => class_basename($w), $panel->getWidgets());
 
         $this->assertContains('StatsOverviewWidget', $widgets);
@@ -82,13 +85,13 @@ class AdminOpsTest extends TestCase
 
     public function test_stats_widget_computes_revenue(): void
     {
-        \App\Models\Order::factory()->create([
+        Order::factory()->create([
             'user_id' => $this->admin->id,
             'payment_status' => 'paid',
             'total' => 5000,
         ]);
 
-        $revenue = (float) \App\Models\Order::where('payment_status', 'paid')->where('created_at', '>=', now()->startOfWeek())->sum('total');
+        $revenue = (float) Order::where('payment_status', 'paid')->where('created_at', '>=', now()->startOfWeek())->sum('total');
 
         $this->assertSame(5000.0, $revenue);
     }
@@ -152,5 +155,4 @@ class AdminOpsTest extends TestCase
             ->assertSee('Trending')
             ->assertSee('Featured');
     }
-
 }

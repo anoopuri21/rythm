@@ -18,12 +18,17 @@ final class CouponService
      *
      * @throws RuntimeException on any invalid/expired/insufficient coupon
      */
-    public function validateAndApply(string $code, float $subtotal): array
+    public function validateAndApply(string $code, float $subtotal, bool $lockForUpdate = false): array
     {
-        $coupon = Coupon::query()
+        $query = Coupon::query()
             ->where('code', strtoupper(trim($code)))
-            ->where('is_active', true)
-            ->first();
+            ->where('is_active', true);
+
+        if ($lockForUpdate) {
+            $query->lockForUpdate();
+        }
+
+        $coupon = $query->first();
 
         if ($coupon === null) {
             throw new RuntimeException('Invalid coupon code.');

@@ -7,8 +7,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\SeoService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class OrderController extends Controller
@@ -44,7 +44,7 @@ final class OrderController extends Controller
         return view('orders.lookup');
     }
 
-    public function lookupPost(Request $request): \Illuminate\Http\RedirectResponse
+    public function lookupPost(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'order_number' => ['required', 'string', 'max:30'],
@@ -93,7 +93,7 @@ final class OrderController extends Controller
             return back()->with('order_error', $e->getMessage());
         }
 
-        return back()->with('order_success', 'Order cancelled. Refund will be processed within 5–7 business days.');
+        return back()->with('order_success', 'Order cancelled. If payment was captured, your refund request is now pending processing.');
     }
 
     private function authorizeView(Request $request, Order $order): void

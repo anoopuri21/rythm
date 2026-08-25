@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationNoticeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
@@ -21,6 +21,9 @@ use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -28,7 +31,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Contact form submission (page itself is dynamic — see catch-all below)
+// Contact page uses the dynamic CMS controller but keeps a stable named route
+// for global navigation, emails and error pages.
+Route::get('/contact', [PageController::class, 'show'])
+    ->defaults('slug', 'contact')
+    ->name('contact');
+
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
@@ -67,13 +75,13 @@ Route::post('/logout', LogoutController::class)->name('logout');
 
 // Email verification (Laravel built-in)
 Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', \App\Http\Controllers\Auth\VerificationNoticeController::class)->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request): \Illuminate\Http\RedirectResponse {
+    Route::get('/email/verify', VerificationNoticeController::class)->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request): RedirectResponse {
         $request->fulfill();
 
         return redirect()->route('account.index')->with('status', 'Email verified!');
     })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse {
+    Route::post('/email/verification-notification', function (Request $request): RedirectResponse {
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('status', 'Verification link sent!');

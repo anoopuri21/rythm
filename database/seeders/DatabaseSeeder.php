@@ -18,15 +18,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::firstOrCreate(
+        $admin = User::firstOrCreate(
             ['email' => 'admin@rythme.test'],
             ['name' => 'Rhythm Exports Admin', 'password' => bcrypt('admin1234')],
         );
+        $admin->forceFill(['role' => User::ROLE_ADMIN])->save();
 
-        User::firstOrCreate(
+        $customer = User::firstOrCreate(
             ['email' => 'test@example.com'],
             ['name' => 'Test User', 'password' => bcrypt('password')],
         );
+        $customer->forceFill(['role' => User::ROLE_CUSTOMER])->save();
 
         $this->call([
             CategorySeeder::class,

@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\SeoFields;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use FilamentTiptapEditor\TiptapEditor;
-use Filament\Forms\Components\Grid;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -32,9 +36,9 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-musical-note';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-musical-note';
 
-    protected static ?string $navigationGroup = 'SHOP';
+    protected static string|\UnitEnum|null $navigationGroup = 'SHOP';
 
     protected static ?int $navigationSort = 1;
 
@@ -45,7 +49,7 @@ class ProductResource extends Resource
             ->with(['category', 'brand', 'media']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Tabs::make('Product editor')->tabs([
@@ -76,7 +80,7 @@ class ProductResource extends Resource
                                     ->label('Featured rank')
                                     ->helperText('Order in homepage Best Sellers (0 = first).'),
                                 Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
-                                TiptapEditor::make('description')->profile('default')->columnSpanFull(),
+                                RichEditor::make('description')->columnSpanFull(),
                             ]),
                         Section::make('Variants')
                             ->description('Optional — finishes, sizes or configurations.')
@@ -109,7 +113,7 @@ class ProductResource extends Resource
                     ]),
                 Tabs\Tab::make('SEO')
                     ->icon('heroicon-o-magnifying-glass-circle')
-                    ->schema(\App\Filament\Components\SeoFields::schema()),
+                    ->schema(SeoFields::schema()),
             ])->columnSpanFull(),
         ]);
     }
@@ -141,12 +145,12 @@ class ProductResource extends Resource
                 TernaryFilter::make('is_trending'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

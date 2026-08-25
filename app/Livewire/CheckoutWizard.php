@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\DTOs\CheckoutData;
+use App\Models\Order;
+use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
-use App\Services\SiteSettingsService;
 use App\Services\OrderService;
+use App\Services\SiteSettingsService;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -141,7 +143,7 @@ final class CheckoutWizard extends Component
     /**
      * Create the order + payment initiation, then return gateway info.
      */
-    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses, SiteSettingsService $settings): void
+    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses): void
     {
         $this->placing = true;
         $this->paymentError = null;
@@ -170,10 +172,6 @@ final class CheckoutWizard extends Component
                 addressId: $address->id,
                 shippingAddress: $addresses->snapshot($address),
                 billingAddress: $addresses->snapshot($address),
-                subtotal: $totals['subtotal'],
-                discount: $this->couponDiscount,
-                shippingFee: $this->shippingFeeFor($totals['subtotal'], $settings),
-                tax: $this->taxFor($totals['subtotal'] - $this->couponDiscount, $settings),
                 currency: 'INR',
                 couponCode: $this->appliedCoupon,
             );
@@ -182,7 +180,7 @@ final class CheckoutWizard extends Component
 
             $gateway = RazorpayGateway::isConfigured()
                 ? RazorpayGateway::fromConfig()
-                : app(\App\Payment\FakePaymentGateway::class);
+                : app(FakePaymentGateway::class);
 
             $gatewayOrderId = $gateway->createOrder($order);
             $orders->recordPaymentInitiation($order, $gatewayOrderId);
@@ -216,11 +214,19 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('No pending order found.');
             }
 
-            $order = \App\Models\Order::with('items.product')->findOrFail($this->orderId);
+            $order = Order::query()
+                ->whereKey($this->orderId)
+                ->where('user_id', auth()->id())
+                ->with('items.product')
+                ->first();
+
+            if ($order === null) {
+                throw new RuntimeException('No pending order found.');
+            }
 
             $gateway = RazorpayGateway::isConfigured()
                 ? RazorpayGateway::fromConfig()
-                : app(\App\Payment\FakePaymentGateway::class);
+                : app(FakePaymentGateway::class);
 
             $result = $gateway->verify($order, $payload);
 
@@ -232,13 +238,6 @@ final class CheckoutWizard extends Component
             }
 
             $orders->markPaid($order, $result, $this->gatewayOrderId);
-
-            if ($this->appliedCoupon !== null) {
-                $coupon = \App\Models\Coupon::where('code', $this->appliedCoupon)->first();
-                if ($coupon !== null) {
-                    app(CouponService::class)->incrementUsage($coupon);
-                }
-            }
 
             $cart->clear();
 

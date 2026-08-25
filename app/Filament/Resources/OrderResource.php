@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Services\OrderService;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\TextSize;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -29,9 +27,9 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = 'COMMERCE';
+    protected static string|\UnitEnum|null $navigationGroup = 'COMMERCE';
 
     protected static ?int $navigationSort = 1;
 
@@ -42,7 +40,7 @@ class OrderResource extends Resource
         return false; // orders are created by checkout only
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist
             ->schema([
@@ -61,7 +59,7 @@ class OrderResource extends Resource
                         }),
                         TextEntry::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
                         TextEntry::make('placed_at')->dateTime('d M Y, h:i A'),
-                        TextEntry::make('total')->money('INR')->weight('bold')->size(TextEntry\TextEntrySize::Large),
+                        TextEntry::make('total')->money('INR')->weight('bold')->size(TextSize::Large),
                     ]),
                 Section::make('Items')
                     ->schema([
@@ -79,20 +77,20 @@ class OrderResource extends Resource
                 Section::make('Addresses')
                     ->columns(2)
                     ->schema([
-                        Group::make([
+                        Section::make('Shipping')->schema([
                             TextEntry::make('shipping_address.name')->label('Name'),
                             TextEntry::make('shipping_address.phone')->label('Phone'),
                             TextEntry::make('shipping_address.line1')->label('Address'),
                             TextEntry::make('shipping_address.city')->label('City'),
                             TextEntry::make('shipping_address.state')->label('State'),
                             TextEntry::make('shipping_address.pincode')->label('PIN'),
-                        ])->label('Shipping'),
-                        Group::make([
+                        ]),
+                        Section::make('Payment')->schema([
                             TextEntry::make('payment_transaction')->label('Gateway payment id')
                                 ->state(fn (Order $record): ?string => $record->payments->last()?->gateway_payment_id),
                             TextEntry::make('payment_gateway')->label('Gateway')
                                 ->state(fn (Order $record): string => $record->payments->last()?->gateway ?? '—'),
-                        ])->label('Payment'),
+                        ]),
                     ]),
                 Section::make('Status history')
                     ->schema([
@@ -145,14 +143,14 @@ class OrderResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 self::statusAction(Order::STATUS_PROCESSING, 'Mark processing', 'heroicon-o-arrow-path', 'info'),
                 self::statusAction(Order::STATUS_SHIPPED, 'Mark shipped', 'heroicon-o-truck', 'info'),
                 self::statusAction(Order::STATUS_DELIVERED, 'Mark delivered', 'heroicon-o-check-circle', 'success'),
                 self::statusAction(Order::STATUS_CANCELLED, 'Cancel order', 'heroicon-o-x-circle', 'danger'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([]),
+                BulkActionGroup::make([]),
             ]);
     }
 

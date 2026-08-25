@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Services\SiteSettingsService;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,6 +17,21 @@ class InfraTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+    }
+
+    public function test_shared_hosting_schedule_has_bounded_queue_worker(): void
+    {
+        $events = app(Schedule::class)->events();
+        $commands = array_map(static fn ($event): string => $event->command ?? '', $events);
+        $worker = collect($commands)->first(
+            static fn (string $command): bool => str_contains($command, 'queue:work')
+        );
+
+        $this->assertNotNull($worker);
+        $this->assertStringContainsString('--stop-when-empty', $worker);
+        $this->assertStringContainsString('--max-time=50', $worker);
+        $this->assertStringContainsString('--tries=3', $worker);
+        $this->assertStringContainsString('--timeout=45', $worker);
     }
 
     public function test_sitemap_renders_all_sections(): void
@@ -47,7 +64,7 @@ class InfraTest extends TestCase
 
     public function test_gst_and_shipping_settings_apply_to_totals(): void
     {
-        $settings = app(\App\Services\SiteSettingsService::class);
+        $settings = app(SiteSettingsService::class);
         $settings->saveAll(['shipping_flat_fee' => '49', 'tax_rate' => '18']);
 
         $this->assertSame(49.0, $settings->getFloat('shipping_flat_fee'));
@@ -56,14 +73,14 @@ class InfraTest extends TestCase
 
     public function test_free_shipping_threshold_applies(): void
     {
-        $settings = app(\App\Services\SiteSettingsService::class);
+        $settings = app(SiteSettingsService::class);
         $settings->saveAll(['shipping_flat_fee' => '49', 'shipping_free_above' => '1000']);
 
         $flat = $settings->getFloat('shipping_flat_fee');
         $freeAbove = $settings->getFloat('shipping_free_above');
 
         // Below threshold → flat fee applies; at/above → free
-        $this->assertSame(49.0, 500 < $freeAbove ? $flat : 0.0);
-        $this->assertSame(0.0, 1500 >= $freeAbove ? 0.0 : $flat);
+        $this->assertSame(49.0, $freeAbove > 500 ? $flat : 0.0);
+        $this->assertSame(0.0, $freeAbove <= 1500 ? 0.0 : $flat);
     }
 }
