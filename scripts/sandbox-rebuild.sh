@@ -13,68 +13,28 @@ export PATH="$HOME/.local/bin:$PATH"
 LOG=/tmp/rebuild.log
 exec > >(tee -a "$LOG") 2>&1
 
-echo "=== [1/8] PHP (gh-api → static-php.dev CDN fallback) ==="
+echo "=== [1/8] PHP ==="
 if [ ! -x "$HOME/.local/bin/php" ]; then
   mkdir -p "$HOME/.local/bin"
-  # Primary: nativephp/php-bin via GitHub API (needs gh + egress).
-  if command -v gh >/dev/null 2>&1 && gh api repos/nativephp/php-bin/contents/bin/linux/x64/php-8.3.zip \
-    -H "Accept: application/vnd.github.raw" > /tmp/php.zip 2>/dev/null && [ -s /tmp/php.zip ]; then
-    unzip -o -j -q /tmp/php.zip -d "$HOME/.local/bin/"
-    chmod +x "$HOME/.local/bin/php"
-    echo "php via gh-api OK"
-  else
-    # FALLBACK 1: npm @libphp (PHP 8.3, Amazon Linux build) — try first as requested.
-    echo "gh-api unavailable — trying npm @libphp fallback..."
-    if [ ! -d /tmp/libphp ]; then
-      npm install --prefix /tmp/libphp @libphp/amazon-linux-2-v83 --no-audit --no-fund >/dev/null 2>&1
-    fi
-    if [ -f /tmp/libphp/node_modules/@libphp/amazon-linux-2-v83/native/php/php ]; then
-      cp /tmp/libphp/node_modules/@libphp/amazon-linux-2-v83/native/php/php "$HOME/.local/bin/php"
-      chmod +x "$HOME/.local/bin/php"
-      # Amazon Linux build may need libncurses.so.5 — if it fails to run, fall through.
-      if "$HOME/.local/bin/php" -v >/dev/null 2>&1; then
-        echo "php via @libphp fallback OK"
-      else
-        echo "@libphp binary missing libs — trying static-php.dev CDN..."
-        rm -f "$HOME/.local/bin/php"
-      fi
-    fi
-    # FALLBACK 2: static-php.dev CDN — non-GitHub, Debian-compatible static PHP 8.3.10.
-    if [ ! -x "$HOME/.local/bin/php" ]; then
-      if [ ! -f /tmp/php-static/php ]; then
-        rm -rf /tmp/php-static && mkdir -p /tmp/php-static
-        curl -sL --max-time 60 "https://dl.static-php.dev/static-php-cli/common/php-8.3.10-cli-linux-x86_64.tar.gz" -o /tmp/php-static.tar.gz
-        tar -xzf /tmp/php-static.tar.gz -C /tmp/php-static
-      fi
-      cp /tmp/php-static/php "$HOME/.local/bin/php"
-      chmod +x "$HOME/.local/bin/php"
-      echo "php via static-php.dev fallback OK"
-    fi
-  fi
+  gh api repos/nativephp/php-bin/contents/bin/linux/x64/php-8.3.zip \
+    -H "Accept: application/vnd.github.raw" > /tmp/php.zip
+  unzip -o -j -q /tmp/php.zip -d "$HOME/.local/bin/"
+  chmod +x "$HOME/.local/bin/php"
 fi
-php -v | head -1 || { echo "ERROR: PHP install failed (all fallbacks)." >&2; exit 1; }
-# Composer may need ext-intl which static builds lack — tolerate it.
-export COMPOSER_IGNORE_PLATFORM_REQ="${COMPOSER_IGNORE_PLATFORM_REQ:-}"
+php -v | head -1
 
-echo "=== [2/8] Composer 2 phar (getcomposer.org → gh-source fallback) ==="
-if [ ! -x "$HOME/.local/bin/composer.phar" ] || ! "$HOME/.local/bin/php" "$HOME/.local/bin/composer.phar" --version >/dev/null 2>&1; then
-  # PRIMARY: official getcomposer.org phar — non-GitHub, no gh needed.
-  if curl -sL --max-time 60 https://getcomposer.org/download/latest-stable/composer.phar \
-    -o "$HOME/.local/bin/composer.phar" 2>/dev/null && [ -s "$HOME/.local/bin/composer.phar" ]; then
-    echo "composer via getcomposer.org OK"
-  else
-    echo "getcomposer.org failed — trying gh-source build..."
-    rm -f "$HOME/.local/bin/composer.phar"
-    if [ ! -d /tmp/composer-src ]; then
-      git clone --depth 1 -q https://github.com/composer/composer.git /tmp/composer-src
-    fi
-    # bootstrap: old 1.x mirror phar, patched for PHP 8.3
-    if [ ! -s "$HOME/.local/bin/composer-1x.phar" ]; then
-      gh api "repos/snowdrogon/composer.phar/contents/composer.phar?ref=master" \
-        -H "Accept: application/vnd.github.raw" > "$HOME/.local/bin/composer-1x.phar" || true
-    fi
-    if [ -s "$HOME/.local/bin/composer-1x.phar" ]; then
-      cat > /tmp/patch1x.php <<'PHPEOF'
+echo "=== [2/8] Composer 2 phar (build from source) ==="
+if [ ! -x /tmp/composer-src/composer.phar ] || [ ! -x "$HOME/.local/bin/composer.phar" ]; then
+  if [ ! -d /tmp/composer-src ]; then
+    git clone --depth 1 -q https://github.com/composer/composer.git /tmp/composer-src
+  fi
+  # bootstrap: old 1.x mirror phar, patched for PHP 8.3
+  if [ ! -s "$HOME/.local/bin/composer-1x.phar" ]; then
+    gh api "repos/snowdrogon/composer.phar/contents/composer.phar?ref=master" \
+      -H "Accept: application/vnd.github.raw" > "$HOME/.local/bin/composer-1x.phar"
+    # NOTE: heredoc-to-`php -` fails when stdin is closed (background proc);
+    # write the patch to a temp file instead.
+    cat > /tmp/patch1x.php <<'PHPEOF'
 <?php
 $pharPath = getenv("HOME") . "/.local/bin/composer-1x.phar";
 $phar = new Phar($pharPath);
@@ -87,6 +47,7 @@ if (strpos($c, "E_USER_DEPRECATED) { return true; }") === false && strpos($c, $n
     $c = str_replace($needle, $rep, $c);
     $tmp = tempnam(sys_get_temp_dir(), "eh"); file_put_contents($tmp, $c);
     $phar->delete($path); $phar->addFile($tmp, $path); unlink($tmp);
+    echo "patch1: ErrorHandler\n";
 }
 $files = [];
 foreach (new RecursiveIteratorIterator($phar) as $f) {
@@ -94,6 +55,7 @@ foreach (new RecursiveIteratorIterator($phar) as $f) {
     if (substr($p, -4) === '.php') $files[] = $p;
 }
 $prefix = 8 + strlen($pharPath);
+$total = 0;
 foreach ($files as $p) {
     $rel0 = substr($p, $prefix);
     $content = $phar[$rel0]->getContent();
@@ -104,48 +66,42 @@ foreach ($files as $p) {
         $t = $tokens[$i];
         if (is_array($t)) {
             if (!in_array($t[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) $lastSig = $t[0];
-            if ($t[0] === T_STRING && ($t[1] === 'self' || $t[1] === 'static')) {
-                $pending = [$i, $t[1]];
-                continue;
+            if ($t[0] === T_SWITCH) $pending = 'S';
+            elseif ($t[0] === T_FOR || $t[0] === T_FOREACH || $t[0] === T_DO) $pending = 'L';
+            elseif ($t[0] === T_WHILE && $lastSig !== '}') $pending = 'L';
+            elseif ($t[0] === T_CONTINUE) {
+                for ($s = count($stack) - 1; $s >= 0; $s--) {
+                    if ($stack[$s] === 'B') continue;
+                    if ($stack[$s] === 'S') { $tokens[$i] = 'break'; $changed = true; }
+                    break;
+                }
             }
-            if ($pending !== null && $t[0] === T_OBJECT_OPERATOR) {
-                $pending = null;
-            } elseif ($pending !== null && $t[0] === T_DOUBLE_COLON && $lastSig !== T_NEW) {
-                $newContent = $content;
-                $newContent = substr_replace($newContent, $tokens[$pending[0]][1], strpos($newContent, $tokens[$pending[0]][1], 0), strlen($tokens[$pending[0]][1]));
-                $changed = true;
-                $pending = null;
-            } else {
-                $pending = null;
-            }
-        }
+        } elseif ($t === '{') { $stack[] = $pending !== null ? $pending : 'B'; $pending = null; }
+        elseif ($t === '}') { if (!empty($stack)) array_pop($stack); }
     }
     if ($changed) {
+        $newContent = '';
+        foreach ($tokens as $t) $newContent .= is_array($t) ? $t[1] : $t;
         $tmp = tempnam(sys_get_temp_dir(), 'lint'); file_put_contents($tmp, $newContent);
-        if (@$phar[$rel0]->getContent() !== $newContent) {
-            $tmp2 = tempnam(sys_get_temp_dir(), 'src'); file_put_contents($tmp2, $newContent);
-            $phar->delete($rel0); $phar->addFile($tmp2, $rel0); unlink($tmp2);
-        }
-        unlink($tmp);
+        $out = shell_exec(PHP_BINARY . ' -l ' . escapeshellarg($tmp) . ' 2>&1'); unlink($tmp);
+        if (strpos($out, 'No syntax errors') === false) { echo "LINT FAIL $rel0\n"; continue; }
+        $phar->delete($rel0);
+        $tmp2 = tempnam(sys_get_temp_dir(), 'src'); file_put_contents($tmp2, $newContent);
+        $phar->addFile($tmp2, $rel0); unlink($tmp2);
+        echo "patch2: $rel0\n"; $total++;
     }
 }
 $phar->stopBuffering();
-echo "patch done\n";
+echo "patch2 total: $total\n";
 PHPEOF
-      "$HOME/.local/bin/php" /tmp/patch1x.php || true
-    fi
-    # build composer 2 from source using the (patched) 1.x bootstrap
-    (cd /tmp/composer-src && "$HOME/.local/bin/php" -d error_reporting=0 "$HOME/.local/bin/composer-1x.phar" install --ignore-platform-reqs --no-interaction -q || true)
-    if [ -f /tmp/composer-src/composer.phar ]; then
-      cp /tmp/composer-src/composer.phar "$HOME/.local/bin/composer.phar"
-      echo "composer via gh-source build OK"
-    else
-      echo "ERROR: composer unavailable (getcomposer.org + source both failed)." >&2
-      exit 1
-    fi
+    php -d phar.readonly=0 /tmp/patch1x.php
   fi
+  cd /tmp/composer-src
+  php -d error_reporting=0 "$HOME/.local/bin/composer-1x.phar" install --ignore-platform-reqs --no-interaction -q
+  php -d phar.readonly=0 bin/compile
+  cp /tmp/composer-src/composer.phar "$HOME/.local/bin/composer.phar"
 fi
-"$HOME/.local/bin/php" -d error_reporting=0 "$HOME/.local/bin/composer.phar" --version 2>/dev/null | head -1
+php -d error_reporting=0 "$HOME/.local/bin/composer.phar" --version 2>/dev/null | head -1
 
 echo "=== [3/8] Vendor ==="
 cd /home/user/rythm

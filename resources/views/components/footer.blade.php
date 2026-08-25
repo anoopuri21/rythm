@@ -8,7 +8,7 @@
 <footer id="footer" class="relative overflow-hidden bg-rythme-black text-white">
     {{-- ============ CTA band ============ --}}
     <section class="cta-band relative overflow-hidden border-b border-white/10" aria-labelledby="cta-title">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(213,8,8,.22),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(213,8,8,.14),transparent_40%)]"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,.07),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(255,255,255,.05),transparent_40%)]"></div>
         <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
         <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
             <div class="reveal-section" data-reveal="up">
@@ -48,7 +48,7 @@
         <div class="mx-auto flex max-w-7xl flex-col items-center gap-6 px-5 py-12 text-center sm:px-8 lg:flex-row lg:justify-between lg:text-left">
             <div>
                 <a href="{{ route('home') }}" class="inline-flex flex-col items-center lg:items-start" aria-label="{{ $brand }} home">
-                    <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                     <span class="mt-2 hidden text-[9px] tracking-[0.35em] text-gold" style="display:none" aria-hidden="true">RHYTHM EXPORTS</span>
                 </a>
                 <p class="mx-auto mt-5 max-w-md text-sm leading-7 text-white/45 lg:mx-0">Premium instruments, thoughtful advice, and a lifelong belief that everyone deserves to find their sound.</p>

@@ -64,7 +64,7 @@
                         @error('message') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                     </label>
                     <div class="sm:col-span-2">
-                        <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(213,8,8,0.25)] transition hover:bg-brand-dark">
+                        <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-brand px-8 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
                             Send message <span aria-hidden="true">→</span>
                         </button>
                     </div>

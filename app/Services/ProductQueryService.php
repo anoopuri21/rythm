@@ -28,6 +28,7 @@ final class ProductQueryService
         $this->applyBrandFilter($query, $filters->brands);
         $this->applyPriceFilter($query, $filters->minPrice, $filters->maxPrice);
         $this->applyAvailabilityFilter($query, $filters->inStockOnly);
+        $this->applySaleFilter($query, $filters->onSale);
         $this->applySearchFilter($query, $filters->search);
         $this->applySort($query, $filters->sort);
 
@@ -117,6 +118,15 @@ final class ProductQueryService
     {
         if ($inStockOnly) {
             $query->where('stock', '>', 0);
+        }
+    }
+
+    /** On sale = a real compare-at price above the selling price. */
+    private function applySaleFilter(Builder $query, bool $onSale): void
+    {
+        if ($onSale) {
+            $query->whereNotNull('compare_at_price')
+                ->whereColumn('compare_at_price', '>', 'price');
         }
     }
 

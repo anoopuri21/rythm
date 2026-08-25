@@ -10,7 +10,7 @@
         '@context' => 'https://schema.org',
         '@type' => 'Product',
         'name' => $product->name,
-        'image' => $product->heroImage() ?: asset('images/hero/grid-slide-guitar.jpg'),
+        'image' => $product->heroImage() ?: asset('images/hero-guitar.jpg'),
         'description' => $product->short_description,
         'sku' => $product->sku,
         'brand' => ['@type' => 'Brand', 'name' => $product->brand?->name ?? 'Rythme'],
@@ -49,7 +49,7 @@
             {{-- Hero grid: gallery | buy box --}}
             <div class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
                 {{-- ===== GALLERY ===== --}}
-                <div x-data="{ active: 0, images: {{ json_encode($product->getMedia('gallery')->map(fn ($m) => $m->getUrl())->values()->all() ?: [null]) }} }">
+                <div x-data="{ active: 0, images: {{ json_encode($product->galleryImages() ?: [null]) }} }">
                     <div class="relative aspect-square overflow-hidden rounded-3xl border border-ink/10 bg-white">
                         <template x-for="(img, i) in images" :key="i">
                             <div x-show="active === i" x-transition.opacity.duration.300 class="absolute inset-0 flex items-center justify-center p-8 sm:p-12">
@@ -72,14 +72,14 @@
                     </div>
 
                     {{-- Thumbnails --}}
-                    @if($product->getMedia('gallery')->count() > 1)
+                    @if(count($product->galleryImages()) > 1)
                         <div class="mt-4 flex gap-3 overflow-x-auto pb-1">
-                            @foreach($product->getMedia('gallery') as $i => $media)
+                            @foreach($product->galleryImages() as $i => $img)
                                 <button type="button" @click="active = {{ $i }}"
                                         class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition {{ $loop->first ? 'border-brand' : 'border-ink/10 hover:border-brand/40' }}"
                                         :class="active === {{ $i }} ? 'border-brand' : 'border-ink/10'"
                                         aria-label="View image {{ $i + 1 }}">
-                                    <img src="{{ $media->getUrl() }}" alt="{{ $product->name }} — image {{ $i + 1 }}" class="h-full w-full object-cover" loading="lazy">
+                                    <img src="{{ $img }}" alt="{{ $product->name }} — image {{ $i + 1 }}" class="h-full w-full object-cover" loading="lazy">
                                 </button>
                             @endforeach
                         </div>
