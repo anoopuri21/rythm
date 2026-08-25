@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 5 — Reviews, product Q&A and coupons QA
-**Overall status:** PHASE 4 COMPLETE / PHASE 5 ISOLATED GATES PASSED / EXACT MYSQL UAT MIGRATION PENDING / NOT PRODUCTION-READY
+**Current phase:** Phase 5 — Reviews, product Q&A and coupons COMPLETE
+**Overall status:** PHASE 5 COMPLETE / AUTO MODE PAUSED AT FULL-PHASE CHECKPOINT / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — genuine external gate: exact MySQL 8.4.3 UAT migration evidence
+**Auto Mode:** PAUSED — Phase 5 full-phase checkpoint reached
 
 ---
 
@@ -63,7 +63,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | COMPLETE | Accepted 25 Aug 2026: 225 tests / 753 assertions plus owner-reported MySQL 8.4.3 forward migration/status |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
-| 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | QA | 265 tests / 974 assertions and 4-width rendered gate passed; exact MySQL 8.4.3 UAT migration/status pending |
+| 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
 | 6 | Agent 5, 4, 8, 15 | Bajaao catalog scraper/import pipeline | PENDING | Validated import, deduplication and media report |
 | 7 | Agent 6, 3, 4, 11 | Filament resources, dashboards and RBAC | PENDING | Role matrix and admin UAT pass |
 | 8 | Agent 8, 3, 4, 11–15 | Security, accessibility, compliance and performance hardening | PENDING | No unresolved critical/high issue; load targets pass |
@@ -304,7 +304,7 @@ Agent 0 accepts Phase 4 as `COMPLETE` on 26 August 2026 based on `tasks/PHASE_4_
 
 Auto Mode pauses at this full-phase checkpoint. Phase 5 requires a new explicit `ACTIVATE AUTO MODE` and the product Q&A/comments scope decision. Agent 10 remains inactive. This is not production sign-off.
 
-## 13. Phase 5 QA and Remaining Acceptance Gate
+## 13. Phase 5 Acceptance
 
 Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
@@ -316,4 +316,6 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 - Full regression passed at **265 tests / 974 assertions**. Migration rollback/forward, production build, changed-file syntax/Pint, Blade, dependency audits and claim scans passed.
 - Four rendered widths (1440/768/390/320) report zero axe violations, horizontal overflow and console/page errors.
 
-**Remaining gate:** migrations `2026_08_26_000001` and `000002` must run successfully on persistent UAT MySQL Community Server 8.4.3, followed by migration-status evidence. Persistent `rhythm_db` was intentionally not changed from the agent sandbox. Auto Mode is paused at this genuine external gate; Agent 10 remains inactive; Phase 5 is not yet Agent-0 accepted as COMPLETE.
+**Exact MySQL evidence:** the owner ran `php artisan migrate --force` from the `rhythm-uat` Laragon project against the established persistent MySQL Community Server 8.4.3 UAT database. Both `2026_08_26_000001_add_review_moderation_and_product_questions` and `2026_08_26_000002_replace_unsupported_seeded_claims` reported `DONE`. No destructive reset or seeding command was run.
+
+**Agent 0 decision:** Phase 5 is `COMPLETE` and accepted on 26 August 2026. Auto Mode pauses at this full-phase checkpoint. Agent 10 remains inactive and no production sign-off is implied.

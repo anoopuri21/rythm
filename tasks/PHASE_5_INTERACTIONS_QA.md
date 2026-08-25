@@ -3,7 +3,7 @@
 **Date:** 26 August 2026  
 **Branch:** `rhythm-uat`  
 **Authority:** Agent 0 with Agents 3, 6, 9, 11, 12 and 14  
-**State:** QA — implementation and isolated gates passed; exact MySQL UAT forward migration pending
+**State:** COMPLETE — accepted by Agent 0 after successful exact MySQL 8.4.3 UAT forward migration
 
 ## Locked scope
 
@@ -67,12 +67,13 @@ Across all four runs:
 
 The browser run exposed one pre-existing stock-text contrast failure. It was changed from `emerald-600` to `emerald-700`; the complete run then passed.
 
-## Data safety and remaining gate
+## Data safety and exact MySQL evidence
 
-- Persistent `rhythm_db` was not connected to, reset, seeded or targeted by destructive tests.
+- Persistent `rhythm_db` was not reset, seeded or targeted by destructive tests.
 - Migration `2026_08_26_000001` performs a non-destructive duplicate-review preflight before adding the unique constraint. If duplicate customer/product reviews exist, it stops before schema changes and reports the required remediation instead of deleting data.
 - Migration `2026_08_26_000002` preserves owner-edited CMS records and only changes untouched seeded rows.
-- Exact MySQL Community Server 8.4.3 forward-migration/status evidence on persistent UAT remains required before Agent 0 can accept Phase 5 as COMPLETE.
+- The owner ran `php artisan migrate --force` from `C:\laragon\www\rythm` on `rhythm-uat` against the established persistent MySQL Community Server 8.4.3 UAT project. Both Phase 5 migrations reported `DONE`: `2026_08_26_000001_add_review_moderation_and_product_questions` and `2026_08_26_000002_replace_unsupported_seeded_claims`.
+- No `migrate:fresh`, `db:wipe`, sample seeder or destructive automated suite was run against persistent UAT.
 
 ## Bounded limitations
 
@@ -80,3 +81,7 @@ The browser run exposed one pre-existing stock-text contrast failure. It was cha
 - Notification workflows for review approval/rejection, staff replies and Q&A answers belong to the later notifications phase.
 - Phase 8 security/compliance hardening, Phase 9 full UAT and Phase 10 production-readiness remain pending.
 - Agent 10 is inactive; this document is not deployment authorization or production sign-off.
+
+## Agent 0 decision
+
+All five Phase 5 chunks meet their bounded acceptance criteria, including the exact MySQL 8.4.3 UAT forward-migration gate. Phase 5 is `COMPLETE` on 26 August 2026. Auto Mode pauses at this full-phase checkpoint. This decision is neither production readiness nor deployment authorization.

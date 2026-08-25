@@ -148,12 +148,11 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — paused at a genuine external Phase 5 gate.
-- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, and Phase 4 Accounts/Commerce (`COMPLETE`).
-- **Current phase:** Phase 5 — Verified reviews, moderated product Q&A and coupons (`QA`).
-- **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates passed.
+- **Active:** No — paused automatically at the completed Phase 5 full-phase checkpoint.
+- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, Phase 4 Accounts/Commerce, and Phase 5 Reviews/Product Q&A/Coupons (`COMPLETE`).
+- **Current phase:** Phase 5 — Verified reviews, moderated product Q&A and coupons (`COMPLETE`).
+- **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates and the owner-reported exact MySQL 8.4.3 UAT forward migrations passed.
 - **Owner-locked interaction scope:** verified-purchase reviews plus moderated product Q&A; no blog comments.
-- **External gate:** exact MySQL Community Server 8.4.3 UAT forward migration and migration-status evidence for Phase 5 migrations.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
 - **Automated Phase 3 evidence:** **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories passed after remediation.
 - **Rendered Phase 3 evidence:** exact-width Homepage/Shop empty/static evidence at 1440/768/390/320 plus isolated populated Homepage/Shop evidence at 1440/390 was reviewed and accepted.

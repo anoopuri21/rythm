@@ -287,3 +287,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Independent isolated gate passed** — **265 tests / 974 assertions**, two-migration forward/rollback/forward, production build, changed-file syntax/Pint, Blade compilation, Composer/npm audits and public claim scan passed.
 - **Rendered qualification passed** — Review/Q&A journeys at 1440/768/390/320 produced zero axe violations, horizontal overflow and console/page errors after correcting a stock-label contrast finding.
 - **Phase 5 `IN PROGRESS` → `QA`** — Exact MySQL 8.4.3 UAT forward-migration/status evidence remains. Auto Mode paused at this genuine external gate; Agent 10 remains inactive; no production sign-off issued.
+
+## 26 August 2026 — Phase 5 Exact MySQL Acceptance
+
+- **Exact MySQL gate passed** — Owner ran `php artisan migrate --force` from `C:\laragon\www\rythm` on `rhythm-uat` against the established persistent MySQL Community Server 8.4.3 UAT project.
+- **Both Phase 5 migrations completed** — `2026_08_26_000001_add_review_moderation_and_product_questions` and `2026_08_26_000002_replace_unsupported_seeded_claims` each reported `DONE`.
+- **Safety retained** — No `migrate:fresh`, `db:wipe`, sample seeder or destructive test command was used against persistent UAT.
+- **Phase 5 `QA` → `COMPLETE`** — Agent 0 accepted Phase 5 on 26 August 2026 with **265 tests / 974 assertions**, four-width zero-violation rendered evidence and exact MySQL forward-migration evidence.
+- **Auto Mode paused at full-phase checkpoint** — Agent 10 remains inactive; this is not production sign-off or deployment authorization.
