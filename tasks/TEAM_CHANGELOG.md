@@ -115,7 +115,8 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Semantic reference access → Grade B structure evidence only** — The live pages prove hierarchy and controls but not computed typography, spacing, color, geometry or responsive pixel behavior.
 - **Current local values → Provisional, not reference-approved** — Existing 1520px container, monochrome Inter tokens, breakpoints and component dimensions are documented as local measurements only.
 - **Reference copying → Prohibited** — XStore remains a layout/interaction reference; its products, imagery, copy, trademarks and theme code are not approved Rythme assets.
-- **Phase 1 status: BLOCKED** — Requires current full-page Homepage and Shop screenshots at 1440px and 390px and owner confirmation of final logo/color treatment before pixel-fidelity acceptance.
+- **Phase 1 status: BLOCKED** — Requires current full-page Homepage and Shop screenshots at 1440px and 390px before pixel-fidelity acceptance; final colors will be confirmed after comparison.
+- **Brand direction: Current Logo First** — Owner confirmed retention of the existing Rythme / Rhythm Exports logo treatment; current monochrome tokens remain provisional until screenshot comparison.
 - **Auto Mode active → Automatically paused at genuine design-evidence blocker** — Independent work is complete; Phase 2/3 implementation dependencies are documented. Agent 10 remains inactive.
 
 ## Active Decisions Still Needed

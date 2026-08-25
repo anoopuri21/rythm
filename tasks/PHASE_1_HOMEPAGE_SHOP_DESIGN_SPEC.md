@@ -9,7 +9,7 @@
 
 Use the XStore Electronic Mega Market references for information hierarchy, marketplace density and component composition. Retain Rythme identity, Indian currency/context and musical-instrument taxonomy. Do not reproduce reference products, imagery, copy, trademarks or theme code.
 
-Current monochrome tokens are a provisional implementation baseline, not final brand approval. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
+The owner confirmed **Current Logo First**: retain the existing Rythme / Rhythm Exports logo treatment. Final color direction will be decided after reference screenshot comparison. Current monochrome tokens remain a provisional implementation baseline, not final color approval. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
 
 ## 2. Responsive Verification Viewports
 
@@ -193,8 +193,9 @@ The implementation phase must lock these in semantic tokens after reference/bran
 - [x] Accessibility and technical SEO contract drafted.
 - [x] Phase 2/3 dependencies identified.
 - [ ] Desktop and mobile reference screenshots supplied and measured.
-- [ ] Final brand logo treatment and colors confirmed.
+- [x] Current Rythme / Rhythm Exports logo treatment retained (owner: “Current Logo First”).
+- [ ] Final color direction confirmed after screenshot comparison.
 - [ ] Visual tokens updated from evidence.
 - [ ] Agent 0 final design-spec acceptance.
 
-Until the final four items are complete, Phase 1 remains `BLOCKED` and no pixel-perfect claim is permitted.
+Until the remaining screenshot/color/token/acceptance items are complete, Phase 1 remains `BLOCKED` and no pixel-perfect claim is permitted.

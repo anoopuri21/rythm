@@ -46,4 +46,4 @@ Phase 1 completes only when the reference structure and measurable visual geomet
 
 ## Current Blocker
 
-The live pages are reachable and their semantic structure has been inspected, but this environment has no browser renderer for viewport screenshots or computed-style measurements. Final approved brand colors/logo treatment are also not confirmed. The owner must provide current full-page reference screenshots at the requested desktop/mobile viewports and confirm the brand treatment before Agent 0 can close Phase 1.
+The live pages are reachable and their semantic structure has been inspected, but this environment has no browser renderer for viewport screenshots or computed-style measurements. The owner has now confirmed “Current Logo First”; final colors remain pending screenshot comparison. The owner must provide current full-page reference screenshots at the requested desktop/mobile viewports and confirm the final color direction after comparison before Agent 0 can close Phase 1.

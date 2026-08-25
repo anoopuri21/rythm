@@ -151,7 +151,7 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - **Completed phase:** Phase 0B — Stack Alignment (`COMPLETE`)
 - **Current phase:** Phase 1 — Homepage + Shop Design Specifications (`BLOCKED`)
 - **Completed Phase 1 work:** source inventory, live semantic reference inspection, gap matrix, responsive contract, accessibility/SEO contract and implementation handoff.
-- **Blocker:** no renderer-backed reference screenshots/computed geometry and no confirmed final brand treatment; semantic extraction cannot prove pixel fidelity.
-- **Required owner evidence:** current full-page Homepage and Shop screenshots at 1440px and 390px, browser zoom 100%, plus logo/color-direction confirmation.
+- **Blocker:** no renderer-backed reference screenshots/computed geometry; semantic extraction cannot prove pixel fidelity. Existing logo treatment is confirmed, while final colors await screenshot comparison.
+- **Required owner evidence:** current full-page Homepage and Shop screenshots at 1440px and 390px, browser zoom 100%, with final color direction to be confirmed after comparison.
 - **Resume action:** supply the evidence, then issue `ACTIVATE AUTO MODE` to finish the Phase 1 gate.
 - **Deployment:** Agent 10 remains inactive.

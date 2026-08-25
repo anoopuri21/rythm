@@ -118,7 +118,7 @@ Required evidence still missing:
 - Full-page Shop screenshot at 1440px desktop width.
 - Full-page Shop screenshot at 390px mobile width.
 - Browser zoom at 100% and no translation/accessibility text scaling during capture.
-- Confirmed Rythme logo treatment and final brand color direction.
+- Final brand color direction. The owner has confirmed “Current Logo First,” so the existing Rythme / Rhythm Exports logo treatment is retained.
 - Reference computed font families/sizes, container widths, spacing, border radii, colors and responsive transition points, or screenshots clear enough to measure them.
 
 ## 6. Legal/Content Boundary
