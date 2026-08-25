@@ -3,6 +3,7 @@
     $brands = $homepage['brandNames'] ?? collect();
 @endphp
 
+@if($brands->isNotEmpty())
 {{-- ============================================================
      POPULAR BRANDS — wordmark strip (mega-market logo row)
      ============================================================ --}}
@@ -20,3 +21,4 @@
         </ul>
     </div>
 </section>
+@endif

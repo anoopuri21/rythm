@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\HeroSlide;
@@ -12,8 +13,6 @@ use App\Models\Product;
 use App\Observers\HomepageDataObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * Single source of truth for ALL homepage data.
@@ -40,51 +39,7 @@ final class HomepageDataService
      */
     public function all(): array
     {
-        // #region agent log
-        $heroExists = Schema::hasTable('hero_slides');
-        $blocksExists = Schema::hasTable('homepage_blocks');
-        $faqsExists = Schema::hasTable('faqs');
-        $heroMigrationRecorded = DB::table('migrations')->where('migration', 'like', '%hero_slides%')->exists();
-        $dbPath = config('database.connections.sqlite.database');
-        file_put_contents(
-            base_path('debug-2b7ff0.log'),
-            json_encode([
-                'sessionId' => '2b7ff0',
-                'runId' => 'pre-fix',
-                'hypothesisId' => 'A',
-                'location' => 'HomepageDataService.php:all',
-                'message' => 'homepage data schema check',
-                'data' => [
-                    'hero_slides_exists' => $heroExists,
-                    'homepage_blocks_exists' => $blocksExists,
-                    'faqs_exists' => $faqsExists,
-                    'hero_migration_recorded' => $heroMigrationRecorded,
-                    'sqlite_database' => $dbPath,
-                    'default_connection' => config('database.default'),
-                ],
-                'timestamp' => (int) (microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
         return Cache::remember(HomepageDataObserver::CACHE_KEY, 3600, function (): array {
-            // #region agent log
-            file_put_contents(
-                base_path('debug-2b7ff0.log'),
-                json_encode([
-                    'sessionId' => '2b7ff0',
-                    'runId' => 'pre-fix',
-                    'hypothesisId' => 'B',
-                    'location' => 'HomepageDataService.php:cache-callback',
-                    'message' => 'about to query hero_slides',
-                    'data' => ['schema_has_hero_slides' => Schema::hasTable('hero_slides')],
-                    'timestamp' => (int) (microtime(true) * 1000),
-                ])."\n",
-                FILE_APPEND | LOCK_EX
-            );
-            // #endregion
-
             return [
                 'heroSlides' => HeroSlide::query()->where('is_active', true)->orderBy('sort_order')->get(),
                 'promos' => HomepageBlock::query()->section('promo')->get(),
@@ -131,7 +86,7 @@ final class HomepageDataService
                     'casio-ct-s300-portable-keyboard',
                     'numark-mixtrack-pro-fx',
                 ]),
-                'brandNames' => \App\Models\Brand::query()->orderBy('name')->limit(16)->pluck('name'),
+                'brandNames' => Brand::query()->orderBy('name')->limit(16)->pluck('name'),
                 'popularCategories' => $this->popularCategories(),
             ];
         });

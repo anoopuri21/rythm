@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\HeroSlide;
+use App\Models\Product;
+use App\Observers\HomepageDataObserver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 /**
@@ -71,6 +75,17 @@ class HomepageSectionsTest extends TestCase
         $this->assertStringContainsString('Feel the music.', $html);
     }
 
+    public function test_hero_keeps_one_descriptive_h1_when_admin_slides_are_empty(): void
+    {
+        HeroSlide::query()->delete();
+        Cache::forget(HomepageDataObserver::CACHE_KEY);
+
+        $response = $this->get('/')->assertOk()
+            ->assertSee('Find your instrument.', escape: false);
+
+        $this->assertSame(1, substr_count($response->getContent(), '<h1'));
+    }
+
     public function test_usp_strip_renders_without_unapproved_commerce_claims(): void
     {
         $this->get('/')
@@ -127,6 +142,18 @@ class HomepageSectionsTest extends TestCase
             ->assertDontSee('Sold:', escape: false)
             ->assertDontSee('data-deal-timer', escape: false)
             ->assertSee('View product', escape: false);
+    }
+
+    public function test_empty_product_collections_do_not_render_broken_sections(): void
+    {
+        Product::query()->delete();
+        Cache::forget(HomepageDataObserver::CACHE_KEY);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('id="new-arrivals"', escape: false)
+            ->assertDontSee('class="deal-mm"', escape: false)
+            ->assertDontSee('class="launch-mm"', escape: false);
     }
 
     public function test_category_banners_section_renders(): void

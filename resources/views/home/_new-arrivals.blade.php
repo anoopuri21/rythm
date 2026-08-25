@@ -3,6 +3,7 @@
     $products = $homepage['newArrivals'] ?? collect();
 @endphp
 
+@if($products->isNotEmpty())
 {{-- ============================================================
      NEW ARRIVAL PRODUCTS — centered heading + responsive grid
      Desktop 5 cols · 1024: 4 · 640: 3 · mobile: 2
@@ -23,3 +24,4 @@
         </div>
     </div>
 </section>
+@endif

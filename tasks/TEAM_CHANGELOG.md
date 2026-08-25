@@ -180,6 +180,16 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Visual-only drawer → Contained accessible dialog** — Added dynamic expanded state, focus entry/restoration, focus/scroll trapping and complete tab/panel relationships.
 - **Chunk 1 gates passed** — 46 tests / 190 assertions, production Vite build, changed-PHP syntax/Pint and diff checks passed.
 
+## 25 August 2026 — Phase 3 Chunk 2 Homepage Fidelity
+
+- **Five-column desktop products → Six-column measured density** — Homepage product sections now use six cards at the 1440px reference width, then step down through five/four/three/two and a 320px one-column fallback.
+- **Two-column mobile benefits → Compact vertical benefit rows** — Matches the accepted 390px composition and preserves touch/readability.
+- **Four forced mobile hero panels → Prioritized three-panel composition** — The lowest-priority fourth campaign is hidden on mobile; desktop retains the full split marketplace hero.
+- **Uniform deal cards → Large lead deal plus three supporting cards** — Uses real product/stock data only; no synthetic urgency returned.
+- **Broken empty sections → Data-aware rendering** — New Arrivals, Deals, Recently Launched, Categories and Brands now avoid empty shells; the hero keeps exactly one descriptive fallback `h1` if admin slides are empty.
+- **Request-time debug writes → Removed** — Deleted obsolete homepage service instrumentation that wrote schema/database details to a local log on every request.
+- **Chunk 2 gates passed** — Homepage/CMS suite: 37 tests / 157 assertions; production build, changed-PHP syntax/Pint and diff checks passed.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

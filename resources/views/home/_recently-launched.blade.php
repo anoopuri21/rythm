@@ -6,6 +6,7 @@
         ->values();
 @endphp
 
+@if($products->isNotEmpty())
 {{-- ============================================================
      RECENTLY LAUNCHED — tall banner + category links + products
      Reference layout: [banner][link list][2x3 product cards]
@@ -48,3 +49,4 @@
         </div>
     </div>
 </section>
+@endif

@@ -3,6 +3,7 @@
     $cats = $homepage['popularCategories'] ?? collect();
 @endphp
 
+@if($cats->isNotEmpty())
 {{-- ============================================================
      POPULAR CATEGORIES — carousel of category tiles
      Centered heading · Swiper carousel (6/5/4/3/2.3 per view)
@@ -43,3 +44,4 @@
         </div>
     </div>
 </section>
+@endif

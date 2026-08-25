@@ -3,6 +3,7 @@
     $deals = $homepage['dealsOfDay'] ?? collect();
 @endphp
 
+@if($deals->isNotEmpty())
 {{-- ============================================================
      DEALS OF THE DAY — sale cards with real current stock.
      Synthetic sold counts and unbacked countdowns are intentionally
@@ -26,7 +27,13 @@
                     <div class="pcard__media">
                         <span class="pcard__badge">Sale!</span>
                         <a href="{{ $href }}" class="pcard__img" aria-label="{{ $product->name }}" tabindex="-1">
-                            <img src="{{ $image }}" alt="{{ $product->name }}" width="600" height="600" loading="lazy" decoding="async">
+                            @if($image)
+                                <img src="{{ $image }}" alt="{{ $product->name }}" width="600" height="600" loading="lazy" decoding="async">
+                            @else
+                                <span class="pcard__img-fallback" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3"/></svg>
+                                </span>
+                            @endif
                         </a>
                         <a href="{{ $href }}" class="pcard__view">View product</a>
                     </div>
@@ -53,3 +60,4 @@
         </div>
     </div>
 </section>
+@endif
