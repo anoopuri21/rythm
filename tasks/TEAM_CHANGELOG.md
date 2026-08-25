@@ -220,6 +220,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Remediation gates passed** — Full regression **233 tests / 811 assertions**; targeted regression **58 / 255**; Blade compilation, production build, changed-PHP syntax/Pint, Composer audit and npm audit pass.
 - **Phase 3 remains `BLOCKED`** — Replacement post-fix captures plus isolated populated-catalogue visual evidence are required. Persistent `rhythm_db` remains protected from sample seeding or destructive reset. Auto Mode paused at this genuine external gate; Agent 10 remains inactive.
 
+## 25 August 2026 — Phase 3 Chunk 5 Isolated Populated Preview
+
+- **Second owner evidence reviewed** — Seven post-remediation files have exact requested DPR-2 widths: Shop 1440/768/390/320 and Homepage 768/390/320. The Homepage desktop JPEG is 1600px wide and cannot prove the required 1440 CSS px/DPR2 layout.
+- **Corrected empty-state surfaces qualified** — The screenshots show truthful catalogue preparation, removed unsupported links/claims, readable responsive stacking and no observed horizontal canvas expansion at 768/390/320.
+- **Empty persistent catalogue → Isolated visual fixture** — Created an ignored SQLite fixture containing 33 active products, 32 active categories and 24 active brands. `migrate:fresh --seed` targeted only that explicit isolated file; persistent `rhythm_db` was not connected to, reset or seeded.
+- **Populated Arena preview started** — Current committed Homepage and Shop render against the fixture with production assets over the preview origin. Shop reports 33 instruments and renders the populated result grid.
+- **Auto Mode paused at final external gate** — Four full-page populated captures remain required: Homepage and Shop at 1440/DPR2 and 390/DPR2. Phase 3 and production readiness remain unapproved; Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

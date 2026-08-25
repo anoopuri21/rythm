@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 3 post-remediation rendered-evidence blocker
+**Status:** PAUSED — Phase 3 isolated populated-preview capture blocker
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,14 +147,15 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — the owner activated Chunk 5, Agent 0 reviewed the first eight captures and completed remediation, then Auto Mode automatically paused at the replacement-render gate.
+- **Active:** No — the owner reactivated Chunk 5, Agent 0 qualified seven exact-width post-fix captures and created the isolated populated preview, then Auto Mode automatically paused at the final external capture gate.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, and Phase 2 MySQL Schema + Domain Architecture (`COMPLETE`)
 - **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`BLOCKED`)
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
 - **Independent evidence:** Chunks 1–4 pass; post-review remediation passes **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories.
-- **First-render result:** responsive empty/static surfaces were evidenced, but unsupported claims/links and misleading empty-catalogue behavior were found and remediated. The Homepage desktop capture was 1400 CSS px rather than 1440.
-- **Blocker:** no screenshot-capable browser exists in the agent environment; post-remediation captures plus populated-catalogue presentation evidence are mandatory and cannot be inferred from the empty persistent catalogue.
-- **Required owner action:** pull/build the remediation and supply replacement Homepage/Shop captures at 1440, 768, 390 and 320 CSS px; Homepage desktop must be a true 1440 CSS px capture.
-- **Resume action:** after supplying replacement visual evidence, issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
+- **Post-fix empty-state result:** Shop 1440/768/390/320 and Homepage 768/390/320 have exact DPR-2 widths and show corrected truthful responsive states without observed horizontal expansion. The Homepage desktop JPEG is 1600px wide and does not satisfy the required 2880px output.
+- **Isolated populated fixture:** ignored SQLite file only; 33 active products, 32 active categories and 24 active brands; persistent `rhythm_db` was not connected to or modified. Arena live preview is running against this fixture.
+- **Blocker:** no screenshot-capable browser exists in the agent environment; populated Homepage and Shop captures at 1440/DPR2 and 390/DPR2 are required from the live preview.
+- **Required owner action:** capture four full-page live-preview files: Homepage and Shop at 1440 × 900/DPR2 and 390 × 844/DPR2.
+- **Resume action:** upload the four captures and issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
 - **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
 - **Deployment:** Agent 10 remains inactive.

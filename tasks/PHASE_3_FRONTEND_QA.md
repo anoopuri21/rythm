@@ -1,7 +1,7 @@
 # Phase 3 — Homepage + Shop Frontend QA
 
 **Date:** 25 August 2026
-**Status:** FIRST RENDER REVIEWED / REMEDIATION PASSED / REPLACEMENT VISUAL EVIDENCE PENDING
+**Status:** POST-REMEDIATION EMPTY-STATE EVIDENCE REVIEWED / POPULATED VISUAL EVIDENCE PENDING
 **Target:** Homepage and Shop at 1440 × 900, 768 × 1024, 390 × 844 and 320px width
 
 ## 1. Implemented Contract
@@ -69,12 +69,44 @@ Post-remediation independent evidence:
 - Composer audit: no advisories; npm audit: zero vulnerabilities.
 - Unsupported-claim scan must remain clean before commit.
 
-## 5. Remaining Visual and Data Gate
+## 5. Post-Remediation Owner Evidence Review — 25 August 2026
 
-Replacement post-remediation Homepage and Shop captures are required at 1440, 768, 390 and 320 CSS px. The Homepage desktop capture must be a true 1440 CSS px / 2880 physical px at DPR 2.
+The owner supplied eight new full-page files after pulling commit `49e932e`. Seven captures have the exact requested DPR-2 width; the replacement Homepage desktop file is a 1600px-wide JPEG and therefore does not qualify as 1440 CSS px / 2880 physical px evidence.
 
-The persistent project/UAT catalogue currently contains no products, categories or brands. Therefore these captures can validate responsive empty-state/static surfaces, but cannot substantiate populated Homepage sections, product-card density, Shop four-column results, or data-driven facets. This is a bounded but unresolved Phase 3 acceptance limitation. It must be closed with isolated non-persistent rendered evidence or explicitly carried as an acceptance blocker; persistent `rhythm_db` must not be destructively reset or sample-seeded.
+| Surface / requested CSS width | Physical dimensions | SHA-256 | Qualification |
+|---|---:|---|---|
+| Homepage / desktop | 1600 × 3116 JPG | `799629cf004349fef8774eca9588781f8fca783c6694e6ef6006693fbe59994d` | Does not establish the required 1440 CSS px DPR-2 width |
+| Homepage / 768 | 1536 × 8816 | `127f6c3c6a5854f274f86adc9bdd4c162946ebc2294b76c1daa005762cf3bfdc` | Qualified empty/static-state width |
+| Homepage / 390 | 780 × 10856 | `33967698c2a1a869d95a72e2c130baf6449aadf7f7769a4882d65c391b6f618f` | Qualified empty/static-state width |
+| Homepage / 320 | 640 × 11596 | `9560e0bbed5e0255746305ee074f7c6c6c14955663f04b5dfb8dd72f2d539152` | Qualified empty/static-state width |
+| Shop / 1440 | 2880 × 4488 | `164ee4418aeb63f44c075b18efafc7d62fe0cf742620c640f24ff2c2728ed1da` | Qualified empty-state width |
+| Shop / 768 | 1536 × 4992 | `a19fb74892c29ce4a6ca11d05750af7bc84bc8236a441a46bb400a07858da587` | Qualified empty-state width |
+| Shop / 390 | 780 × 5394 | `cbec1cf2e498ac22c4591e1897fbfde5a0eb7f6ae9cea1ec21b3c401512450f8` | Qualified empty-state width |
+| Shop / 320 | 640 × 5852 | `53e88eff86247541ec6096b8d341b394979d8388510bc8c2a9724265f5cd2aa8` | Qualified empty-state width |
 
-## 6. Gate Decision
+Visual review confirms the corrected catalogue-preparation state, removed unsupported claims/links, readable responsive stacking and no observed horizontal canvas expansion at 768, 390 or 320. The evidence remains an empty-catalogue review and cannot prove product-card density or data-driven sections.
 
-Chunks 1–4 remain independently green. Chunk 5 remediation is locally green, but replacement visual evidence and populated-catalogue presentation evidence remain outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.
+## 6. Isolated Populated Visual Fixture
+
+After the owner reactivated Auto Mode, Agent 0 created `storage/app/phase3-visual-fixture.sqlite`, which is ignored by Git and isolated from all configured project/UAT data. Only this explicit SQLite file was targeted with `migrate:fresh --seed`; persistent `rhythm_db` was not connected to, altered, reset or seeded.
+
+Fixture inventory:
+
+- 33 active products
+- 32 active categories
+- 24 active brands
+
+The current committed storefront is running against that isolated fixture in the Arena live preview. Homepage and Shop HTML both render successfully; Shop reports 33 instruments and emits the populated product grid. A production Vite build supplies preview assets over the HTTPS preview origin.
+
+## 7. Remaining Visual Gate
+
+Capture the populated live-preview Homepage and Shop at:
+
+- 1440 × 900 CSS px, DPR 2 (2880px output width)
+- 390 × 844 CSS px, DPR 2 (780px output width)
+
+The populated 1440 Homepage capture will also replace the invalid 1600px desktop file. Existing post-remediation 768/320 evidence remains valid for empty-state overflow/readability; populated 1440/390 evidence is the minimum remaining density/card/facet gate.
+
+## 8. Gate Decision
+
+Chunks 1–4 remain independently green. Chunk 5 remediation and empty-state review are green within the recorded evidence limits. Populated 1440/390 rendered evidence remains outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.

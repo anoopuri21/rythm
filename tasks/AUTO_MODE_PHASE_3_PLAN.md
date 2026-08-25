@@ -2,7 +2,7 @@
 
 **Activated:** 25 August 2026
 **Mode:** Autonomous
-**Status:** BLOCKED — Chunks 1–4 complete; first Chunk 5 render remediated; replacement and populated-catalogue evidence required
+**Status:** BLOCKED — Chunks 1–4 and remediation complete; isolated populated preview ready; 1440/390 captures required
 **Primary agents:** Agent 2 (frontend), Agent 1 (visual fidelity), Agent 9 (QA), Agent 13 (accessibility/SEO)
 **Review authority:** Agent 0
 **Total chunks:** 5
