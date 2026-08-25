@@ -1,6 +1,6 @@
 # Phase 1 — Homepage + Shop Design Specification
 
-**Status:** DRAFT COMPLETE / VISUAL METRICS BLOCKED
+**Status:** COMPLETE — accepted by Agent 0 on 25 August 2026
 **Owners:** Agent 1 (specification), Agent 2 (feasibility), Agent 13 (accessibility/SEO)
 **Final acceptance:** Agent 0 only
 **Brand:** Rythme / Rhythm Exports
@@ -9,7 +9,7 @@
 
 Use the XStore Electronic Mega Market references for information hierarchy, marketplace density and component composition. Retain Rythme identity, Indian currency/context and musical-instrument taxonomy. Do not reproduce reference products, imagery, copy, trademarks or theme code.
 
-The owner confirmed **Current Logo First**: retain the existing Rythme / Rhythm Exports logo treatment. Final color direction will be decided after reference screenshot comparison. Current monochrome tokens remain a provisional implementation baseline, not final color approval. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
+The owner confirmed **Current Logo First** and then selected **Reference Teal** after screenshot comparison. Retain the existing Rythme / Rhythm Exports logo treatment and use the measured teal accent in the storefront visual system. All future visual changes must use semantic tokens rather than hardcoded view-level colors.
 
 ## 2. Responsive Verification Viewports
 
@@ -20,7 +20,7 @@ Implementation and visual comparison must include:
 - Mobile: 390 × 844 viewport.
 - Additional overflow check: 320px width.
 
-Reference screenshots are required at 1440px and 390px before exact geometry is locked. Tablet behavior may then be interpolated conservatively and verified independently.
+Owner-supplied 1440px and 390px DPR-2 reference screenshots are accepted and measured in `tasks/PHASE_1_SCREENSHOT_MEASUREMENTS.md`. Tablet behavior may be interpolated conservatively between those anchors and verified independently.
 
 ## 3. Shared Header Contract
 
@@ -123,18 +123,29 @@ Do not activate the existing Stories partial just to mimic reference density. It
 - Loading skeletons reserve final card dimensions and are hidden from assistive technology.
 - Empty state includes one clear reset action.
 
-## 6. Design Tokens Pending Measurement
+## 6. Approved Design-token Direction
 
-The implementation phase must lock these in semantic tokens after reference/brand evidence arrives:
+The owner selected the measured **Reference Teal** direction while retaining the current logo. Phase 3 must implement these as semantic tokens and may tune only secondary shades during contrast/visual regression review:
 
-- Container maximum width and horizontal gutters.
-- Surface, text, border, focus and status colors.
-- Type family, weights and scale.
-- 4/8px-based spacing scale or measured alternative.
-- Border radii for controls, cards and banners.
-- Shadow/elevation levels.
-- Transition durations/easing and reduced-motion alternatives.
-- Breakpoints based on content fit, with current 640/768/1024 values treated as provisional.
+| Role | Approved value/direction |
+|---|---|
+| Primary accent | `#00796B` |
+| Accent hover/strong | `#005F55` |
+| Accent soft surface | `#E7F4F1` |
+| Main text / dark footer | `#222222` |
+| Main surface | `#FFFFFF` |
+| Alternate section surface | `#F7F7F8` |
+| Neutral border | `#E5E7EB` |
+| Focus indication | high-contrast teal/dark ring with at least 3:1 adjacent contrast |
+
+White on `#00796B` measures approximately **5.32:1**, and white on `#005F55` approximately **7.59:1**, passing WCAG AA for normal text. Main `#222222` text on white measures approximately **15.91:1**.
+
+Additional Phase 3 token work:
+
+- Align Homepage and Shop to the shared near-full-width marketplace container evidenced at 1440px.
+- Retain content-fit breakpoints around current 640/768/1024 anchors, then verify at 320/390/768/1440.
+- Define typography, spacing, radii, shadows and motion as semantic tokens from screenshot proportions; do not hardcode them in Blade views.
+- Preserve reduced-motion alternatives and avoid using teal as the sole indicator of state.
 
 ## 7. Accessibility Acceptance (WCAG 2.2 AA)
 
@@ -192,10 +203,10 @@ The implementation phase must lock these in semantic tokens after reference/bran
 - [x] Responsive behavior contract drafted.
 - [x] Accessibility and technical SEO contract drafted.
 - [x] Phase 2/3 dependencies identified.
-- [ ] Desktop and mobile reference screenshots supplied and measured.
+- [x] Desktop and mobile reference screenshots supplied and measured.
 - [x] Current Rythme / Rhythm Exports logo treatment retained (owner: “Current Logo First”).
-- [ ] Final color direction confirmed after screenshot comparison.
-- [ ] Visual tokens updated from evidence.
-- [ ] Agent 0 final design-spec acceptance.
+- [x] Final color direction confirmed: Reference Teal `#00796B`.
+- [x] Design-token direction updated from evidence with WCAG contrast checks.
+- [x] Agent 0 final design-spec acceptance.
 
-Until the remaining screenshot/color/token/acceptance items are complete, Phase 1 remains `BLOCKED` and no pixel-perfect claim is permitted.
+Phase 1 is complete. Pixel accuracy remains an implementation claim that must be proven by Phase 3 side-by-side desktop/mobile visual regression; this specification alone does not claim the current storefront already matches.

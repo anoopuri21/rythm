@@ -119,6 +119,22 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Brand direction: Current Logo First** — Owner confirmed retention of the existing Rythme / Rhythm Exports logo treatment; current monochrome tokens remain provisional until screenshot comparison.
 - **Auto Mode active → Automatically paused at genuine design-evidence blocker** — Independent work is complete; Phase 2/3 implementation dependencies are documented. Agent 10 remains inactive.
 
+## 25 August 2026 — Phase 1 Screenshot Evidence Accepted
+
+- **Missing viewport evidence → Four DPR-2 captures accepted** — Owner supplied Homepage and Shop screenshots at physical widths 2880px and 780px, matching requested 1440px and 390px CSS viewports at DPR 2.
+- **Third-party screenshots → Hash-only repository evidence** — PNG dimensions and SHA-256 identities are recorded in `PHASE_1_SCREENSHOT_MEASUREMENTS.md`; reference imagery itself is not committed or republished.
+- **Reference palette measured** — Primary accent `#00796B`, dark/footer approximately `#222222`, white surfaces and soft `#F5F5F5`–`#F7F7F8` sections.
+- **Screenshot gate: PASSED** — Desktop/mobile composition, density and responsive behavior can now guide Phase 3. Mobile Homepage capture truncation after Popular Brands does not omit any active Rythme Homepage contract section.
+- **Remaining Phase 1 decision:** current monochrome tokens versus measured teal accent while retaining the current Rythme logo.
+
+## 25 August 2026 — Phase 1 Design Specification Accepted
+
+- **Monochrome vs. teal checkpoint → Reference Teal selected** — Owner selected measured reference accent `#00796B` while retaining the current Rythme / Rhythm Exports logo.
+- **Accessible token direction locked** — Primary `#00796B`, strong `#005F55`, soft `#E7F4F1`, text/footer `#222222`, surface `#FFFFFF`, alternate surface `#F7F7F8`, border `#E5E7EB`; white/primary contrast is approximately 5.32:1.
+- **Phase 1 `BLOCKED` → `COMPLETE`** — Agent 0 accepted structural, screenshot, responsive, accessibility, SEO and implementation-handoff evidence.
+- **Specification acceptance ≠ current pixel match** — Phase 3 must implement and prove side-by-side desktop/mobile visual regression. No claim is made that the current storefront already matches.
+- **Auto Mode active → Paused at full-phase boundary** — Next phase is Phase 2 MySQL schema/migrations/domain architecture. Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

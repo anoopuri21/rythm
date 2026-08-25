@@ -14,7 +14,7 @@
 | C — inferred | Visual behavior is suggested but not measured | Must not be called pixel-accurate |
 | BLOCKED | A browser screenshot/computed style or owner asset is required | Cannot close Phase 1 |
 
-No Grade A visual geometry has been obtained from the live reference. The fetched page proves hierarchy and content, not pixel dimensions, typography, spacing, color, breakpoint behavior or hover/focus styling.
+Owner-supplied 1440px and 390px DPR-2 screenshots now provide Grade A viewport evidence. See `tasks/PHASE_1_SCREENSHOT_MEASUREMENTS.md`. Semantic extraction remains the source for text/control hierarchy; screenshots provide composition, density, palette and responsive evidence.
 
 ## 2. Reference Homepage — Observed Structure (Grade B)
 
@@ -109,17 +109,11 @@ The following are current implementation values, not reference measurements:
 
 These values must not be treated as approved reference values until screenshot comparison is available.
 
-## 5. Evidence Gaps Blocking Pixel-fidelity Acceptance
+## 5. Final Acceptance Decision
 
-Required evidence still missing:
+The four requested viewport captures were supplied and accepted. PNG widths are exactly 2880 and 780 physical pixels, consistent with the requested 1440px and 390px viewports at DPR 2. The mobile Homepage capture is capped at 16384 physical pixels but contains every active reference section required for the Rythme Homepage contract through Popular Brands.
 
-- Full-page Homepage screenshot at 1440px desktop width.
-- Full-page Homepage screenshot at 390px mobile width.
-- Full-page Shop screenshot at 1440px desktop width.
-- Full-page Shop screenshot at 390px mobile width.
-- Browser zoom at 100% and no translation/accessibility text scaling during capture.
-- Final brand color direction. The owner has confirmed “Current Logo First,” so the existing Rythme / Rhythm Exports logo treatment is retained.
-- Reference computed font families/sizes, container widths, spacing, border radii, colors and responsive transition points, or screenshots clear enough to measure them.
+The owner retained the current logo and selected the measured Reference Teal accent (`#00796B`). Screenshot/reference evidence is sufficient for Phase 1 specification acceptance. Exact font rendering and pixel accuracy will be validated during Phase 3 visual implementation rather than inferred from raster anti-aliasing.
 
 ## 6. Legal/Content Boundary
 
