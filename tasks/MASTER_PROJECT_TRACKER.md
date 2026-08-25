@@ -31,6 +31,8 @@
 | Auto Mode pause | `PAUSE AUTO MODE`, genuine blocker, or full roadmap phase completion |
 | Active integration branch | `rhythm-uat` until the owner requests another branch or Agent 0 records a justified branch change |
 | Code-task completion | After applicable local tests pass, commit and push the latest code to the active branch and provide a commit report; push/auth failures must be reported, never concealed |
+| Owner assistance standard | Assume the owner is non-technical: minimize manual work and provide every unavoidable manual action as short, numbered, copy-safe steps |
+| Working database policy | Use a persistent project/UAT MySQL 8 database for application data; do not label it demo/practice. Destructive automated tests still require isolation and may never erase persistent or production data |
 
 ---
 
@@ -261,4 +263,4 @@ Completed and independently reviewed on 25 August 2026:
 
 ## 10. Recommended Next Action
 
-Run at minimum `php artisan migrate:fresh --seed --force` against the empty local `rythme_acceptance` database and provide the redacted result. Credentials must remain in the ignored local `.env` or process environment. The acceptance database must not receive real customer/catalog data and must never be treated as production. After this mandatory gate passes, Agent 0 may close Phase 0B and start the next approved phase. Deployment remains inactive.
+Treat the currently empty MySQL 8 database as the persistent UAT/project database and run the non-destructive initial command `php artisan migrate --force`; do not run `migrate:fresh` or automated `RefreshDatabase` tests against it. Credentials stay in the ignored local `.env` or process environment. Existing sample seeders are not approved as real catalog data; real data import remains gated by the catalog source/legal/import phases. Phase 0B remains blocked until redacted MySQL migration evidence is available. Deployment remains inactive.

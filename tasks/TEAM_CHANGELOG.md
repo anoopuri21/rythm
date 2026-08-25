@@ -94,6 +94,13 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **MySQL identity evidence accepted partially** — Owner reports MySQL Community Server 8.4.3 and an empty `rythme_acceptance` database. This proves engine identity, not application migration compatibility.
 - **Request to skip database gate → Not accepted as phase completion evidence** — Auto Mode cannot waive mandatory quality gates. `rythme_acceptance` remains disposable and must not receive real data before migration/schema and later catalog/deployment gates.
 
+## 25 August 2026 — Owner Assistance and Persistent Database Rules
+
+- **Developer-oriented instructions → Guided owner workflow** — The owner is non-technical. Agent 0 must minimize manual actions and present unavoidable work as short numbered steps with exact labels/commands and safety warnings.
+- **Disposable/demo application database → Persistent project/UAT database** — Normal application migrations and approved data imports target a persistent MySQL 8 project database. It must not be described as a demo/practice database.
+- **Persistent database → Never a destructive test target** — The request does not authorize `migrate:fresh`, `RefreshDatabase`, or destructive automated suites against persistent/production data. Database qualification must use non-destructive initial migration evidence or an isolated test schema.
+- **Exposed PAT → Not stored or replayed through visible agent commands** — Repository URL was recovered from README and `origin` configured. Because this environment has no secret-input channel, Git authentication will use a repository-scoped writable deploy key instead of placing the exposed PAT into command logs.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

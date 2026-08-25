@@ -15,17 +15,15 @@ SELECT VERSION() AS server_version, @@version_comment AS version_comment;
 
 Acceptance requires Oracle MySQL 8.x. Typical acceptable output identifies `MySQL Community Server - GPL` with an `8.x` version. Output identifying MariaDB is not acceptable, regardless of client compatibility.
 
-## 2. Create a disposable database
+## 2. Persistent project/UAT database
 
-Create an empty database used only for destructive automated qualification:
+The owner created `rythme_acceptance` and elected to use the MySQL database as the persistent project/UAT database rather than a demo/practice target. Despite its current name, treat it as persistent data:
 
-```sql
-CREATE DATABASE rythme_acceptance
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-```
-
-Create or select a least-privilege test user that has full rights only on `rythme_acceptance`. Do not use a production database, production credentials, or a database containing user data.
+- Never run `migrate:fresh`, `db:wipe`, or `RefreshDatabase` tests against it.
+- Apply schema forward with `php artisan migrate --force`.
+- Back up before any later destructive or data-transforming migration.
+- Use a least-privilege application user scoped to this database.
+- Do not import sample/competitor/production catalog data until its source, rights, validation, and import workflow are approved.
 
 ## 3. Inject credentials locally
 
@@ -47,19 +45,19 @@ $env:DB_USERNAME = "<local-test-user>"
 $env:DB_PASSWORD = "<local-secret>"
 ```
 
-## 4. Run the destructive acceptance gate
+## 4. Run the persistent UAT migration
 
-From the project root, after confirming the selected database is disposable:
+From the project root:
 
 ```bash
 php artisan config:clear
-php artisan migrate:fresh --seed --force
-php artisan test --testsuite=Feature
+php artisan migrate --force
+php artisan migrate:status
 ```
 
-Tests must run sequentially. Do not use parallel test workers against one shared acceptance database.
+Do not run the automated feature suite against this persistent database because many tests intentionally reset database state. Existing automated regression continues on the isolated SQLite test stack until a separate isolated MySQL test schema is approved and available.
 
-The final Agent 0 gate will additionally run:
+The standard independent code gates remain:
 
 ```bash
 php artisan test
@@ -74,7 +72,7 @@ npm run build
 - Migration and seeder result.
 - Exact test and assertion counts.
 - Any MySQL-specific SQL errors and their fixes.
-- Confirmation that the target database was disposable.
+- Confirmation that forward migrations completed without erasing the persistent UAT database.
 
 ## 6. Shared-hosting rule
 

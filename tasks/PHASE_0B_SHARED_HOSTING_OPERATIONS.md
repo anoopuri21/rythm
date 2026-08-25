@@ -29,7 +29,7 @@ SELECT VERSION() AS server_version, @@version_comment AS version_comment;
 ```
 
 - MariaDB, even when accessible through phpMyAdmin or HeidiSQL and largely protocol-compatible, does not satisfy the exact MySQL 8 gate.
-- Phase 0B qualification uses an empty disposable MySQL 8 database. Production/cPanel data must never be targeted by `migrate:fresh` or destructive tests.
+- The owner-selected MySQL 8 project/UAT database is persistent. Apply forward migrations with `php artisan migrate --force`; never target persistent UAT or production/cPanel data with `migrate:fresh`, `db:wipe`, `RefreshDatabase`, or destructive tests.
 
 ## Cron contract
 
