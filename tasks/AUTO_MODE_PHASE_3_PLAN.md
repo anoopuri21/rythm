@@ -2,7 +2,7 @@
 
 **Activated:** 25 August 2026
 **Mode:** Autonomous
-**Status:** BLOCKED — Chunks 1–4 complete; rendered visual evidence required for Chunk 5
+**Status:** BLOCKED — Chunks 1–4 complete; first Chunk 5 render remediated; replacement and populated-catalogue evidence required
 **Primary agents:** Agent 2 (frontend), Agent 1 (visual fidelity), Agent 9 (QA), Agent 13 (accessibility/SEO)
 **Review authority:** Agent 0
 **Total chunks:** 5
@@ -39,6 +39,9 @@
 - Commit and push independently green implementation to `rhythm-uat`.
 - Compare current Homepage and Shop at 1440 × 900, 768 × 1024, 390 × 844 and 320px against accepted reference measurements.
 - Fix measurable implementation regressions, record evidence and update governance.
+- First owner render reviewed: responsive empty/static surfaces were visible; unsupported footer/hero claims, unapproved links and misleading empty-catalogue behavior were remediated.
+- Replacement post-remediation captures are required, including a true 1440 CSS px Homepage desktop capture.
+- Populated Homepage/product-card/Shop density remains unproven because persistent UAT catalogue data is empty; close this with isolated non-persistent evidence without altering `rhythm_db`.
 - Agent 0 accepts Phase 3 only after desktop/mobile rendered evidence supports the fidelity claim. Deployment remains inactive.
 
 ## Phase Gate

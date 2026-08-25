@@ -168,12 +168,17 @@ class DynamicCmsTest extends TestCase
             ->count());
         $this->assertSame('Second', $product->seoEntry->meta_title);
     }
-    public function test_support_pages_render(): void
+
+    public function test_only_approved_support_pages_are_public(): void
     {
-        foreach (['shipping', 'returns', 'warranty', 'faqs', 'terms', 'privacy'] as $slug) {
+        foreach (['terms', 'privacy'] as $slug) {
             $this->get('/'.$slug)
                 ->assertOk()
                 ->assertSee('Rhythm Exports', escape: false);
+        }
+
+        foreach (['shipping', 'returns', 'warranty', 'faqs'] as $slug) {
+            $this->get('/'.$slug)->assertNotFound();
         }
     }
 
@@ -194,15 +199,15 @@ class DynamicCmsTest extends TestCase
         $this->assertSame(1, substr_count($html, 'id="footer"'));
     }
 
-    public function test_footer_links_to_dynamic_slugs(): void
+    public function test_footer_links_only_to_approved_dynamic_policy_slugs(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('/shipping', escape: false)
-            ->assertSee('/returns', escape: false)
-            ->assertSee('/warranty', escape: false)
-            ->assertSee('/faqs', escape: false)
             ->assertSee('/terms', escape: false)
-            ->assertSee('/privacy', escape: false);
+            ->assertSee('/privacy', escape: false)
+            ->assertDontSee('/shipping', escape: false)
+            ->assertDontSee('/returns', escape: false)
+            ->assertDontSee('/warranty', escape: false)
+            ->assertDontSee('/faqs', escape: false);
     }
 }

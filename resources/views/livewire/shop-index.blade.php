@@ -1,5 +1,6 @@
 <div class="mx-auto max-w-[1520px] px-4 py-8 sm:px-6 lg:px-8" x-data="{ mobileFilters: false }"
      @keydown.escape.window="if (mobileFilters) { mobileFilters = false; $nextTick(() => $refs.filterTrigger.focus()) }">
+    @if($catalogHasProducts && $categories !== [])
     <section class="mb-8 border-b border-ink/10 pb-8" aria-labelledby="shop-shortcuts-title">
         <div class="mb-5 flex items-end justify-between gap-4">
             <div>
@@ -23,10 +24,12 @@
             @endforeach
         </div>
     </section>
+    @endif
 
-    <div class="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8 xl:gap-10">
+    <div class="{{ $catalogHasProducts ? 'lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8 xl:gap-10' : '' }}">
 
         {{-- ===== FILTER SIDEBAR ===== --}}
+        @if($catalogHasProducts)
         {{-- Mobile overlay --}}
         <div x-cloak x-show="mobileFilters" x-transition.opacity.duration.200ms
              class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden"
@@ -230,9 +233,11 @@
                 </button>
             @endif
         </aside>
+        @endif
 
         {{-- ===== RESULTS ===== --}}
         <section aria-label="Products">
+            @if($catalogHasProducts)
             {{-- Mobile toolbar --}}
             <div class="mb-6 flex items-center gap-3 lg:hidden">
                 <button x-ref="filterTrigger" type="button"
@@ -282,6 +287,7 @@
                 </div>
             </div>
             <p class="sr-only lg:hidden" role="status" aria-live="polite" aria-atomic="true">{{ $products->total() }} instruments found</p>
+            @endif
 
             {{-- Active filter chips --}}
             @if($activeFilterCount > 0)
@@ -368,16 +374,26 @@
             {{-- Product grid --}}
             <div wire:loading.remove.delay.shortest>
                 @if($products->isEmpty())
-                    <div class="rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-24 text-center">
+                    <div class="rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-20 text-center sm:py-24">
                         <p class="text-5xl" aria-hidden="true">🎸</p>
-                        <h2 class="mt-6 font-playfair text-2xl text-ink">Nothing matches those filters</h2>
-                        <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
-                            Try removing a filter or two — or explore our best sellers below.
-                        </p>
-                        <button type="button" wire:click="clearFilters"
-                                class="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
-                            Clear all filters
-                        </button>
+                        @if($catalogHasProducts)
+                            <h2 class="mt-6 font-playfair text-2xl text-ink">Nothing matches those filters</h2>
+                            <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
+                                Try removing a filter or search term to see more instruments.
+                            </p>
+                            <button type="button" wire:click="clearFilters"
+                                    class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                                Clear all filters
+                            </button>
+                        @else
+                            <h2 class="mt-6 font-playfair text-2xl text-ink">The catalogue is being prepared</h2>
+                            <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
+                                Product information will appear here after the approved catalogue is added.
+                            </p>
+                            <a href="{{ route('home') }}" class="mt-8 inline-flex min-h-11 items-center rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                                Return to homepage
+                            </a>
+                        @endif
                     </div>
                 @else
                     <div class="shop-product-grid">

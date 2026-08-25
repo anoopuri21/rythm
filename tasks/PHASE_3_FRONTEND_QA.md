@@ -1,7 +1,7 @@
 # Phase 3 — Homepage + Shop Frontend QA
 
 **Date:** 25 August 2026
-**Status:** INDEPENDENT GATES PASSED / RENDERED VISUAL EVIDENCE PENDING
+**Status:** FIRST RENDER REVIEWED / REMEDIATION PASSED / REPLACEMENT VISUAL EVIDENCE PENDING
 **Target:** Homepage and Shop at 1440 × 900, 768 × 1024, 390 × 844 and 320px width
 
 ## 1. Implemented Contract
@@ -36,19 +36,45 @@
 7. Added a 320px header fallback that removes non-required wishlist chrome while preserving menu, logo, search and cart.
 8. Prevented empty data collections from rendering broken Homepage sections.
 
-## 4. Remaining Visual Gate
+## 4. First Owner-Rendered Evidence Review — 25 August 2026
 
-No Chromium, Chrome, Firefox or screenshot-capable browser executable is available in the agent environment. Source, CSS, compiled assets and automated tests cannot substantiate a pixel-fidelity claim by themselves.
+The owner supplied eight DPR-2 full-page captures. The evidence files remain outside the repository under `/home/user/uploads`; only dimensions and hashes are recorded here.
 
-Owner-rendered current Homepage and Shop evidence is required at:
+| Surface / requested CSS width | Physical dimensions | SHA-256 | Qualification |
+|---|---:|---|---|
+| Homepage / desktop | 2800 × 6326 | `3d9eff9ae1fe99ed4b3844b90b44fa24bc7cd8d2284ce763a66fb901c4b8b219` | 1400 CSS px, not the required 1440 |
+| Homepage / 768 | 1536 × 9220 | `d7b1a16fa9c459bb615d539015b1d9e52222fbc831008c0a5889e2b7de9d3875` | Correct DPR-2 width |
+| Homepage / 390 | 780 × 11626 | `a37c9635f484b1c711302f0d55948ba4804ebe39ffdad4e1d554e116626e6199` | Correct DPR-2 width |
+| Homepage / 320 | 640 × 12264 | `ffba3fea9780b02a533ed25c543d262863d90bab58efafcd2d25e40e13fc15ea` | Correct DPR-2 width |
+| Shop / 1440 | 2880 × 5802 | `43fbdb042378e027936461c8f73a521f7d187a38de8c59686454255bf5cd96b9` | Correct DPR-2 width |
+| Shop / 768 | 1536 × 5786 | `7a651237679828879fe48f89e0c802e142f97fd21065f156e30927cd5c3a6133` | Correct DPR-2 width |
+| Shop / 390 | 780 × 6656 | `b94880c5e9606086617bc33acb2424f7e719f96cc17da262889f8c0aaf538cbb` | Correct DPR-2 width |
+| Shop / 320 | 640 × 6964 | `1926bb71ab540d32961627748112be776fc242943c7ccaea4dbe14c93244d99b` | Correct DPR-2 width |
 
-- 1440 × 900
-- 768 × 1024
-- 390 × 844
-- 320px width (overflow/touch check)
+The tablet/mobile captures show no horizontal canvas expansion and confirm responsive static/empty-state stacking. They also exposed issues that source-level checks had missed:
 
-Agent 0 must compare the current renders with the accepted Phase 1 measurements, record mismatches and either fix them or explicitly accept bounded deviations. Phase 3 remains blocked until this visual evidence is reviewed.
+1. Footer text and links asserted unsupported operating history, brand count, support availability, free setup, expertise/advice, and placeholder social/WhatsApp destinations.
+2. Unapproved shipping, return, warranty and FAQ content was publicly linked.
+3. The Shop described an empty persistent catalogue as a filter mismatch and displayed unusable category/filter chrome.
+4. The Homepage hero described tabla sets as handcrafted and concert-ready without evidence.
 
-## 5. Gate Decision
+The remediation removes those claims and destinations, withholds unapproved public content pages and sitemap entries, gives the Shop a distinct catalogue-preparation state, hides unusable empty-catalogue controls, and replaces the unsupported hero subtitle. Unused legacy Homepage partials carrying additional synthetic claims were removed.
 
-Chunks 1–4 are independently green. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.
+Post-remediation independent evidence:
+
+- Full PHP regression: **233 tests / 811 assertions passed**.
+- Targeted remediation regression: **58 tests / 255 assertions passed**.
+- Production Vite build and Blade compilation: passed.
+- Changed PHP syntax and targeted Pint: passed; full-repository Pint still reports the documented pre-existing baseline outside this change.
+- Composer audit: no advisories; npm audit: zero vulnerabilities.
+- Unsupported-claim scan must remain clean before commit.
+
+## 5. Remaining Visual and Data Gate
+
+Replacement post-remediation Homepage and Shop captures are required at 1440, 768, 390 and 320 CSS px. The Homepage desktop capture must be a true 1440 CSS px / 2880 physical px at DPR 2.
+
+The persistent project/UAT catalogue currently contains no products, categories or brands. Therefore these captures can validate responsive empty-state/static surfaces, but cannot substantiate populated Homepage sections, product-card density, Shop four-column results, or data-driven facets. This is a bounded but unresolved Phase 3 acceptance limitation. It must be closed with isolated non-persistent rendered evidence or explicitly carried as an acceptance blocker; persistent `rhythm_db` must not be destructively reset or sample-seeded.
+
+## 6. Gate Decision
+
+Chunks 1–4 remain independently green. Chunk 5 remediation is locally green, but replacement visual evidence and populated-catalogue presentation evidence remain outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.

@@ -14,6 +14,8 @@ final class PageController extends Controller
 
     public function show(string $slug): View
     {
+        abort_if(in_array($slug, config('rythme.withheld_public_pages', []), true), 404);
+
         $page = Page::query()
             ->where('slug', $slug)
             ->where('is_active', true)

@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\DTOs\ShopFilters;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Services\BrandService;
 use App\Services\CategoryService;
@@ -142,6 +143,7 @@ final class ShopIndex extends Component
 
         return view('livewire.shop-index', [
             'products' => $products,
+            'catalogHasProducts' => Product::query()->active()->exists(),
             'categories' => app(CategoryService::class)->tree(),
             'brands' => app(BrandService::class)->allWithCounts(),
             'attributeFacets' => $attributeFacets,

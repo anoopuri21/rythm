@@ -256,12 +256,19 @@ class ShopPageTest extends TestCase
             ->assertSee('Shop by Category', escape: false);
     }
 
-    public function test_shop_empty_state_shows_clear_button(): void
+    public function test_shop_distinguishes_filtered_empty_state_from_empty_catalogue(): void
     {
+        Livewire::test(ShopIndex::class)
+            ->set('search', 'no-product-can-match-this')
+            ->assertSee('Nothing matches those filters')
+            ->assertSee('Clear all filters');
+
         Product::query()->delete();
 
         Livewire::test(ShopIndex::class)
-            ->assertSee('Nothing matches those filters')
-            ->assertSee('Clear all filters');
+            ->assertSee('The catalogue is being prepared')
+            ->assertSee('Return to homepage')
+            ->assertDontSee('Nothing matches those filters')
+            ->assertDontSee('Shop popular categories');
     }
 }

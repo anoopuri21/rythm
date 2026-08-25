@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 3 rendered visual-evidence blocker
+**Status:** PAUSED — Phase 3 post-remediation rendered-evidence blocker
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,14 +147,14 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — automatically paused at the Phase 3 external visual-evidence gate
+- **Active:** No — the owner activated Chunk 5, Agent 0 reviewed the first eight captures and completed remediation, then Auto Mode automatically paused at the replacement-render gate.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, and Phase 2 MySQL Schema + Domain Architecture (`COMPLETE`)
 - **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`BLOCKED`)
-- **Independent evidence:** normalized catalog facets, inventory movement ledger integration, payment-event/idempotency foundations, clean migration/seed and rollback, **225 tests / 753 assertions**, changed-PHP Pint/syntax and Composer audit all pass.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
-- **Independent evidence:** Chunks 1–4 pass with **232 tests / 800 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories.
-- **Blocker:** no screenshot-capable browser exists in the agent environment; current rendered Homepage/Shop viewport evidence is required for visual comparison.
-- **Required owner action:** build current assets and supply current Homepage/Shop captures at the requested viewports.
-- **Resume action:** after supplying visual evidence, issue exact `ACTIVATE AUTO MODE` for Chunk 5 review.
+- **Independent evidence:** Chunks 1–4 pass; post-review remediation passes **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories.
+- **First-render result:** responsive empty/static surfaces were evidenced, but unsupported claims/links and misleading empty-catalogue behavior were found and remediated. The Homepage desktop capture was 1400 CSS px rather than 1440.
+- **Blocker:** no screenshot-capable browser exists in the agent environment; post-remediation captures plus populated-catalogue presentation evidence are mandatory and cannot be inferred from the empty persistent catalogue.
+- **Required owner action:** pull/build the remediation and supply replacement Homepage/Shop captures at 1440, 768, 390 and 320 CSS px; Homepage desktop must be a true 1440 CSS px capture.
+- **Resume action:** after supplying replacement visual evidence, issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
 - **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
 - **Deployment:** Agent 10 remains inactive.

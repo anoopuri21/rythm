@@ -209,6 +209,17 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 3 `IN PROGRESS` → `BLOCKED`** — No screenshot-capable browser exists in the agent environment. Current owner-rendered Homepage/Shop evidence at 1440/768/390/320 is mandatory before visual-fidelity acceptance.
 - **Auto Mode active → Paused at genuine external visual gate** — Agent 10 remains inactive; no production or Phase 3 completion sign-off issued.
 
+## 25 August 2026 — Phase 3 Chunk 5 First Render Review and Remediation
+
+- **Owner evidence received and measured** — Eight full-page DPR-2 Homepage/Shop captures were hashed and reviewed. The 768/390/320 widths are valid; Shop desktop is a valid 1440 CSS px capture, while Homepage desktop is 1400 CSS px and must be replaced.
+- **Responsive static/empty surfaces evidenced** — No horizontal canvas expansion was observed at 768, 390 or 320; the empty persistent catalogue prevents populated-card/density validation.
+- **Unsupported footer and hero claims → Removed** — Removed unsupported support availability, operating history, brand count, setup/expertise claims, placeholder WhatsApp/social destinations and the unsupported tabla description.
+- **Unapproved policy publication → Withheld** — Shipping, returns, warranty and FAQ records are not treated as owner publication approval; their routes and sitemap entries now return/omit until expressly approved. Terms and Privacy remain public.
+- **Filter mismatch copy on an empty database → Distinct catalogue state** — Empty catalogues hide category shortcuts, facet/sidebar and result toolbars and present a truthful preparation message; genuinely filtered empty results retain reset controls.
+- **Dormant synthetic-claim templates → Removed** — Deleted nine unused legacy Homepage partials so stale unsupported statistics, testimonials and promotional claims cannot be reintroduced accidentally.
+- **Remediation gates passed** — Full regression **233 tests / 811 assertions**; targeted regression **58 / 255**; Blade compilation, production build, changed-PHP syntax/Pint, Composer audit and npm audit pass.
+- **Phase 3 remains `BLOCKED`** — Replacement post-fix captures plus isolated populated-catalogue visual evidence are required. Persistent `rhythm_db` remains protected from sample seeding or destructive reset. Auto Mode paused at this genuine external gate; Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

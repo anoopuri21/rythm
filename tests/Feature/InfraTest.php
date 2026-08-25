@@ -43,7 +43,10 @@ class InfraTest extends TestCase
             ->assertSee(route('home'), escape: false)
             ->assertSee(route('shop.index'), escape: false)
             ->assertSee('/about', escape: false)
-            ->assertSee('/product/yamaha-f310-acoustic-guitar', escape: false);
+            ->assertSee('/product/yamaha-f310-acoustic-guitar', escape: false)
+            ->assertDontSee('/shipping', escape: false)
+            ->assertDontSee('/returns', escape: false)
+            ->assertDontSee('/warranty', escape: false);
     }
 
     public function test_robots_txt_renders(): void

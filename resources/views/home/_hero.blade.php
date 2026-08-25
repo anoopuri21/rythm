@@ -98,7 +98,7 @@
             <img src="{{ asset('images/hero/grid-banner-tabla.jpg') }}" alt="Tabla set" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
                 <span class="hero-mm__banner-title">Tabla Sets</span>
-                <span class="hero-mm__banner-sub">Handcrafted · concert ready</span>
+                <span class="hero-mm__banner-sub">Explore percussion instruments</span>
                 <span class="hero-mm__banner-link">Shop now →</span>
             </span>
         </a>

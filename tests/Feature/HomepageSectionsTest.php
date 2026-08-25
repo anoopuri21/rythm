@@ -202,6 +202,19 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('footer-brands', escape: false);
     }
 
+    public function test_footer_uses_verified_capabilities_without_placeholder_contacts_or_policy_claims(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Catalogue filters')
+            ->assertSee('Server-verified checkout totals')
+            ->assertDontSee('24×7')
+            ->assertDontSee('Free setup on every instrument')
+            ->assertDontSee('wa.me/919000000000', escape: false)
+            ->assertDontSee('Shipping &amp; delivery', escape: false)
+            ->assertDontSee('Returns &amp; refunds', escape: false);
+    }
+
     public function test_scroll_to_top_button_is_present(): void
     {
         $this->get('/')
