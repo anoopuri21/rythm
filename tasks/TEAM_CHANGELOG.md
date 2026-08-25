@@ -101,6 +101,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Persistent database → Never a destructive test target** — The request does not authorize `migrate:fresh`, `RefreshDatabase`, or destructive automated suites against persistent/production data. Database qualification must use non-destructive initial migration evidence or an isolated test schema.
 - **Exposed PAT → Not stored or replayed through visible agent commands** — Repository URL was recovered from README and `origin` configured. Because this environment has no secret-input channel, Git authentication will use a repository-scoped writable deploy key instead of placing the exposed PAT into command logs.
 
+## 25 August 2026 — Phase 0B MySQL Gate Accepted
+
+- **MySQL identity-only evidence → Forward migration evidence accepted** — Owner confirmed MySQL Community Server 8.4.3, aligned local locked Composer dependencies, and reported successful `php artisan migrate --force` execution against persistent `rhythm_db`.
+- **Persistent UAT safety retained** — Sample/development seeders and destructive suites were not run. `migrate:fresh`, `db:wipe`, `RefreshDatabase`, and unapproved seed/import operations remain prohibited against `rhythm_db`.
+- **Phase 0B `BLOCKED` → `COMPLETE`** — Agent 0 accepted the owner-reported MySQL migration evidence together with the previously passed 222 tests / 744 assertions, build, syntax/style and dependency-audit gates.
+- **Completion is not production sign-off** — Phase 1–10 gates remain; deployment Agent 10 remains inactive.
+- **Auto Mode remains paused at the full-phase boundary** — The registered protocol requires the exact `ACTIVATE AUTO MODE` command before Phase 1 autonomous planning begins.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

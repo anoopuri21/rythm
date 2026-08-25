@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 0B — Stack Alignment BLOCKED on exact MySQL 8 evidence  
-**Overall status:** FILAMENT 5 ALIGNED / DATABASE GATE UNVERIFIED / NOT PRODUCTION-READY  
+**Current phase:** Phase 0B — Stack Alignment COMPLETE; paused at full-phase boundary
+**Overall status:** PHASE 0B ACCEPTED / PHASE 1 PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — genuine mandatory environment blocker
+**Auto Mode:** PAUSED — Phase 0B full-phase boundary; exact reactivation command required
 
 ---
 
@@ -57,7 +57,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 |---|---|---|---|---|
 | 0 | Agent 0, 8, 9, 11 | Existing codebase status audit | COMPLETE | Evidence accepted; `PHASE_0_STATUS_AUDIT.md` |
 | 0A | Agent 0, 3, 4, 8, 9, 11, 12 | Critical admin/payment/discount/inventory/refund safety remediation | COMPLETE | Accepted 25 Aug 2026: 221 tests / 739 assertions; build and dependency audits green |
-| 0B | Agent 0, 2, 6, 8, 9, 11 | Stack alignment: dependency review, Filament 5 spike, exact MySQL 8 evidence, cron strategy | BLOCKED | Filament/cron gates pass; exact MySQL 8 runtime required |
+| 0B | Agent 0, 2, 6, 8, 9, 11 | Stack alignment: dependency review, Filament 5, exact MySQL 8 migration, cron strategy | COMPLETE | Accepted 25 Aug 2026: all independent gates plus owner-reported MySQL 8.4.3 forward migration |
 | 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | PENDING | Confirmed reference evidence and approved design spec |
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | PENDING | Schema review, migrations and DB tests pass |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | PENDING | Side-by-side desktop/mobile verification |
@@ -196,7 +196,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 |---|---|
 | Existing codebase qualification | Phase 0 audit and Phase 0A safety remediation complete; later phase gates remain |
 | Reference-page measurements/screenshots | To be acquired during Phase 1; user evidence requested if live inspection is incomplete |
-| MySQL connection for migration verification | Required during Phase 0/2 |
+| MySQL connection for migration verification | Phase 0B forward migration accepted; Phase 2 schema-specific evidence remains required |
 | Final brand logo/colors/assets | Brand selected; assets still require verification |
 | Comment scope | Must decide product Q&A only vs. review/blog comments before Phase 5 |
 | Product scraper language | PHP or Python decision required before Phase 6 |
@@ -243,7 +243,7 @@ Accepted by Agent 0 on 25 August 2026 after specialist implementation and indepe
 
 Phase 0A closes its identified critical findings but does **not** constitute enterprise or production sign-off. Exact MySQL 8 validation, Filament 5 alignment, full architecture/design phases, reconciliation/refund execution operations and remaining roadmap gates are still pending.
 
-## 9. Phase 0B Progress and Blocker
+## 9. Phase 0B Acceptance Evidence
 
 Completed and independently reviewed on 25 August 2026:
 
@@ -259,8 +259,12 @@ Completed and independently reviewed on 25 August 2026:
 - Changed-PHP Pint: **42 files passed**; PHP syntax: **198 files passed**.
 - Composer audit: no advisories. npm production/full audits: zero vulnerabilities.
 
-**Partial database evidence:** the owner reports Laragon is running MySQL Community Server 8.4.3 and that an empty `rythme_acceptance` database exists. This satisfies engine identity only. The current agent environment cannot reach the owner's localhost, and no MySQL 8 migration/seed result has been supplied. Phase 0B therefore remains `BLOCKED` on the mandatory database execution gate. MariaDB results are not substituted.
+**Exact MySQL acceptance evidence:** the owner reported MySQL Community Server **8.4.3**, configured the persistent project/UAT database as `rhythm_db`, successfully aligned local Composer dependencies, and reported `php artisan migrate --force` completed successfully. This closes the forward-migration compatibility gate. The agent cannot directly inspect the owner's localhost, so this portion is explicitly owner-reported evidence. MariaDB results were not substituted.
+
+Sample/development seeders and destructive automated suites were intentionally not run against `rhythm_db`. The independent full regression remains **222 tests / 744 assertions** on the isolated test environment. Persistent `rhythm_db` remains protected from `migrate:fresh`, `db:wipe`, `RefreshDatabase`, and unapproved seed/import operations.
+
+**Agent 0 decision:** Phase 0B is `COMPLETE` and accepted on 25 August 2026. This is not production sign-off.
 
 ## 10. Recommended Next Action
 
-Treat the currently empty MySQL 8 database as the persistent UAT/project database and run the non-destructive initial command `php artisan migrate --force`; do not run `migrate:fresh` or automated `RefreshDatabase` tests against it. Credentials stay in the ignored local `.env` or process environment. Existing sample seeders are not approved as real catalog data; real data import remains gated by the catalog source/legal/import phases. Phase 0B remains blocked until redacted MySQL migration evidence is available. Deployment remains inactive.
+Proceed to Phase 1 Homepage + Shop design specifications after Auto Mode is reactivated with the exact registered command. Phase 1 must obtain measurable reference evidence and brand/design assets before any pixel-fidelity claim. Deployment remains inactive.

@@ -2,7 +2,7 @@
 
 **Activated:** 25 August 2026  
 **Mode:** Autonomous  
-**Status:** BLOCKED — all independent work complete; exact MySQL 8 runtime unavailable  
+**Status:** COMPLETE — accepted by Agent 0 on 25 August 2026
 **Total chunks:** 5
 
 ## Chunk 1 — Compatibility Matrix and Upgrade Preflight
@@ -33,7 +33,7 @@
 - Inventory queue, scheduler, cache/session and filesystem assumptions.
 - Add/document cron-compatible queue and scheduler operation without persistent workers.
 - Define coupon-reservation and pending-refund recovery/reconciliation command requirements.
-- Run exact MySQL 8 migration/seed/test evidence through a direct environment-configured database connection when available.
+- Run exact MySQL 8 application migration evidence through a direct environment-configured database connection; keep destructive tests and sample seeders away from the persistent project/UAT database.
 - Do not introduce Docker/Podman: local qualification will use Laragon MySQL and later hosting verification will use the cPanel database administered through phpMyAdmin.
 - Treat absence of a confirmed exact MySQL 8 server as a mandatory phase-gate blocker rather than substituting MariaDB.
 
@@ -47,4 +47,4 @@
 
 ## Phase Gate
 
-Phase 0B completes only when Filament is on the latest compatible stable line, supported plugins are resolved, full regression/audits pass, shared-hosting operations are documented, and exact MySQL 8 evidence passes. Auto Mode pauses at a genuine unavailable-environment blocker or at phase completion.
+Phase 0B was accepted after Filament reached the latest compatible stable line, supported plugins were resolved, the independent regression/audit suite passed, shared-hosting operations were documented, MySQL Community Server 8.4.3 identity was confirmed, and the owner reported a successful non-destructive `php artisan migrate --force` against the persistent `rhythm_db` project/UAT database. Sample seeders and destructive automated suites were intentionally excluded from that persistent database. Auto Mode pauses at this completed full-phase boundary.

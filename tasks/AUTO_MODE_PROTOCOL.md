@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 0B blocked on exact MySQL 8 runtime  
+**Status:** PAUSED — Phase 0B complete; full-phase boundary reached
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,9 +147,9 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — automatically paused at a genuine blocker
-- **Current phase:** Phase 0B — Stack Alignment (`BLOCKED`)
-- **Execution plan:** `tasks/AUTO_MODE_PHASE_0B_PLAN.md`
-- **Blocker:** a direct connection to a confirmed exact MySQL 8.x server is unavailable; MariaDB 11.8 is not acceptable substitution evidence.
-- **Locked route:** environment-configured Laragon MySQL for local qualification and cPanel MySQL/phpMyAdmin for later hosting verification; Docker/Podman are excluded.
-- **Resume action:** securely inject access to an empty disposable exact MySQL 8 database, then reactivate Auto Mode to run the remaining database gate.
+- **Active:** No — automatically paused at the completed Phase 0B boundary
+- **Completed phase:** Phase 0B — Stack Alignment (`COMPLETE`)
+- **Accepted evidence:** independent 222-test regression and audits; Filament 5.7.6 / Livewire 4.4.2 alignment; MySQL Community Server 8.4.3 identity; owner-reported successful non-destructive forward migration on persistent `rhythm_db`.
+- **Next phase:** Phase 1 — Homepage + Shop Design Specifications (`PENDING`).
+- **Resume action:** the owner must issue the exact command `ACTIVATE AUTO MODE`; activation then begins Phase 1 planning.
+- **Deployment:** Agent 10 remains inactive.

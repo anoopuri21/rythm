@@ -453,9 +453,9 @@ After critical remediation is accepted, proceed to Phase 1 design specification,
 - npm production/full audits: zero vulnerabilities.
 - External vendor symlink remains `/tmp/rythm-vendor`.
 
-### Blocking gate
+### Exact MySQL gate — accepted
 
-The accessible database service is MariaDB 11.8. No exact MySQL 8 daemon and no Docker/Podman runtime are available. Exact MySQL 8 migration, seed and concurrency evidence therefore cannot be produced in this environment. Phase 0B remains blocked and Auto Mode is paused. MariaDB results must not be relabeled as MySQL 8 acceptance.
+The agent workspace itself exposes MariaDB 11.8 only, so it was not used as substitute acceptance evidence. The owner separately confirmed MySQL Community Server 8.4.3 in Laragon and reported successful execution of the application's non-destructive forward migrations against the persistent `rhythm_db` project/UAT database. That owner-reported result closes the Phase 0B MySQL migration gate; it does not authorize destructive tests, sample seeding, or a production-readiness claim.
 
 ### MySQL 8 qualification route decision
 
@@ -463,4 +463,10 @@ The owner has locked direct environment-configured MySQL connectivity as the onl
 
 ### Owner-provided MySQL engine evidence
 
-The owner reports `SELECT VERSION(), @@version_comment` returned MySQL Community Server 8.4.3 and created an empty `rythme_acceptance` database. Engine identity is accepted as owner-provided evidence. The owner subsequently designated this as a persistent project/UAT database, so only forward migrations may target it; destructive automated tests are prohibited. Migration and application compatibility remain unverified because the agent cannot access the owner's localhost and no execution output was supplied. Real catalog/customer data injection remains gated by schema, import, legal/content-rights, and deployment controls.
+The owner reports `SELECT VERSION(), @@version_comment` returned MySQL Community Server 8.4.3. The canonical persistent project/UAT database is `rhythm_db`. After updating the local locked Composer dependencies, the owner reported `php artisan migrate --force` completed successfully. Engine identity and forward application migration compatibility are accepted as owner-provided evidence because the agent cannot access the owner's localhost. Destructive automated tests and sample seeders remain prohibited on this database. Real catalog/customer data injection remains gated by schema, import, legal/content-rights, and deployment controls.
+
+### Agent 0 Phase 0B decision
+
+**Phase 0B:** COMPLETE — accepted 25 August 2026.
+**Production readiness:** NOT APPROVED.
+**Auto Mode:** PAUSED at the full-phase boundary pending the exact registered reactivation command.
