@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend BLOCKED on populated live-preview captures
-**Overall status:** PHASE 3 CHUNKS 1–4 PASSED / CHUNK 5 REMEDIATION AND EMPTY-STATE REVIEW GREEN / POPULATED 1440/390 EVIDENCE PENDING / NOT PRODUCTION-READY
+**Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend BLOCKED on guarded local populated-preview captures
+**Overall status:** PHASE 3 CHUNKS 1–4 PASSED / CHUNK 5 REMEDIATION AND EXACT-WIDTH EMPTY-STATE REVIEW GREEN / POPULATED 1440/390 EVIDENCE PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — genuine Phase 3 isolated populated-preview capture blocker
+**Auto Mode:** PAUSED — genuine Phase 3 guarded local populated-preview capture blocker
 
 ---
 
@@ -195,8 +195,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | Item | State |
 |---|---|
 | Existing codebase qualification | Phase 0 audit and Phase 0A safety remediation complete; later phase gates remain |
-| Phase 3 post-remediation empty-state evidence | PARTIAL PASS: Shop 1440/768/390/320 and Homepage 768/390/320 exact DPR-2 widths qualify; supplied Homepage desktop JPEG is only 1600px wide |
-| Phase 3 populated catalogue presentation | BLOCKED: isolated ignored SQLite fixture and live preview are ready with 33 products, 32 categories and 24 brands; owner captures at 1440/390 remain required; persistent `rhythm_db` was untouched |
+| Phase 3 post-remediation empty-state evidence | PASS WITH BOUNDS: exact DPR-2 1440/768/390/320 widths now exist for Homepage and Shop; corrected static/empty states and no observed narrow-width canvas expansion |
+| Phase 3 populated catalogue presentation | BLOCKED: third capture set used the normal empty site; guarded Laragon/Windows SQLite launcher is ready for 33-product isolated evidence at 1440/390; persistent `rhythm_db` remains untouched |
 | Reference-page measurements/screenshots | PASSED: four owner-supplied DPR-2 captures measured; hashes recorded without committing third-party images |
 | MySQL connection for migration verification | PASSED: owner reported all Phase 2 migrations `Ran` on persistent MySQL 8.4.3 `rhythm_db` |
 | Final brand logo/colors/assets | Phase 1 direction accepted: current logo + Rythme Red `#B20202`; final production assets still require later QA |

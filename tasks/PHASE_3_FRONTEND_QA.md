@@ -98,15 +98,28 @@ Fixture inventory:
 
 The current committed storefront is running against that isolated fixture in the Arena live preview. Homepage and Shop HTML both render successfully; Shop reports 33 instruments and emits the populated product grid. A production Vite build supplies preview assets over the HTTPS preview origin.
 
-## 7. Remaining Visual Gate
+## 7. Third Owner Capture Review — 25 August 2026
 
-Capture the populated live-preview Homepage and Shop at:
+The four requested widths are now exact, but the rendered content is from the normal empty-catalogue site rather than the isolated populated fixture.
+
+| Surface | Physical dimensions | SHA-256 | Result |
+|---|---:|---|---|
+| Homepage / 1440 | 2880 × 6196 | `13f6b02fccaff8bc3edeb10ff7cef375fd0aa45af901f8c9f6a6eaf673ab7a78` | Width valid; populated sections absent |
+| Homepage / 390 | 780 × 10856 | `3c80e9597196d3b7569d9b77e83691aac194d49cf2f52c488cfffde0d4619d87` | Width valid; populated sections absent |
+| Shop / 1440 | 2880 × 4488 | `7427124eac14e42765943132a71ed05f627a4561b4eecc5b094e4e0220751424` | Width valid; shows catalogue-preparation state |
+| Shop / 390 | 780 × 5394 | `b70f0494ada2ae2dd0c1ea50550778d17736667b0ff208278eb2ed91b88cc266` | Width valid; shows catalogue-preparation state |
+
+These files complete the true-1440 empty/static layout record, but do not close product-card, result-density or facet evidence. The former Arena preview process was no longer available when the capture returned, so Agent 0 added a guarded Windows/Laragon launcher at `tools/start-phase3-visual-preview.bat`. It uses process-local SQLite overrides, verifies Laravel's effective connection/path before migration, and leaves the normal `.env` untouched.
+
+## 8. Remaining Visual Gate
+
+Run the guarded local isolated preview and capture its populated Homepage and Shop at:
 
 - 1440 × 900 CSS px, DPR 2 (2880px output width)
 - 390 × 844 CSS px, DPR 2 (780px output width)
 
-The populated 1440 Homepage capture will also replace the invalid 1600px desktop file. Existing post-remediation 768/320 evidence remains valid for empty-state overflow/readability; populated 1440/390 evidence is the minimum remaining density/card/facet gate.
+A valid Shop capture must visibly show category shortcuts, product cards, filters and a result count. “The catalogue is being prepared” identifies the normal empty site and does not qualify as populated evidence.
 
-## 8. Gate Decision
+## 9. Gate Decision
 
-Chunks 1–4 remain independently green. Chunk 5 remediation and empty-state review are green within the recorded evidence limits. Populated 1440/390 rendered evidence remains outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.
+Chunks 1–4 remain independently green. Chunk 5 remediation, exact-width static/empty-state evidence and the isolated-preview safety path are green within recorded limits. Populated 1440/390 rendered evidence remains outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.

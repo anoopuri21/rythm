@@ -228,6 +228,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Populated Arena preview started** — Current committed Homepage and Shop render against the fixture with production assets over the preview origin. Shop reports 33 instruments and renders the populated result grid.
 - **Auto Mode paused at final external gate** — Four full-page populated captures remain required: Homepage and Shop at 1440/DPR2 and 390/DPR2. Phase 3 and production readiness remain unapproved; Agent 10 remains inactive.
 
+## 25 August 2026 — Phase 3 Third Capture Review and Guarded Local Preview
+
+- **Four exact widths received, populated gate still open** — Homepage and Shop 1440/390 captures have valid 2880/780px widths, but Shop visibly remains in catalogue-preparation state and Homepage omits its data-driven catalogue sections; the normal empty site was captured instead of the fixture.
+- **Homepage true-1440 static gate closed** — The new 2880px Homepage file closes the prior desktop-width deficiency for static/empty content.
+- **Expired Arena process → Guarded Laragon launcher** — Added `tools/start-phase3-visual-preview.bat` and owner instructions. Process-local environment overrides select only `storage/app/phase3-visual-fixture.sqlite`; a Laravel connection/path check must pass before isolated `migrate:fresh --seed`; `.env` and persistent `rhythm_db` remain untouched.
+- **Current agent runtime limitation recorded** — The previous preview process expired and this runtime no longer exposes PHP/Composer, preventing Agent 0 from restarting Laravel here. Owner-side rendering is the remaining genuine external gate.
+- **Auto Mode paused** — Four populated local-preview captures remain required at 1440/390. No Phase 3 or production sign-off issued; Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

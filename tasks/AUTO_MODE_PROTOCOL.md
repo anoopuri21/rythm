@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 3 isolated populated-preview capture blocker
+**Status:** PAUSED — Phase 3 guarded local populated-preview capture blocker
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,15 +147,17 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — the owner reactivated Chunk 5, Agent 0 qualified seven exact-width post-fix captures and created the isolated populated preview, then Auto Mode automatically paused at the final external capture gate.
+- **Active:** No — the owner reactivated Chunk 5, Agent 0 reviewed four exact-width but empty-site captures, added a guarded local fixture launcher, then Auto Mode automatically paused at the populated capture gate.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, and Phase 2 MySQL Schema + Domain Architecture (`COMPLETE`)
 - **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`BLOCKED`)
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
 - **Independent evidence:** Chunks 1–4 pass; post-review remediation passes **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories.
-- **Post-fix empty-state result:** Shop 1440/768/390/320 and Homepage 768/390/320 have exact DPR-2 widths and show corrected truthful responsive states without observed horizontal expansion. The Homepage desktop JPEG is 1600px wide and does not satisfy the required 2880px output.
-- **Isolated populated fixture:** ignored SQLite file only; 33 active products, 32 active categories and 24 active brands; persistent `rhythm_db` was not connected to or modified. Arena live preview is running against this fixture.
-- **Blocker:** no screenshot-capable browser exists in the agent environment; populated Homepage and Shop captures at 1440/DPR2 and 390/DPR2 are required from the live preview.
-- **Required owner action:** capture four full-page live-preview files: Homepage and Shop at 1440 × 900/DPR2 and 390 × 844/DPR2.
-- **Resume action:** upload the four captures and issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
+- **Post-fix empty-state result:** Shop and Homepage now have exact-width 1440/768/390/320 evidence showing corrected truthful responsive states without observed horizontal expansion.
+- **Third-capture result:** the four new 1440/390 files have valid widths but came from the normal empty site; Shop still says “The catalogue is being prepared,” so populated density/facets remain unproven.
+- **Isolated populated fixture:** ignored SQLite file only; 33 active products, 32 active categories and 24 active brands. Persistent `rhythm_db` was not connected to or modified.
+- **Guarded local launcher:** `tools/start-phase3-visual-preview.bat` sets process-local SQLite configuration, verifies the effective Laravel connection/path before `migrate:fresh --seed`, leaves `.env` untouched and serves on port 8001.
+- **Blocker:** the prior Arena preview process expired and the current agent runtime no longer contains PHP, so owner-side Laragon rendering is required for the mandatory populated captures.
+- **Required owner action:** run the guarded launcher and capture four full-page populated files: Homepage and Shop at 1440 × 900/DPR2 and 390 × 844/DPR2.
+- **Resume action:** upload the four populated captures and issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
 - **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
 - **Deployment:** Agent 10 remains inactive.
