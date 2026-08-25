@@ -159,7 +159,7 @@
                         <button type="button" wire:click="setMinRating({{ $rating }})"
                                 class="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-sm transition hover:bg-ink/5 {{ $minRating === $rating ? 'font-bold text-brand' : 'text-muted' }}"
                                 aria-pressed="{{ $minRating === $rating ? 'true' : 'false' }}">
-                            <span class="text-brand" aria-hidden="true">★★★★★</span>
+                            <span class="text-brand" aria-hidden="true">{{ str_repeat('★', $rating).str_repeat('☆', 5 - $rating) }}</span>
                             <span>{{ $rating }} &amp; up</span>
                         </button>
                     @endforeach

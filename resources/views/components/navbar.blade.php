@@ -58,7 +58,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
                     <span class="nav__icon-label">Account</span>
                 </a>
-                <a href="{{ auth()->check() ? route('wishlist.index') : route('login') }}" class="nav__icon" aria-label="Wishlist">
+                <a href="{{ auth()->check() ? route('wishlist.index') : route('login') }}" class="nav__icon nav__icon--wishlist" aria-label="Wishlist">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0z"/></svg>
                     <livewire:wishlist-badge :key="'wish-' . (auth()->id() ?? 'guest')" />
                     <span class="nav__icon-label">Wishlist</span>

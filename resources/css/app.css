@@ -1651,3 +1651,10 @@ input:focus-visible { outline: none; }
 @media (max-width: 1023px), (hover: none) {
     .shop-card__view { min-height: 44px; transform: translateY(0); }
 }
+
+/* 320px overflow protection: keep the required menu, logo, search and cart. */
+@media (max-width: 359px) {
+    .nav__logo-img { max-width: 120px; }
+    .nav__icon--wishlist { display: none; }
+    .nav__icons { gap: .45rem; }
+}

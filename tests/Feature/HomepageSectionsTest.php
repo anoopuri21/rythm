@@ -126,11 +126,16 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Shop now', escape: false);
     }
 
-    public function test_advantages_section_renders(): void
+    public function test_advantages_section_renders_verified_platform_capabilities_only(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('adv-mm', escape: false);
+            ->assertSee('adv-mm', escape: false)
+            ->assertSee('Server-Verified Totals')
+            ->assertSee('Order Status Tracking')
+            ->assertDontSee('Fee-Free EMI')
+            ->assertDontSee('Best Price Guarantee')
+            ->assertDontSee('Store Pickup In 15 Min');
     }
 
     public function test_deals_section_uses_real_stock_without_synthetic_sales_or_deadline(): void

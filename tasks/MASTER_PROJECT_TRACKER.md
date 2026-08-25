@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend IN PROGRESS
-**Overall status:** PHASE 2 COMPLETE / PHASE 3 IN PROGRESS / NOT PRODUCTION-READY
+**Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend BLOCKED on rendered visual evidence
+**Overall status:** PHASE 3 CHUNKS 1–4 PASSED / VISUAL REGRESSION EVIDENCE PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** ACTIVE — Phase 3 plan executing
+**Auto Mode:** PAUSED — genuine Phase 3 external visual-evidence blocker
 
 ---
 
@@ -60,7 +60,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 0B | Agent 0, 2, 6, 8, 9, 11 | Stack alignment: dependency review, Filament 5, exact MySQL 8 migration, cron strategy | COMPLETE | Accepted 25 Aug 2026: all independent gates plus owner-reported MySQL 8.4.3 forward migration |
 | 1 | Agent 1, 2, 13 | Homepage + Shop design specifications | COMPLETE | Accepted 25 Aug 2026: structure, four viewport captures, Rythme Red, accessibility/SEO contract |
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | COMPLETE | Accepted 25 Aug 2026: 225 tests / 753 assertions plus owner-reported MySQL 8.4.3 forward migration/status |
-| 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | IN PROGRESS | Side-by-side desktop/mobile verification |
+| 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | BLOCKED | Chunks 1–4 pass; current rendered 1440/768/390/320 evidence required |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | PENDING | Functional, authorization and integration tests pass |
 | 5 | Agent 3, 6, 9, 14 | Reviews, ratings, comments/Q&A and coupons | PENDING | Moderation, security and workflow tests pass |
 | 6 | Agent 5, 4, 8, 15 | Bajaao catalog scraper/import pipeline | PENDING | Validated import, deduplication and media report |

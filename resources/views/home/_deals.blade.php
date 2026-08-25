@@ -6,8 +6,8 @@
 @if($deals->isNotEmpty())
 {{-- ============================================================
      DEALS OF THE DAY — sale cards with real current stock.
-     Synthetic sold counts and unbacked countdowns are intentionally
-     omitted; expiry UI may return only with a persisted timestamp.
+     Unsupported sales counters and countdowns are intentionally omitted;
+     expiry UI may return only with a persisted timestamp.
      ============================================================ --}}
 <section class="deal-mm" aria-label="Deals of the day">
     <div class="deal-mm__inner">

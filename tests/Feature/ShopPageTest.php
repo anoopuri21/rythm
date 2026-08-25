@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductAttributeValue;
+use App\Models\ProductVariant;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -168,10 +169,23 @@ class ShopPageTest extends TestCase
             'value' => 'Mahogany',
             'slug' => 'mahogany',
         ]);
+        $cedar = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Cedar',
+            'slug' => 'cedar',
+        ]);
+        $fenderVariant = ProductVariant::create([
+            'product_id' => $fender->id,
+            'name' => 'Cedar QA',
+            'sku' => 'TEST-FENDER-CEDAR-QA',
+            'stock' => 2,
+            'is_active' => true,
+        ]);
 
         $attribute->categories()->attach($category->id, ['is_filterable' => true]);
         $spruce->products()->attach($yamaha->id);
         $mahogany->products()->attach($fender->id);
+        $cedar->variants()->attach($fenderVariant->id);
 
         Livewire::test(ShopIndex::class)
             ->call('setCategory', 'acoustic-guitars')
@@ -181,6 +195,13 @@ class ShopPageTest extends TestCase
             ->assertSet('selectedAttributes', ['top-wood' => ['spruce']])
             ->assertSee('Yamaha F310 Acoustic Guitar')
             ->assertDontSee('Fender CD-60S Dreadnought');
+
+        Livewire::test(ShopIndex::class)
+            ->call('setCategory', 'acoustic-guitars')
+            ->assertSee('Cedar')
+            ->call('toggleAttribute', 'top-wood', 'cedar')
+            ->assertSee('Fender CD-60S Dreadnought')
+            ->assertDontSee('Yamaha F310 Acoustic Guitar');
     }
 
     public function test_livewire_sort_price_ascending(): void
