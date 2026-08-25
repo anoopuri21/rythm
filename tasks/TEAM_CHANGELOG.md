@@ -255,8 +255,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 
 ## Active Decisions Still Needed
 
-- Product Q&A/comments scope before Phase 5.
-- PHP versus Python scraper before Phase 6.
+- Phase 5 interaction scope is resolved: verified-purchase reviews plus moderated product Q&A; no blog comments.
+- PHP versus Python scraper before canonical Phase 6 activation.
+- Permission to build Phase 6 against bounded public reference data while commercial content/image rights remain unresolved.
+- Confirm Phase 6 public-page-only access, no authentication/CAPTCHA bypass and respectful rate limiting.
 - Product content/image commercial rights before production data launch.
 
 ## 26 August 2026 — Phase 4 Commerce Acceptance
@@ -295,3 +297,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Safety retained** — No `migrate:fresh`, `db:wipe`, sample seeder or destructive test command was used against persistent UAT.
 - **Phase 5 `QA` → `COMPLETE`** — Agent 0 accepted Phase 5 on 26 August 2026 with **265 tests / 974 assertions**, four-width zero-violation rendered evidence and exact MySQL forward-migration evidence.
 - **Auto Mode paused at full-phase checkpoint** — Agent 10 remains inactive; this is not production sign-off or deployment authorization.
+
+## 26 August 2026 — Canonical Delivery Sequence Reconciliation
+
+- **Conflicting numbered roadmaps → One canonical sequence** — Accepted Delivery Phases 0–5 retain their numbers. `tasks/CANONICAL_PHASE_SEQUENCE.md` now controls order/crosswalk and `tasks/MASTER_PROJECT_TRACKER.md` controls delivery status.
+- **Legacy phase labels → E-series capability IDs** — The older static-review roadmap is preserved as enterprise workstreams E0–E13, so no capability scope is discarded and its identifiers cannot be mistaken for delivery phases.
+- **Pending programme expanded to Delivery Phases 6–18** — Catalogue acquisition/import; admin governance; finance; notifications; fulfillment/tax; customer experience/search; security/compliance/accessibility; performance; observability; release packaging; full QA/UAT; sign-off; and deployment/launch are now separately gated in dependency order.
+- **Canonical next phase resolved** — Phase 6 is controlled catalogue acquisition and import because realistic normalized catalogue/media evidence is required before meaningful search, merchandising and performance qualification.
+- **No implicit activation** — Auto Mode remains paused after Phase 5. Phase 6 requires its recorded language/source-boundary decisions. Agent 10 and Phase 18 remain inactive until explicit deployment activation after Phase 17 acceptance.
+- **No production sign-off** — Reconciliation changes governance only; every production gate remains pending.

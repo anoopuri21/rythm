@@ -259,9 +259,11 @@ No original agent has been removed. Agent 10 remains inactive until explicit dep
 
 ---
 
-## 9. Responsibility Matrix by Phase
+## 9. Responsibility Matrix by Canonical Delivery Phase
 
-| Phase | Accountable | Primary agents | Review/support agents |
+`tasks/CANONICAL_PHASE_SEQUENCE.md` controls ordering and `tasks/MASTER_PROJECT_TRACKER.md` controls status. Enterprise-roadmap E-series IDs are capability workstreams, not phases.
+
+| Delivery phase | Accountable | Primary agents | Review/support agents |
 |---|---|---|---|
 | 0 — Status Audit | Agent 0 | 8, 9, 11 | 1–7, 12–15 as domain reviewers |
 | 1 — Design Specs | Agent 0 | 1 | 2, 13, 9 |
@@ -269,12 +271,19 @@ No original agent has been removed. Agent 10 remains inactive until explicit dep
 | 3 — Frontend | Agent 0 | 2, 1 | 13, 8, 9 |
 | 4 — Core Commerce | Agent 0 | 3, 4, 11 | 12, 14, 8, 9 |
 | 5 — Engagement/Coupons | Agent 0 | 3, 6 | 4, 14, 8, 9 |
-| 6 — Product Migration | Agent 0 | 5, 4 | 6, 8, 9, 15 |
-| 7 — Filament Admin | Agent 0 | 6, 3 | 4, 11, 8, 9 |
-| 8 — Hardening | Agent 0 | 8, 11 | 3, 4, 12–15, 9 |
-| 9 — QA/UAT | Agent 0 | 9 | All active specialists |
-| 10 — Sign-off | Agent 0 | 0, 7, 9 | All specialists provide evidence |
-| 11 — Deployment | Agent 0 | 10 | 3, 4, 8, 12, 14 |
+| 6 — Catalogue Acquisition/Import | Agent 0 | 5, 4 | 6, 8, 9, 15 |
+| 7 — Admin Governance/RBAC/Audit | Agent 0 | 6, 3 | 4, 8, 11 |
+| 8 — Payments/Refunds/Reconciliation | Agent 0 | 12, 3 | 4, 6, 8, 9, 11 |
+| 9 — Notifications/Integrations | Agent 0 | 14, 3 | 4, 8, 9, 11 |
+| 10 — Fulfillment/Returns/Tax | Agent 0 | 15, 3, 6 | 4, 9, 11, 12 |
+| 11 — Search/Merchandising/CX | Agent 0 | 3, 6, 13 | 2, 4, 8, 9 |
+| 12 — Security/Privacy/Compliance/A11y | Agent 0 | 8, 13, 15 | 3, 4, 9, 11 |
+| 13 — Performance/Resilience | Agent 0 | 8, 3, 4 | 9, 11 |
+| 14 — Observability/Operations | Agent 0 | 8, 14 | 9, 10 (constraints only), 11 |
+| 15 — CI/CD/Shared-host Release Packaging | Agent 0 | 8, 11 | 9, 10 (constraints only) |
+| 16 — Full QA/UAT/Release Candidate | Agent 0 | 9 | All active specialists |
+| 17 — Production-readiness Sign-off | Agent 0 | 0, 7, 9 | All specialists provide evidence |
+| 18 — Deployment/Launch/Stabilization | Agent 0 | 10 after explicit activation | 3, 4, 8, 9, 12, 14 |
 
 ---
 
@@ -293,7 +302,7 @@ No original agent has been removed. Agent 10 remains inactive until explicit dep
 
 ## 11. Team Readiness Verdict
 
-**Verdict: TEAM STRUCTURE IS COMPLETE AND FIT FOR PHASE 0.**
+**Verdict: TEAM STRUCTURE IS COMPLETE AND FIT FOR THE CANONICAL DELIVERY PROGRAMME.**
 
 The team has coverage for product leadership, design, frontend, backend, database, architecture, catalog migration, admin operations, feature completeness, payments, notifications, compliance, security, performance, accessibility, SEO, QA and shared-hosting deployment.
 

@@ -79,8 +79,8 @@ The browser run exposed one pre-existing stock-text contrast failure. It was cha
 
 - Final commercial shipping, return, warranty, privacy and legal terms still require owner/legal approval before production; the storefront now states bounded operational facts rather than inventing policy.
 - Notification workflows for review approval/rejection, staff replies and Q&A answers belong to the later notifications phase.
-- Phase 8 security/compliance hardening, Phase 9 full UAT and Phase 10 production-readiness remain pending.
-- Agent 10 is inactive; this document is not deployment authorization or production sign-off.
+- Canonical Phase 12 security/compliance/accessibility hardening, Phase 16 full QA/UAT and Phase 17 production-readiness remain pending.
+- Agent 10 and Phase 18 deployment remain inactive; this document is not deployment authorization or production sign-off.
 
 ## Agent 0 decision
 

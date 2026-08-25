@@ -31,6 +31,7 @@
 | Auto Mode pause | `PAUSE AUTO MODE`, genuine blocker, or full roadmap phase completion |
 | Active integration branch | `rhythm-uat` until the owner requests another branch or Agent 0 records a justified branch change |
 | Code-task completion | After applicable local tests pass, commit and push the latest code to the active branch and provide a commit report; push/auth failures must be reported, never concealed |
+| Canonical phase sequence | `tasks/CANONICAL_PHASE_SEQUENCE.md` and this tracker control delivery numbering/status; enterprise-roadmap E-series identifiers are capability workstreams, not delivery phases |
 | Owner assistance standard | Assume the owner is non-technical: minimize manual work and provide every unavoidable manual action as short, numbered, copy-safe steps |
 | Uploaded evidence retention | Uploaded files are temporary reference only: never copy/commit them into the repository; record only necessary metadata/findings and delete staged originals immediately after inspection |
 | Working database policy | Use a persistent project/UAT MySQL 8 database for application data; do not label it demo/practice. Destructive automated tests still require isolation and may never erase persistent or production data |
@@ -64,12 +65,19 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
 | 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
-| 6 | Agent 5, 4, 8, 15 | Bajaao catalog scraper/import pipeline | PENDING | Validated import, deduplication and media report |
-| 7 | Agent 6, 3, 4, 11 | Filament resources, dashboards and RBAC | PENDING | Role matrix and admin UAT pass |
-| 8 | Agent 8, 3, 4, 11–15 | Security, accessibility, compliance and performance hardening | PENDING | No unresolved critical/high issue; load targets pass |
-| 9 | Agent 9 + all | Full QA, regression and bug fixing | PENDING | UAT pass; critical bug count = 0 |
-| 10 | Agent 0, 7, 9 | Production-readiness review | PENDING | Every production gate verified |
-| 11 | Agent 10 | Shared-hosting deployment | INACTIVE | Activated only by explicit user command |
+| 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | PENDING | Approved language/source contract; validation, deduplication, resumability and media report pass |
+| 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | PENDING | Least-privilege role matrix, sensitive-action audit and admin UAT pass |
+| 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | PENDING | Real test-mode payment/refund/retry/reconciliation evidence passes |
+| 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
+| 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | PENDING | Professionally approved rules plus fulfillment/tax/RMA tests pass |
+| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | PENDING | Realistic-catalog search, merchandising, SEO and responsive conversion gates pass |
+| 12 | Agent 8, 3, 4, 9, 11, 13, 15 | Security, privacy, compliance and accessibility hardening | PENDING | No unresolved critical/high finding; privacy/legal/accessibility gates pass |
+| 13 | Agent 8, 3, 4, 9, 11 | Performance, scalability and resilience | PENDING | Approved service-level, load, cache and failure-recovery targets pass |
+| 14 | Agent 8, 9, 11, 14 | Observability, backups and production operations | PENDING | Monitoring, backup/restore, incident and runbook drills pass |
+| 15 | Agent 8, 9, 11 | CI/CD and shared-hosting release packaging | PENDING | Reproducible build, migration, rollback and cPanel-compatible release artifact pass |
+| 16 | Agent 9 + all | Full QA, compatibility, UAT and release candidate | PENDING | Full UAT passes with zero critical bugs and accepted release candidate |
+| 17 | Agent 0, 7, 9, 11 | Production-readiness review and sign-off decision | PENDING | Every production release gate independently verified |
+| 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | INACTIVE | Activated only by explicit deployment command after Phase 17 acceptance |
 
 ---
 
@@ -288,7 +296,7 @@ Agent 0 accepts Phase 3 as `COMPLETE` on 26 August 2026 based on:
 
 Bounded Phase 3 limitations remain recorded in `tasks/PHASE_3_FRONTEND_QA.md`: the browser height cap on the populated 390px Homepage capture is supplemented by earlier mobile footer evidence; missing fixture media exercises fallback rendering; production catalogue media/content rights remain a Phase 6 gate.
 
-Auto Mode is paused at the Phase 3 full-phase checkpoint. The next eligible action is explicit `ACTIVATE AUTO MODE` to begin Phase 4 planning/execution. Deployment remains inactive and this is not production sign-off.
+At that checkpoint, Auto Mode paused until the owner explicitly activated Phase 4; Phase 4 has since completed. Deployment remains inactive and Phase 3 acceptance was not production sign-off.
 
 ## 12. Phase 4 Acceptance and Recommended Next Action
 
@@ -302,7 +310,7 @@ Agent 0 accepts Phase 4 as `COMPLETE` on 26 August 2026 based on `tasks/PHASE_4_
 - Isolated Chromium evidence covered 17 authenticated commerce page/viewport combinations at 1440, 768, 390 and 320 CSS px with zero axe violations, horizontal overflow or console/page errors.
 - Persistent `rhythm_db` remained untouched by destructive tests and the disposable browser fixture.
 
-Auto Mode pauses at this full-phase checkpoint. Phase 5 requires a new explicit `ACTIVATE AUTO MODE` and the product Q&A/comments scope decision. Agent 10 remains inactive. This is not production sign-off.
+At that checkpoint, Auto Mode paused until the owner explicitly activated Phase 5 and resolved the interaction scope; Phase 5 has since completed. Agent 10 remains inactive. Phase 4 acceptance was not production sign-off.
 
 ## 13. Phase 5 Acceptance
 
@@ -319,3 +327,9 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 **Exact MySQL evidence:** the owner ran `php artisan migrate --force` from the `rhythm-uat` Laragon project against the established persistent MySQL Community Server 8.4.3 UAT database. Both `2026_08_26_000001_add_review_moderation_and_product_questions` and `2026_08_26_000002_replace_unsupported_seeded_claims` reported `DONE`. No destructive reset or seeding command was run.
 
 **Agent 0 decision:** Phase 5 is `COMPLETE` and accepted on 26 August 2026. Auto Mode pauses at this full-phase checkpoint. Agent 10 remains inactive and no production sign-off is implied.
+
+## 14. Canonical Next Action
+
+The post-Phase-5 numbering conflict is resolved by `tasks/CANONICAL_PHASE_SEQUENCE.md`. The next delivery phase is **Phase 6 — Controlled catalogue acquisition and import pipeline**. It remains `PENDING` and is not activated by this governance reconciliation.
+
+Before activation, Agent 0 requires the recorded scraper-language and bounded public-source/access decisions. Commercial competitor text/image rights remain a separate production-data gate. All subsequent work must use canonical Delivery Phases 7–18; Agent 10 and Phase 18 remain inactive until the explicit deployment boundary is satisfied.

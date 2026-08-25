@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** ACTIVE — Phase 4 accounts/commerce execution
+**Status:** PAUSED — Phase 5 complete; canonical Phase 6 not activated
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,7 +150,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - **Registered:** Yes
 - **Active:** No — paused automatically at the completed Phase 5 full-phase checkpoint.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, Phase 4 Accounts/Commerce, and Phase 5 Reviews/Product Q&A/Coupons (`COMPLETE`).
-- **Current phase:** Phase 5 — Verified reviews, moderated product Q&A and coupons (`COMPLETE`).
+- **Current phase:** Phase 5 — Verified reviews, moderated product Q&A and coupons (`COMPLETE`); the canonical next phase is Phase 6 controlled catalogue acquisition/import, pending its pre-activation decisions.
+- **Sequence authority:** `tasks/CANONICAL_PHASE_SEQUENCE.md` controls delivery order; `tasks/MASTER_PROJECT_TRACKER.md` controls status; enterprise-roadmap E-series IDs are capability workstreams only.
 - **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates and the owner-reported exact MySQL 8.4.3 UAT forward migrations passed.
 - **Owner-locked interaction scope:** verified-purchase reviews plus moderated product Q&A; no blog comments.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.

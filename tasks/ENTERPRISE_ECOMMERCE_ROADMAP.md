@@ -1,10 +1,11 @@
-# Rythme Enterprise E-commerce — Phase-wise Task List
+# Rythme Enterprise E-commerce — Capability Workstream Inventory
 
 **Prepared:** 25 August 2026  
+**Numbering reconciled:** 26 August 2026
 **Target:** Enterprise-grade, production-ready single-vendor musical instruments store  
-**Stack:** Laravel 13, PHP 8.3+, Blade, Livewire 3, Tailwind 4, Filament 3, Razorpay
+**Current locked stack:** Laravel 13.24.0, PHP 8.3+, Blade/Livewire 4/custom CSS/Vanilla JS, Tailwind 4 retained where audited, Filament 5.7.6, Razorpay abstraction, exact MySQL 8.x
 
-> This roadmap is prepared from a repository-level static review of `main` at commit `5bb8053`. Existing code and tests indicate a strong functional base, but **the platform must not be called production-ready until all Production Gate items are verified in a staging environment**.
+> This document began as a static capability review of `main` at commit `5bb8053`. Its former phase numbers are now **E-series enterprise workstream IDs**, not delivery phase numbers. The authoritative delivery order and status are `tasks/CANONICAL_PHASE_SEQUENCE.md` and `tasks/MASTER_PROJECT_TRACKER.md`. Existing code and tests indicate a strong functional base, but **the platform must not be called production-ready until all Production Gate items are verified in a staging environment**.
 
 ---
 
@@ -17,9 +18,9 @@
 | ⬜ Pending | Not found or not complete in the current repository |
 | 🔒 Gate | Must pass before production release |
 
-## Working Rule for Every Phase
+## Working Rule for Every Delivery Phase
 
-Each phase will be handled separately and closed only after:
+Each canonical delivery phase is handled separately and closed only after:
 
 1. Scope and acceptance criteria are reviewed.
 2. Implementation is completed without breaking existing behavior.
@@ -34,7 +35,7 @@ Each phase will be handled separately and closed only after:
 
 # A. Existing Completed Foundation
 
-These features are already present in the repository. Phase 0 will revalidate them before relying on them for production.
+These features were present in the reviewed repository. Delivery Phases 0/0B revalidated the baseline; later owning phases must still provide their required production evidence.
 
 ## A1. Platform and Storefront — ✅ Completed
 
@@ -83,14 +84,14 @@ These features are already present in the repository. Phase 0 will revalidate th
 - ✅ CSRF protection, validation, throttling, honeypot and mass-assignment protections are represented in code/tests.
 - ✅ Security headers middleware and signed checkout-success links exist.
 - ✅ Server-side totals, stock checks and payment signature tests exist.
-- 🟡 Fresh-environment test/build/dependency audit must be rerun in Phase 0.
+- ✅ Baseline and later phase test/build/dependency audits have been recorded in the master tracker and phase evidence.
 - 🟡 Production infrastructure, observability, backups, CI/CD and operational verification remain pending.
 
 ---
 
-# B. Pending Enterprise Phases
+# B. Enterprise Capability Workstreams (E-series)
 
-## Phase 0 — Baseline Audit, Environment and Scope Freeze — ⬜ Pending (Start Here)
+## Workstream E0 — Baseline Audit, Environment and Scope Freeze — ✅ Covered by Delivery Phases 0/0B
 
 **Goal:** Establish a trustworthy baseline before changing business functionality.
 
@@ -117,7 +118,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 1 — Domain Hardening and Database Integrity — ⬜ Pending
+## Workstream E1 — Domain Hardening and Database Integrity — 🟡 Foundations covered; later owning phases retain residual work
 
 **Goal:** Make catalog, inventory, cart and order data safe under concurrency and production load.
 
@@ -145,7 +146,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 2 — Payment Gateway, Refunds and Financial Reconciliation — ⬜ Pending
+## Workstream E2 — Payment Gateway, Refunds and Financial Reconciliation — 🟡 Foundations complete; Delivery Phase 8 pending
 
 **Goal:** Complete production-safe Razorpay operations beyond initial payment capture.
 
@@ -171,7 +172,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 3 — Enterprise Review, Rating and Comment System — ⬜ Pending
+## Workstream E3 — Enterprise Review, Rating and Comment System — 🟡 Owner-approved scope completed in Delivery Phase 5
 
 **Goal:** Extend the current verified-purchase review feature into a complete moderated engagement system.
 
@@ -181,32 +182,26 @@ These features are already present in the repository. Phase 0 will revalidate th
 - ✅ Star rating, approval and duplicate guard.
 - ✅ Review moderation resource.
 
-### Pending Tasks
+### Capability disposition
 
-- [ ] Add review title and optional approved media attachments.
-- [ ] Define whether one review is allowed per order item or per customer/product.
-- [ ] Add review edit window and soft deletion policy.
-- [ ] Add abuse-reporting workflow and moderation reasons.
-- [ ] Add helpful/not-helpful voting with duplicate-vote protection.
-- [ ] Add admin/merchant response to a product review.
-- [ ] Implement threaded comments/replies where approved by scope.
-- [ ] Support comments on product reviews; optionally support CMS/blog comments later.
-- [ ] Add comment status: pending, approved, rejected, spam and archived.
-- [ ] Add sanitized plain-text/rich-text policy and XSS tests.
-- [ ] Add spam protection, per-user/IP throttles and moderation audit trail.
-- [ ] Notify reviewer when an admin response/reply is published.
-- [ ] Add aggregate rating cache and reliable invalidation.
-- [ ] Include valid aggregate-rating/review schema only when approved reviews exist.
-- [ ] Add admin filters, bulk moderation and export.
+- [x] Add review title.
+- [x] Define and enforce one review per verified customer/product under the approved policy.
+- [x] Add staff answers through moderated product Q&A.
+- [x] Add moderation states/reasons, sanitization, authorization, throttling and audit-relevant metadata for the approved interactions.
+- [x] Include truthful aggregate-rating/review schema only when approved reviews exist.
+- [ ] Review media, edit windows, abuse reports, helpful voting, threaded review replies, aggregate caching, bulk moderation and export remain unapproved backlog candidates; they are not implied by workstream completion.
+- [ ] Reviewer answer/reply notifications are owned by Delivery Phase 9 if approved in its event matrix.
+- [x] CMS/blog comments are explicitly excluded from the approved scope and must not be inferred from this historical inventory.
 
-### Definition of Done
+### Definition of Done for the approved scope
 
-- Reviews, replies and comments are authorized, moderated, sanitized, rate-limited and tested.
-- Product rating aggregates remain correct after approval, edit and deletion.
+- Reviews and product Q&A are authorized, moderated, sanitized, rate-limited and tested.
+- Product rating aggregates remain correct across approved moderation transitions.
+- Completion evidence is recorded in `tasks/PHASE_5_INTERACTIONS_QA.md`.
 
 ---
 
-## Phase 4 — Notification System — ⬜ Pending
+## Workstream E4 — Notification System — ⬜ Delivery Phase 9 pending
 
 **Goal:** Build a centralized, reliable, user-configurable notification system.
 
@@ -244,7 +239,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 5 — Shipping, Fulfillment, Returns and Tax — ⬜ Pending
+## Workstream E5 — Shipping, Fulfillment, Returns and Tax — ⬜ Delivery Phase 10 pending
 
 **Goal:** Replace simple shipping/GST settings with an operational fulfillment workflow.
 
@@ -272,7 +267,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 6 — Customer Experience, Search and Merchandising — ⬜ Pending
+## Workstream E6 — Customer Experience, Search and Merchandising — ⬜ Delivery Phase 11 pending
 
 **Goal:** Improve conversion, usability and catalog discoverability at production scale.
 
@@ -299,7 +294,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 7 — Admin Governance, RBAC and Auditability — ⬜ Pending
+## Workstream E7 — Admin Governance, RBAC and Auditability — ⬜ Delivery Phase 7 pending
 
 **Goal:** Ensure staff access follows least privilege and every sensitive action is traceable.
 
@@ -324,7 +319,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 8 — Security, Privacy and Compliance Hardening — ⬜ Pending
+## Workstream E8 — Security, Privacy and Compliance Hardening — ⬜ Delivery Phase 12 pending
 
 **Goal:** Complete a production-focused security and privacy pass.
 
@@ -353,7 +348,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 9 — Performance, Scalability and Resilience — ⬜ Pending
+## Workstream E9 — Performance, Scalability and Resilience — ⬜ Delivery Phase 13 pending
 
 **Goal:** Meet defined service levels under realistic traffic and failure scenarios.
 
@@ -380,7 +375,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 10 — Observability and Production Operations — ⬜ Pending
+## Workstream E10 — Observability and Production Operations — ⬜ Delivery Phase 14 pending
 
 **Goal:** Make production failures visible, diagnosable and recoverable.
 
@@ -406,7 +401,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 11 — CI/CD, Infrastructure and Deployment — ⬜ Pending
+## Workstream E11 — CI/CD, Infrastructure and Deployment Preparation — ⬜ Delivery Phase 15 pending
 
 **Goal:** Establish repeatable, secure and low-risk releases.
 
@@ -417,7 +412,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 - [ ] Add browser E2E tests for critical user journeys.
 - [ ] Add deployment pipeline with artifact/version tracking.
 - [ ] Add safe migration strategy and pre-deployment backup.
-- [ ] Configure production web server, PHP-FPM, scheduler and supervised queue workers.
+- [ ] Configure cPanel/shared-host-compatible PHP, scheduler and cron-driven queue execution without assuming SSH or persistent workers.
 - [ ] Configure environment secrets outside the repository.
 - [ ] Add zero/low-downtime deployment and rollback procedure.
 - [ ] Add post-deploy smoke tests.
@@ -431,7 +426,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 12 — QA, Accessibility, Compatibility and Release Candidate — ⬜ Pending
+## Workstream E12 — QA, Accessibility, Compatibility and Release Candidate — ⬜ Delivery Phase 16 pending
 
 **Goal:** Validate the complete system against acceptance criteria before launch.
 
@@ -457,7 +452,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 
 ---
 
-## Phase 13 — Production Launch and Post-launch Stabilization — ⬜ Pending
+## Workstream E13 — Production Launch and Post-launch Stabilization — ⬜ Delivery Phase 18 inactive
 
 **Goal:** Launch safely and stabilize the platform with measured monitoring.
 
@@ -466,7 +461,7 @@ These features are already present in the repository. Phase 0 will revalidate th
 - [ ] Complete production readiness checklist and go/no-go review.
 - [ ] Confirm live Razorpay keys/webhook secrets and make a controlled low-value live transaction.
 - [ ] Confirm email domain authentication and delivery.
-- [ ] Confirm backups, monitoring, alerts, queue workers and scheduler.
+- [ ] Confirm backups, monitoring, alerts, cron-driven queue execution and scheduler.
 - [ ] Seed/import verified production catalog and content.
 - [ ] Verify legal pages, contact details, GST/shipping/return configuration.
 - [ ] Deploy the approved release and run production smoke tests.
@@ -504,46 +499,16 @@ The platform is **production-ready only when every gate below is green**.
 
 ---
 
-# D. Recommended Execution Order
+# D. Delivery-order authority
 
-1. **Phase 0:** Baseline Audit and Scope Freeze
-2. **Phase 1:** Domain/Data/Inventory Hardening
-3. **Phase 2:** Payments and Refunds
-4. **Phase 3:** Reviews and Comments
-5. **Phase 4:** Notifications
-6. **Phase 5:** Shipping, Returns and Tax
-7. **Phase 7:** Admin RBAC and Auditability
-8. **Phase 8:** Security and Privacy
-9. **Phase 6:** Search and Customer Experience
-10. **Phase 9:** Performance and Resilience
-11. **Phase 10:** Observability and Operations
-12. **Phase 11:** CI/CD and Deployment
-13. **Phase 12:** Release Candidate QA/UAT
-14. **Phase 13:** Production Launch
+This inventory does not define execution order. The complete workstream-to-delivery crosswalk and dependency rationale are maintained in `tasks/CANONICAL_PHASE_SEQUENCE.md`; live completion status is maintained in `tasks/MASTER_PROJECT_TRACKER.md`.
 
-> Phases 6–11 can overlap selectively after the commerce state/payment foundation is stable, but production release gates cannot be bypassed.
+Delivery Phases 0–5 are complete and accepted. Pending work proceeds sequentially through canonical Delivery Phases 6–18. Capability workstreams may contribute to more than one delivery phase, but their E-series IDs never replace delivery phase numbers and no production release gate may be bypassed.
 
 ---
 
-# E. Review Decisions Needed Before Phase 0 Closure
+# E. Decision ownership
 
-- [ ] Production database: MySQL 8+ or another approved database.
-- [ ] Cache/session/queue: Redis or database-backed setup.
-- [ ] Hosting and deployment platform.
-- [ ] Media storage: local/object storage provider and CDN.
-- [ ] Transactional email provider and sender domain.
-- [ ] Shipping provider/aggregator and PIN-code serviceability rules.
-- [ ] GST/tax and invoice requirements approved by accountant/legal advisor.
-- [ ] Return, replacement, cancellation and refund policy.
-- [ ] Comment scope: product-review replies only, or comments on CMS/blog content too.
-- [ ] Notification channels: email + in-app; optional SMS/WhatsApp.
-- [ ] Search engine choice based on expected catalog/traffic.
-- [ ] Admin role matrix and 2FA requirement.
-- [ ] Required analytics/cookie/marketing tools and consent requirements.
-- [ ] Expected peak users/orders and performance targets.
+The original review surfaced infrastructure, media, mail, shipping, tax, returns, notifications, search, RBAC, analytics and performance decisions. Resolved decisions are recorded in the master tracker and phase evidence; unresolved decisions belong to the pre-activation contract of their canonical owning delivery phase rather than to the historical E-series number.
 
----
-
-## Proposed First Action After Approval
-
-Begin **Phase 0 only**: run a clean technical baseline, reconcile outdated documentation with the current code, produce an evidence-based audit report, and then request approval before starting Phase 1.
+The immediate pre-activation decisions for Delivery Phase 6 are recorded in `tasks/CANONICAL_PHASE_SEQUENCE.md`. Agent 10 and Delivery Phase 18 remain inactive unless explicitly activated after Delivery Phase 17 acceptance.

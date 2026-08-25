@@ -53,7 +53,7 @@ Machine-readable results and full-page screenshots are under `tasks/evidence/pha
 - The real Razorpay network/API and live bank instruments were not charged. Cryptographic verification, replay, invalid-callback, initiation and fake-gateway journeys are automated; live-provider certification remains a later operational/UAT gate.
 - Exact MySQL 8.4.3 schema acceptance was established in Phase 2. This Phase 4 destructive regression/browser fixture used isolated SQLite by design and did not touch persistent MySQL data.
 - Browser evidence uses seeded catalogue/placeholders and does not satisfy Phase 6 commercial content/media rights or import completeness.
-- Phase 8 hardening, Phase 9 full UAT and Phase 10 production-readiness gates remain pending. Agent 10 deployment is inactive.
+- Canonical Phase 12 hardening, Phase 16 full QA/UAT and Phase 17 production-readiness gates remain pending. Agent 10 and Phase 18 deployment remain inactive.
 
 ## Agent 0 decision
 
