@@ -6,7 +6,7 @@ const commonModules = [A11y, Autoplay, Keyboard, Navigation, Pagination];
 export function initCarousels(reducedMotion) {
     const hero = document.querySelector('.hero-swiper');
     if (hero) {
-        new Swiper(hero, {
+        const heroSwiper = new Swiper(hero, {
             modules: [...commonModules, EffectFade],
             loop: true,
             speed: reducedMotion ? 0 : 1100,
@@ -28,6 +28,30 @@ export function initCarousels(reducedMotion) {
             keyboard: { enabled: true, onlyInViewport: true },
             a11y: { enabled: true },
         });
+
+        const pauseButton = hero.querySelector('.hero-pause');
+        const pauseLabel = pauseButton?.querySelector('[data-hero-pause-label]');
+        let userPaused = false;
+
+        const renderPauseState = () => {
+            pauseButton?.setAttribute('aria-pressed', String(userPaused));
+            pauseButton?.setAttribute('aria-label', userPaused ? 'Resume featured collections' : 'Pause featured collections');
+            if (pauseLabel) pauseLabel.textContent = userPaused ? 'Play' : 'Pause';
+        };
+
+        pauseButton?.addEventListener('click', () => {
+            userPaused = !userPaused;
+            if (userPaused) heroSwiper.autoplay?.stop();
+            else heroSwiper.autoplay?.start();
+            renderPauseState();
+        });
+
+        hero.addEventListener('focusin', () => heroSwiper.autoplay?.pause());
+        hero.addEventListener('focusout', (event) => {
+            if (!userPaused && !hero.contains(event.relatedTarget)) heroSwiper.autoplay?.resume();
+        });
+
+        renderPauseState();
     }
 
     // Popular categories — multi-card carousel with side arrows

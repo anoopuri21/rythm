@@ -4,9 +4,9 @@
 @endphp
 
 {{-- ============================================================
-     DEALS OF THE DAY — sale cards with stock meter + countdown
-     Countdown runs to local midnight (daily reset), one shared
-     timer feeds every card.
+     DEALS OF THE DAY — sale cards with real current stock.
+     Synthetic sold counts and unbacked countdowns are intentionally
+     omitted; expiry UI may return only with a persisted timestamp.
      ============================================================ --}}
 <section class="deal-mm" aria-label="Deals of the day">
     <div class="deal-mm__inner">
@@ -20,8 +20,6 @@
                 @php
                     $image = $product->heroImage();
                     $available = max((int) $product->stock, 0);
-                    $sold = (($product->id * 13) % 45) + 5; // deterministic demo counter until order data exists
-                    $pct = $available + $sold > 0 ? (int) round($sold / ($available + $sold) * 100) : 0;
                     $href = route('product.show', $product->slug);
                 @endphp
                 <article class="pcard dealcard">
@@ -42,44 +40,16 @@
                             <ins>₹{{ number_format((float) $product->price) }}</ins>
                         </p>
 
-                        <div class="dealcard__stock">
-                            <span>Available: <b>{{ $available }}</b></span>
-                            <span>Sold: <b>{{ $sold }}</b></span>
-                        </div>
-                        <div class="dealcard__bar" role="presentation">
-                            <span style="width: {{ $pct }}%"></span>
-                        </div>
-
-                        <div class="dealcard__timer" data-deal-timer aria-label="Deal ends in">
-                            <span><b data-t="d">0</b>Days</span>
-                            <span><b data-t="h">0</b>Hours</span>
-                            <span><b data-t="m">0</b>Mins</span>
-                            <span><b data-t="s">0</b>Secs</span>
-                        </div>
+                        <p class="dealcard__stock" aria-label="Availability">
+                            @if($available > 0)
+                                <span>Available now: <b>{{ $available }}</b></span>
+                            @else
+                                <span><b>Currently out of stock</b></span>
+                            @endif
+                        </p>
                     </div>
                 </article>
             @endforeach
         </div>
     </div>
 </section>
-
-<script>
-    // Shared daily countdown — all deals end at local midnight.
-    (function () {
-        var timers = document.querySelectorAll('[data-deal-timer]');
-        if (!timers.length) return;
-        function tick() {
-            var now = new Date();
-            var end = new Date(now); end.setHours(24, 0, 0, 0);
-            var s = Math.max(0, Math.floor((end - now) / 1000));
-            var v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
-            timers.forEach(function (t) {
-                ['d', 'h', 'm', 's'].forEach(function (k) {
-                    t.querySelector('[data-t="' + k + '"]').textContent = v[k];
-                });
-            });
-        }
-        tick();
-        setInterval(tick, 1000);
-    })();
-</script>

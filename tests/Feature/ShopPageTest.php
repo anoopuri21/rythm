@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Livewire\ShopIndex;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -28,6 +30,24 @@ class ShopPageTest extends TestCase
             ->assertSee('Shop instruments')
             ->assertSee('Yamaha F310 Acoustic Guitar')
             ->assertSee('₹8,499');
+    }
+
+    public function test_shop_seo_policy_distinguishes_base_pagination_and_filtered_queries(): void
+    {
+        $this->get('/shop')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('shop.index').'">', escape: false)
+            ->assertSee('<meta name="robots" content="index, follow">', escape: false);
+
+        $this->get('/shop?page=2')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('shop.index', ['page' => 2]).'">', escape: false)
+            ->assertSee('<meta name="robots" content="index, follow">', escape: false);
+
+        $this->get('/shop?q=guitar')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('shop.index').'">', escape: false)
+            ->assertSee('<meta name="robots" content="noindex, follow">', escape: false);
     }
 
     public function test_child_category_filter_shows_only_that_category(): void
@@ -69,8 +89,8 @@ class ShopPageTest extends TestCase
     public function test_in_stock_filter_excludes_out_of_stock(): void
     {
         $outOfStock = Product::factory()->create([
-            'category_id' => \App\Models\Category::where('slug', 'picks-capos')->firstOrFail()->id,
-            'brand_id' => \App\Models\Brand::where('slug', 'fender')->firstOrFail()->id,
+            'category_id' => Category::where('slug', 'picks-capos')->firstOrFail()->id,
+            'brand_id' => Brand::where('slug', 'fender')->firstOrFail()->id,
             'name' => 'Out Of Stock Special',
             'slug' => 'out-of-stock-special',
             'sku' => 'RYM-OOS-001',

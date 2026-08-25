@@ -59,6 +59,9 @@
                     @endforeach
                 </div>
                 <div class="hero-pagination swiper-pagination !bottom-5 !text-left"></div>
+                <button type="button" class="hero-pause hero-mm__pause" aria-pressed="false" aria-label="Pause featured collections">
+                    <span data-hero-pause-label>Pause</span>
+                </button>
                 <button type="button" class="hero-prev hero-mm__navbtn hero-mm__navbtn--prev" aria-label="Previous slide">←</button>
                 <button type="button" class="hero-next hero-mm__navbtn hero-mm__navbtn--next" aria-label="Next slide">→</button>
             </div>
@@ -90,7 +93,7 @@
             <img src="{{ asset('images/hero/grid-banner-headphones.jpg') }}" alt="Studio headphones" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
                 <span class="hero-mm__banner-title">Studio Gear</span>
-                <span class="hero-mm__banner-sub">Up to 30% discount</span>
+                <span class="hero-mm__banner-sub">Explore current studio offers</span>
                 <span class="hero-mm__banner-link">Shop now →</span>
             </span>
         </a>

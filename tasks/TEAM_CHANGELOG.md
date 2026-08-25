@@ -166,6 +166,20 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 2 `BLOCKED` → `COMPLETE`** — Agent 0 accepted the owner-reported exact MySQL evidence together with the independently passed 225 tests / 753 assertions, isolated rollback/forward cycle, syntax/style checks, and Composer audit.
 - **Auto Mode paused at phase checkpoint** — Phase 3 remains `PENDING` until the owner issues exact `ACTIVATE AUTO MODE`. Agent 10 remains inactive and no production sign-off is implied.
 
+## 25 August 2026 — Phase 3 Auto Mode Activated
+
+- **Phase 3 `PENDING` → `IN PROGRESS`** — Owner issued exact `ACTIVATE AUTO MODE`; Agents 2, 1, 9 and 13 activated under Agent 0.
+- **Five-chunk implementation plan approved** — Shared truthfulness/accessibility, Homepage fidelity, Shop marketplace, automated QA and rendered visual regression are sequenced in `tasks/AUTO_MODE_PHASE_3_PLAN.md`.
+- **Source review ≠ visual acceptance** — Browser-rendered 1440px/390px evidence remains mandatory before Agent 0 can accept Phase 3.
+
+## 25 August 2026 — Phase 3 Chunk 1 Shared Storefront Baseline
+
+- **Unapproved promotional claims → Truthful storefront copy** — Removed shipping, return, EMI, warranty, fixed-discount, synthetic sold-count and unbacked countdown claims from active Homepage/Shop/header surfaces; deal availability now uses real stock only.
+- **Generic SEO fallback → Query-aware policy** — Homepage and base Shop are self-canonical; paginated Shop pages preserve their page canonical; filtered/search Shop states are `noindex, follow` and canonicalize to the base Shop.
+- **Passive hero autoplay → User-controllable carousel** — Added pause/resume control, keyboard-focus pause and reduced-motion behavior.
+- **Visual-only drawer → Contained accessible dialog** — Added dynamic expanded state, focus entry/restoration, focus/scroll trapping and complete tab/panel relationships.
+- **Chunk 1 gates passed** — 46 tests / 190 assertions, production Vite build, changed-PHP syntax/Pint and diff checks passed.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

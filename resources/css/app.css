@@ -70,7 +70,7 @@
 ::-webkit-scrollbar-thumb { background: var(--color-brand); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-brand-dark); }
 
-html { scroll-behavior: auto; }
+html { scroll-behavior: auto; scroll-padding-top: 8.5rem; }
 
 .swiper-pagination-bullet {
     width: 12px !important;
@@ -995,7 +995,25 @@ input:focus-visible { outline: none; }
 .hero-mm__navbtn:hover { background: #fff; color: var(--color-ink); }
 .hero-mm__navbtn--prev { right: 66px; }
 .hero-mm__navbtn--next { right: 16px; }
+.hero-mm__pause {
+    position: absolute;
+    z-index: 20;
+    right: 16px;
+    top: 16px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .5);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+.hero-mm__pause:hover, .hero-mm__pause[aria-pressed="true"] { background: var(--color-brand); }
 @media (min-width: 640px) { .hero-mm__navbtn { display: flex; } }
+@media (prefers-reduced-motion: reduce) { .hero-mm__pause { display: none; } }
 
 /* Banner cards */
 .hero-mm__banner {

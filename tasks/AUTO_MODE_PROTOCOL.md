@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 2 complete; next roadmap phase requires explicit activation
+**Status:** ACTIVE — Phase 3 Homepage + Shop frontend
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,11 +147,11 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — automatically paused after completion of a full roadmap phase
+- **Active:** Yes — owner issued exact `ACTIVATE AUTO MODE` for Phase 3
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, and Phase 2 MySQL Schema + Domain Architecture (`COMPLETE`)
-- **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`PENDING`)
+- **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`IN PROGRESS`)
 - **Independent evidence:** normalized catalog facets, inventory movement ledger integration, payment-event/idempotency foundations, clean migration/seed and rollback, **225 tests / 753 assertions**, changed-PHP Pint/syntax and Composer audit all pass.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
-- **Blocker:** none for Phase 2.
-- **Resume action:** issue exact `ACTIVATE AUTO MODE` to begin Phase 3 planning and execution.
+- **Blocker:** none; visual evidence becomes mandatory at the final Phase 3 gate.
+- **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`.
 - **Deployment:** Agent 10 remains inactive.

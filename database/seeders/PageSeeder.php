@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Page;
-use App\Models\SeoEntry;
 use Illuminate\Database\Seeder;
 
 /**
@@ -24,10 +23,10 @@ class PageSeeder extends Seeder
                 'content' => null,
                 'seo' => [
                     'meta_title' => 'Rhythm Exports - Feel The Music, Own The Sound',
-                    'meta_description' => 'Shop premium musical instruments at Rhythm Exports. Guitars, Keyboards, Drums, Pro Audio and more from top brands like Fender, Yamaha, Roland. Free shipping all over India.',
+                    'meta_description' => 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories from leading brands at Rhythm Exports.',
                     'meta_keywords' => 'music store india, buy guitars online, digital pianos, pro audio, rythme',
                     'og_title' => 'Rhythm Exports - Feel The Music, Own The Sound',
-                    'og_description' => 'Premium musical instruments, expert setup, free shipping across India.',
+                    'og_description' => 'Explore musical instruments and studio gear from leading brands at Rhythm Exports.',
                     'robots' => 'index, follow',
                 ],
             ],
@@ -63,7 +62,7 @@ class PageSeeder extends Seeder
                 'content' => null,
                 'seo' => [
                     'meta_title' => 'Shop All Instruments - Guitars, Keyboards, Drums, Pro Audio | Rhythm Exports',
-                    'meta_description' => 'Browse the full Rhythm Exports catalogue - acoustic and electric guitars, digital pianos, electronic drums, pro audio and accessories. Free shipping all over India.',
+                    'meta_description' => 'Browse guitars, digital pianos, drums, pro audio and musical-instrument accessories from leading brands at Rhythm Exports.',
                     'meta_keywords' => 'buy musical instruments online, guitars india, keyboards, pro audio, rhythm exports',
                     'og_title' => 'Shop Instruments at Rhythm Exports',
                     'robots' => 'index, follow',

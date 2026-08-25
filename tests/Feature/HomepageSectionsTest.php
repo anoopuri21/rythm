@@ -54,7 +54,8 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('hero-swiper swiper', escape: false)
             ->assertSee('hero-slide-image', escape: false)
             ->assertSee('hero-pagination', escape: false)
-            ->assertSee('hero-mm__cta', escape: false);
+            ->assertSee('hero-mm__cta', escape: false)
+            ->assertSee('aria-label="Pause featured collections"', escape: false);
     }
 
     public function test_hero_has_admin_driven_slides(): void
@@ -70,12 +71,15 @@ class HomepageSectionsTest extends TestCase
         $this->assertStringContainsString('Feel the music.', $html);
     }
 
-    public function test_usp_strip_renders(): void
+    public function test_usp_strip_renders_without_unapproved_commerce_claims(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSee('class="usp-strip"', escape: false)
-            ->assertSee('Free express', escape: false);
+            ->assertSee('Instrument-first', escape: false)
+            ->assertDontSee('Free express', escape: false)
+            ->assertDontSee('7-day returns', escape: false)
+            ->assertDontSee('Easy EMI', escape: false);
     }
 
     public function test_categories_carousel_renders_with_db_categories(): void
@@ -114,14 +118,14 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('adv-mm', escape: false);
     }
 
-    public function test_deals_section_renders_with_countdown(): void
+    public function test_deals_section_uses_real_stock_without_synthetic_sales_or_deadline(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSee('deal-mm', escape: false)
-            ->assertSee('Days', escape: false)
-            ->assertSee('Hours', escape: false)
-            ->assertSee('Mins', escape: false)
+            ->assertSee('Available now', escape: false)
+            ->assertDontSee('Sold:', escape: false)
+            ->assertDontSee('data-deal-timer', escape: false)
             ->assertSee('View product', escape: false);
     }
 
@@ -147,6 +151,14 @@ class HomepageSectionsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('brand-mm', escape: false);
+    }
+
+    public function test_homepage_has_self_canonical_and_index_policy(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('home').'">', escape: false)
+            ->assertSee('<meta name="robots" content="index, follow">', escape: false);
     }
 
     public function test_footer_renders(): void

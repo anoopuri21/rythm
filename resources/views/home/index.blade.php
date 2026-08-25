@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Rhythm Exports - Feel The Music, Own The Sound')
-@section('meta_description', 'Shop premium musical instruments at Rhythm Exports. Guitars, Keyboards, Drums, Pro Audio and more from top brands like Fender, Yamaha, Gibson. Free shipping all over India.')
+@section('meta_description', 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories from leading brands at Rhythm Exports.')
 
 @push('head')
     <link rel="preload" as="image" href="{{ asset('images/hero/grid-slide-guitar.jpg') }}" fetchpriority="high">
