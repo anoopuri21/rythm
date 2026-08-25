@@ -36,14 +36,18 @@ class CouponResource extends Resource
             TextInput::make('code')->required()->maxLength(50)->uppercase()
                 ->unique(ignoreRecord: true)
                 ->helperText('Customer enters this code at checkout.'),
-            Select::make('type')->options(['percent' => 'Percent (%)', 'fixed' => 'Fixed (₹)'])->required(),
-            TextInput::make('value')->numeric()->required()->minValue(0)
-                ->helperText('Percent value (1–100) or fixed amount in ₹.'),
-            TextInput::make('min_order')->numeric()->default(0)->prefix('₹'),
-            TextInput::make('max_discount')->numeric()->nullable()->prefix('₹')
+            Select::make('type')->options([
+                Coupon::TYPE_PERCENT => 'Percent (%)',
+                Coupon::TYPE_FIXED => 'Fixed (₹)',
+            ])->required()->live(),
+            TextInput::make('value')->numeric()->required()->minValue(0.01)
+                ->maxValue(fn ($get): ?int => $get('type') === Coupon::TYPE_PERCENT ? 100 : null)
+                ->helperText('Percent must be 0.01–100; fixed amount is in ₹.'),
+            TextInput::make('min_order')->numeric()->default(0)->minValue(0)->prefix('₹'),
+            TextInput::make('max_discount')->numeric()->nullable()->minValue(0.01)->prefix('₹')
                 ->helperText('Max discount cap for percent coupons (optional).'),
             DateTimePicker::make('starts_at'),
-            DateTimePicker::make('expires_at'),
+            DateTimePicker::make('expires_at')->after('starts_at'),
             TextInput::make('max_uses')->numeric()->nullable()->minValue(1),
             Toggle::make('is_active')->default(true),
         ])->columns(2);
@@ -63,7 +67,10 @@ class CouponResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active'),
-                SelectFilter::make('type')->options(['percent' => 'Percent', 'fixed' => 'Fixed']),
+                SelectFilter::make('type')->options([
+                    Coupon::TYPE_PERCENT => 'Percent',
+                    Coupon::TYPE_FIXED => 'Fixed',
+                ]),
             ])
             ->actions([
                 EditAction::make(),

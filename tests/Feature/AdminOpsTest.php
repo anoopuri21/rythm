@@ -136,7 +136,8 @@ class AdminOpsTest extends TestCase
         $this->actingAs($this->admin)
             ->get('/admin/homepage-blocks')
             ->assertOk()
-            ->assertSee('Free expert setup');
+            ->assertSee('Server-verified totals')
+            ->assertDontSee('Free expert setup');
     }
 
     public function test_admin_faqs_resource(): void
@@ -144,7 +145,7 @@ class AdminOpsTest extends TestCase
         $this->actingAs($this->admin)
             ->get('/admin/faqs')
             ->assertOk()
-            ->assertSee('How long does delivery take');
+            ->assertSee('How are shipping charges calculated?');
     }
 
     public function test_products_show_trending_and_rank_columns(): void

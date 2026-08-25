@@ -132,6 +132,46 @@ class CouponTest extends TestCase
         $this->assertNotNull($order->fresh()->coupon_usage_released_at);
     }
 
+    public function test_invalid_coupon_type_and_value_are_rejected(): void
+    {
+        Coupon::factory()->create(['code' => 'BADTYPE', 'type' => 'mystery', 'value' => 10]);
+        Coupon::factory()->create(['code' => 'BADPERCENT', 'type' => Coupon::TYPE_PERCENT, 'value' => 101]);
+
+        try {
+            app(CouponService::class)->validateAndApply('BADTYPE', 1000);
+            $this->fail('Invalid coupon type was accepted.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('invalid discount type', $exception->getMessage());
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('invalid discount value');
+        app(CouponService::class)->validateAndApply('BADPERCENT', 1000);
+    }
+
+    public function test_invalid_coupon_active_period_is_rejected(): void
+    {
+        Coupon::factory()->create([
+            'code' => 'BADWINDOW',
+            'starts_at' => now()->subHour(),
+            'expires_at' => now()->subHours(2),
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('invalid active period');
+        app(CouponService::class)->validateAndApply('BADWINDOW', 1000);
+    }
+
+    public function test_coupon_codes_are_normalized_on_write(): void
+    {
+        $coupon = Coupon::factory()->create(['code' => '  mixedCase  ']);
+
+        $this->assertSame('MIXEDCASE', $coupon->fresh()->code);
+        $result = app(CouponService::class)->validateAndApply('mixedcase', 1000);
+        $this->assertTrue($result['coupon']->is($coupon));
+        $this->assertGreaterThan(0, $result['discount']);
+    }
+
     public function test_max_discount_cap(): void
     {
         Coupon::factory()->create(['code' => 'CAP', 'type' => 'percent', 'value' => 50, 'max_discount' => 300]);
@@ -146,6 +186,15 @@ class CouponTest extends TestCase
 
         app(CouponService::class)->incrementUsage($coupon);
         $this->assertSame(1, $coupon->fresh()->used_count);
+    }
+
+    public function test_usage_increment_cannot_exceed_limit(): void
+    {
+        $coupon = Coupon::factory()->create(['max_uses' => 1, 'used_count' => 1]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('usage limit');
+        app(CouponService::class)->incrementUsage($coupon);
     }
 
     public function test_checkout_with_coupon_discounts_order(): void

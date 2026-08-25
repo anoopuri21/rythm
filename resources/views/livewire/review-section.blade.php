@@ -1,8 +1,8 @@
-<div class="mt-16">
+<section id="customer-reviews" class="mt-16 scroll-mt-28" aria-labelledby="customer-reviews-title">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <p class="section-kicker mb-3">Real voices</p>
-            <h2 class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Customer reviews</h2>
+            <h2 id="customer-reviews-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Customer reviews</h2>
         </div>
         @if($summary['count'] > 0)
             <div class="flex items-center gap-3 rounded-2xl border border-ink/10 bg-white px-5 py-3">
@@ -33,7 +33,7 @@
     @endif
 
     {{-- Submit form --}}
-    <div class="mt-8 max-w-2xl rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
+    <form wire:submit="submit" class="mt-8 max-w-2xl rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
         <h3 class="text-sm font-bold text-ink">Write a review</h3>
 
         @if($submitted)
@@ -46,24 +46,27 @@
         @else
             <div class="mt-4 flex items-center gap-1.5" role="radiogroup" aria-label="Star rating">
                 @for($star = 1; $star <= 5; $star++)
-                    <button type="button" wire:click="setRating({{ $star }})"
+                    <button type="button" role="radio" wire:click="setRating({{ $star }})"
                             class="text-2xl transition hover:scale-110 {{ $rating >= $star ? 'text-amber-400' : 'text-ink/15' }}"
-                            :aria-label="'Rate {{ $star }} star{{ $star > 1 ? 's' : '' }}'">
+                            aria-checked="{{ $rating === $star ? 'true' : 'false' }}"
+                            aria-label="Rate {{ $star }} {{ Str::plural('star', $star) }}">
                         ★
                     </button>
                 @endfor
                 <span class="ml-2 text-xs text-muted">{{ $rating }}/5</span>
             </div>
-            <textarea wire:model="comment" rows="3" maxlength="2000" placeholder="How does it play? What do you love?"
-                      class="mt-4 w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"></textarea>
-            <button type="button" wire:click="submit" wire:loading.attr="disabled"
+            <label for="review-comment-{{ $product->id }}" class="mt-4 block text-xs font-bold uppercase tracking-wide text-muted">Review details (optional)</label>
+            <textarea id="review-comment-{{ $product->id }}" wire:model="comment" rows="3" maxlength="2000"
+                      class="mt-2 w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"></textarea>
+            @error('comment') <p class="mt-2 text-xs font-semibold text-brand" role="alert">{{ $message }}</p> @enderror
+            <button type="submit" wire:loading.attr="disabled" wire:target="submit"
                     class="mt-4 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-60">
-                <span wire:loading.remove>Submit review</span>
-                <span wire:loading>Submitting…</span>
+                <span wire:loading.remove wire:target="submit">Submit review</span>
+                <span wire:loading wire:target="submit">Submitting…</span>
             </button>
-            <p class="mt-3 text-[11px] text-muted">Verified purchases only — reviews appear after moderation.</p>
+            <p class="mt-3 text-[11px] text-muted">Paid, delivered purchases only — reviews appear after moderation.</p>
         @endif
-    </div>
+    </form>
 
     {{-- List --}}
     <div class="mt-8 grid gap-4 sm:grid-cols-2">
@@ -79,6 +82,12 @@
                 @if($review->comment)
                     <p class="mt-3 text-sm leading-6 text-ink/80">{{ $review->comment }}</p>
                 @endif
+                @if($review->merchant_reply)
+                    <div class="mt-4 rounded-2xl bg-paper-dark px-4 py-3">
+                        <p class="text-[10px] font-bold uppercase tracking-wide text-muted">Reply from Rhythm Exports</p>
+                        <p class="mt-1 text-sm leading-6 text-ink/80">{{ $review->merchant_reply }}</p>
+                    </div>
+                @endif
             </article>
         @empty
             <p class="rounded-2xl border border-dashed border-ink/15 bg-white px-6 py-10 text-center text-sm text-muted sm:col-span-2">
@@ -87,7 +96,7 @@
         @endforelse
     </div>
 
-    <div class="mt-8">
-        {{ $paginated->links() }}
-    </div>
-</div>
+    @if($paginated->hasPages())
+        <div class="mt-8">{{ $paginated->links() }}</div>
+    @endif
+</section>

@@ -15,14 +15,14 @@
         </div>
     </header>
 
-    {{-- Numbers (static) --}}
+    {{-- Verified platform capabilities --}}
     <section class="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
         <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
             @foreach([
-                ['12+', 'Years of craft'],
-                ['35,000+', 'Musicians served'],
-                ['80+', 'Brands stocked'],
-                ['4.8★', 'Average rating'],
+                ['Curated', 'Instrument catalogue'],
+                ['Verified', 'Checkout totals'],
+                ['Moderated', 'Reviews & Q&A'],
+                ['Protected', 'Order tracking'],
             ] as [$value, $label])
                 <div class="rounded-3xl border border-ink/10 bg-white p-6 text-center sm:p-8">
                     <p class="font-playfair text-3xl font-bold text-brand sm:text-4xl">{{ $value }}</p>
@@ -37,18 +37,18 @@
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
                 <p class="section-kicker mb-3">Our promise</p>
-                <h2 class="font-playfair text-3xl font-bold text-ink sm:text-4xl">From Delhi workshops to your doorstep</h2>
+                <h2 class="font-playfair text-3xl font-bold text-ink sm:text-4xl">A clearer way to explore musical instruments</h2>
                 <p class="mt-5 leading-7 text-muted">
-                    Our team of working musicians tests every product line before it reaches the store.
-                    We stock what we would play ourselves, and we stand behind every single order with
-                    honest advice and quick support.
+                    Rhythm Exports presents catalogue details, availability and checkout totals through
+                    the storefront. Product questions and verified-purchase reviews are moderated before
+                    they appear publicly.
                 </p>
                 <ul class="mt-6 space-y-3">
                     @foreach([
-                        'Free expert setup on every guitar',
-                        '1-year warranty on all instruments',
-                        'Free shipping across India',
-                        'Real humans answering your questions',
+                        'Category, brand, price and specification filters',
+                        'Server-verified checkout totals',
+                        'Moderated product questions and staff answers',
+                        'Protected order tracking and invoice access',
                     ] as $point)
                         <li class="flex items-start gap-3 text-sm text-ink">
                             <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>

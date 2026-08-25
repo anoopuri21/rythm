@@ -45,7 +45,7 @@
             <span class="w-8 text-center text-sm font-bold text-ink" wire:loading.class="opacity-50">{{ $qty }}</span>
             <button type="button" wire:click="setQty({{ $qty + 1 }})" class="flex h-11 w-11 items-center justify-center rounded-full text-lg font-bold text-ink transition hover:text-brand" aria-label="Increase quantity">+</button>
         </div>
-        <p class="text-xs font-semibold {{ $stock > 0 ? 'text-emerald-600' : 'text-brand' }}">
+        <p class="text-xs font-semibold {{ $stock > 0 ? 'text-emerald-700' : 'text-brand' }}">
             @if($stock > 0)
                 In stock — {{ $stock }} available
             @else

@@ -269,3 +269,21 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Independent gate passed** — Focused Phase 4 regression: **93 tests / 280 assertions**. Full regression: **244 tests / 858 assertions**. Production Vite build, Blade compilation, changed-file syntax/Pint, claim scan, Composer audit and npm production audit passed.
 - **Data safety retained** — Browser evidence used a disposable isolated SQLite file. Persistent `rhythm_db` was not connected to, reset, migrated, seeded or targeted by tests.
 - **Phase 4 `IN PROGRESS` → `COMPLETE`** — Agent 0 accepted Phase 4 on 26 August 2026. Auto Mode paused at the full-phase checkpoint; Agent 10 remains inactive; no production sign-off was issued.
+
+## 26 August 2026 — Phase 5 Auto Mode Activated
+
+- **Phase 5 `PENDING` → `IN PROGRESS`** — Owner issued exact `ACTIVATE AUTO MODE`; Agents 3, 6, 9, 11, 12 and 14 activated under Agent 0.
+- **Interaction scope locked** — Owner selected verified-purchase reviews plus moderated product Q&A; blog comments are excluded.
+- **Five-chunk plan approved** — Truthfulness/domain audit, verified reviews, product Q&A, coupon/UX qualification and independent gate are sequenced in `tasks/AUTO_MODE_PHASE_5_PLAN.md`.
+- **Initial audit findings** — Product detail renders a synthetic `4.8` rating and unsupported warranty claim; review eligibility accepts unpaid/non-delivered orders; duplicate reviews lack a database constraint; pending and rejected moderation are conflated; controls need accessibility remediation; product Q&A does not exist; coupon configuration validation requires hardening.
+- **Safety boundary retained** — Persistent `rhythm_db` remains protected from destructive tests and sample seeding; Agent 10 remains inactive; no production sign-off is implied.
+
+## 26 August 2026 — Phase 5 Implementation and Isolated QA
+
+- **Verified-review integrity implemented** — Paid + delivered eligibility, unique customer/product constraint, explicit moderation states, staff audit fields, merchant replies and approved-only aggregates replaced the permissive/synthetic behavior.
+- **Product Q&A implemented** — Added schema/model/service, validated and rate-limited Livewire submission, approved-answer-only public rendering, escaped content and deny-by-default Filament moderation.
+- **Coupon hardening completed** — Codes normalize, malformed type/value/windows are rejected, and direct usage increments lock and respect limits while Phase 0A reservation/release invariants remain green.
+- **Unsupported content remediated** — Removed synthetic ratings/testimonials/business metrics and unsupported setup, shipping, warranty, EMI, delivery and refund promises. A guarded migration changes only untouched seeded CMS content and preserves owner edits.
+- **Independent isolated gate passed** — **265 tests / 974 assertions**, two-migration forward/rollback/forward, production build, changed-file syntax/Pint, Blade compilation, Composer/npm audits and public claim scan passed.
+- **Rendered qualification passed** — Review/Q&A journeys at 1440/768/390/320 produced zero axe violations, horizontal overflow and console/page errors after correcting a stock-label contrast finding.
+- **Phase 5 `IN PROGRESS` → `QA`** — Exact MySQL 8.4.3 UAT forward-migration/status evidence remains. Auto Mode paused at this genuine external gate; Agent 10 remains inactive; no production sign-off issued.

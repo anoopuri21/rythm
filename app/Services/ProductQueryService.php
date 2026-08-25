@@ -25,8 +25,12 @@ final class ProductQueryService
         $query = Product::query()
             ->active()
             ->with(['brand', 'category', 'media'])
-            ->withAvg(['reviews as reviews_avg_rating' => fn (Builder $review): Builder => $review->where('is_approved', true)], 'rating')
-            ->withCount(['reviews as reviews_count' => fn (Builder $review): Builder => $review->where('is_approved', true)]);
+            ->withAvg(['reviews as reviews_avg_rating' => fn (Builder $review): Builder => $review
+                ->where('status', Review::STATUS_APPROVED)
+                ->where('is_approved', true)], 'rating')
+            ->withCount(['reviews as reviews_count' => fn (Builder $review): Builder => $review
+                ->where('status', Review::STATUS_APPROVED)
+                ->where('is_approved', true)]);
 
         $this->applyCategoryFilter($query, $filters->category);
         $this->applyBrandFilter($query, $filters->brands);
@@ -160,6 +164,7 @@ final class ProductQueryService
         $minimum = min(5, max(1, $minRating));
         $ratedProductIds = Review::query()
             ->select('product_id')
+            ->where('status', Review::STATUS_APPROVED)
             ->where('is_approved', true)
             ->groupBy('product_id')
             ->havingRaw('AVG(rating) >= ?', [$minimum]);

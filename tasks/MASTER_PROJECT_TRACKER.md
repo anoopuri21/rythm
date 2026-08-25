@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 4 — Accounts, cart, wishlist, checkout and orders COMPLETE
-**Overall status:** PHASE 4 COMPLETE / AUTO MODE PAUSED AT FULL-PHASE CHECKPOINT / NOT PRODUCTION-READY
+**Current phase:** Phase 5 — Reviews, product Q&A and coupons QA
+**Overall status:** PHASE 4 COMPLETE / PHASE 5 ISOLATED GATES PASSED / EXACT MYSQL UAT MIGRATION PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — Phase 4 full-phase checkpoint reached
+**Auto Mode:** PAUSED — genuine external gate: exact MySQL 8.4.3 UAT migration evidence
 
 ---
 
@@ -63,7 +63,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 2 | Agent 4, 3, 11, 12, 15 | MySQL schema, migrations and domain architecture | COMPLETE | Accepted 25 Aug 2026: 225 tests / 753 assertions plus owner-reported MySQL 8.4.3 forward migration/status |
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
-| 5 | Agent 3, 6, 9, 14 | Reviews, ratings, comments/Q&A and coupons | PENDING | Moderation, security and workflow tests pass |
+| 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | QA | 265 tests / 974 assertions and 4-width rendered gate passed; exact MySQL 8.4.3 UAT migration/status pending |
 | 6 | Agent 5, 4, 8, 15 | Bajaao catalog scraper/import pipeline | PENDING | Validated import, deduplication and media report |
 | 7 | Agent 6, 3, 4, 11 | Filament resources, dashboards and RBAC | PENDING | Role matrix and admin UAT pass |
 | 8 | Agent 8, 3, 4, 11–15 | Security, accessibility, compliance and performance hardening | PENDING | No unresolved critical/high issue; load targets pass |
@@ -303,3 +303,17 @@ Agent 0 accepts Phase 4 as `COMPLETE` on 26 August 2026 based on `tasks/PHASE_4_
 - Persistent `rhythm_db` remained untouched by destructive tests and the disposable browser fixture.
 
 Auto Mode pauses at this full-phase checkpoint. Phase 5 requires a new explicit `ACTIVATE AUTO MODE` and the product Q&A/comments scope decision. Agent 10 remains inactive. This is not production sign-off.
+
+## 13. Phase 5 QA and Remaining Acceptance Gate
+
+Phase 5 implementation and isolated qualification completed on 26 August 2026:
+
+- Verified reviews require paid, delivered purchases and one customer/product review is enforced at service and database layers.
+- Pending/approved/rejected review moderation, staff audit fields and bounded merchant replies are implemented.
+- Moderated, authenticated and rate-limited product Q&A is implemented in Livewire and Filament; only approved answered questions are public.
+- Coupon type/value/window normalization and transaction-locked direct usage limits passed without weakening Phase 0A reservation/release behavior.
+- Synthetic ratings, testimonials, business metrics and unsupported policy claims were removed; untouched seeded CMS data receives a guarded remediation while owner-edited records remain unchanged.
+- Full regression passed at **265 tests / 974 assertions**. Migration rollback/forward, production build, changed-file syntax/Pint, Blade, dependency audits and claim scans passed.
+- Four rendered widths (1440/768/390/320) report zero axe violations, horizontal overflow and console/page errors.
+
+**Remaining gate:** migrations `2026_08_26_000001` and `000002` must run successfully on persistent UAT MySQL Community Server 8.4.3, followed by migration-status evidence. Persistent `rhythm_db` was intentionally not changed from the agent sandbox. Auto Mode is paused at this genuine external gate; Agent 10 remains inactive; Phase 5 is not yet Agent-0 accepted as COMPLETE.

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Coupon;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
@@ -32,6 +33,19 @@ final class CouponService
 
         if ($coupon === null) {
             throw new RuntimeException('Invalid coupon code.');
+        }
+
+        if (! in_array($coupon->type, [Coupon::TYPE_PERCENT, Coupon::TYPE_FIXED], true)) {
+            throw new RuntimeException('This coupon has an invalid discount type.');
+        }
+
+        $value = (float) $coupon->value;
+        if ($value <= 0 || ($coupon->type === Coupon::TYPE_PERCENT && $value > 100)) {
+            throw new RuntimeException('This coupon has an invalid discount value.');
+        }
+
+        if ($coupon->starts_at !== null && $coupon->expires_at !== null && $coupon->starts_at->gte($coupon->expires_at)) {
+            throw new RuntimeException('This coupon has an invalid active period.');
         }
 
         if ($coupon->starts_at !== null && Carbon::parse($coupon->starts_at)->isFuture()) {
@@ -67,6 +81,14 @@ final class CouponService
 
     public function incrementUsage(Coupon $coupon): void
     {
-        $coupon->increment('used_count');
+        DB::transaction(function () use ($coupon): void {
+            $locked = Coupon::query()->whereKey($coupon->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->max_uses !== null && $locked->used_count >= $locked->max_uses) {
+                throw new RuntimeException('This coupon has reached its usage limit.');
+            }
+
+            $locked->increment('used_count');
+        });
     }
 }
