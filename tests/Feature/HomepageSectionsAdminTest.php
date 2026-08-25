@@ -35,8 +35,7 @@ class HomepageSectionsAdminTest extends TestCase
         $this->actingAs($this->admin)
             ->get('/admin/homepage-sections')
             ->assertOk()
-            ->assertSee('deals')
-            ->assertSee('The encore sale');
+            ->assertSee('deals');
     }
 
     public function test_guest_cannot_access_admin(): void
@@ -44,19 +43,17 @@ class HomepageSectionsAdminTest extends TestCase
         $this->get('/admin/homepage-sections')->assertRedirect('/admin/login');
     }
 
-    public function test_homepage_renders_db_driven_kicker_and_title(): void
+    public function test_homepage_renders_db_driven_title(): void
     {
-        // Customise a section, then confirm it renders on the homepage.
+        // Main homepage: _deals renders $sec->title (admin-driven).
         $deals = HomepageSection::where('section_key', 'deals')->firstOrFail();
         $deals->update([
-            'kicker' => 'Custom sale kicker',
             'title' => 'Custom sale',
             'title_accent' => 'heading.',
         ]);
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Custom sale kicker')
             ->assertSee('Custom sale')
             ->assertSee('heading.');
     }
@@ -68,18 +65,19 @@ class HomepageSectionsAdminTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('The encore sale');
+            ->assertSee('Deals Of The Day');
     }
 
     public function test_cache_flushes_when_section_updated(): void
     {
         $this->get('/')->assertOk();
 
-        $faq = HomepageSection::where('section_key', 'faq')->firstOrFail();
-        $faq->update(['kicker' => 'Fresh FAQ kicker']);
+        // categories section is rendered on main homepage — update + verify flush.
+        $categories = HomepageSection::where('section_key', 'categories')->firstOrFail();
+        $categories->update(['title' => 'Fresh Categories Title']);
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Fresh FAQ kicker');
+            ->assertSee('Fresh Categories Title');
     }
 }

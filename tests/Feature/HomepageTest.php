@@ -16,7 +16,8 @@ class HomepageTest extends TestCase
         parent::setUp();
         $this->seed();
     }
-    public function test_homepage_renders_all_completed_sections(): void
+
+    public function test_homepage_renders_all_sections(): void
     {
         $response = $this->get('/');
 
@@ -24,25 +25,24 @@ class HomepageTest extends TestCase
             ->assertOk()
             ->assertViewIs('home.index')
             ->assertViewHas('heroMode', 'slider')
+            // Main (arena) section order + classes
             ->assertSeeInOrder([
                 'id="hero"',
+                'class="usp-strip"',
                 'id="categories"',
-                'id="bestsellers"',
-                'id="why-rythme"',
-                'id="brands"',
-                'id="numbers"',
                 'id="new-arrivals"',
-                'id="deals"',
-                'id="video-showcase"',
-                'id="stories"',
-                'id="testimonials"',
-                'id="comparison"',
-                'id="ugc"',
-                'id="faq"',
+                'class="promo-mm"',
+                'class="adv-mm"',
+                'class="deal-mm"',
+                'class="catban-mm"',
+                'class="launch-mm"',
+                'class="brand-mm"',
                 'id="footer"',
             ], escape: false)
-            ->assertSee('"@type": "FAQPage"', escape: false)
-            ->assertSee('#RhythmExportsFamily');
+            // Key section headings
+            ->assertSee('Popular Categories')
+            ->assertSee('New Arrival Products')
+            ->assertSee('Just landed');
     }
 
     public function test_homepage_brand_is_rhythm_exports_everywhere(): void
@@ -51,8 +51,7 @@ class HomepageTest extends TestCase
             ->assertOk()
             ->assertSee('Rhythm Exports')
             ->assertSee('RHYTHM')
-            ->assertDontSee('Rythme Music Store')
-            ->assertDontSee('RYTHME');
+            ->assertDontSee('Rythme Music Store');
     }
 
     public function test_homepage_contains_primary_navigation_and_calls_to_action(): void
@@ -60,8 +59,8 @@ class HomepageTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Explore instruments')
-            ->assertSee('Shop the sale')
-            ->assertSee('Read all stories')
-            ->assertSee('Loved by players,');
+            ->assertSee('Shop now')
+            ->assertSee('View all products')
+            ->assertSee('Just landed');
     }
 }

@@ -74,22 +74,21 @@ class DesignSystemTest extends TestCase
             ->assertDontSee('family=Bebas', escape: false);
     }
 
-    public function test_explore_slider_images_use_object_contain(): void
+    public function test_category_images_render_with_fit(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('products-swiper swiper', escape: false)
-            ->assertSee('object-contain p-5', escape: false)
-            ->assertSee('Bestseller', escape: false)
-            ->assertSee('mcard__img-el', escape: false); // minimal product card
+            ->assertSee('cat-card__img', escape: false)
+            ->assertSee('images/categories/guitars.jpg', escape: false)
+            ->assertSee('images/categories/electric-guitars.jpg', escape: false);
     }
 
-    public function test_minimal_black_buttons_and_cards_render(): void
+    public function test_monochrome_buttons_and_cards_render(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('mcard', escape: false)
-            ->assertSee('bg-black', escape: false)
+            ->assertSee('btn-gold btn-shine', escape: false)
+            ->assertSee('btn-ghost-light', escape: false)
             ->assertDontSee('hover:bg-rythme-red-dark', escape: false)
             ->assertDontSee('bg-rythme-red', escape: false);
     }
