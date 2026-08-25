@@ -31,7 +31,7 @@ final class ProductController extends Controller
         $this->seo->apply(SeoService::fromEntry($product->seoEntry, [
             'meta_title' => $product->meta_title ?: $product->name.' — Buy Online in India | Rythme Music Store',
             'meta_description' => $product->meta_description ?: (string) $product->short_description,
-            'og_image' => $product->getFirstMediaUrl('og') ?: $product->getFirstMediaUrl('gallery'),
+            'og_image' => $product->getFirstMediaUrl('og') ?: $product->heroImage(),
         ]));
 
         return view('product.show', [

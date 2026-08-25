@@ -49,12 +49,7 @@
 
         {{-- ===== ROW 2 · Centered menu (desktop) ===== --}}
         <nav class="nav__menu" aria-label="Main navigation">
-            <button type="button" class="nav__link nav__link--btn"
-                    @click="$store.catDrawer.open = true"
-                    aria-haspopup="dialog" aria-controls="category-drawer">
-                Shop
-                <svg class="nav__chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-            </button>
+            <a href="/shop" class="nav__link">Shop</a>
             <a href="/about" class="nav__link">About</a>
             <a href="/shop" class="nav__link">Best Sellers</a>
             <a href="/contact" class="nav__link">Contact</a>
@@ -86,10 +81,10 @@
                        class="h-11 w-full rounded-full border border-black/10 bg-white pl-11 pr-4 text-sm text-black outline-none transition focus:border-black focus:ring-2 focus:ring-black/10">
             </form>
 
-            <button type="button" @click="mobileMenu = false; $store.catDrawer.open = true"
-                    class="mb-1 flex w-full items-center gap-2.5 rounded-xl border border-black/15 px-4 py-3 text-sm font-bold text-black transition hover:border-black">
+            <a href="/shop" @click="mobileMenu = false"
+               class="mb-1 flex w-full items-center gap-2.5 rounded-xl border border-black/15 px-4 py-3 text-sm font-bold text-black transition hover:border-black">
                 Shop by Category
-            </button>
+            </a>
             <a href="{{ route('home') }}" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-black transition hover:bg-black/5">Home</a>
             <a href="/shop" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-black transition hover:bg-black/5">Shop All</a>
             <a href="/about" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-black transition hover:bg-black/5">About</a>
@@ -109,6 +104,4 @@
         </div>
     </aside>
 
-    {{-- Amazon-style shop-by-category drawer (DB-driven) --}}
-    <x-category-drawer :categories="$navCategories" />
 </header>

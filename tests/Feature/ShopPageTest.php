@@ -135,14 +135,14 @@ class ShopPageTest extends TestCase
             ->assertDontSee('Kala KA-15S');  // ₹4,499
     }
 
-    public function test_navbar_has_category_drawer_with_db_categories(): void
+    public function test_navbar_has_shop_menu_and_links(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('All Categories', escape: false)
-            ->assertSee('/shop?category=guitars', escape: false)
-            ->assertSee('/shop?category=acoustic-guitars', escape: false)
-            ->assertSee('Shop by Category', escape: false);
+            ->assertSee('nav__menu', escape: false)
+            ->assertSee('>Shop<', escape: false)
+            ->assertSee('>About<', escape: false)
+            ->assertSee('>Contact<', escape: false);
     }
 
     public function test_shop_empty_state_shows_clear_button(): void

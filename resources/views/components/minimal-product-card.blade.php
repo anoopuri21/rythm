@@ -4,7 +4,7 @@
     // Supports BOTH: config-array products AND Eloquent Product models.
     $isModel = is_object($product) && method_exists($product, 'getFirstMediaUrl');
     $image = $isModel
-        ? ($product->getFirstMediaUrl('gallery') ?: 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name))
+        ? ($product->heroImage() ?? 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name))
         : ($product['image'] ?? '');
     $name = $isModel ? $product->name : $product['name'];
     $brand = $isModel ? ($product->brand?->name ?? '') : ($product['brand'] ?? '');

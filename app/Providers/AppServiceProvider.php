@@ -30,10 +30,6 @@ class AppServiceProvider extends ServiceProvider
             Model::preventLazyLoading();
         }
 
-        // DB-driven category tree for the navbar "Shop by Category" drawer.
-        View::composer('components.navbar', function ($view): void {
-            $view->with('navCategories', app(CategoryService::class)->tree());
-        });
 
         // Merge the guest session cart into the user's cart on login.
         \Illuminate\Support\Facades\Event::listen(

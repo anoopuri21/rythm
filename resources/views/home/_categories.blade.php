@@ -89,7 +89,7 @@
                         <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-[#E8E8E8] bg-white transition hover:border-black">
                             {{-- Image: admin product image — object-fit: contain (kabhi cut nahi hota) --}}
                             <div class="relative m-3 aspect-square overflow-hidden rounded-lg bg-[#f7f7f7]">
-                                <img src="{{ $product->getFirstMediaUrl('gallery') ?: 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name) }}" alt="{{ $product->name }} — real product photo from Bajaao" width="800" height="800"
+                                <img src="{{ $product->heroImage() ?? 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name) }}" alt="{{ $product->name }} — real product photo from Bajaao" width="800" height="800"
                                      class="h-full w-full object-contain p-5 transition-transform duration-700 group-hover:scale-105"
                                      loading="lazy" decoding="async">
                                 @if($loop->first)
