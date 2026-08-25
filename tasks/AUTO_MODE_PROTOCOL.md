@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 3 guarded local populated-preview capture blocker
+**Status:** PAUSED — Phase 3 complete; full-phase checkpoint
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -138,6 +138,7 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - Auto Mode cannot declare production readiness before all gates pass.
 - Auto Mode cannot push, publish, rotate secrets, perform live payments or alter production data without the required access and approved workflow.
 - Existing secrets must never be written to source files, logs or reports.
+- Uploaded files are temporary reference evidence only: never copy or commit them into the repository; retain only necessary hashes/dimensions/findings and delete staged originals immediately after inspection.
 - Destructive migrations/data transformations require a backup/rollback plan and user escalation when real data is at risk.
 - The active integration branch is `rhythm-uat` until the owner requests a replacement or Agent 0 records a justified branch split.
 - A code-changing task is not operationally closed until applicable local gates pass, the latest code is committed, a push to the active branch is attempted, and a commit report is provided. Remote/authentication failures are blockers to push, not permission to claim it succeeded.
@@ -147,17 +148,15 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — the owner reactivated Chunk 5, Agent 0 reviewed four exact-width but empty-site captures, added a guarded local fixture launcher, then Auto Mode automatically paused at the populated capture gate.
-- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, and Phase 2 MySQL Schema + Domain Architecture (`COMPLETE`)
-- **Current phase:** Phase 3 — Pixel-accurate Homepage + Shop frontend (`BLOCKED`)
+- **Active:** No — Auto Mode automatically paused after Agent 0 completed and accepted the full Phase 3 gate.
+- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, and Phase 3 Homepage + Shop Frontend (`COMPLETE`).
+- **Current phase:** Phase 3 complete; Phase 4 has not been activated.
 - **Phase 2 MySQL evidence:** owner reported all three forward migrations completed successfully on MySQL Community Server 8.4.3 `rhythm_db`, with all migrations shown as `Ran`.
-- **Independent evidence:** Chunks 1–4 pass; post-review remediation passes **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories.
-- **Post-fix empty-state result:** Shop and Homepage now have exact-width 1440/768/390/320 evidence showing corrected truthful responsive states without observed horizontal expansion.
-- **Third-capture result:** the four new 1440/390 files have valid widths but came from the normal empty site; Shop still says “The catalogue is being prepared,” so populated density/facets remain unproven.
-- **Isolated populated fixture:** ignored SQLite file only; 33 active products, 32 active categories and 24 active brands. Persistent `rhythm_db` was not connected to or modified.
-- **Guarded local launcher:** `tools/start-phase3-visual-preview.bat` sets process-local SQLite configuration, verifies the effective Laravel connection/path before `migrate:fresh --seed`, leaves `.env` untouched and serves on port 8001.
-- **Blocker:** the prior Arena preview process expired and the current agent runtime no longer contains PHP, so owner-side Laragon rendering is required for the mandatory populated captures.
-- **Required owner action:** run the guarded launcher and capture four full-page populated files: Homepage and Shop at 1440 × 900/DPR2 and 390 × 844/DPR2.
-- **Resume action:** upload the four populated captures and issue exact `ACTIVATE AUTO MODE` for final Chunk 5 review.
-- **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
-- **Deployment:** Agent 10 remains inactive.
+- **Automated Phase 3 evidence:** **233 tests / 811 assertions**, production build, Blade compilation, changed-PHP syntax/Pint and zero Composer/npm advisories passed after remediation.
+- **Rendered Phase 3 evidence:** exact-width Homepage/Shop empty/static evidence at 1440/768/390/320 plus isolated populated Homepage/Shop evidence at 1440/390 was reviewed and accepted.
+- **Visual result:** populated Homepage sections, six-across desktop Homepage products, four-across desktop Shop results, two-across 390px cards, category shortcuts, facets, sorting, pagination and responsive shared surfaces were evidenced without observed horizontal canvas expansion.
+- **Evidence handling:** uploaded originals were deleted immediately after metadata and findings were recorded; no upload was committed or retained.
+- **Persistent data safety:** isolated SQLite evidence did not connect to, reset or seed persistent `rhythm_db`.
+- **Next activation:** explicit `ACTIVATE AUTO MODE` is required to begin Phase 4 planning/execution.
+- **Execution plan:** `tasks/AUTO_MODE_PHASE_3_PLAN.md`; final QA evidence: `tasks/PHASE_3_FRONTEND_QA.md`.
+- **Deployment:** Agent 10 remains inactive; no production sign-off is implied.

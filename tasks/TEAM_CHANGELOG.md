@@ -236,6 +236,16 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Current agent runtime limitation recorded** — The previous preview process expired and this runtime no longer exposes PHP/Composer, preventing Agent 0 from restarting Laravel here. Owner-side rendering is the remaining genuine external gate.
 - **Auto Mode paused** — Four populated local-preview captures remain required at 1440/390. No Phase 3 or production sign-off issued; Agent 10 remains inactive.
 
+## 26 August 2026 — Phase 3 Final Populated Visual Acceptance
+
+- **Guarded populated captures received** — Homepage and Shop were rendered from the isolated 33-product SQLite fixture at 1440/DPR2 and 390/DPR2; dimensions and SHA-256 hashes are recorded in `tasks/PHASE_3_FRONTEND_QA.md`.
+- **Homepage density evidenced** — Desktop shows populated categories, six-across New Arrivals, deals, recently launched and brands; mobile shows two-across cards and stacked sections without observed horizontal expansion.
+- **Shop marketplace evidenced** — Desktop shows six category shortcuts, full facet sidebar, `33 instruments`, four cards across, truthful sort controls and pagination; mobile shows shortcut rail, filter/sort controls, two cards across and pagination.
+- **Bounded deviations accepted** — The mobile Homepage screenshot height cap is supplemented by earlier footer evidence; fixture fallback media and production catalogue rights/completeness remain Phase 6 gates; pagination/sidebar height whitespace is data-length dependent and not overflow.
+- **Upload retention rule applied** — Original uploaded evidence was deleted immediately after metadata/findings were recorded; no uploaded image was copied into or retained by the repository/workspace.
+- **Phase 3 `BLOCKED` → `COMPLETE`** — Agent 0 accepted Phase 3 on 26 August 2026 with **233 tests / 811 assertions** and all recorded automated/rendered gates. This is not production sign-off.
+- **Auto Mode paused at full-phase checkpoint** — Phase 4 requires a new explicit activation. Agent 10 remains inactive.
+
 ## Active Decisions Still Needed
 
 - Product Q&A/comments scope before Phase 5.

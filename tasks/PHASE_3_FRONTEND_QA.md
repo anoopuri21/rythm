@@ -1,7 +1,7 @@
 # Phase 3 — Homepage + Shop Frontend QA
 
-**Date:** 25 August 2026
-**Status:** POST-REMEDIATION EMPTY-STATE EVIDENCE REVIEWED / POPULATED VISUAL EVIDENCE PENDING
+**Date:** 26 August 2026
+**Status:** COMPLETE — PHASE 3 VISUAL AND AUTOMATED GATES ACCEPTED / NOT PRODUCTION-READY
 **Target:** Homepage and Shop at 1440 × 900, 768 × 1024, 390 × 844 and 320px width
 
 ## 1. Implemented Contract
@@ -16,10 +16,10 @@
 
 ## 2. Independent Automated Evidence
 
-- Full PHP regression: **232 tests / 800 assertions passed**.
+- Final post-remediation PHP regression: **233 tests / 811 assertions passed**.
 - Blade compilation: passed.
 - Production Vite build: passed.
-- Phase 3 changed PHP: **23 files** passed syntax and Pint.
+- Phase 3 changed PHP passed targeted syntax and Pint.
 - Composer audit: no security vulnerability advisories.
 - npm full audit: zero vulnerabilities.
 - Static 320px/390px/768px/1440px breakpoint and active-surface contract review: passed.
@@ -111,15 +111,51 @@ The four requested widths are now exact, but the rendered content is from the no
 
 These files complete the true-1440 empty/static layout record, but do not close product-card, result-density or facet evidence. The former Arena preview process was no longer available when the capture returned, so Agent 0 added a guarded Windows/Laragon launcher at `tools/start-phase3-visual-preview.bat`. It uses process-local SQLite overrides, verifies Laravel's effective connection/path before migration, and leaves the normal `.env` untouched.
 
-## 8. Remaining Visual Gate
+## 8. Final Isolated Populated Evidence — 26 August 2026
 
-Run the guarded local isolated preview and capture its populated Homepage and Shop at:
+The owner ran the guarded local launcher and supplied four populated DPR-2 captures. Agent 0 inspected them, recorded only metadata/findings, and immediately deleted the uploaded originals under the standing upload-retention rule.
 
-- 1440 × 900 CSS px, DPR 2 (2880px output width)
-- 390 × 844 CSS px, DPR 2 (780px output width)
+| Surface | Physical dimensions | SHA-256 | Result |
+|---|---:|---|---|
+| Homepage / 1440 | 2880 × 13304 | `9d2b2ae8ef4aa160129ddf25617bdab35e03676b4d7f35ce46550089b2676672` | Qualified populated desktop evidence |
+| Homepage / 390 | 780 × 16384 | `01dd9cc4a0580c6a74a743f3b41b1d5577dd9d51dcf5bf78a43b65e91bab179a` | Qualified populated mobile evidence within browser full-page height cap |
+| Shop / 1440 | 2880 × 8762 | `67884d6176ddbc0271040c5cfe12e345d6e1c81af019ecc3798c1c1c49d1630f` | Qualified populated desktop evidence |
+| Shop / 390 | 780 × 10322 | `fc8d1a3eaa8f20088394e0a49d5f3268a5f614c06a8024726ec1547681fc038b` | Qualified populated mobile evidence |
 
-A valid Shop capture must visibly show category shortcuts, product cards, filters and a result count. “The catalogue is being prepared” identifies the normal empty site and does not qualify as populated evidence.
+Observed populated behavior:
 
-## 9. Gate Decision
+- Homepage desktop renders six-across product density, populated category cards, New Arrival Products, Deals Of The Day, Recently Launched and Popular Brands in the accepted hierarchy.
+- Homepage mobile renders two-across product cards, stacked campaign/category content and readable compact controls without observed horizontal canvas expansion.
+- Shop desktop renders six category shortcuts, a full facet sidebar, `33 instruments`, four product cards across, truthful sorting and pagination.
+- Shop mobile renders the shortcut rail, mobile filter/sort controls, two product cards across, pagination and the corrected footer without observed horizontal canvas expansion.
+- Product cards show prices, discounts only where data supports them, wishlist controls, stock-aware content and deterministic fallback media where the isolated fixture lacks an image.
+- Shared header, CTA/footer, Rythme Red controls, local imagery and current logo remain consistent across populated and empty states.
 
-Chunks 1–4 remain independently green. Chunk 5 remediation, exact-width static/empty-state evidence and the isolated-preview safety path are green within recorded limits. Populated 1440/390 rendered evidence remains outstanding. Phase 3 is **not complete** and production readiness is **not approved**. Agent 10 remains inactive.
+Accepted bounded deviations/limitations:
+
+1. The 390px Homepage capture reaches the browser's 16384px full-page image limit after proving populated mobile sections; earlier exact-width 390/320 evidence independently covers the lower shared footer.
+2. The 12-card desktop Shop page ends before the taller facet sidebar, leaving white space until the shared grid row ends. This is a bounded pagination/data-length effect, not overflow or broken layout.
+3. A small number of fixture products intentionally exercise fallback media. Production catalogue media completeness remains a Phase 6 import/content-rights gate and is not inferred here.
+4. The evidence fixture is isolated sample data, not authorization to seed or replace persistent `rhythm_db`.
+
+## 9. Accepted Reference Comparison
+
+Agent 1/Agent 0 compared the final renders with the accepted Phase 1 screenshot measurements rather than the live third-party page:
+
+| Contract area | Homepage result | Shop result |
+|---|---|---|
+| 1440 marketplace width/hierarchy | Match within accepted Rythme content adaptation | Match within accepted Rythme content adaptation |
+| 390 responsive hierarchy | Match; stacked hero/campaigns and two-across populated cards | Match; compact header, shortcut rail, controls and two-across cards |
+| Desktop catalogue density | Six product cards across | Four cards across beside the facet sidebar |
+| Responsive overflow | No observed horizontal canvas expansion at 768/390/320 | No observed horizontal canvas expansion at 768/390/320 |
+| Brand/design system | Current logo and approved Rythme Red tokens retained | Current logo and approved Rythme Red tokens retained |
+| Content independence | Rythme copy/local campaign imagery; no XStore products/theme code | Rythme/isolated catalogue data; no XStore products/theme code |
+| Empty/data failure behavior | Empty data sections hide safely | Truthful catalogue-preparation and filtered-empty states |
+
+The comparison supports the accepted layout and responsive contract; it does not claim literal duplication of XStore copyrighted content, imagery or theme implementation.
+
+## 10. Gate Decision
+
+Agent 0 accepts Phase 3 as **COMPLETE on 26 August 2026**. The implementation, automated gates, truthful-content remediation, exact-width empty/static evidence and populated desktop/mobile evidence collectively satisfy the Phase 3 Homepage + Shop gate.
+
+This acceptance is phase-scoped only. It does **not** approve production readiness, production catalogue rights/media, deployment, or later account/checkout/security/operations phases. Agent 10 remains inactive.
