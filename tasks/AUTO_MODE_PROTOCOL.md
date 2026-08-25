@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead  
-**Status:** PAUSED — Phase 0B complete; full-phase boundary reached
+**Status:** PAUSED — Phase 1 blocked on measurable design evidence
 **Activation command:** `ACTIVATE AUTO MODE`  
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -147,9 +147,11 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — automatically paused at the completed Phase 0B boundary
+- **Active:** No — activated by the owner, then automatically paused at a genuine Phase 1 blocker
 - **Completed phase:** Phase 0B — Stack Alignment (`COMPLETE`)
-- **Accepted evidence:** independent 222-test regression and audits; Filament 5.7.6 / Livewire 4.4.2 alignment; MySQL Community Server 8.4.3 identity; owner-reported successful non-destructive forward migration on persistent `rhythm_db`.
-- **Next phase:** Phase 1 — Homepage + Shop Design Specifications (`PENDING`).
-- **Resume action:** the owner must issue the exact command `ACTIVATE AUTO MODE`; activation then begins Phase 1 planning.
+- **Current phase:** Phase 1 — Homepage + Shop Design Specifications (`BLOCKED`)
+- **Completed Phase 1 work:** source inventory, live semantic reference inspection, gap matrix, responsive contract, accessibility/SEO contract and implementation handoff.
+- **Blocker:** no renderer-backed reference screenshots/computed geometry and no confirmed final brand treatment; semantic extraction cannot prove pixel fidelity.
+- **Required owner evidence:** current full-page Homepage and Shop screenshots at 1440px and 390px, browser zoom 100%, plus logo/color-direction confirmation.
+- **Resume action:** supply the evidence, then issue `ACTIVATE AUTO MODE` to finish the Phase 1 gate.
 - **Deployment:** Agent 10 remains inactive.
