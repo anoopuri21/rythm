@@ -61,7 +61,7 @@
                                         srcset="{{ $slide->getFirstMediaUrl('mobile_image') }}"
                                         width="900" height="1200">
                             @endif
-                            <img src="{{ $slide->getFirstMediaUrl('desktop_image') ?: asset('images/hero-guitar.jpg') }}" alt="" width="1376" height="768"
+                            <img src="{{ $slide->getFirstMediaUrl('desktop_image') ?: asset('images/hero/grid-slide-guitar.jpg') }}" alt="" width="1376" height="768"
                                  class="hero-slide-image absolute inset-0 h-full w-full object-cover"
                                  loading="{{ $loop->first ? 'eager' : 'lazy' }}"
                                  fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">

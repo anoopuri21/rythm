@@ -12,7 +12,7 @@
         $seoDescription = $seo['meta_description'] ?? ($__env->yieldContent('meta_description') ?: 'Rhythm Exports - Premium musical instruments, guitars, keyboards, drums, pro audio and more. Shop authentic instruments from top brands with free shipping all over India.');
         $ogTitle = $seo['og_title'] ?? ($__env->yieldContent('title') ?: 'Rhythm Exports');
         $ogDescription = $seo['og_description'] ?? $seoDescription;
-        $ogImage = $seo['og_image'] ?? ($__env->yieldContent('og_image') ?: asset('images/hero-guitar.jpg'));
+        $ogImage = $seo['og_image'] ?? ($__env->yieldContent('og_image') ?: asset('images/hero/grid-slide-guitar.jpg'));
     @endphp
     <title>{{ $seoTitle }}</title>
     <meta name="description" content="{{ $seoDescription }}">

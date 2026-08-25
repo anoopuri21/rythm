@@ -66,6 +66,8 @@ final class AddToCart extends Component
             app(CartService::class)->addItem($this->product, $variant, $this->qty);
             $this->added = true;
             $this->dispatch('cart-updated');
+            // Open the cart drawer right after adding (cart drawer UX).
+            $this->dispatch('cart-drawer-toggle');
         } catch (RuntimeException $e) {
             $this->error = $e->getMessage();
         }

@@ -18,7 +18,7 @@
     }
 @endphp
 
-<section id="numbers" class="numbers-section parallax-section relative overflow-hidden bg-rythme-black py-28 text-white sm:py-36" style="background-image: linear-gradient(rgba(10,10,10,.88), rgba(10,10,10,.94)), url('{{ asset('images/hero-studio.jpg') }}')">
+<section id="numbers" class="numbers-section parallax-section relative overflow-hidden bg-rythme-black py-28 text-white sm:py-36" style="background-image: linear-gradient(rgba(10,10,10,.88), rgba(10,10,10,.94)), url('{{ asset('images/hero/dark-synth.jpg') }}')">
     <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent"></div>
     <div class="mx-auto max-w-7xl px-5 sm:px-8">
         <div class="reveal-section mx-auto mb-16 max-w-2xl text-center"><p class="section-kicker justify-center">{{ $sec->kicker ?? 'In tune with India' }}</p><h2 class="font-playfair text-4xl sm:text-5xl">@if($sec?->title){{ $sec->title }}@if($sec?->title_accent) <em class="text-gold">{{ $sec->title_accent }}</em>@endif@else A community that keeps <em class="text-gold">growing.</em>@endif</h2></div>

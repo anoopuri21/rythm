@@ -10,7 +10,7 @@
         '@context' => 'https://schema.org',
         '@type' => 'Product',
         'name' => $product->name,
-        'image' => $product->heroImage() ?: asset('images/hero-guitar.jpg'),
+        'image' => $product->heroImage() ?: asset('images/hero/grid-slide-guitar.jpg'),
         'description' => $product->short_description,
         'sku' => $product->sku,
         'brand' => ['@type' => 'Brand', 'name' => $product->brand?->name ?? 'Rythme'],
