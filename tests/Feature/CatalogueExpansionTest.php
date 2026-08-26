@@ -80,6 +80,32 @@ final class CatalogueExpansionTest extends TestCase
         Http::assertSentCount(4);
     }
 
+    public function test_media_failure_or_missing_media_stops_a_publishable_batch(): void
+    {
+        $product = $this->sourceProduct('1', 'selected-one', 'Plain description.');
+        $product['images'] = [['src' => 'https://unapproved.example/image.jpg']];
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'www.bajaao.com/collections/group-one/products.json*' => Http::response([
+                'products' => [['handle' => 'selected-one']],
+            ]),
+            'www.bajaao.com/products/selected-one.json' => Http::response(['product' => $product]),
+        ]);
+
+        $this->artisan('catalogue:acquire-expansion', [
+            'manifest' => $this->manifest,
+            '--group' => ['group-one'],
+            '--batch' => 'media-failure',
+            '--output' => $this->root.'/output',
+        ])->expectsOutputToContain('incomplete')->assertFailed();
+
+        $report = json_decode(file_get_contents($this->root.'/output/media-failure/batch-report.json'), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(1, $report['image_failures']);
+        $this->assertSame(1, $report['products_without_media']);
+        $this->assertFalse($report['complete']);
+    }
+
     public function test_manifest_source_identity_mismatch_stops_the_batch(): void
     {
         Http::preventStrayRequests();

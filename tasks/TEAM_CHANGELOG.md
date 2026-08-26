@@ -374,3 +374,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Automated gate passed** — Focused catalogue suite passed **10 tests / 63 assertions**; full rerun after build passed **284 tests / 1,101 assertions**; build, Pint and dependency audits passed.
 - **No persistent write** — Qualification output was deleted after evidence extraction; no database import, activation or publication occurred.
 - **Phase 6A Chunk 1 accepted** — Four real two-category acquisition batches are next.
+
+## 26 August 2026 — Phase 6A Chunk 2 Real Category Batches
+
+- **Four bounded batches passed** — Eight groups acquired 80/80 exact manifest products with zero product failures.
+- **Media became local and verified** — 226 images / 21,502,734 bytes passed file existence, hash, MIME/content, dimension and local-path checks with zero media failures or hotlinks.
+- **Variable gallery size handled truthfully** — Some source records exposed fewer than three images; every selected product still had at least one valid local image.
+- **Publication review quantified** — 63/80 records triggered retailer promise/promotion/bundle flags; all 80 still require normal price, stock, category and content review.
+- **Media gate hardened** — Expansion batches now fail if any image fails or any media-enabled product has no local media; regression covers unapproved media hosts.
+- **Capacity/cleanup passed** — Largest batch was approximately 6.89 MiB; each disposable batch was deleted before the next, and final staging entries were zero.
+- **No UAT write occurred** — Persistent import, activation and publication remain Chunk 3 operations beginning with an explicit dry-run.
+- **Phase 6A Chunk 2 accepted** — Batch-safe reviewed import and real-stock-gated activation are next.

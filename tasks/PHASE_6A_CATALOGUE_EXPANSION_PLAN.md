@@ -1,7 +1,7 @@
 # Phase 6A — Multi-Category Catalogue and Homepage Expansion Plan
 
 **Owner:** Agent 0 — Project Lead
-**Status:** IN PROGRESS — Chunks 0–1 accepted; Chunk 2 next
+**Status:** IN PROGRESS — Chunks 0–2 accepted; Chunk 3 next
 **Priority:** Urgent owner-directed catalogue operation before canonical Phase 8
 **Date:** 26 August 2026
 
@@ -130,8 +130,9 @@ Each completed chunk requires applicable tests, a bounded commit, push attempt, 
 
 - **Chunk 0 — COMPLETE:** Eight public collections qualified, exact 80-record manifest produced with zero internal duplicate handles, UAT/local-fixture boundaries documented and capacity/request budget accepted. Evidence: `tasks/PHASE_6A_CHUNK_0_QUALIFICATION.md`.
 - **Chunk 1 — COMPLETE:** Manifest-driven one-/two-group acquisition, deterministic resume, exact handle/source-ID validation, combined reporting and publication-review flags passed automated and real metadata-only qualification. Evidence: `tasks/PHASE_6A_CHUNK_1_ACQUISITION.md`.
-- **Chunk 2 — NEXT:** Execute and validate four bounded real two-category acquisition batches; persistent import remains prohibited.
+- **Chunk 2 — COMPLETE:** Four real two-category runs acquired 80/80 selected products and 226 valid local images with zero product, media or integrity failures; every batch was cleaned after evidence extraction. Evidence: `tasks/PHASE_6A_CHUNK_2_REAL_BATCHES.md`.
+- **Chunk 3 — NEXT:** Implement batch-safe dry-run/import, publication review, real-stock gating and audited authorized activation.
 
 ## Immediate next action
 
-Activate Agents 5, 8 and 9 for Chunk 2 Batch 1: Acoustic Guitars and Electric Guitars, with three locally staged images per product.
+Activate Agents 4, 6, 8 and 9 for Chunk 3. Persistent UAT import remains explicit and must start with dry-run evidence.

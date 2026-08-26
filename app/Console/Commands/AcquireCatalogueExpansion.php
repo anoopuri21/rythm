@@ -66,6 +66,8 @@ final class AcquireCatalogueExpansion extends Command
                 'products_requested' => 0,
                 'products_completed' => 0,
                 'products_failed' => 0,
+                'image_failures' => 0,
+                'products_without_media' => 0,
                 'publication_review_required' => 0,
                 'media_bytes' => 0,
                 'groups' => [],
@@ -98,10 +100,14 @@ final class AcquireCatalogueExpansion extends Command
                     selectedSourceIds: $sourceIds,
                 );
 
-                $reviewCount = collect($report['products'])->where('publication_review_required', true)->count();
+                $products = collect($report['products']);
+                $reviewCount = $products->where('publication_review_required', true)->count();
+                $productsWithoutMedia = $this->option('no-images') ? 0 : $products->where('images', 0)->count();
                 $combined['products_requested'] += count($handles);
                 $combined['products_completed'] += (int) $report['products_completed'];
                 $combined['products_failed'] += (int) $report['products_failed'];
+                $combined['image_failures'] += (int) $report['image_failures'];
+                $combined['products_without_media'] += $productsWithoutMedia;
                 $combined['publication_review_required'] += $reviewCount;
                 $combined['media_bytes'] += (int) $report['media_bytes'];
                 $combined['groups'][] = [
@@ -110,6 +116,8 @@ final class AcquireCatalogueExpansion extends Command
                     'run_id' => $report['run_id'],
                     'products_completed' => $report['products_completed'],
                     'products_failed' => $report['products_failed'],
+                    'image_failures' => $report['image_failures'],
+                    'products_without_media' => $productsWithoutMedia,
                     'publication_review_required' => $reviewCount,
                     'media_bytes' => $report['media_bytes'],
                     'output_directory' => $report['output_directory'],
@@ -118,7 +126,9 @@ final class AcquireCatalogueExpansion extends Command
 
             $combined['completed_at'] = now()->toIso8601String();
             $combined['complete'] = $combined['products_completed'] === $combined['products_requested']
-                && $combined['products_failed'] === 0;
+                && $combined['products_failed'] === 0
+                && $combined['image_failures'] === 0
+                && $combined['products_without_media'] === 0;
             $combinedPath = $batchDirectory.DIRECTORY_SEPARATOR.'batch-report.json';
             file_put_contents($combinedPath, json_encode($combined, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR).PHP_EOL, LOCK_EX);
 
@@ -126,7 +136,9 @@ final class AcquireCatalogueExpansion extends Command
                 ['Batch', $batch],
                 ['Groups', implode(', ', $selected)],
                 ['Products', "{$combined['products_completed']}/{$combined['products_requested']}"],
-                ['Failures', $combined['products_failed']],
+                ['Product failures', $combined['products_failed']],
+                ['Image failures', $combined['image_failures']],
+                ['Products without media', $combined['products_without_media']],
                 ['Publication review required', $combined['publication_review_required']],
                 ['Media', $this->bytes((int) $combined['media_bytes'])],
                 ['Report', $combinedPath],
