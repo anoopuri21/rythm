@@ -1,7 +1,7 @@
 # Phase 6A — Multi-Category Catalogue and Homepage Expansion Plan
 
 **Owner:** Agent 0 — Project Lead
-**Status:** PLANNED — execution not started
+**Status:** IN PROGRESS — Chunk 0 accepted; Chunk 1 next
 **Priority:** Urgent owner-directed catalogue operation before canonical Phase 8
 **Date:** 26 August 2026
 
@@ -126,6 +126,11 @@ For every batch:
 
 Each completed chunk requires applicable tests, a bounded commit, push attempt, branch/hash report and cleanup/size check. Raw source responses, downloaded media, temporary databases and generated QA catalogues must not be committed.
 
-## Immediate next action after plan gate
+## Progress
 
-Activate Agents 5, 4, 6, 8 and 9 for Chunk 0. Perform a read-only catalogue inventory and public collection-handle qualification, then publish the exact acquisition manifest before downloading or importing the multi-category catalogue.
+- **Chunk 0 — COMPLETE:** Eight public collections qualified, exact 80-record manifest produced with zero internal duplicate handles, UAT/local-fixture boundaries documented and capacity/request budget accepted. Evidence: `tasks/PHASE_6A_CHUNK_0_QUALIFICATION.md`.
+- **Chunk 1 — NEXT:** Implement and independently test manifest-driven multi-category acquisition plus publication-content review controls.
+
+## Immediate next action
+
+Activate Agents 5, 4, 8 and 9 for Chunk 1. No persistent import is authorized in Chunk 1.

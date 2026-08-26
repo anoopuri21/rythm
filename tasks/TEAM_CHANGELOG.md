@@ -353,3 +353,13 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Publication decision recorded** — Owner authorized use/publication of acquired product text and images; Rythme-local media remains mandatory and real stock must still be supplied or verified rather than inferred.
 - **Homepage direction locked** — Preserve the existing dynamic sections and add bounded, configurable category-led presentation.
 - **Phase 6A plan created** — Work is divided into inventory/source qualification, orchestration, four category batches, safe review/activation, Homepage/Shop expansion and independent volume QA. Execution has not started.
+
+## 26 August 2026 — Phase 6A Chunk 0 Qualification
+
+- **Eight collection handles passed** — Acoustic Guitars, Electric Guitars, Portable Keyboards, Electronic Drum Kits, Microphones, Audio Interfaces, Monitor Speakers and Guitar Accessories each returned ten products from bounded public JSON requests.
+- **Unsuitable source rejected** — The empty `headphones` collection was replaced with the non-empty `monitors-speakers` source for Studio Monitors.
+- **Exact 80-record manifest locked** — Eight groups of ten source identities were selected with zero internal duplicate handles; the first five Acoustic records are expected UAT skips and all actual counts remain subject to import dry-run.
+- **Blind collection order rejected** — A misclassified microphone accessory, open-box products and obvious bundle/promotional candidates were excluded where identified; retailer-specific promises remain a mandatory sanitization/review concern.
+- **Capacity accepted** — Eight independent ten-product runs at three images each are estimated around 24–26 MiB total based on the hardened pilot, with no more than two category runs retained before cleanup.
+- **No import occurred** — Qualification was metadata-only and read-only; no images were downloaded and persistent UAT was not connected or modified.
+- **Phase 6A `PLANNED` → `IN PROGRESS`** — Chunk 0 accepted by Agent 0; manifest-driven acquisition orchestration is next.
