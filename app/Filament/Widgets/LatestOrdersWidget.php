@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use App\Models\User;
+use App\Support\AdminAccess;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -14,6 +16,13 @@ class LatestOrdersWidget extends BaseWidget
     protected static ?int $sort = 2;
 
     protected int|string|array $columnSpan = 'full';
+
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && $user->hasAdminPermission(AdminAccess::ORDERS_VIEW);
+    }
 
     public function table(Table $table): Table
     {

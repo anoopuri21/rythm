@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\AdminAccess;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,13 +43,13 @@ class ProductQuestion extends Model
             $question->answer = $answer !== '' ? $answer : null;
 
             $actor = auth()->user();
-            if ($question->isDirty('status') && $actor?->isAdmin()) {
+            if ($question->isDirty('status') && $actor?->hasAdminPermission(AdminAccess::INTERACTIONS_MANAGE)) {
                 $question->moderated_by = $actor->id;
                 $question->moderated_at = now();
             }
 
             if ($question->isDirty('answer')) {
-                if ($question->answer !== null && $actor?->isAdmin()) {
+                if ($question->answer !== null && $actor?->hasAdminPermission(AdminAccess::INTERACTIONS_MANAGE)) {
                     $question->answered_by = $actor->id;
                     $question->answered_at = now();
                 } elseif ($question->answer === null) {

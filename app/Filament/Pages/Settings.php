@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Models\User;
 use App\Services\SiteSettingsService;
+use App\Support\AdminAccess;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -26,6 +28,13 @@ class Settings extends Page implements HasForms
     protected string $view = 'filament.pages.settings';
 
     public array $data = [];
+
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && $user->hasAdminPermission(AdminAccess::SETTINGS_MANAGE);
+    }
 
     public function mount(SiteSettingsService $settings): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\AdminAccess;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,7 +47,7 @@ class Review extends Model
             $review->is_approved = $review->status === self::STATUS_APPROVED;
 
             $actor = auth()->user();
-            if ($review->isDirty('status') && $actor?->isAdmin()) {
+            if ($review->isDirty('status') && $actor?->hasAdminPermission(AdminAccess::INTERACTIONS_MANAGE)) {
                 $review->moderated_by = $actor->id;
                 $review->moderated_at = now();
             }
@@ -55,7 +56,7 @@ class Review extends Model
             $review->merchant_reply = $reply !== '' ? $reply : null;
 
             if ($review->isDirty('merchant_reply')) {
-                if ($review->merchant_reply !== null && $actor?->isAdmin()) {
+                if ($review->merchant_reply !== null && $actor?->hasAdminPermission(AdminAccess::INTERACTIONS_MANAGE)) {
                     $review->replied_by = $actor->id;
                     $review->replied_at = now();
                 } elseif ($review->merchant_reply === null) {

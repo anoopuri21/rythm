@@ -7,9 +7,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Services\OrderService;
+use App\Support\AdminAccess;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -22,6 +24,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class OrderResource extends Resource
 {
@@ -160,10 +163,17 @@ class OrderResource extends Resource
             ->label($label)
             ->icon($icon)
             ->color($color)
+            ->visible(fn (): bool => auth()->user()?->hasAdminPermission(AdminAccess::ORDERS_MANAGE) ?? false)
             ->requiresConfirmation()
-            ->action(function (Order $record) use ($to): void {
+            ->schema([
+                Textarea::make('reason')->label('Reason / operational note')->required()->minLength(5)->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data) use ($to): void {
+                Gate::authorize('update', $record);
+                request()->merge(['audit_reason' => $data['reason']]);
+
                 try {
-                    app(OrderService::class)->changeStatus($record, $to);
+                    app(OrderService::class)->changeStatus($record, $to, $data['reason']);
                     Notification::make()->success()->title("Order marked {$to}")->send();
                 } catch (\RuntimeException $e) {
                     Notification::make()->danger()->title($e->getMessage())->send();

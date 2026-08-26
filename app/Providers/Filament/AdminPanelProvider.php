@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\LatestOrdersWidget;
+use App\Filament\Widgets\StatsOverviewWidget;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -29,6 +32,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile()
+            ->multiFactorAuthentication(
+                AppAuthentication::make()
+                    ->recoverable()
+                    ->brandName('Rythme / Rhythm Exports'),
+                isRequired: fn (): bool => ! app()->runningUnitTests(),
+            )
+            ->strictAuthorization()
             ->colors([
                 'primary' => Color::Red,
             ])
@@ -39,8 +50,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                \App\Filament\Widgets\StatsOverviewWidget::class,
-                \App\Filament\Widgets\LatestOrdersWidget::class,
+                StatsOverviewWidget::class,
+                LatestOrdersWidget::class,
                 Widgets\AccountWidget::class,
             ])
             ->middleware([
