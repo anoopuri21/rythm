@@ -339,3 +339,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Admin/public boundary passed** — Inactive imported products remain 404 on the storefront while explicit administrators can review them in Filament.
 - **Curated launch target defined** — Approximately 60 products across eight category groups, acquired category-by-category and always imported inactive; client-managed manual additions remain supported.
 - **Phase 6 `IN PROGRESS` → `QA`** — Full local regression passed at **271 tests / 1,017 assertions**, isolated migration forward/rollback/forward and production build passed. Owner-side MySQL 8.4.3 migration/status and manual Filament review remain external acceptance gates.
+
+## 26 August 2026 — Phase 6 Owner Acceptance and Phase 7 Activation
+
+- **Owner MySQL/Filament gate passed** — Owner successfully used the persistent MySQL 8.4.3 project import and confirmed imported products are visible and editable in Filament.
+- **Phase 6 `QA` → `COMPLETE`** — Agent 0 accepted the controlled catalogue pipeline with 271 tests / 1,017 assertions, real 5→10 acquisition evidence, idempotent inactive import and owner-side admin evidence. Commercial publication rights remain unresolved and no production sign-off is implied.
+- **Phase 7 `PENDING` → `IN PROGRESS`** — Agents 6, 3, 4, 8 and 11 activated for least-privilege staff roles, TOTP 2FA, sensitive-action auditability and admin UAT. Agent 10 remains inactive.

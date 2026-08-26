@@ -148,4 +148,8 @@ Each category must run separately with dry-run first, disk-budget checks and ina
 
 The public acquisition and safe inactive-import mechanisms are viable for the agreed bounded catalogue plan. Five products completed cleanly, the run resumed to ten without re-downloading completed products, all attached media became locally managed files, and measured storage is modest.
 
-Phase 6 technical scope is `QA`: acquisition, resume, validation, inactive import, provenance deduplication, media attachment, admin/storefront boundaries and the curated launch plan pass locally. Final acceptance remains pending owner-side MySQL 8.4.3 forward migration/status and manual Filament review after pull. Commercial content/image rights remain a production-publication gate; the technical phase does not authorize publication.
+## Owner-side MySQL and Filament acceptance
+
+On 26 August 2026 the owner pulled `rhythm-uat`, ran the Phase 6 migration/acquisition/import flow against the established persistent MySQL Community Server 8.4.3 UAT project, and confirmed that imported products are visible and editable in Filament. Successful provenance-backed import establishes that migration `2026_08_26_000003_create_product_import_sources_table` is present and operational. The owner also confirmed that the product/media path issue was environmental URL/storage-path interpretation rather than a failed product record.
+
+**Agent 0 decision:** Phase 6 is `COMPLETE` and accepted on 26 August 2026. Acquisition, resume, validation, inactive import, provenance deduplication, locally managed media, admin/storefront boundaries, exact-MySQL owner evidence and the curated launch plan pass. Commercial content/image rights remain a production-publication gate; Phase 6 completion does not authorize publication or production launch.

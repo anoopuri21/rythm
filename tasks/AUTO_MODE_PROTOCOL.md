@@ -151,7 +151,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - **Registered:** Yes
 - **Active:** Yes — owner-authorized continuous sequential execution through Phase 11.
 - **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, Phase 4 Accounts/Commerce, and Phase 5 Reviews/Product Q&A/Coupons (`COMPLETE`).
-- **Current phase:** Phase 6 — Controlled catalogue acquisition and import pipeline (`QA`: local technical gates passed; owner MySQL/manual review pending).
+- **Current phase:** Phase 7 — Admin governance, staff RBAC and auditability (`IN PROGRESS`).
+- **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
 - **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.
 - **Sequence authority:** `tasks/CANONICAL_PHASE_SEQUENCE.md` controls delivery order; `tasks/MASTER_PROJECT_TRACKER.md` controls status; enterprise-roadmap E-series IDs are capability workstreams only.
 - **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates and the owner-reported exact MySQL 8.4.3 UAT forward migrations passed.

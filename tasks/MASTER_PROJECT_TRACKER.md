@@ -4,7 +4,7 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current phase:** Phase 5 — Reviews, product Q&A and coupons COMPLETE
-**Overall status:** PHASE 6 TECHNICAL QA / CONTINUOUS AUTO MODE AUTHORIZED THROUGH PHASE 11 / NOT PRODUCTION-READY
+**Overall status:** PHASE 6 COMPLETE / PHASE 7 IN PROGRESS / CONTINUOUS AUTO MODE THROUGH PHASE 11 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** PAUSED — Phase 5 full-phase checkpoint reached
 
@@ -65,8 +65,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 3 | Agent 2, 1, 9, 13 | Pixel-accurate Homepage + Shop frontend | COMPLETE | Accepted 26 Aug 2026: 233 tests / 811 assertions plus exact-width empty/static and isolated populated 1440/390 rendered evidence |
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
 | 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
-| 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | QA | Local acquisition/import gates passed: 271 tests / 1,017 assertions; owner MySQL migration/status and manual Filament review pending |
-| 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | PENDING | Least-privilege role matrix, sensitive-action audit and admin UAT pass |
+| 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | COMPLETE | Accepted 26 Aug 2026: 271 tests / 1,017 assertions; owner confirmed exact-MySQL import plus Filament visibility/editability |
+| 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | IN PROGRESS | Least-privilege role matrix, TOTP 2FA, sensitive-action audit and admin UAT must pass |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | PENDING | Real test-mode payment/refund/retry/reconciliation evidence passes |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
 | 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | PENDING | Professionally approved rules plus fulfillment/tax/RMA tests pass |
