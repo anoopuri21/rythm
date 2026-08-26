@@ -73,7 +73,7 @@ Persistent UAT has not yet been imported by the agent. The owner must first pull
 4. In Filament, enter verified stock, review source promises/price/media, then use **Approve & activate** with a reason.
 5. Delete the disposable batch directory after accepted import/media verification.
 
-The first five Acoustic imports should normally be unchanged skips. If their source payload has genuinely changed, they remain conflicts for owner review; no overwrite is permitted.
+If the first five Acoustic source payloads have genuinely changed, they remain conflicts for owner review and are never overwritten. After inspecting the dry-run report, `--commit --allow-conflicts` may be used to import only ready records while explicitly holding those existing conflicts. The command reports both created and held counts and still fails on actual validation/media errors.
 
 ## Agent 0 gate decision
 

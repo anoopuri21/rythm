@@ -107,6 +107,43 @@ class CatalogueImportTest extends TestCase
         $this->assertSame(0, Product::sole()->stock);
     }
 
+    public function test_explicit_allow_conflicts_imports_nothing_over_existing_changed_products(): void
+    {
+        $run = $this->acquiredRun();
+        app(CatalogueImportService::class)->import($run, true);
+        $originalPrice = Product::sole()->price;
+
+        $file = collect(glob($run.'/*.json'))->first(fn (string $path): bool => basename($path) !== 'report.json');
+        $payload = json_decode((string) file_get_contents($file), true, flags: JSON_THROW_ON_ERROR);
+        $payload['price'] = '1.00';
+        file_put_contents($file, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $batch = $this->outputRoot.'/conflict-batch';
+        mkdir($batch, 0700);
+        $group = $batch.'/acoustic-guitars';
+        rename($run, $group);
+        file_put_contents($batch.'/batch-report.json', json_encode([
+            'complete' => true,
+            'products_failed' => 0,
+            'image_failures' => 0,
+            'products_without_media' => 0,
+            'groups' => [['collection' => 'acoustic-guitars', 'output_directory' => $group]],
+        ], JSON_THROW_ON_ERROR));
+
+        config(['catalogue.pilot.output_root' => $this->outputRoot]);
+        $this->artisan('catalogue:import-expansion', [
+            'batch' => 'conflict-batch',
+            '--commit' => true,
+            '--allow-conflicts' => true,
+        ])->expectsOutputToContain('safely held without overwrite')->assertSuccessful();
+
+        $this->assertDatabaseCount('products', 1);
+        $this->assertSame($originalPrice, Product::sole()->price);
+        $report = json_decode(file_get_contents($batch.'/import-report.json'), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(1, $report['conflicts']);
+        $this->assertSame(0, $report['created']);
+    }
+
     public function test_imported_product_requires_review_real_stock_and_approved_local_media_before_activation(): void
     {
         $directory = $this->acquiredRun();

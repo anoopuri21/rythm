@@ -396,3 +396,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Sensitive activation → Confirmation/reason/audit** — Authorized single and maximum-20 bulk actions record local-media approval, actor, timestamps and an audit reason.
 - **Independent gates passed** — Full regression **288 tests / 1,123 assertions**, isolated migration forward/rollback/forward and production build passed.
 - **Chunk 3 remains `QA`** — Persistent MySQL acquisition/import and admin review are owner-operated; Homepage/Shop work may proceed independently.
+
+## 26 August 2026 — Expected Existing-Source Conflict Handling
+
+- **Owner dry-run diagnosed** — Batch 1 reported 15 ready records, five changed-source conflicts corresponding exactly to the original five Acoustic imports, and zero failures.
+- **Conflicts remain immutable** — Existing products are never overwritten, even when ready records are committed.
+- **Explicit partial-safe mode added** — `--commit --allow-conflicts` imports only ready records and reports existing conflicts as safely held; actual validation/media failures still fail the command.
+- **Regression passed** — Conflict-allow mode preserves the existing product and source price while returning a clear successful held-conflict result; focused catalogue tests passed 12 tests / 73 assertions after the disposable build was restored.

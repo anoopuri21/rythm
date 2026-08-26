@@ -13,7 +13,8 @@ final class ImportCatalogueExpansion extends Command
 {
     protected $signature = 'catalogue:import-expansion
         {batch : Safe batch ID under the configured disposable root, or an absolute batch directory}
-        {--commit : Create inactive, zero-stock, review-required catalogue records}';
+        {--commit : Create inactive, zero-stock, review-required catalogue records}
+        {--allow-conflicts : Import ready records while safely holding existing changed/slug conflicts without overwrite}';
 
     protected $description = 'Dry-run or explicitly import a completed expansion batch without activating products';
 
@@ -76,15 +77,19 @@ final class ImportCatalogueExpansion extends Command
                 ['Report', $resultPath],
             ]);
 
-            if ($combined['failed'] > 0 || $combined['conflicts'] > 0 || $combined['files'] === 0) {
+            $allowConflicts = (bool) $this->option('allow-conflicts');
+            if ($combined['failed'] > 0 || ($combined['conflicts'] > 0 && ! $allowConflicts) || $combined['files'] === 0) {
                 $this->components->error('Expansion import requires review; no activation occurred.');
 
                 return self::FAILURE;
             }
 
-            $message = $this->option('commit')
-                ? 'Expansion records imported inactive with zero stock and mandatory review controls.'
-                : 'Expansion dry-run passed. Re-run with --commit only after reviewing this report.';
+            $message = match (true) {
+                $this->option('commit') && $combined['conflicts'] > 0 => "{$combined['created']} ready records imported inactive; {$combined['conflicts']} existing conflicts remained safely held without overwrite.",
+                (bool) $this->option('commit') => 'Expansion records imported inactive with zero stock and mandatory review controls.',
+                $combined['conflicts'] > 0 => "Dry-run accepted with {$combined['conflicts']} safely held conflicts. Use --commit --allow-conflicts to import only ready records.",
+                default => 'Expansion dry-run passed. Re-run with --commit only after reviewing this report.',
+            };
             $this->components->success($message);
 
             return self::SUCCESS;
