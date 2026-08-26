@@ -345,3 +345,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Owner MySQL/Filament gate passed** — Owner successfully used the persistent MySQL 8.4.3 project import and confirmed imported products are visible and editable in Filament.
 - **Phase 6 `QA` → `COMPLETE`** — Agent 0 accepted the controlled catalogue pipeline with 271 tests / 1,017 assertions, real 5→10 acquisition evidence, idempotent inactive import and owner-side admin evidence. Commercial publication rights remain unresolved and no production sign-off is implied.
 - **Phase 7 `PENDING` → `IN PROGRESS`** — Agents 6, 3, 4, 8 and 11 activated for least-privilege staff roles, TOTP 2FA, sensitive-action auditability and admin UAT. Agent 10 remains inactive.
+
+## 26 August 2026 — Phase 7 Owner Acceptance and Phase 6A Planning
+
+- **Phase 7 `QA` → `COMPLETE`** — Owner reported TOTP enrollment/challenge, role boundaries and protected new-staff creation working correctly; Agent 0 accepted the phase without implying deployment or production sign-off.
+- **Urgent catalogue priority recorded** — Before canonical Phase 8, the owner requested approximately ten products per category across a broader multi-category catalogue, with additional acquisition/review and Homepage/Shop QA.
+- **Publication decision recorded** — Owner authorized use/publication of acquired product text and images; Rythme-local media remains mandatory and real stock must still be supplied or verified rather than inferred.
+- **Homepage direction locked** — Preserve the existing dynamic sections and add bounded, configurable category-led presentation.
+- **Phase 6A plan created** — Work is divided into inventory/source qualification, orchestration, four category batches, safe review/activation, Homepage/Shop expansion and independent volume QA. Execution has not started.

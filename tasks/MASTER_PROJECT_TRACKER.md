@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current phase:** Phase 5 — Reviews, product Q&A and coupons COMPLETE
-**Overall status:** PHASE 6 COMPLETE / PHASE 7 IN PROGRESS / CONTINUOUS AUTO MODE THROUGH PHASE 11 / NOT PRODUCTION-READY
+**Current operational priority:** Phase 6A — urgent multi-category catalogue and homepage expansion PLANNED before canonical Phase 8
+**Overall status:** PHASES 6–7 COMPLETE / PHASE 6A PLANNED / PHASE 8 PENDING / CONTINUOUS AUTO MODE THROUGH PHASE 11 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** PAUSED — Phase 5 full-phase checkpoint reached
+**Auto Mode:** ACTIVE — owner authorized continuous execution and urgent catalogue expansion
 
 ---
 
@@ -66,7 +66,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 4 | Agent 3, 4, 9, 11, 12, 14 | Accounts, cart, wishlist, checkout and orders | COMPLETE | Accepted 26 Aug 2026: 244 tests / 858 assertions; 17 rendered viewport/journey checks with zero axe violations, overflow or console errors |
 | 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
 | 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | COMPLETE | Accepted 26 Aug 2026: 271 tests / 1,017 assertions; owner confirmed exact-MySQL import plus Filament visibility/editability |
-| 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | IN PROGRESS | Least-privilege role matrix, TOTP 2FA, sensitive-action audit and admin UAT must pass |
+| 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | COMPLETE | Accepted 26 Aug 2026: 280 tests / 1,081 assertions plus owner-confirmed TOTP, roles and protected staff creation UAT |
+| 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | PLANNED | Approximately 10 products across each of eight groups; safe import, admin review, Homepage/Shop and volume QA pass |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | PENDING | Real test-mode payment/refund/retry/reconciliation evidence passes |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
 | 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | PENDING | Professionally approved rules plus fulfillment/tax/RMA tests pass |
@@ -328,8 +329,8 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 **Agent 0 decision:** Phase 5 is `COMPLETE` and accepted on 26 August 2026. Auto Mode pauses at this full-phase checkpoint. Agent 10 remains inactive and no production sign-off is implied.
 
-## 14. Canonical Next Action
+## 14. Current Next Action
 
-The post-Phase-5 numbering conflict is resolved by `tasks/CANONICAL_PHASE_SEQUENCE.md`. **Phase 6 — Controlled catalogue acquisition and import pipeline** is now `IN PROGRESS` after the owner selected PHP, approved bounded public reference-data development and confirmed the no-authentication/no-CAPTCHA-bypass respectful-rate-limit boundary.
+Phase 7 is accepted after automated qualification and owner-reported UAT of TOTP, roles and protected staff creation. The owner then prioritized a bounded post-Phase-6 catalogue operation before canonical Phase 8: approximately ten products in each of eight product groups, plus additional Homepage category sections and realistic Homepage/Shop QA.
 
-The owner authorized Agent 0 to execute canonical Phases 6–11 sequentially without routine inter-phase confirmation under `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`. Missing external credentials, professional approvals or owner manual UAT must remain truthful `QA`/`BLOCKED` gates; they cannot be reported as passed. Commercial competitor text/image rights remain a separate production-data gate. Agent 10 and Phase 18 remain inactive.
+Execution is controlled by `tasks/PHASE_6A_CATALOGUE_EXPANSION_PLAN.md`. Chunk 0 is a read-only inventory, public collection qualification and exact manifest; acquisition/import must not begin before that gate. Canonical Phase 8 remains pending during this urgent operation. Agent 10 and deployment remain inactive, and no production sign-off is implied.

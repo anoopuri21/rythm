@@ -1,7 +1,7 @@
 # Auto Mode Phase 7 Plan — Admin Governance, Staff RBAC and Auditability
 
 **Owner:** Agent 0
-**Status:** QA — automated gates passed; exact MySQL/admin-owner UAT remains external evidence
+**Status:** COMPLETE — accepted by Agent 0 after owner UAT on 26 August 2026
 **Activated:** 26 August 2026
 **Agents:** 6 (Filament), 3 (Laravel), 4 (database), 8 (security), 11 (architecture), 9 (independent QA)
 
@@ -50,7 +50,9 @@
 - Production Vite build: **passed**.
 - Composer locked audit and npm production audit: **0 known vulnerabilities**.
 - Pint and `git diff --check`: **passed**.
-- Remaining external evidence: exact MySQL 8.4.3 migration/UAT and owner verification of TOTP enrollment/recovery, role-specific navigation/actions, protected staff assignment, audit visibility and reset controls.
+- Owner UAT accepted on 26 August 2026: TOTP, role boundaries and protected new-staff creation were reported working correctly on the established UAT environment.
+
+**Agent 0 decision:** Phase 7 is `COMPLETE`. This acceptance is not production or deployment sign-off.
 
 ## Data safety
 
