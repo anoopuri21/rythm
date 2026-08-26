@@ -12,7 +12,12 @@ use Throwable;
 
 final class CatalogueAcquisitionService
 {
-    /** @return array<string, mixed> */
+    public function __construct(private readonly CataloguePublicationReviewService $publicationReview) {}
+
+    /** @param list<string> $selectedHandles
+     * @param  array<string, string>  $selectedSourceIds
+     * @return array<string, mixed>
+     */
     public function acquire(
         string $collection,
         int $limit,
@@ -23,8 +28,10 @@ final class CatalogueAcquisitionService
         string $outputRoot,
         bool $downloadImages = true,
         ?string $resumeRunId = null,
+        array $selectedHandles = [],
+        array $selectedSourceIds = [],
     ): array {
-        $this->guardInputs($collection, $limit, $delayMs, $imageLimit, $maxImageBytes, $maxRunBytes);
+        $this->guardInputs($collection, $limit, $delayMs, $imageLimit, $maxImageBytes, $maxRunBytes, $selectedHandles, $selectedSourceIds);
         if ($resumeRunId !== null && ! preg_match('/^[A-Za-z0-9-]+$/', $resumeRunId)) {
             throw new RuntimeException('Resume run ID is invalid.');
         }
@@ -40,6 +47,7 @@ final class CatalogueAcquisitionService
             'source' => 'bajaao-public-shopify-json',
             'collection' => $collection,
             'requested_limit' => $limit,
+            'selected_handles' => $selectedHandles,
             'started_at' => now()->toIso8601String(),
             'request_count' => 0,
             'products_discovered' => 0,
@@ -56,11 +64,27 @@ final class CatalogueAcquisitionService
         ];
 
         try {
-            $collectionUrl = $this->sourceUrl("/collections/{$collection}/products.json?limit={$limit}");
+            $collectionLimit = $selectedHandles === [] ? $limit : 50;
+            $collectionUrl = $this->sourceUrl("/collections/{$collection}/products.json?limit={$collectionLimit}");
             $collectionResponse = $this->request()->get($collectionUrl)->throw();
             $report['request_count']++;
             $report['raw_bytes'] += strlen($collectionResponse->body());
-            $products = array_slice($collectionResponse->json('products', []), 0, $limit);
+            $collectionProducts = array_values(array_filter($collectionResponse->json('products', []), 'is_array'));
+
+            if ($selectedHandles === []) {
+                $products = array_slice($collectionProducts, 0, $limit);
+            } else {
+                $byHandle = [];
+                foreach ($collectionProducts as $product) {
+                    $byHandle[(string) ($product['handle'] ?? '')] = $product;
+                }
+                $missing = array_values(array_diff($selectedHandles, array_keys($byHandle)));
+                if ($missing !== []) {
+                    throw new RuntimeException('Selected handles are absent from the public collection: '.implode(', ', $missing));
+                }
+                $products = array_map(static fn (string $handle): array => $byHandle[$handle], $selectedHandles);
+            }
+
             $report['products_discovered'] = count($products);
 
             foreach ($products as $position => $summary) {
@@ -79,6 +103,9 @@ final class CatalogueAcquisitionService
                 $productFile = $runDirectory.DIRECTORY_SEPARATOR.$handle.'.json';
                 if ($resumeRunId !== null && is_file($productFile)) {
                     $existing = json_decode((string) file_get_contents($productFile), true, flags: JSON_THROW_ON_ERROR);
+                    if ($selectedSourceIds !== [] && (string) ($existing['source_product_id'] ?? '') !== $selectedSourceIds[$handle]) {
+                        throw new RuntimeException("Resumed source identity differs from the manifest: {$handle}");
+                    }
                     $report['products_completed']++;
                     $report['resumed_products']++;
                     $report['normalized_bytes'] += filesize($productFile) ?: 0;
@@ -92,6 +119,7 @@ final class CatalogueAcquisitionService
                         'brand' => (string) ($existing['brand'] ?? ''),
                         'variants' => count($existing['variants'] ?? []),
                         'images' => count($existing['media'] ?? []),
+                        'publication_review_required' => (bool) ($existing['publication_review']['required'] ?? false),
                     ];
 
                     continue;
@@ -104,6 +132,9 @@ final class CatalogueAcquisitionService
                     $source = $response->json('product');
                     if (! is_array($source)) {
                         throw new RuntimeException('Product JSON does not contain a product object.');
+                    }
+                    if ($selectedSourceIds !== [] && (string) ($source['id'] ?? '') !== $selectedSourceIds[$handle]) {
+                        throw new RuntimeException("Source product identity changed for selected handle: {$handle}");
                     }
 
                     $normalized = $this->normalize($source, $collection);
@@ -141,6 +172,7 @@ final class CatalogueAcquisitionService
                         'brand' => $normalized['brand'],
                         'variants' => count($normalized['variants']),
                         'images' => count($normalized['media']),
+                        'publication_review_required' => (bool) $normalized['publication_review']['required'],
                     ];
                 } catch (Throwable $exception) {
                     $report['products_failed']++;
@@ -197,18 +229,20 @@ final class CatalogueAcquisitionService
         $bodyHtml = (string) ($source['body_html'] ?? '');
         $bodyHtml = preg_replace('~<(script|style|iframe)\b[^>]*>.*?</\\1>~is', ' ', $bodyHtml) ?? '';
         $plainDescription = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($bodyHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? '');
+        $title = trim((string) ($source['title'] ?? ''));
 
         return [
             'schema_version' => 1,
             'source_product_id' => (string) ($source['id'] ?? ''),
             'source_url' => $this->sourceUrl('/products/'.(string) ($source['handle'] ?? '')),
             'collection' => $collection,
-            'name' => trim((string) ($source['title'] ?? '')),
+            'name' => $title,
             'slug' => trim((string) ($source['handle'] ?? '')),
             'brand' => trim((string) ($source['vendor'] ?? '')),
             'product_type' => trim((string) ($source['product_type'] ?? '')),
             'description_text' => $plainDescription,
             'short_description' => Str::limit($plainDescription, 500, ''),
+            'publication_review' => $this->publicationReview->assess($title, $plainDescription),
             'price' => $prices === [] ? '0.00' : number_format(min($prices), 2, '.', ''),
             'compare_at_price' => max($comparePrices ?: [0]) > max($prices ?: [0]) ? number_format(max($comparePrices), 2, '.', '') : null,
             'available' => in_array(true, array_column($variants, 'available'), true),
@@ -279,13 +313,36 @@ final class CatalogueAcquisitionService
         return $baseUrl.'/'.ltrim($path, '/');
     }
 
-    private function guardInputs(string $collection, int $limit, int $delayMs, int $imageLimit, int $maxImageBytes, int $maxRunBytes): void
+    /** @param list<string> $selectedHandles
+     * @param  array<string, string>  $selectedSourceIds
+     */
+    private function guardInputs(string $collection, int $limit, int $delayMs, int $imageLimit, int $maxImageBytes, int $maxRunBytes, array $selectedHandles, array $selectedSourceIds): void
     {
         if (! preg_match('/^[a-z0-9][a-z0-9-]*$/', $collection)) {
             throw new RuntimeException('Collection must be a public Shopify collection handle.');
         }
         if ($limit < 1 || $limit > 10) {
             throw new RuntimeException('Pilot limit must be between 1 and 10 products.');
+        }
+        if ($selectedHandles !== []) {
+            if (count($selectedHandles) !== $limit || count(array_unique($selectedHandles)) !== count($selectedHandles)) {
+                throw new RuntimeException('Selected handles must be unique and match the requested limit.');
+            }
+            foreach ($selectedHandles as $handle) {
+                if (! is_string($handle) || ! preg_match('/^[a-z0-9][a-z0-9-]*$/', $handle)) {
+                    throw new RuntimeException('Selected product handle is invalid.');
+                }
+            }
+            if ($selectedSourceIds !== [] && array_keys($selectedSourceIds) !== $selectedHandles) {
+                throw new RuntimeException('Selected source identities must match the ordered handles.');
+            }
+            foreach ($selectedSourceIds as $sourceId) {
+                if (! is_string($sourceId) || ! ctype_digit($sourceId)) {
+                    throw new RuntimeException('Selected source product identity is invalid.');
+                }
+            }
+        } elseif ($selectedSourceIds !== []) {
+            throw new RuntimeException('Selected source identities require selected handles.');
         }
         if ($delayMs < 1000 || $delayMs > 10000) {
             throw new RuntimeException('Request delay must be between 1000 and 10000 milliseconds.');

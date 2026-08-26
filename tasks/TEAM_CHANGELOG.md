@@ -363,3 +363,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Capacity accepted** — Eight independent ten-product runs at three images each are estimated around 24–26 MiB total based on the hardened pilot, with no more than two category runs retained before cleanup.
 - **No import occurred** — Qualification was metadata-only and read-only; no images were downloaded and persistent UAT was not connected or modified.
 - **Phase 6A `PLANNED` → `IN PROGRESS`** — Chunk 0 accepted by Agent 0; manifest-driven acquisition orchestration is next.
+
+## 26 August 2026 — Phase 6A Chunk 1 Acquisition Orchestration
+
+- **Collection order → Exact manifest selection** — New expansion command stages only committed handles and verifies fetched/resumed source IDs, preventing collection reorder or identity drift from changing the batch.
+- **Unbounded expansion → Two-group ceiling** — Each invocation accepts one or two groups only, writes outside the repository and emits group plus combined reports.
+- **Interrupted batch → Deterministic resume** — Batch/group paths are stable; a real Acoustic metadata run resumed 10/10 records with one collection revalidation request and no product redownload.
+- **Retailer promises → Explicit publication review** — Warranty, free item/lesson/trial, shipping/return, promotion, bundle, open-box and source-retailer wording are flagged rather than silently published.
+- **Real qualification passed** — Exact Acoustic manifest run completed 10/10, zero failures, zero media downloads, 184 KiB staging and all 10 appropriately flagged for review.
+- **Automated gate passed** — Focused catalogue suite passed **10 tests / 63 assertions**; full rerun after build passed **284 tests / 1,101 assertions**; build, Pint and dependency audits passed.
+- **No persistent write** — Qualification output was deleted after evidence extraction; no database import, activation or publication occurred.
+- **Phase 6A Chunk 1 accepted** — Four real two-category acquisition batches are next.

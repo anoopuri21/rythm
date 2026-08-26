@@ -1,7 +1,7 @@
 # Phase 6A — Multi-Category Catalogue and Homepage Expansion Plan
 
 **Owner:** Agent 0 — Project Lead
-**Status:** IN PROGRESS — Chunk 0 accepted; Chunk 1 next
+**Status:** IN PROGRESS — Chunks 0–1 accepted; Chunk 2 next
 **Priority:** Urgent owner-directed catalogue operation before canonical Phase 8
 **Date:** 26 August 2026
 
@@ -129,8 +129,9 @@ Each completed chunk requires applicable tests, a bounded commit, push attempt, 
 ## Progress
 
 - **Chunk 0 — COMPLETE:** Eight public collections qualified, exact 80-record manifest produced with zero internal duplicate handles, UAT/local-fixture boundaries documented and capacity/request budget accepted. Evidence: `tasks/PHASE_6A_CHUNK_0_QUALIFICATION.md`.
-- **Chunk 1 — NEXT:** Implement and independently test manifest-driven multi-category acquisition plus publication-content review controls.
+- **Chunk 1 — COMPLETE:** Manifest-driven one-/two-group acquisition, deterministic resume, exact handle/source-ID validation, combined reporting and publication-review flags passed automated and real metadata-only qualification. Evidence: `tasks/PHASE_6A_CHUNK_1_ACQUISITION.md`.
+- **Chunk 2 — NEXT:** Execute and validate four bounded real two-category acquisition batches; persistent import remains prohibited.
 
 ## Immediate next action
 
-Activate Agents 5, 4, 8 and 9 for Chunk 1. No persistent import is authorized in Chunk 1.
+Activate Agents 5, 8 and 9 for Chunk 2 Batch 1: Acoustic Guitars and Electric Guitars, with three locally staged images per product.
