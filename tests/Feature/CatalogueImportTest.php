@@ -128,6 +128,8 @@ class CatalogueImportTest extends TestCase
             ->approveAndActivate($product->refresh(), $actor, 'Content, local media, price and physical stock verified.');
 
         $this->assertTrue($activated->is_active);
+        $this->assertTrue($activated->category()->sole()->is_active);
+        $this->assertTrue($activated->brand()->sole()->is_active);
         $source = $activated->importSource()->sole();
         $this->assertNotNull($source->publication_reviewed_at);
         $this->assertSame($actor->id, $source->publication_reviewed_by);

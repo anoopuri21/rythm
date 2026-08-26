@@ -36,7 +36,7 @@ Imported products cannot become active through the normal edit toggle or table t
 3. Confirmation that local media is approved for commercial use.
 4. A mandatory 5–500 character reason/review note.
 
-The service transaction rechecks authorization, positive price, real product or active-variant stock and at least one locally managed gallery image. It records reviewer/approver identity and time, marks each local media item approved, activates the product and writes a durable audit event.
+The service transaction rechecks authorization, positive price, real product or active-variant stock and at least one locally managed gallery image. It records reviewer/approver identity and time, marks each local media item approved, activates its reviewed category/brand mappings with the product, activates the product and writes a durable audit event.
 
 A model-level guard independently rejects direct activation of provenance-backed products unless review, commercial approval, price, stock and local-media requirements are all satisfied. Bulk activation is bounded to 20 reviewed products per operation and applies the same per-record transaction and audit controls.
 

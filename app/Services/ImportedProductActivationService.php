@@ -63,6 +63,9 @@ final class ImportedProductActivationService
                 'commercial_use_approved_by' => $actor->id,
             ])->save();
 
+            $locked->category()->update(['is_active' => true]);
+            $locked->brand()->update(['is_active' => true]);
+
             request()->merge(['audit_reason' => $reason]);
             $locked->update(['is_active' => true]);
 
