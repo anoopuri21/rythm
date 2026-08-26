@@ -89,8 +89,63 @@ After independent review added actual image-content/MIME and dimension validatio
 - External Composer dependencies remained under `/tmp/rythm-vendor`; no physical repository vendor directory was created.
 - The disposable real pilot data/media was deleted after compact metrics and findings were recorded.
 
+## Import pipeline qualification
+
+A provenance-backed import layer now validates staged schema, approved source host, price/variant structure, local relative media paths, SHA-256 and image dimensions before any write. The normal command is dry-run; `--commit` is explicit.
+
+Safety behavior:
+
+- Imported products and variants always start inactive with zero stock.
+- Scraped availability never becomes an invented stock quantity.
+- Newly required category/brand mappings start inactive; existing slug mappings are reused.
+- Media is copied into Rythme-managed Spatie storage with source hash/dimensions and `commercial_use_approved=false`; no CDN URL is used by the product.
+- Source identity and payload hash are stored in `product_import_sources`, not raw competitor content.
+- An unchanged rerun is skipped idempotently.
+- Changed source content or a pre-existing slug becomes a review conflict and never overwrites owner-managed data.
+- Database uniqueness independently enforces source identity.
+
+Real isolated SQLite evidence used a newly created `/tmp/phase6-import.sqlite`, never persistent UAT:
+
+| Step | Result |
+|---|---|
+| Five-product acquisition with one image each | 5/5 passed |
+| Import dry run | 5 validated; 0 writes; 0 conflicts/failures |
+| Explicit commit | 5 inactive products, 49 inactive variants, 5 local media, 5 provenance rows |
+| Active products after import | 0 |
+| Identical second commit | 5 skipped unchanged; 0 duplicates/writes |
+| Isolated DB size | 648 KiB |
+| Cleanup | Staged source/media, copied media and isolated DB deleted |
+
+Focused acquisition/import tests after admin/storefront qualification: **6 passed / 43 assertions**.
+
+Final local gates:
+
+- Full regression: **271 tests / 1,017 assertions passed**.
+- New migration isolated forward → rollback → forward passed.
+- Production Vite build passed.
+- Changed-file syntax and Pint passed.
+- Inactive imported product returned storefront 404 while an explicit admin could see it in Filament.
+
+## Curated approximately 60-product launch plan
+
+This is a bounded acquisition target, not permission to publish competitor content. Suggested balance based on the existing Rythme category tree:
+
+| Category | Target |
+|---|---:|
+| Acoustic Guitars | 10 |
+| Electric Guitars | 8 |
+| Portable Keyboards/Digital Pianos | 8 |
+| Electronic Drum Kits/Hand Percussion | 6 |
+| Microphones | 8 |
+| Audio Interfaces | 6 |
+| Studio Monitors/Headphones | 6 |
+| Guitar Strings/Cables/Accessories | 8 |
+| **Total** | **60** |
+
+Each category must run separately with dry-run first, disk-budget checks and inactive imports. Client/admin may replace, edit or manually add products. No record becomes public until content/media rights, stock, price and merchandising review are explicitly completed.
+
 ## Current decision
 
-The public acquisition mechanism is viable for the agreed bounded catalogue plan: five products completed cleanly, the run resumed to ten without re-downloading completed products, all media became locally managed files, and measured storage is modest at the three-image pilot cap.
+The public acquisition and safe inactive-import mechanisms are viable for the agreed bounded catalogue plan. Five products completed cleanly, the run resumed to ten without re-downloading completed products, all attached media became locally managed files, and measured storage is modest.
 
-This closes only the acquisition pilot. Phase 6 remains `IN PROGRESS` until validation/import staging, database deduplication/idempotency, category/brand/variant mapping, media attachment, isolated import tests, admin/storefront verification and the curated approximately 60-product launch plan are complete. Commercial content/image rights remain a production-publication gate.
+Phase 6 technical scope is `QA`: acquisition, resume, validation, inactive import, provenance deduplication, media attachment, admin/storefront boundaries and the curated launch plan pass locally. Final acceptance remains pending owner-side MySQL 8.4.3 forward migration/status and manual Filament review after pull. Commercial content/image rights remain a production-publication gate; the technical phase does not authorize publication.

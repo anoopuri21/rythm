@@ -25,7 +25,7 @@
 | 3 | Homepage and Shop frontend qualification | Storefront programme | COMPLETE |
 | 4 | Accounts, cart, wishlist, checkout and orders | E1, E2 | COMPLETE |
 | 5 | Verified reviews, moderated product Q&A and coupons | E3 | COMPLETE |
-| 6 | Controlled catalogue acquisition and import pipeline | Catalog acquisition prerequisite absent from legacy roadmap | IN PROGRESS |
+| 6 | Controlled catalogue acquisition and import pipeline | Catalog acquisition prerequisite absent from legacy roadmap | QA |
 | 7 | Admin governance, staff RBAC and auditability | E7 | PENDING |
 | 8 | Payment, refund and financial reconciliation operations | E2 | PENDING |
 | 9 | Central notifications and external-integration event architecture | E4 | PENDING |

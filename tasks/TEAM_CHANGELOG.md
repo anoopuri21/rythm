@@ -327,3 +327,15 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Capacity boundary passed** — Real source data/media stayed under `/tmp`, no source artefact entered Git, and the compact repository remained approximately 28 MiB excluding dependencies/build output.
 - **Pilot artefacts cleaned** — Temporary catalogue responses/media were deleted after compact metrics were recorded in `tasks/PHASE_6_CATALOGUE_QA.md`.
 - **Phase 6 remains `IN PROGRESS`** — Import staging, DB idempotency/deduplication, mappings, media attachment and admin/storefront qualification are still required.
+
+## 26 August 2026 — Phase 6 Safe Import Pipeline
+
+- **Staged data → Explicit dry-run/commit workflow** — `catalogue:import` validates every normalized record and media manifest; writes occur only with `--commit`.
+- **Unknown rights/stock → Inactive zero-stock records** — Imported products and variants cannot become public or purchasable automatically; media is marked `commercial_use_approved=false`.
+- **Source reruns → Provenance-backed idempotency** — A compact source identity/payload hash table skips unchanged reruns, rejects changed-source and slug conflicts, and never overwrites owner-managed products.
+- **CDN media → Rythme-managed storage** — Approved import copies verified files to Spatie media storage and retains no storefront hotlink.
+- **Real isolated import passed** — Five acquired products dry-ran with zero writes, committed as 5 inactive products/49 inactive variants/5 local media/5 provenance rows, and reran with all five skipped and no duplicates.
+- **Data/capacity safety retained** — The isolated 648 KiB SQLite DB, source staging and copied media were deleted; persistent UAT was not connected or modified.
+- **Admin/public boundary passed** — Inactive imported products remain 404 on the storefront while explicit administrators can review them in Filament.
+- **Curated launch target defined** — Approximately 60 products across eight category groups, acquired category-by-category and always imported inactive; client-managed manual additions remain supported.
+- **Phase 6 `IN PROGRESS` → `QA`** — Full local regression passed at **271 tests / 1,017 assertions**, isolated migration forward/rollback/forward and production build passed. Owner-side MySQL 8.4.3 migration/status and manual Filament review remain external acceptance gates.
