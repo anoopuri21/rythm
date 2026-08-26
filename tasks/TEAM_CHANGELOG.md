@@ -317,3 +317,13 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 11 shared-host baseline approved** — MySQL-safe search/facets, recently viewed, related/complementary administration, back-in-stock subscriptions and truthful states; no persistent search daemon, gift cards, abandoned-cart marketing or price-drop promises.
 - **Workspace capacity guard locked** — Large raw responses, media, generated catalogues, test databases, dependencies and browser/build artefacts stay disposable/outside the repository and are cleaned after compact evidence extraction.
 - **Phase 6 `PENDING` → `IN PROGRESS`** — Agents 5, 4, 8, 9 and 15 activated under Agent 0. Agent 10 remains inactive; no production sign-off is implied.
+
+## 26 August 2026 — Phase 6 Bounded Acquisition Pilot
+
+- **Public source contract verified** — Bajaao's public agent instructions explicitly document unauthenticated collection/product JSON; implementation uses only those surfaces and returned Shopify CDN media, with allowlisted hosts, bounded retries and 1.5-second pacing.
+- **Five Acoustic Guitars passed** — 5/5 products, 15/15 images and 49 variants completed with no failures in 12.237 seconds; disposable output was 2.1 MiB.
+- **Resume-to-ten passed** — The same run expanded to 10/10 products while reusing the first five records/media; cumulative result was 95 variants, 30 images and 3.2 MiB temporary output with zero acquisition/media failures.
+- **No hotlink/runtime dependency** — Media manifests use local relative files with verified SHA-256; a separate scan returned zero required-field, integrity or hotlink errors.
+- **Capacity boundary passed** — Real source data/media stayed under `/tmp`, no source artefact entered Git, and the compact repository remained approximately 28 MiB excluding dependencies/build output.
+- **Pilot artefacts cleaned** — Temporary catalogue responses/media were deleted after compact metrics were recorded in `tasks/PHASE_6_CATALOGUE_QA.md`.
+- **Phase 6 remains `IN PROGRESS`** — Import staging, DB idempotency/deduplication, mappings, media attachment and admin/storefront qualification are still required.
