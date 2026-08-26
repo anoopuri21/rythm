@@ -16,6 +16,7 @@ final class CatalogueAcquisitionService
 
     /** @param list<string> $selectedHandles
      * @param  array<string, string>  $selectedSourceIds
+     * @param  array{name: string, slug: string}|array{}  $targetCategory
      * @return array<string, mixed>
      */
     public function acquire(
@@ -30,8 +31,9 @@ final class CatalogueAcquisitionService
         ?string $resumeRunId = null,
         array $selectedHandles = [],
         array $selectedSourceIds = [],
+        array $targetCategory = [],
     ): array {
-        $this->guardInputs($collection, $limit, $delayMs, $imageLimit, $maxImageBytes, $maxRunBytes, $selectedHandles, $selectedSourceIds);
+        $this->guardInputs($collection, $limit, $delayMs, $imageLimit, $maxImageBytes, $maxRunBytes, $selectedHandles, $selectedSourceIds, $targetCategory);
         if ($resumeRunId !== null && ! preg_match('/^[A-Za-z0-9-]+$/', $resumeRunId)) {
             throw new RuntimeException('Resume run ID is invalid.');
         }
@@ -137,7 +139,7 @@ final class CatalogueAcquisitionService
                         throw new RuntimeException("Source product identity changed for selected handle: {$handle}");
                     }
 
-                    $normalized = $this->normalize($source, $collection);
+                    $normalized = $this->normalize($source, $collection, $targetCategory);
                     $normalized['media'] = [];
 
                     if ($downloadImages) {
@@ -206,9 +208,10 @@ final class CatalogueAcquisitionService
     }
 
     /** @param array<string, mixed> $source
+     * @param  array{name: string, slug: string}|array{}  $targetCategory
      * @return array<string, mixed>
      */
-    private function normalize(array $source, string $collection): array
+    private function normalize(array $source, string $collection, array $targetCategory): array
     {
         $variants = array_map(static fn (array $variant): array => [
             'source_id' => (string) ($variant['id'] ?? ''),
@@ -236,6 +239,8 @@ final class CatalogueAcquisitionService
             'source_product_id' => (string) ($source['id'] ?? ''),
             'source_url' => $this->sourceUrl('/products/'.(string) ($source['handle'] ?? '')),
             'collection' => $collection,
+            'target_category_name' => $targetCategory['name'] ?? Str::headline($collection),
+            'target_category_slug' => $targetCategory['slug'] ?? Str::slug($collection),
             'name' => $title,
             'slug' => trim((string) ($source['handle'] ?? '')),
             'brand' => trim((string) ($source['vendor'] ?? '')),
@@ -315,8 +320,9 @@ final class CatalogueAcquisitionService
 
     /** @param list<string> $selectedHandles
      * @param  array<string, string>  $selectedSourceIds
+     * @param  array{name: string, slug: string}|array{}  $targetCategory
      */
-    private function guardInputs(string $collection, int $limit, int $delayMs, int $imageLimit, int $maxImageBytes, int $maxRunBytes, array $selectedHandles, array $selectedSourceIds): void
+    private function guardInputs(string $collection, int $limit, int $delayMs, int $imageLimit, int $maxImageBytes, int $maxRunBytes, array $selectedHandles, array $selectedSourceIds, array $targetCategory): void
     {
         if (! preg_match('/^[a-z0-9][a-z0-9-]*$/', $collection)) {
             throw new RuntimeException('Collection must be a public Shopify collection handle.');
@@ -343,6 +349,12 @@ final class CatalogueAcquisitionService
             }
         } elseif ($selectedSourceIds !== []) {
             throw new RuntimeException('Selected source identities require selected handles.');
+        }
+        if ($targetCategory !== [] && (
+            trim((string) ($targetCategory['name'] ?? '')) === ''
+            || ! preg_match('/^[a-z0-9][a-z0-9-]*$/', (string) ($targetCategory['slug'] ?? ''))
+        )) {
+            throw new RuntimeException('Target category mapping is invalid.');
         }
         if ($delayMs < 1000 || $delayMs > 10000) {
             throw new RuntimeException('Request delay must be between 1000 and 10000 milliseconds.');

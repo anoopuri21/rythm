@@ -98,6 +98,7 @@ final class AcquireCatalogueExpansion extends Command
                     resumeRunId: $collection,
                     selectedHandles: $handles,
                     selectedSourceIds: $sourceIds,
+                    targetCategory: ['name' => (string) $group['name'], 'slug' => (string) $group['category_slug']],
                 );
 
                 $products = collect($report['products']);

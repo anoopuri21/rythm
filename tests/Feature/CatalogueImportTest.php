@@ -9,6 +9,7 @@ use App\Models\ProductImportSource;
 use App\Models\User;
 use App\Services\CatalogueAcquisitionService;
 use App\Services\CatalogueImportService;
+use App\Services\ImportedProductActivationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -62,7 +63,12 @@ class CatalogueImportTest extends TestCase
         $this->assertCount(1, $product->media);
         $this->assertFalse($product->media->first()->getCustomProperty('commercial_use_approved'));
         $this->assertStringNotContainsString('bajaao.com', $product->media->first()->getUrl());
-        $this->assertDatabaseHas('product_import_sources', ['product_id' => $product->id, 'source' => 'bajaao']);
+        $this->assertDatabaseHas('product_import_sources', [
+            'product_id' => $product->id,
+            'source' => 'bajaao',
+            'publication_review_required' => false,
+            'publication_reviewed_at' => null,
+        ]);
         $this->get('/product/test-guitar')->assertNotFound();
         $this->actingAs(User::factory()->admin()->create())
             ->get('/admin/products')
@@ -74,6 +80,84 @@ class CatalogueImportTest extends TestCase
         $this->assertDatabaseCount('products', 1);
         $this->assertDatabaseCount('product_variants', 2);
         $this->assertDatabaseCount('media', 1);
+    }
+
+    public function test_expansion_batch_import_is_dry_run_first_and_commit_stays_inactive(): void
+    {
+        $run = $this->acquiredRun();
+        $batch = $this->outputRoot.'/expansion-batch';
+        mkdir($batch, 0700);
+        $group = $batch.'/acoustic-guitars';
+        rename($run, $group);
+        file_put_contents($batch.'/batch-report.json', json_encode([
+            'complete' => true,
+            'products_failed' => 0,
+            'image_failures' => 0,
+            'products_without_media' => 0,
+            'groups' => [['collection' => 'acoustic-guitars', 'output_directory' => $group]],
+        ], JSON_THROW_ON_ERROR));
+
+        config(['catalogue.pilot.output_root' => $this->outputRoot]);
+        $this->artisan('catalogue:import-expansion', ['batch' => 'expansion-batch'])->assertSuccessful();
+        $this->assertDatabaseCount('products', 0);
+
+        $this->artisan('catalogue:import-expansion', ['batch' => 'expansion-batch', '--commit' => true])->assertSuccessful();
+        $this->assertDatabaseCount('products', 1);
+        $this->assertFalse(Product::sole()->is_active);
+        $this->assertSame(0, Product::sole()->stock);
+    }
+
+    public function test_imported_product_requires_review_real_stock_and_approved_local_media_before_activation(): void
+    {
+        $directory = $this->acquiredRun();
+        app(CatalogueImportService::class)->import($directory, true);
+        $product = Product::sole();
+        $actor = User::factory()->create();
+        $actor->forceFill(['role' => User::ROLE_CATALOGUE_MANAGER])->save();
+        $this->actingAs($actor);
+
+        try {
+            $product->update(['is_active' => true]);
+            $this->fail('Direct activation should be blocked.');
+        } catch (\DomainException $exception) {
+            $this->assertStringContainsString('reviewed content', $exception->getMessage());
+        }
+
+        $product->refresh()->update(['stock' => 5]);
+        $activated = app(ImportedProductActivationService::class)
+            ->approveAndActivate($product->refresh(), $actor, 'Content, local media, price and physical stock verified.');
+
+        $this->assertTrue($activated->is_active);
+        $source = $activated->importSource()->sole();
+        $this->assertNotNull($source->publication_reviewed_at);
+        $this->assertSame($actor->id, $source->publication_reviewed_by);
+        $this->assertNotNull($source->commercial_use_approved_at);
+        $this->assertTrue((bool) $activated->getFirstMedia('gallery')->getCustomProperty('commercial_use_approved'));
+        $this->assertDatabaseHas('admin_audit_logs', [
+            'actor_id' => $actor->id,
+            'action' => 'catalogue.imported_product_activated',
+            'reason' => 'Content, local media, price and physical stock verified.',
+        ]);
+        $this->get('/product/test-guitar')->assertOk();
+    }
+
+    public function test_review_and_category_metadata_do_not_create_false_source_change_conflicts(): void
+    {
+        $directory = $this->acquiredRun();
+        $service = app(CatalogueImportService::class);
+        $service->import($directory, true);
+
+        $file = collect(glob($directory.'/*.json'))->first(fn (string $path): bool => basename($path) !== 'report.json');
+        $payload = json_decode((string) file_get_contents($file), true, flags: JSON_THROW_ON_ERROR);
+        $payload['publication_review'] = ['required' => true, 'reasons' => ['new review rule']];
+        $payload['target_category_name'] = 'Mapped Acoustic Guitars';
+        $payload['target_category_slug'] = 'mapped-acoustic-guitars';
+        file_put_contents($file, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $result = $service->import($directory, true);
+        $this->assertSame(1, $result['skipped_unchanged']);
+        $this->assertSame(0, $result['conflicts']);
+        $this->assertDatabaseCount('products', 1);
     }
 
     public function test_changed_source_is_a_conflict_and_never_overwrites_existing_product(): void

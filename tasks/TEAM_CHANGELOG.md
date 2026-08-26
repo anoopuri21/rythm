@@ -385,3 +385,14 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Capacity/cleanup passed** — Largest batch was approximately 6.89 MiB; each disposable batch was deleted before the next, and final staging entries were zero.
 - **No UAT write occurred** — Persistent import, activation and publication remain Chunk 3 operations beginning with an explicit dry-run.
 - **Phase 6A Chunk 2 accepted** — Batch-safe reviewed import and real-stock-gated activation are next.
+
+## 26 August 2026 — Phase 6A Chunk 3 Import and Activation Controls
+
+- **Single-run import → Expansion batch import** — New dry-run-first command aggregates completed one-/two-group batches and accepts an explicit `--commit` only after acquisition reports pass.
+- **Platform-specific paths → Safe batch IDs** — Import resolves a validated batch ID under PHP's configured temporary root on Windows or Linux.
+- **Imported record → Durable review queue** — Provenance now stores review reasons, reviewer/approver identities and timestamps with indexed queue fields.
+- **Source metadata evolution → Stable content identity** — Review/category governance metadata is excluded from payload hashes, preventing false conflicts with the original five imports while real source changes still stop overwrite.
+- **Normal toggle → Protected activation** — Imported product edit/table toggles are disabled; model guard plus service require reviewed copy, commercial media approval, positive price and verified real stock.
+- **Sensitive activation → Confirmation/reason/audit** — Authorized single and maximum-20 bulk actions record local-media approval, actor, timestamps and an audit reason.
+- **Independent gates passed** — Full regression **288 tests / 1,123 assertions**, isolated migration forward/rollback/forward and production build passed.
+- **Chunk 3 remains `QA`** — Persistent MySQL acquisition/import and admin review are owner-operated; Homepage/Shop work may proceed independently.

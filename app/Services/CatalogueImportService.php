@@ -109,8 +109,8 @@ final class CatalogueImportService
     {
         return DB::transaction(function () use ($payload, $hash): Product {
             $category = Category::firstOrCreate(
-                ['slug' => Str::slug((string) $payload['collection'])],
-                ['name' => Str::headline((string) $payload['collection']), 'is_active' => false],
+                ['slug' => (string) ($payload['target_category_slug'] ?? Str::slug((string) $payload['collection']))],
+                ['name' => (string) ($payload['target_category_name'] ?? Str::headline((string) $payload['collection'])), 'is_active' => false],
             );
             $brandName = trim((string) $payload['brand']);
             $brand = $brandName === '' ? null : Brand::firstOrCreate(
@@ -152,6 +152,8 @@ final class CatalogueImportService
                 'source_product_id' => $payload['source_product_id'],
                 'source_url' => $payload['source_url'],
                 'payload_hash' => $hash,
+                'publication_review_required' => (bool) ($payload['publication_review']['required'] ?? true),
+                'publication_review_reasons' => array_values($payload['publication_review']['reasons'] ?? ['legacy import requires publication review']),
                 'imported_at' => now(),
             ]);
 
@@ -169,6 +171,19 @@ final class CatalogueImportService
         }
         if ($payload['schema_version'] !== 1 || ! preg_match('/^[a-z0-9][a-z0-9-]*$/', (string) $payload['slug'])) {
             throw new RuntimeException('Unsupported schema or invalid slug.');
+        }
+        if (isset($payload['target_category_slug']) && (
+            ! preg_match('/^[a-z0-9][a-z0-9-]*$/', (string) $payload['target_category_slug'])
+            || trim((string) ($payload['target_category_name'] ?? '')) === ''
+        )) {
+            throw new RuntimeException('Target category mapping is invalid.');
+        }
+        if (isset($payload['publication_review']) && (
+            ! is_array($payload['publication_review'])
+            || ! is_bool($payload['publication_review']['required'] ?? null)
+            || ! is_array($payload['publication_review']['reasons'] ?? null)
+        )) {
+            throw new RuntimeException('Publication review metadata is invalid.');
         }
         if (parse_url((string) $payload['source_url'], PHP_URL_HOST) !== config('catalogue.source.allowed_host')) {
             throw new RuntimeException('Source URL host is not approved.');
@@ -196,7 +211,7 @@ final class CatalogueImportService
     private function payloadHash(array $payload): string
     {
         $copy = $payload;
-        unset($copy['media']);
+        unset($copy['media'], $copy['publication_review'], $copy['target_category_name'], $copy['target_category_slug']);
         $copy['media_hashes'] = array_column($payload['media'], 'sha256');
 
         return hash('sha256', json_encode($copy, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));

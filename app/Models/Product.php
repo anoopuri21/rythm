@@ -37,6 +37,32 @@ class Product extends Model implements HasMedia
         'is_trending' => 'boolean',
     ];
 
+    protected static function booted(): void
+    {
+        static::updating(function (Product $product): void {
+            if (! $product->isDirty('is_active') || ! $product->is_active) {
+                return;
+            }
+
+            $source = $product->importSource()->first();
+            if ($source === null) {
+                return;
+            }
+
+            $hasStock = $product->stock > 0 || $product->variants()->where('is_active', true)->where('stock', '>', 0)->exists();
+            $mediaApproved = $product->getMedia('gallery')->isNotEmpty()
+                && $product->getMedia('gallery')->every(fn ($media): bool => (bool) $media->getCustomProperty('commercial_use_approved', false));
+
+            if ($source->publication_reviewed_at === null
+                || $source->commercial_use_approved_at === null
+                || (float) $product->price <= 0
+                || ! $hasStock
+                || ! $mediaApproved) {
+                throw new \DomainException('Imported products require reviewed content, approved local media, a positive price and verified real stock before activation.');
+            }
+        });
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
