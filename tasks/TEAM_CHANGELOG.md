@@ -403,3 +403,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Conflicts remain immutable** — Existing products are never overwritten, even when ready records are committed.
 - **Explicit partial-safe mode added** — `--commit --allow-conflicts` imports only ready records and reports existing conflicts as safely held; actual validation/media failures still fail the command.
 - **Regression passed** — Conflict-allow mode preserves the existing product and source price while returning a clear successful held-conflict result; focused catalogue tests passed 12 tests / 73 assertions after the disposable build was restored.
+
+## 27 August 2026 — Autonomous Supervisor Requirements Locked
+
+- **Owner-proxy model selected** — A resumable Arena-based Supervisor will prioritize and audit work above Agent 0; Agent 0 remains sole technical completion/sign-off authority.
+- **Authority bounded** — Broad development and non-destructive UAT autonomy is approved through canonical Phase 17. Phase 18/deployment, live money movement, secrets, destructive persistent-data operations and unapproved legal/tax promises remain human-gated.
+- **Recovery policy selected** — Risk-based bounded retry, actual-outcome reconciliation and idempotency checks are mandatory; unknown timeout outcomes are never blindly repeated.
+- **Durable state required** — Compact machine-readable checkpoints, decisions, retries, evidence and next actions will be versioned in Git without secrets or disposable outputs.
+- **Requirements complete; build not started** — `tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md` records the contract and eight build chunks. No existing project delivery is attributed to the unbuilt Supervisor.
+- **Legacy conflicts found** — Existing task-agent/config/tasks files and strict-rules text contain superseded branch, Filament, palette and source-of-truth rules; Build Chunk 0 must reconcile these before automated writes are enabled.
