@@ -2,7 +2,7 @@
 
 **Owner:** Project owner
 **Governance reviewer:** Agent 0 — Project Lead
-**Status:** REQUIREMENTS COMPLETE — BUILD NOT STARTED
+**Status:** REQUIREMENTS COMPLETE — BUILD IN PROGRESS (CHUNK 0 COMPLETE; CHUNK 1 NEXT)
 **Recorded:** 27 August 2026
 **Target authorization:** Canonical Phases 6A and 8–17; Phase 18/deployment excluded
 

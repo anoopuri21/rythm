@@ -1,8 +1,9 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
-**Owner:** Agent 0 — Project Lead  
-**Status:** ACTIVE — Phase 6 in progress; continuous authority through Phase 11
-**Activation command:** `ACTIVATE AUTO MODE`  
+**Owner:** Agent 0 — Project Lead
+**Status:** ACTIVE — Phase 6A in progress; current Agent 0 authority through Phase 11
+**Target Supervisor authority:** Phase 17 after build, QA and Agent 0 activation; Phase 18 excluded
+**Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
 ---
@@ -149,10 +150,12 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** Yes — owner-authorized continuous sequential execution through Phase 11.
-- **Completed phases:** Phase 0B Stack Alignment, Phase 1 Homepage + Shop Design Specifications, Phase 2 MySQL Schema + Domain Architecture, Phase 3 Homepage + Shop Frontend, Phase 4 Accounts/Commerce, and Phase 5 Reviews/Product Q&A/Coupons (`COMPLETE`).
-- **Current phase:** Phase 7 — Admin governance, staff RBAC and auditability (`IN PROGRESS`).
+- **Active:** Yes — existing Agent 0 Auto Mode is owner-authorized through Phase 11.
+- **Autonomous Supervisor:** Requirements complete; build/QA/activation pending. Its approved horizon is through Phase 17, but that authority is not active until Agent 0 accepts activation evidence.
+- **Completed phases:** Canonical Phases 0–7 (`COMPLETE`).
+- **Current priority:** Phase 6A multi-category catalogue and Homepage/Shop expansion (`IN PROGRESS`) before Phase 8.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
+- **Phase 7 acceptance:** Owner confirmed TOTP, roles and protected staff-user creation; Agent 0 marked Phase 7 `COMPLETE` on 26 August 2026.
 - **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.
 - **Sequence authority:** `tasks/CANONICAL_PHASE_SEQUENCE.md` controls delivery order; `tasks/MASTER_PROJECT_TRACKER.md` controls status; enterprise-roadmap E-series IDs are capability workstreams only.
 - **Execution/evidence:** `tasks/AUTO_MODE_PHASE_5_PLAN.md` and `tasks/PHASE_5_INTERACTIONS_QA.md`; all isolated gates and the owner-reported exact MySQL 8.4.3 UAT forward migrations passed.

@@ -1,6 +1,6 @@
-# AGENT_RULES_STRICT — SOUNDSCAPE / Rythme Music Store
+# AGENT_RULES_STRICT — LEGACY / NON-AUTHORITATIVE
 
-> **MUST be read before every task.** These rules are non-negotiable. Violations = redo.
+> **ARCHIVED:** This file contains superseded branch, Filament, palette and workflow rules and must not drive current work or automation. Current authority is `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/CANONICAL_PHASE_SEQUENCE.md`, approved phase contracts, `tasks/AUTO_MODE_PROTOCOL.md`, and `tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md`. It is retained only as historical context until a bounded rule migration is completed.
 
 ---
 

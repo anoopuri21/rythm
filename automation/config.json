@@ -1,14 +1,24 @@
 {
-    "interval_seconds": 1800,
-    "branch": "feature/dev",
-    "single_branch_rule": "NEVER create new branches or new PRs — all work lands on feature/dev, single open PR #22",
-    "health": [
-        "php artisan --version",
-        "php artisan config:clear",
-        "npm run build"
+    "schema_version": 2,
+    "enabled": false,
+    "status": "LEGACY_DISABLED_PENDING_SUPERVISOR_ACTIVATION",
+    "reason": "The legacy task agent used superseded branch, tracker and framework rules. It must remain write-disabled until the Autonomous Supervisor passes activation QA.",
+    "branch": "rhythm-uat",
+    "authoritative_sources": [
+        "tasks/MASTER_PROJECT_TRACKER.md",
+        "tasks/CANONICAL_PHASE_SEQUENCE.md",
+        "tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md",
+        "tasks/AUTO_MODE_PROTOCOL.md",
+        "tasks/TEAM_ROSTER.md",
+        "tasks/TEAM_CHANGELOG.md"
     ],
-    "gates": [
-        "php artisan test"
+    "legacy_non_authoritative_sources": [
+        "tasks/tasks.json",
+        "docs/AGENT_RULES_STRICT.md"
     ],
+    "persistent_data_policy": "Never run destructive tests, migrate:fresh or db:wipe against persistent UAT or production data.",
+    "secrets_policy": "Environment only; never write secrets to repository state or logs.",
+    "health": [],
+    "gates": [],
     "logs_dir": "logs"
 }

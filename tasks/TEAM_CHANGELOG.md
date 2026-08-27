@@ -412,3 +412,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Durable state required** — Compact machine-readable checkpoints, decisions, retries, evidence and next actions will be versioned in Git without secrets or disposable outputs.
 - **Requirements complete; build not started** — `tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md` records the contract and eight build chunks. No existing project delivery is attributed to the unbuilt Supervisor.
 - **Legacy conflicts found** — Existing task-agent/config/tasks files and strict-rules text contain superseded branch, Filament, palette and source-of-truth rules; Build Chunk 0 must reconcile these before automated writes are enabled.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 0
+
+- **Legacy automation write-disabled** — The stale task agent is now a compatibility guard and exits safely until activation QA passes.
+- **Authority sources frozen** — `rhythm-uat`, the Master Tracker, canonical sequence, Supervisor requirements, Auto Mode protocol, roster and changelog are identified as current sources.
+- **Stale inputs quarantined** — Legacy `tasks.json` and strict-rules documentation are explicitly non-authoritative; their old branch/Filament/palette assumptions cannot drive automation.
+- **Governance status reconciled** — Phases 0–7 are complete, Phase 6A is current, existing Agent 0 authority remains distinct from the pending Phase-17 Supervisor horizon.
+- **Gates passed** — JavaScript syntax, JSON parsing, disabled behavior, stale executable branch check and Git diff validation passed. No application/database behavior changed.
