@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rythme.local/schemas/autonomous-supervisor-state-v1.json",
+  "title": "Rythme Autonomous Supervisor State",
+  "type": "object",
+  "required": ["schema_version", "project", "lifecycle", "authorization", "git", "delivery", "execution", "agents", "checkpoint", "decisions", "risks", "blockers", "human_gates", "gate_results", "next_action"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "project": { "type": "object" },
+    "lifecycle": { "enum": ["inactive", "planning", "building", "executing", "recovering", "blocked", "complete"] },
+    "authorization": { "type": "object" },
+    "git": { "type": "object" },
+    "delivery": { "type": "object" },
+    "execution": { "type": "object" },
+    "agents": { "type": "object" },
+    "checkpoint": { "type": "object" },
+    "decisions": { "type": "array" },
+    "risks": { "type": "array" },
+    "blockers": { "type": "array" },
+    "human_gates": { "type": "array" },
+    "gate_results": { "type": "array" },
+    "next_action": { "type": "object" }
+  },
+  "additionalProperties": false
+}

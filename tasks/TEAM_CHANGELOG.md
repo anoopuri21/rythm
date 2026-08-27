@@ -420,3 +420,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Stale inputs quarantined** — Legacy `tasks.json` and strict-rules documentation are explicitly non-authoritative; their old branch/Filament/palette assumptions cannot drive automation.
 - **Governance status reconciled** — Phases 0–7 are complete, Phase 6A is current, existing Agent 0 authority remains distinct from the pending Phase-17 Supervisor horizon.
 - **Gates passed** — JavaScript syntax, JSON parsing, disabled behavior, stale executable branch check and Git diff validation passed. No application/database behavior changed.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 1
+
+- **Durable state delivered** — Versioned project, lifecycle, authorization, Git, delivery, execution, agent, gate, blocker and next-action state is now machine-readable.
+- **Safe checkpoints delivered** — SHA-256 checkpoint identities and atomic private-file replacement prevent partial state writes and support session resume.
+- **Guardrails encoded** — Wrong branch, deployment activation, malformed state, excessive retries and secret-bearing fields/material are rejected.
+- **CLI delivered** — Read-only status/validation and explicit checkpoint commands operate without application or persistent-UAT access.
+- **Tests passed** — Seven Node tests cover schema, validation, secrets, deterministic identity, atomicity, malformed input and compact status.
