@@ -428,3 +428,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Guardrails encoded** — Wrong branch, deployment activation, malformed state, excessive retries and secret-bearing fields/material are rejected.
 - **CLI delivered** — Read-only status/validation and explicit checkpoint commands operate without application or persistent-UAT access.
 - **Tests passed** — Seven Node tests cover schema, validation, secrets, deterministic identity, atomicity, malformed input and compact status.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 2
+
+- **Read-only audit delivered** — Branch, local/remote outcome, dirty state, authority hashes, deployment lock and external-vendor policy are inspected without repository writes.
+- **Canonical planner delivered** — Durable build actions, Phase 6A priority and Phases 8–17 ordering drive selection; legacy tasks and Phase 18 cannot be selected.
+- **Unsafe planning blocked** — Any critical authority, branch, deployment or vendor finding stops scheduling before execution.
+- **Real repository result** — `rhythm-uat`, six authority sources, zero findings and safe planning were reported.
+- **Combined tests passed** — Fourteen state/auditor/planner tests passed with zero failures.
