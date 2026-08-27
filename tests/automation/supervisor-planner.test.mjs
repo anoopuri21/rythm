@@ -24,7 +24,7 @@ test('building lifecycle selects exact checkpointed build action', () => {
     const result = chooseNextTask({ state, audit: safeAudit, trackerMarkdown: '', expansionMarkdown: '' });
     assert.equal(result.status, 'ready');
     assert.equal(result.source, 'supervisor-build-state');
-    assert.equal(result.task.id, 'AS-BUILD-4-AGENTS');
+    assert.equal(result.task.id, 'AS-BUILD-5-GATES');
 });
 
 test('critical audit finding blocks all planning', () => {

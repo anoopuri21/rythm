@@ -444,3 +444,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Non-idempotent writes protected** — Retry requires proof that no write occurred and preconditions remain unchanged.
 - **Hard human gates encoded** — Destructive, financial, credential and production actions receive zero automatic retries.
 - **Combined tests passed** — Twenty-five Supervisor tests passed; the real read-only audit reported zero findings.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 4
+
+- **Assignment governance delivered** — Agent 0 remains accountable, specialists own delivery and reviewers must be independent.
+- **Completion authority enforced** — Specialist claims cannot close work; passed evidence and explicit reasoned Agent 0 acceptance are mandatory.
+- **Team changes audited** — Supervisor proposals require reason, capability, overlap and rollback; only Agent 0 can approve/reject.
+- **Protected roles enforced** — Agent 0 cannot be removed and Agent 10 remains unavailable before explicit Phase 18 authorization.
+- **Combined tests passed** — Thirty-three Supervisor tests passed; real repository audit remained zero-finding.
