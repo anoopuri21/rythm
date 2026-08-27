@@ -452,3 +452,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Team changes audited** — Supervisor proposals require reason, capability, overlap and rollback; only Agent 0 can approve/reject.
 - **Protected roles enforced** — Agent 0 cannot be removed and Agent 10 remains unavailable before explicit Phase 18 authorization.
 - **Combined tests passed** — Thirty-three Supervisor tests passed; real repository audit remained zero-finding.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 5
+
+- **Applicable gates encoded** — PHP, UI, migration, dependency, security, automation and documentation profiles map to mandatory evidence.
+- **Freshness and binding enforced** — Evidence must exist, pass, postdate task start and bind to the exact commit or current working-tree digest.
+- **False completion prevented** — Missing/failed gates retain QA; critical blockers force BLOCKED; only reasoned Agent 0 acceptance permits COMPLETE.
+- **Phase self-completion prevented** — Passed chunks still require full phase regression and Agent 0 acceptance.
+- **Combined tests passed** — Forty-one Supervisor tests passed; real repository audit remained zero-finding.
