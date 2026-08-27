@@ -436,3 +436,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Unsafe planning blocked** — Any critical authority, branch, deployment or vendor finding stops scheduling before execution.
 - **Real repository result** — `rhythm-uat`, six authority sources, zero findings and safe planning were reported.
 - **Combined tests passed** — Fourteen state/auditor/planner tests passed with zero failures.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 3
+
+- **Risk-classified recovery delivered** — Safe reversible actions use bounded retries; unknown outcomes always require post-state reconciliation.
+- **Duplicate effects prevented** — Completed commits, pushes and persistent writes are accepted from durable evidence and cannot be blindly repeated.
+- **Non-idempotent writes protected** — Retry requires proof that no write occurred and preconditions remain unchanged.
+- **Hard human gates encoded** — Destructive, financial, credential and production actions receive zero automatic retries.
+- **Combined tests passed** — Twenty-five Supervisor tests passed; the real read-only audit reported zero findings.
