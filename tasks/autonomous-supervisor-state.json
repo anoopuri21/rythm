@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "21c3c449a684905ab579d2afcaa42e2a69da38f4",
-    "remote_head": "21c3c449a684905ab579d2afcaa42e2a69da38f4",
+    "local_head": "8f97e5ce7416a123ac6485b42a62887cc174c51e",
+    "remote_head": "8f97e5ce7416a123ac6485b42a62887cc174c51e",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "8",
-    "chunk": "3",
-    "task": "Full and partial refund operations",
+    "chunk": "4",
+    "task": "Payment/refund timelines and reconciliation",
     "status": "ready"
   },
   "execution": {
     "action_class": "idempotent_write",
     "attempt": 0,
     "max_attempts": 1,
-    "last_verified_action": "Phase 8 Chunk 2 passed 54 focused tests / 210 assertions, 311 full tests / 1,230 assertions and production build in external QA."
+    "last_verified_action": "Phase 8 Chunk 3 passed 60 focused tests / 251 assertions, 317 full tests / 1,259 assertions and migration cycle in external QA."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "f388ff62d1aacd2f59567c9a1e9bdfc6275a39b688a86def16c6a293d3877509",
-    "created_at": "2026-08-29T20:00:00.000Z"
+    "id": "38483f83fb94978c780be1f6bf88970657d3db8e90b042cd7c6c8f427527436c",
+    "created_at": "2026-08-29T21:00:00.000Z"
   },
   "decisions": [
     {
@@ -180,11 +180,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_8_CHUNK_2_PAYMENT_RETRY.md",
       "verified_at": "2026-08-29T20:00:00.000Z"
+    },
+    {
+      "name": "Phase 8 Chunk 3 refund operations",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_8_CHUNK_3_REFUNDS.md",
+      "verified_at": "2026-08-29T21:00:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-8-CHUNK-3",
-    "description": "Implement fake-qualified full and partial refund operations with aggregate amount bounds, idempotent provider identity, finance authorization, reasons and audit evidence.",
+    "id": "PHASE-8-CHUNK-4",
+    "description": "Add safe customer/admin payment and refund timelines plus a bounded read-only reconciliation command and mismatch evidence.",
     "requires_human": false
   }
 }

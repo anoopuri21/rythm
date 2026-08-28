@@ -6,12 +6,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Refund;
+use App\Payment\FakePaymentGateway;
+use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
+use App\Services\RefundService;
 use App\Support\AdminAccess;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -95,6 +101,18 @@ class OrderResource extends Resource
                                 ->state(fn (Order $record): string => $record->payments->last()?->gateway ?? '—'),
                         ]),
                     ]),
+                Section::make('Refunds')
+                    ->schema([
+                        RepeatableEntry::make('refunds')
+                            ->schema([
+                                TextEntry::make('amount')->money('INR'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('reason'),
+                                TextEntry::make('gateway_refund_id')->placeholder('Not processed'),
+                                TextEntry::make('processed_at')->dateTime('d M Y, h:i A')->placeholder('Pending'),
+                            ])
+                            ->columns(5),
+                    ]),
                 Section::make('Status history')
                     ->schema([
                         RepeatableEntry::make('statusHistory')
@@ -147,6 +165,7 @@ class OrderResource extends Resource
             ])
             ->actions([
                 ViewAction::make(),
+                self::refundAction(),
                 self::statusAction(Order::STATUS_PROCESSING, 'Mark processing', 'heroicon-o-arrow-path', 'info'),
                 self::statusAction(Order::STATUS_SHIPPED, 'Mark shipped', 'heroicon-o-truck', 'info'),
                 self::statusAction(Order::STATUS_DELIVERED, 'Mark delivered', 'heroicon-o-check-circle', 'success'),
@@ -155,6 +174,62 @@ class OrderResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([]),
             ]);
+    }
+
+    private static function refundAction(): Action
+    {
+        return Action::make('request_refund')
+            ->label('Refund')
+            ->icon('heroicon-o-receipt-refund')
+            ->color('danger')
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::FINANCE_MANAGE) ?? false)
+                && in_array($record->payment_status, [Order::PAYMENT_PAID, Order::PAYMENT_REFUND_PENDING], true))
+            ->requiresConfirmation()
+            ->schema([
+                TextInput::make('amount')
+                    ->numeric()
+                    ->prefix('₹')
+                    ->minValue(0.01)
+                    ->required(),
+                Textarea::make('reason')
+                    ->required()
+                    ->minLength(5)
+                    ->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data): void {
+                $user = auth()->user();
+                $payment = $record->payments()
+                    ->whereIn('status', [Payment::STATUS_PAID, Payment::STATUS_REFUNDED])
+                    ->latest('id')
+                    ->first();
+
+                if ($user === null || $payment === null) {
+                    Notification::make()->danger()->title('A captured payment is required.')->send();
+
+                    return;
+                }
+
+                request()->merge(['audit_reason' => $data['reason']]);
+
+                try {
+                    $service = app(RefundService::class);
+                    $refund = $service->request($payment, (float) $data['amount'], $data['reason'], $user);
+                    $gateway = RazorpayGateway::isConfigured()
+                        ? RazorpayGateway::fromConfig()
+                        : app(FakePaymentGateway::class);
+                    $refund = $service->process($refund, $gateway, $user);
+                    $notification = Notification::make()->title(
+                        $refund->status === Refund::STATUS_REFUNDED
+                                                    ? 'Refund processed'
+                                                    : 'Refund submitted; provider completion is pending reconciliation'
+                    );
+                    ($refund->status === Refund::STATUS_REFUNDED ? $notification->success() : $notification->warning())->send();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->danger()->title($exception->getMessage())->send();
+                } catch (\Throwable) {
+                    Notification::make()->warning()->title('Refund outcome requires reconciliation before retry.')->send();
+                }
+            });
     }
 
     private static function statusAction(string $to, string $label, string $icon, string $color): Action

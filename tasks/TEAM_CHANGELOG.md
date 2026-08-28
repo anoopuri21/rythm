@@ -556,3 +556,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Unknown outcomes contained** — A local reservation precedes provider creation; unresolved provider calls block blind retry and require reconciliation.
 - **Attempts bounded** — Existing initiated attempts are reused, paid/cancelled/progressed orders are rejected and each order is capped at three attempts.
 - **QA passed** — 54 focused tests / 210 assertions, 311 full tests / 1,230 assertions and the production build passed in external QA; no external financial action occurred.
+
+## 29 August 2026 — Phase 8 Chunk 3 Refund Operations
+
+- **Partial and full refunds delivered** — Multiple idempotent refund records are cumulatively bounded by the captured payment amount.
+- **Finance governance delivered** — Requester/approver evidence, mandatory reasons, finance-only processing and existing audit observation protect financial actions.
+- **Unknown outcomes remain truthful** — Provider-pending or interrupted operations stay processing and cannot be blindly retried or described as refunded.
+- **QA passed** — 60 focused tests / 251 assertions, 317 full tests / 1,259 assertions, migration forward/rollback/forward and Pint passed; no external refund occurred.

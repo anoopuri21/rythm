@@ -18,6 +18,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductQuestion;
+use App\Models\Refund;
 use App\Models\Review;
 use App\Models\User;
 
@@ -66,6 +67,7 @@ final class AdminAccess
         Category::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Brand::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Order::class => ['view' => self::ORDERS_VIEW, 'manage' => self::ORDERS_MANAGE],
+        Refund::class => ['view' => self::FINANCE_VIEW, 'manage' => self::FINANCE_MANAGE],
         User::class => ['view' => self::CUSTOMERS_VIEW, 'manage' => self::STAFF_MANAGE],
         Review::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         ProductQuestion::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],

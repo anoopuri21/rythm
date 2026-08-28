@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Payment;
 
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Refund;
 use Razorpay\Api\Api;
 use RuntimeException;
 
@@ -100,6 +102,28 @@ final class RazorpayGateway implements PaymentGateway
         return $isCaptured
             ? new PaymentResult(true, 'paid', (string) ($paymentEntity['id'] ?? ''))
             : new PaymentResult(false, 'failed', message: 'Payment not captured.');
+    }
+
+    public function refund(Payment $payment, Refund $refund): RefundResult
+    {
+        if ($payment->gateway_payment_id === null || $payment->gateway_payment_id === '') {
+            return new RefundResult(false, 'failed', message: 'Captured gateway payment identifier is missing.');
+        }
+
+        $gatewayRefund = $this->api()->payment->fetch($payment->gateway_payment_id)->refund([
+            'amount' => (int) round((float) $refund->amount * 100),
+            'notes' => [
+                'refund_id' => $refund->id,
+                'idempotency_key' => $refund->idempotency_key,
+            ],
+        ]);
+        $gatewayRefundId = (string) ($gatewayRefund['id'] ?? '');
+
+        if ($gatewayRefundId === '') {
+            return new RefundResult(false, 'failed', message: 'The provider returned no refund identifier.');
+        }
+
+        return new RefundResult(true, (string) ($gatewayRefund['status'] ?? 'processed'), $gatewayRefundId);
     }
 
     /**
