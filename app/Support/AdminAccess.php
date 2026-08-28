@@ -14,6 +14,7 @@ use App\Models\HomepageBlock;
 use App\Models\HomepageCategoryRow;
 use App\Models\HomepageSection;
 use App\Models\NewsletterSubscriber;
+use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
@@ -50,13 +51,15 @@ final class AdminAccess
 
     public const AUDIT_VIEW = 'audit.view';
 
+    public const NOTIFICATIONS_VIEW = 'notifications.view';
+
     /** @var array<string, list<string>> */
     private const ROLE_PERMISSIONS = [
         User::ROLE_SUPER_ADMIN => ['*'],
         User::ROLE_ADMIN => ['*'], // Controlled legacy alias until every owner account is migrated.
         User::ROLE_CATALOGUE_MANAGER => [self::CATALOGUE_VIEW, self::CATALOGUE_MANAGE],
         User::ROLE_ORDER_MANAGER => [self::ORDERS_VIEW, self::ORDERS_MANAGE, self::CUSTOMERS_VIEW, self::CATALOGUE_VIEW],
-        User::ROLE_SUPPORT => [self::ORDERS_VIEW, self::CUSTOMERS_VIEW, self::INTERACTIONS_MANAGE, self::CATALOGUE_VIEW],
+        User::ROLE_SUPPORT => [self::ORDERS_VIEW, self::CUSTOMERS_VIEW, self::INTERACTIONS_MANAGE, self::CATALOGUE_VIEW, self::NOTIFICATIONS_VIEW],
         User::ROLE_MARKETING => [self::CATALOGUE_VIEW, self::CONTENT_MANAGE, self::MARKETING_MANAGE],
         User::ROLE_FINANCE => [self::ORDERS_VIEW, self::CUSTOMERS_VIEW, self::FINANCE_VIEW, self::FINANCE_MANAGE],
     ];
@@ -68,6 +71,7 @@ final class AdminAccess
         Brand::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Order::class => ['view' => self::ORDERS_VIEW, 'manage' => self::ORDERS_MANAGE],
         Refund::class => ['view' => self::FINANCE_VIEW, 'manage' => self::FINANCE_MANAGE],
+        NotificationDelivery::class => ['view' => self::NOTIFICATIONS_VIEW, 'manage' => self::NOTIFICATIONS_VIEW],
         User::class => ['view' => self::CUSTOMERS_VIEW, 'manage' => self::STAFF_MANAGE],
         Review::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         ProductQuestion::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],

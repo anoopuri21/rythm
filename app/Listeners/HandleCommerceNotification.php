@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Events\CommerceNotificationRequested;
+use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Notifications\CommerceOrderNotification;
 use App\Services\CommerceNotificationService;
@@ -74,6 +75,25 @@ final class HandleCommerceNotification
                 ));
             }
         }
+    }
+
+    public function retryDelivery(NotificationDelivery $delivery): void
+    {
+        $delivery->loadMissing(['event', 'user']);
+        $order = Order::query()->find($delivery->event->aggregate_id);
+        if ($order === null || $delivery->user === null) {
+            throw new \RuntimeException('Retry requires an owned customer delivery and existing order.');
+        }
+
+        [$title, $message] = $this->copy($delivery->event->event_type, $order->order_number);
+        $url = URL::temporarySignedRoute('orders.show', now()->addDays(7), ['order' => $order]);
+        $delivery->user->notify(new CommerceOrderNotification(
+            $delivery,
+            [$delivery->channel],
+            $title,
+            $message,
+            $url,
+        ));
     }
 
     /** @return array{string, string} */

@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "8184f6044bf6a362ca4e43b2327c9fb6ddab9ea3",
-    "remote_head": "8184f6044bf6a362ca4e43b2327c9fb6ddab9ea3",
+    "local_head": "59b0278a689e4600c22c2a6d2b826831217e8cda",
+    "remote_head": "59b0278a689e4600c22c2a6d2b826831217e8cda",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "9",
-    "chunk": "4",
-    "task": "Admin delivery evidence and bounded notification retries",
-    "status": "ready"
+    "chunk": "5-owner-mail-uat",
+    "task": "Controlled staging email delivery, DNS and rendering evidence",
+    "status": "waiting_human"
   },
   "execution": {
-    "action_class": "idempotent_write",
+    "action_class": "credential",
     "attempt": 0,
-    "max_attempts": 1,
-    "last_verified_action": "Phase 9 Chunk 3 passed 27 focused tests / 112 assertions, 334 full tests / 1,347 assertions and production build in external QA."
+    "max_attempts": 0,
+    "last_verified_action": "Phase 9 Chunk 4 passed 23 focused tests / 134 assertions and 340 full tests / 1,376 assertions in external QA."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "63c4400924e7a8866d442a79443cfa3445054eb819f1d79929483915ea676f96",
-    "created_at": "2026-08-30T01:00:00.000Z"
+    "id": "673fff98d3c245f1066c0dc745f860f87bca22bda42db99b66a59f41db7054c5",
+    "created_at": "2026-08-30T02:00:00.000Z"
   },
   "decisions": [
     {
@@ -81,6 +81,11 @@
       "id": "AS-H003",
       "status": "closed",
       "summary": "Owner must run controlled Razorpay test-mode payment, replay, failure, full/partial refund and provider reconciliation scenarios without exposing credentials."
+    },
+    {
+      "id": "AS-H004",
+      "status": "open",
+      "summary": "Owner must verify controlled staging transactional email delivery, SPF/DKIM/DMARC status and HTML/plain-text rendering without sharing credentials."
     }
   ],
   "gate_results": [
@@ -227,11 +232,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_9_CHUNK_3_NOTIFICATION_CENTER.md",
       "verified_at": "2026-08-30T01:00:00.000Z"
+    },
+    {
+      "name": "Phase 9 Chunk 4 notification operations",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_9_CHUNK_4_NOTIFICATION_OPERATIONS.md",
+      "verified_at": "2026-08-30T02:00:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-9-CHUNK-4",
-    "description": "Add least-privilege admin delivery evidence plus read-only reconciliation and bounded retry for known failed notification deliveries.",
-    "requires_human": false
+    "id": "PHASE-9-CHUNK-5-OWNER-MAIL-UAT",
+    "description": "Owner verifies controlled staging transactional delivery, SPF/DKIM/DMARC status, inbox rendering and plain-text fallback and reports non-secret outcomes.",
+    "requires_human": true
   }
 }

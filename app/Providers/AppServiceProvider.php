@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Events\CommerceNotificationRequested;
 use App\Listeners\HandleCommerceNotification;
+use App\Listeners\MarkNotificationDeliveryFailed;
+use App\Listeners\MarkNotificationDeliverySent;
 use App\Models\AdminAuditLog;
 use App\Models\Brand;
 use App\Models\Category;
@@ -17,6 +19,7 @@ use App\Models\HomepageBlock;
 use App\Models\HomepageCategoryRow;
 use App\Models\HomepageSection;
 use App\Models\NewsletterSubscriber;
+use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
@@ -32,12 +35,15 @@ use App\Policies\ContentPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\InteractionPolicy;
 use App\Policies\MarketingPolicy;
+use App\Policies\NotificationDeliveryPolicy;
 use App\Policies\OrderPolicy;
 use App\Services\CartService;
 use App\Services\CategoryService;
 use App\Support\AdminAccess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Events\NotificationFailed;
+use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -76,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
             HomepageBlock::class => ContentPolicy::class,
             HomepageCategoryRow::class => ContentPolicy::class,
             HomepageSection::class => ContentPolicy::class,
+            NotificationDelivery::class => NotificationDeliveryPolicy::class,
         ] as $model => $policy) {
             Gate::policy($model, $policy);
         }
@@ -129,5 +136,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
+        Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
+        Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);
     }
 }

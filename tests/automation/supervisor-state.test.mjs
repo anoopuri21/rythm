@@ -76,7 +76,7 @@ test('readState rejects malformed JSON and CLI reports compact status', () => {
     const status = JSON.parse(output);
     assert.equal(status.lifecycle, 'executing');
     assert.equal(status.phase, '9');
-    assert.equal(status.next_action, 'PHASE-9-CHUNK-4');
+    assert.equal(status.next_action, 'PHASE-9-CHUNK-5-OWNER-MAIL-UAT');
 });
 
 test('published JSON schema is parseable and identifies state version one', () => {

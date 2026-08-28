@@ -605,3 +605,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Owned controls delivered** — Read, unread and mark-all actions are authenticated, throttled and cannot mutate another customer’s records.
 - **Optional preferences delivered** — Email/database settings cover approved optional categories while mandatory transactional messages remain enabled.
 - **QA passed** — 27 focused tests / 112 assertions, 334 full tests / 1,347 assertions, production build and Pint passed; no external email was sent.
+
+## 30 August 2026 — Phase 9 Chunk 4 Notification Operations
+
+- **Outcome tracking delivered** — Sent/failed channel events update durable statuses, attempts and timestamps with redacted failure evidence.
+- **Bounded operations delivered** — Read-only reconciliation caps at 500 records; retry caps at 50 records and three known-failure attempts.
+- **Least-privilege evidence delivered** — Support and super-admin roles can inspect a read-only Filament delivery log; unrelated roles cannot.
+- **QA passed** — 23 focused tests / 134 assertions, 340 full tests / 1,376 assertions and Pint passed; no external email was sent.

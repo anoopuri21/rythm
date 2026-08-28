@@ -1,6 +1,6 @@
 # Phase 9 — Notification and Integration Event Architecture
 
-**Status:** IN PROGRESS — Chunks 0–3 complete; Chunk 4 next
+**Status:** IN PROGRESS — Chunks 0–4 complete; Chunk 5 owner-controlled mail gate next
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 14, 3, 4 and 8
