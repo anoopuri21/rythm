@@ -507,3 +507,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Supervisor guard strengthened** — Any workspace vendor entry is a critical finding and blocks planning/execution.
 - **External QA copy added** — `automation/prepare-external-qa.mjs` creates a disposable `/tmp/rythm-qa` source copy for dependencies, builds and PHP tests without polluting the workspace.
 - **Verification passed** — Workspace vendor absent, external copy excludes Git/vendor/generated runtime state, real audit safe, and 58 Supervisor tests passed.
+
+## 29 August 2026 — Phase 6A Chunk 4.1 Bounded Queries
+
+- **Bounded category rows delivered** — Homepage loads at most four configured rows and defensively limits each to 4–8 active products.
+- **Truthful visibility delivered** — Inactive rows/categories and categories without active products are omitted; no stock or activation is inferred.
+- **Configured discovery delivered** — Configured categories lead the existing fallback and active counts use grouped queries.
+- **External QA passed** — 10 tests / 25 assertions passed in `/tmp/rythm-qa`; workspace vendor remained absent.

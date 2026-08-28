@@ -1,6 +1,6 @@
 # Phase 6A Chunk 4 — Homepage and Shop Expansion Implementation Plan
 
-**Status:** IN PROGRESS — Subchunk 4.0 complete; 4.1 next
+**Status:** IN PROGRESS — Subchunks 4.0–4.1 complete; 4.2 next
 **Date:** 27 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 2, 3 and 6

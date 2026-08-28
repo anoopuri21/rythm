@@ -26,5 +26,15 @@ cpSync(root, destination, {
         return ![...excluded].some((item) => relative === item || relative.startsWith(`${item}/`));
     }
 });
+for (const relative of [
+    'bootstrap/cache',
+    'storage/framework/cache/data',
+    'storage/framework/sessions',
+    'storage/framework/testing',
+    'storage/framework/views',
+    'storage/logs'
+]) {
+    mkdirSync(path.join(destination, relative), { recursive: true });
+}
 console.log(`QA COPY READY: ${destination}`);
 console.log(`WORKSPACE VENDOR: ${existsSync(path.join(root, 'vendor')) ? 'FORBIDDEN' : 'ABSENT'}`);

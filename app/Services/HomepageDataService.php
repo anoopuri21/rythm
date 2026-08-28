@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
 use App\Models\Product;
 use App\Observers\HomepageDataObserver;
 use Illuminate\Support\Collection;
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\Cache;
  */
 final class HomepageDataService
 {
+    private const MAX_CATEGORY_ROWS = 4;
+
+    private const MAX_DISCOVERY_CATEGORIES = 10;
     /**
      * @return array{
      *   heroSlides: Collection<int, HeroSlide>,
@@ -34,12 +38,15 @@ final class HomepageDataService
      *   bestsellers: Collection<int, Product>,
      *   newArrivals: Collection<int, Product>,
      *   trending: Collection<int, Product>,
+     *   categoryRows: Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>,
      *   popularCategories: Collection<int, array{name:string, slug:string, count:int}>,
      * }
      */
     public function all(): array
     {
         return Cache::remember(HomepageDataObserver::CACHE_KEY, 3600, function (): array {
+            $categoryRows = $this->categoryRows();
+
             return [
                 'heroSlides' => HeroSlide::query()->where('is_active', true)->orderBy('sort_order')->get(),
                 'promos' => HomepageBlock::query()->section('promo')->get(),
@@ -87,7 +94,8 @@ final class HomepageDataService
                     'numark-mixtrack-pro-fx',
                 ]),
                 'brandNames' => Brand::query()->orderBy('name')->limit(16)->pluck('name'),
-                'popularCategories' => $this->popularCategories(),
+                'categoryRows' => $categoryRows,
+                'popularCategories' => $this->popularCategories($categoryRows->pluck('category')),
             ];
         });
     }
@@ -112,40 +120,88 @@ final class HomepageDataService
     }
 
     /**
-     * Category cards for the "Popular Categories" carousel —
-     * curated order: 6 roots + 4 popular subcategories.
-     * Root counts include products from all child categories.
+     * @return Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>
+     */
+    private function categoryRows(): Collection
+    {
+        return HomepageCategoryRow::query()
+            ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query
+                ->where('is_active', true)
+                ->whereHas('products', fn ($products) => $products->active()))
+            ->with('category:id,name,slug,is_active')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->limit(self::MAX_CATEGORY_ROWS)
+            ->get()
+            ->map(function (HomepageCategoryRow $row): array {
+                $products = Product::query()
+                    ->active()
+                    ->where('category_id', $row->category_id)
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->orderByRaw('featured_rank IS NULL')
+                    ->orderBy('featured_rank')
+                    ->orderByDesc('updated_at')
+                    ->limit($row->boundedProductLimit())
+                    ->get();
+
+                return [
+                    'row' => $row,
+                    'category' => $row->category,
+                    'products' => $products,
+                ];
+            });
+    }
+
+    /**
+     * Configured row categories lead the existing curated fallback.
+     * Root counts include direct products and immediate child categories.
      *
+     * @param  Collection<int, Category>  $configured
      * @return Collection<int, array{name:string, slug:string, count:int}>
      */
-    private function popularCategories(): Collection
+    private function popularCategories(Collection $configured): Collection
     {
-        $order = [
+        $fallback = [
             'guitars', 'electric-guitars', 'acoustic-guitars',
             'keyboards-pianos', 'digital-pianos',
             'drums-percussion', 'pro-audio',
             'dj-stage', 'dj-controllers', 'accessories',
         ];
+        $order = $configured->pluck('slug')
+            ->merge($fallback)
+            ->unique()
+            ->take(self::MAX_DISCOVERY_CATEGORIES)
+            ->values();
 
         $categories = Category::query()
             ->whereIn('slug', $order)
             ->where('is_active', true)
             ->with('children:id,parent_id')
             ->get(['id', 'parent_id', 'name', 'slug']);
+        $categoryIds = $categories
+            ->flatMap(fn (Category $category) => $category->children->pluck('id')->push($category->id))
+            ->unique();
+        $counts = Product::query()
+            ->active()
+            ->whereIn('category_id', $categoryIds)
+            ->selectRaw('category_id, count(*) as aggregate')
+            ->groupBy('category_id')
+            ->pluck('aggregate', 'category_id');
 
-        return collect($order)
-            ->map(function (string $slug) use ($categories): ?array {
+        return $order
+            ->map(function (string $slug) use ($categories, $counts): ?array {
                 $category = $categories->firstWhere('slug', $slug);
                 if ($category === null) {
                     return null;
                 }
-
                 $ids = $category->children->pluck('id')->push($category->id);
+                $count = $ids->sum(fn (int $id): int => (int) ($counts[$id] ?? 0));
 
-                return [
+                return $count === 0 ? null : [
                     'name' => $category->name,
                     'slug' => $category->slug,
-                    'count' => Product::query()->active()->whereIn('category_id', $ids)->count(),
+                    'count' => $count,
                 ];
             })
             ->filter()
