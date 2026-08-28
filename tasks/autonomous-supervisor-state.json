@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "0cfb0658e6350db50dafce04b31d47d05a650fe3ec708843de853b237ea537da",
-    "created_at": "2026-08-30T02:30:00.000Z"
+    "id": "c2c15a73b217ddd7fba81628242737ba0b0919d62ed2ab572e184060f97e1d81",
+    "created_at": "2026-08-29T12:00:00.000Z"
   },
   "decisions": [
     {
@@ -249,7 +249,7 @@
       "name": "Phase 9 Chunk 5 staging mail UAT",
       "outcome": "failed",
       "evidence": "tasks/PHASE_9_CHUNK_5_MAIL_UAT.md",
-      "verified_at": "2026-08-30T02:30:00.000Z"
+      "verified_at": "2026-08-29T12:00:00.000Z"
     }
   ],
   "next_action": {

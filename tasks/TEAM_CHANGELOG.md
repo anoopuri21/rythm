@@ -613,7 +613,7 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Least-privilege evidence delivered** — Support and super-admin roles can inspect a read-only Filament delivery log; unrelated roles cannot.
 - **QA passed** — 23 focused tests / 134 assertions, 340 full tests / 1,376 assertions and Pint passed; no external email was sent.
 
-## 30 August 2026 — Phase 9 Chunk 5 Mail UAT Blocker
+## 29 August 2026 — Phase 9 Chunk 5 Mail UAT Blocker
 
 - **External gate failed** — Owner reported that the staging transactional email was not received.
 - **Domain/rendering failures reported** — Multiple or unidentified SPF/DKIM/DMARC and HTML/plain-text/link checks failed.
