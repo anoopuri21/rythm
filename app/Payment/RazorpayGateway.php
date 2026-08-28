@@ -63,11 +63,19 @@ final class RazorpayGateway implements PaymentGateway
             return new PaymentResult(false, 'failed', $paymentId, 'Payment not captured.');
         }
 
+        if ((string) ($payment['order_id'] ?? '') !== $orderId) {
+            return new PaymentResult(false, 'failed', $paymentId, 'Gateway order mismatch.');
+        }
+
         $amountPaid = (int) ($payment['amount'] ?? 0);
         $expectedAmount = (int) round($order->total * 100);
 
         if ($amountPaid !== $expectedAmount) {
             return new PaymentResult(false, 'failed', $paymentId, 'Payment amount mismatch.');
+        }
+
+        if (strtoupper((string) ($payment['currency'] ?? '')) !== strtoupper((string) $order->currency)) {
+            return new PaymentResult(false, 'failed', $paymentId, 'Payment currency mismatch.');
         }
 
         return new PaymentResult(true, 'paid', $paymentId);

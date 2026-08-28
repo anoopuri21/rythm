@@ -542,3 +542,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Critical gaps bounded** — Webhook ledger use, amount/currency ownership checks, payment retry, provider refunds, partial-refund structure, finance workflow and reconciliation remain.
 - **Safety contract locked** — No external financial write without a human gate; retries require reconciliation, refund totals are bounded and secrets remain environment-only.
 - **Phase 8 started** — Agent 0 accepted a five-chunk implementation plan; replay-safe payment verification is next.
+
+## 29 August 2026 — Phase 8 Chunk 1 Payment Events
+
+- **Replay-safe ledger activated** — Valid webhooks now persist unique event receipts with payload hashes and allowlisted metadata before mutation.
+- **Financial verification hardened** — Gateway order ownership, amount, currency, captured status and payment identity are checked before finalization.
+- **Collision and failure handling added** — Exact replays are harmless; conflicting event-ID payloads, mismatches and unknown orders are rejected and recorded without sensitive data.
+- **QA passed** — 25 focused tests / 116 assertions and 306 full tests / 1,205 assertions passed in external QA; no external financial action occurred.

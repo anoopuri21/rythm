@@ -6,9 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\PaymentEvent;
 use App\Payment\RazorpayGateway;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Services\PaymentEventService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,7 +67,7 @@ final class RazorpayController extends Controller
         }
     }
 
-    public function webhook(Request $request, OrderService $orders): JsonResponse
+    public function webhook(Request $request, OrderService $orders, PaymentEventService $events): JsonResponse
     {
         $rawBody = $request->getContent();
         $signature = (string) $request->header('X-Razorpay-Signature', '');
@@ -80,33 +82,50 @@ final class RazorpayController extends Controller
             }
 
             $payload = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-            $result = $gateway->handleWebhook($payload);
-
-            if (! $result->success) {
-                return response()->json(['error' => $result->message ?? 'Webhook rejected'], 422);
-            }
-
-            // Locate the order via the gateway order id recorded at initiation.
-            $entity = $payload['payload']['payment']['entity']
-                ?? $payload['payload']['order']['entity']
-                ?? null;
-
-            $gatewayOrderId = (string) ($entity['order_id'] ?? $entity['id'] ?? '');
-
+            $entity = $payload['payload']['payment']['entity'] ?? [];
+            $gatewayOrderId = is_array($entity) ? (string) ($entity['order_id'] ?? '') : '';
             $payment = Payment::query()
                 ->where('gateway_order_id', $gatewayOrderId)
                 ->latest()
                 ->first();
+            $receipt = $events->receive(
+                $rawBody,
+                $payload,
+                $payment,
+                $request->header('X-Razorpay-Event-Id'),
+            );
+            $event = $receipt['event'];
+
+            if (! $receipt['payload_matches']) {
+                Log::warning('Razorpay webhook: event identity reused with a different payload');
+
+                return response()->json(['error' => 'Event identity conflict'], 409);
+            }
+
+            if (! $receipt['is_new']) {
+                return match ($event->status) {
+                    PaymentEvent::STATUS_PROCESSED => response()->json(['status' => 'ok', 'replayed' => true]),
+                    PaymentEvent::STATUS_FAILED => response()->json(['error' => 'Previously rejected event'], 422),
+                    default => response()->json(['status' => 'processing'], 202),
+                };
+            }
 
             if ($payment === null) {
-                Log::warning('Razorpay webhook: order not found', ['gateway_order_id' => $gatewayOrderId]);
+                $events->failed($event, 'Gateway order not found.');
+                Log::warning('Razorpay webhook: order not found');
 
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
-            if (! $payment->order->isPaid()) {
-                $orders->markPaid($payment->order, $result, $gatewayOrderId);
+            $result = $events->verifyCapturedPayment($payment, $payload);
+            if (! $result->success) {
+                $events->failed($event, $result->message ?? 'Webhook rejected.');
+
+                return response()->json(['error' => $result->message ?? 'Webhook rejected'], 422);
             }
+
+            $orders->markPaid($payment->order, $result, $gatewayOrderId);
+            $events->processed($event);
 
             return response()->json(['status' => 'ok']);
         } catch (\Throwable $e) {
