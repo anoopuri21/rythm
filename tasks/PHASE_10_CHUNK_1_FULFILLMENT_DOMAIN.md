@@ -31,3 +31,7 @@ php artisan test
 ```
 
 Report only test counts/assertions or non-secret errors. Persistent data must not be targeted by destructive test commands.
+
+## Owner QA result — remediation pending
+
+The forward migration and new fulfillment coverage passed within the owner run. The full suite reported **344 passed / 4 failed / 1,388 assertions**; all failures were the pre-existing catalogue expansion command tests on Windows. Agent 0 traced them to absolute temporary-path detection and prepared a cross-platform fix. Chunk acceptance remains pending the focused four-test rerun.

@@ -11,7 +11,7 @@ final class CatalogueExpansionManifestService
     /** @return array<string, mixed> */
     public function load(string $path): array
     {
-        $resolved = str_starts_with($path, DIRECTORY_SEPARATOR) ? $path : base_path($path);
+        $resolved = $this->isAbsolutePath($path) ? $path : base_path($path);
         if (! is_file($resolved) || (filesize($resolved) ?: 0) > 262_144) {
             throw new RuntimeException('Expansion manifest is missing or exceeds 256 KiB.');
         }
@@ -71,5 +71,20 @@ final class CatalogueExpansionManifestService
         $manifest['_sha256'] = hash_file('sha256', $resolved);
 
         return $manifest;
+    }
+
+    private function isAbsolutePath(string $path): bool
+    {
+        if ($path === '') {
+            return false;
+        }
+
+        // POSIX root, Windows rooted/UNC path, or Windows drive-qualified path.
+        return str_starts_with($path, '/')
+            || str_starts_with($path, '\\')
+            || (isset($path[2])
+                && ctype_alpha($path[0])
+                && $path[1] === ':'
+                && in_array($path[2], ['/', '\\'], true));
     }
 }

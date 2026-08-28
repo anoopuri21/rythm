@@ -641,3 +641,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Truthful order synchronization implemented** — Dispatch can mark an order shipped; delivery requires every ordered unit to be allocated and every active shipment to be delivered.
 - **External integrations excluded** — Carrier calls, credentials, rates, serviceability and delivery promises remain disabled.
 - **QA pending** — Focused and full PHP/MySQL checks require the owner runtime because PHP/Composer is unavailable in Arena; the chunk is not yet accepted.
+
+## 29 August 2026 — Windows Catalogue Expansion Test Hotfix
+
+- **Root cause isolated** — The expansion manifest loader recognized POSIX absolute paths only; Windows drive-qualified temporary manifest paths were incorrectly prefixed with the repository path.
+- **Cross-platform path handling fixed** — POSIX, Windows rooted/UNC and Windows drive-qualified paths are now recognized without weakening manifest size, source-host or output-boundary controls.
+- **Observed scope** — This single pre-command manifest failure explains all four reported catalogue expansion failures and their missing expected command output. A focused owner rerun remains required.
