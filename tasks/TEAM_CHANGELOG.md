@@ -591,3 +591,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Delivery deduplication delivered** — Recipient/channel records use unique delivery keys and hashed recipients with bounded status/failure evidence.
 - **Inbox and preferences delivered** — Laravel database notifications are active; only approved optional categories are configurable and mandatory transactions stay enabled.
 - **QA passed** — 20 focused tests / 114 assertions, 326 full tests / 1,306 assertions, migration cycle and Pint passed; no external notification was sent.
+
+## 29 August 2026 — Phase 9 Chunk 2 Commerce Notifications
+
+- **Central events delivered** — Order, payment and refund transitions now dispatch typed after-commit events instead of direct service-level mail calls.
+- **Exactly-once delivery reservations delivered** — Immutable event and recipient/channel identities suppress listener replay duplicates.
+- **Transactional channels delivered** — Customers receive queued mail and database notifications with signed order links and no sensitive provider data.
+- **QA passed** — 54 focused tests / 197 assertions, 329 full tests / 1,316 assertions and Pint passed; no external email was sent.

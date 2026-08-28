@@ -73,7 +73,7 @@ final class CommerceNotificationService
 
     public function reserveDelivery(
         CommerceEvent $event,
-        User $user,
+        ?User $user,
         string $channel,
         string $notificationType,
         string $recipient,
@@ -85,7 +85,7 @@ final class CommerceNotificationService
         $recipientHash = hash('sha256', Str::lower(trim($recipient)));
         $deliveryKey = hash('sha256', implode('|', [
             $event->event_key,
-            $user->id,
+            $user?->id ?? $recipientHash,
             $channel,
             $notificationType,
         ]));
@@ -95,7 +95,7 @@ final class CommerceNotificationService
                 ['delivery_key' => $deliveryKey],
                 [
                     'commerce_event_id' => $event->id,
-                    'user_id' => $user->id,
+                    'user_id' => $user?->id,
                     'channel' => $channel,
                     'notification_type' => Str::limit($notificationType, 120, ''),
                     'recipient_hash' => $recipientHash,

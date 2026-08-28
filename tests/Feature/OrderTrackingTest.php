@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Mail\OrderStatusMail;
+use App\Events\CommerceNotificationRequested;
 use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -14,6 +14,7 @@ use App\Models\Refund;
 use App\Models\User;
 use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -200,15 +201,15 @@ class OrderTrackingTest extends TestCase
 
     public function test_shipped_status_queues_email(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
         app(OrderService::class)->changeStatus($order, Order::STATUS_SHIPPED);
 
         $this->assertSame(Order::STATUS_SHIPPED, $order->fresh()->status);
-        Mail::assertQueued(
-            OrderStatusMail::class,
-            fn ($mail) => $mail->order->is($order) && $mail->newStatus === Order::STATUS_SHIPPED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.shipped'
         );
 
         // Audit history has the transition
@@ -228,14 +229,14 @@ class OrderTrackingTest extends TestCase
 
     public function test_cancelled_queues_email(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
         app(OrderService::class)->changeStatus($order, Order::STATUS_CANCELLED);
 
-        Mail::assertQueued(
-            OrderStatusMail::class,
-            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.cancelled'
         );
     }
 
@@ -280,7 +281,7 @@ class OrderTrackingTest extends TestCase
 
     public function test_user_can_cancel_confirmed_order_with_stock_restore(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
         $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
         $stockBefore = $product->stock;
@@ -333,9 +334,9 @@ class OrderTrackingTest extends TestCase
         $this->assertSame(1, $order->inventoryMovements()->count());
         $this->assertSame($stockBefore + 2, $product->fresh()->stock);
 
-        Mail::assertQueued(
-            OrderStatusMail::class,
-            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.cancelled'
         );
     }
 

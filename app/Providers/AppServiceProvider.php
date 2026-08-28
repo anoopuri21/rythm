@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Mail\OrderConfirmationMail;
+use App\Events\CommerceNotificationRequested;
+use App\Listeners\HandleCommerceNotification;
 use App\Models\AdminAuditLog;
 use App\Models\Brand;
 use App\Models\Category;
@@ -39,7 +40,6 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -128,7 +128,6 @@ class AppServiceProvider extends ServiceProvider
             },
         );
 
-        // Route non-blocking email jobs to the 'emails' queue.
-        Queue::route(OrderConfirmationMail::class, 'emails');
+        Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
     }
 }

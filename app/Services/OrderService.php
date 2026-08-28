@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\DTOs\CheckoutData;
-use App\Mail\OrderConfirmationMail;
-use App\Mail\OrderStatusMail;
+use App\Events\CommerceNotificationRequested;
 use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -17,7 +16,6 @@ use App\Models\User;
 use App\Payment\PaymentResult;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use RuntimeException;
 
 /**
@@ -254,9 +252,11 @@ final class OrderService
 
             $this->transitionStatus($lockedOrder, Order::STATUS_CONFIRMED, 'Payment captured', from: $fromStatus);
 
-            if ($lockedOrder->email !== null) {
-                Mail::to($lockedOrder->email)->queue(new OrderConfirmationMail($lockedOrder));
-            }
+            CommerceNotificationRequested::dispatch(
+                "order:{$lockedOrder->id}:confirmed",
+                'order.confirmed',
+                $lockedOrder->id,
+            );
 
             return true;
         });
@@ -286,6 +286,14 @@ final class OrderService
             }
 
             $lockedOrder->update(['payment_status' => Order::PAYMENT_FAILED]);
+
+            if ($payment !== null) {
+                CommerceNotificationRequested::dispatch(
+                    "payment:{$payment->id}:failed",
+                    'payment.failed',
+                    $lockedOrder->id,
+                );
+            }
         });
     }
 
@@ -342,13 +350,17 @@ final class OrderService
             $order->update(['status' => $to]);
             $this->transitionStatus($order, $to, $note, from: $from);
 
-            // Queue notification for user-facing statuses.
             if (in_array($to, [
+                Order::STATUS_PROCESSING,
                 Order::STATUS_SHIPPED,
                 Order::STATUS_DELIVERED,
                 Order::STATUS_CANCELLED,
-            ], true) && $order->email !== null) {
-                Mail::to($order->email)->queue(new OrderStatusMail($order, $to));
+            ], true)) {
+                CommerceNotificationRequested::dispatch(
+                    "order:{$order->id}:status:{$to}",
+                    "order.{$to}",
+                    $order->id,
+                );
             }
         });
     }
@@ -385,9 +397,11 @@ final class OrderService
 
             $this->transitionStatus($lockedOrder, Order::STATUS_CANCELLED, 'Cancelled by customer', from: $from);
 
-            if ($lockedOrder->email !== null) {
-                Mail::to($lockedOrder->email)->queue(new OrderStatusMail($lockedOrder, Order::STATUS_CANCELLED));
-            }
+            CommerceNotificationRequested::dispatch(
+                "order:{$lockedOrder->id}:status:cancelled",
+                'order.cancelled',
+                $lockedOrder->id,
+            );
         });
     }
 

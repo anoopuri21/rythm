@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Events\CommerceNotificationRequested;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Refund;
@@ -99,6 +100,12 @@ final class RefundService
                     'failure_message' => Str::limit($result->message ?? 'Refund rejected by provider.', 500, ''),
                     'processed_at' => now(),
                 ]);
+                CommerceNotificationRequested::dispatch(
+                    "refund:{$locked->id}:failed",
+                    'refund.failed',
+                    $locked->order_id,
+                    ['refund_id' => $locked->id, 'amount' => $locked->amount, 'currency' => $locked->currency],
+                );
 
                 return $locked;
             }
@@ -134,6 +141,13 @@ final class RefundService
                 }
                 $order->update($updates);
             }
+
+            CommerceNotificationRequested::dispatch(
+                "refund:{$locked->id}:completed",
+                'refund.completed',
+                $locked->order_id,
+                ['refund_id' => $locked->id, 'amount' => $locked->amount, 'currency' => $locked->currency],
+            );
 
             return $locked->fresh();
         });
@@ -181,7 +195,7 @@ final class RefundService
                 throw new RuntimeException('A refund reason between 5 and 500 characters is required.');
             }
 
-            return Refund::query()->create([
+            $refund = Refund::query()->create([
                 'order_id' => $lockedPayment->order_id,
                 'payment_id' => $lockedPayment->id,
                 'idempotency_key' => $idempotencyKey,
@@ -191,6 +205,15 @@ final class RefundService
                 'reason' => $reason,
                 'requested_by' => $requestedBy,
             ]);
+
+            CommerceNotificationRequested::dispatch(
+                "refund:{$refund->id}:requested",
+                'refund.requested',
+                $lockedPayment->order_id,
+                ['refund_id' => $refund->id, 'amount' => $refund->amount, 'currency' => $refund->currency],
+            );
+
+            return $refund;
         });
     }
 

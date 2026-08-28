@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\DTOs\CheckoutData;
+use App\Events\CommerceNotificationRequested;
 use App\Livewire\CheckoutWizard;
-use App\Mail\OrderConfirmationMail;
 use App\Models\InventoryMovement;
 use App\Models\Order;
 use App\Models\Payment;
@@ -22,7 +22,7 @@ use App\Services\CartService;
 use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -78,7 +78,7 @@ class CheckoutTest extends TestCase
 
     public function test_full_checkout_flow_with_fake_gateway(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
         $this->fillCart(2);
         $addressId = $this->addAddress();
 
@@ -99,8 +99,10 @@ class CheckoutTest extends TestCase
         $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
         $this->assertSame(48, $product->fresh()->stock);
 
-        // Confirmation email queued
-        Mail::assertQueued(OrderConfirmationMail::class, fn ($mail) => $mail->order->is($order));
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.confirmed'
+        );
 
         // Cart cleared
         $this->assertSame(0, app(CartService::class)->count());
@@ -267,7 +269,7 @@ class CheckoutTest extends TestCase
 
     public function test_payment_finalization_is_idempotent(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
         $this->fillCart(2);
         $addressId = $this->addAddress();
 
@@ -299,7 +301,7 @@ class CheckoutTest extends TestCase
             'balance_after' => $stockAfterFirstCapture,
         ]);
         $this->assertSame(1, $order->inventoryMovements()->count());
-        Mail::assertQueued(OrderConfirmationMail::class, 1);
+        Event::assertDispatchedTimes(CommerceNotificationRequested::class, 1);
     }
 
     public function test_variant_checkout_decrements_only_variant_stock_once(): void
