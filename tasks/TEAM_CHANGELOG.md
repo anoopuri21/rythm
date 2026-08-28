@@ -514,3 +514,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Truthful visibility delivered** — Inactive rows/categories and categories without active products are omitted; no stock or activation is inferred.
 - **Configured discovery delivered** — Configured categories lead the existing fallback and active counts use grouped queries.
 - **External QA passed** — 10 tests / 25 assertions passed in `/tmp/rythm-qa`; workspace vendor remained absent.
+
+## 29 August 2026 — Phase 6A Chunk 4.2 Homepage Presentation
+
+- **Category-led rows delivered** — Bounded configured rows now render after New Arrivals without reordering existing Homepage sections.
+- **Shared accessible presentation delivered** — Rows use labelled sections, category-filtered Shop links and existing shared product cards.
+- **Responsive behavior preserved** — Existing `.prod-mm` desktop and two-column mobile grid behavior is reused with no new JavaScript.
+- **External QA passed** — Production build and 15 tests / 50 assertions passed in `/tmp/rythm-qa`; workspace vendor remained absent.
