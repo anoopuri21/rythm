@@ -20,5 +20,6 @@
     "secrets_policy": "Environment only; never write secrets to repository state or logs.",
     "health": [],
     "gates": [],
-    "logs_dir": "logs"
+    "logs_dir": "logs",
+    "workspace_dependency_policy": "The workspace must contain no vendor directory or vendor symlink. Run PHP tooling from a disposable external QA copy."
 }

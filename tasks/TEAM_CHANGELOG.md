@@ -500,3 +500,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Cache safety delivered** — Row lifecycle changes flush Homepage data cache; relationships are explicit in both directions.
 - **Gates passed** — 21 focused tests / 106 assertions, PHP syntax, Pint, production build and isolated targeted migration forward/rollback/forward passed.
 - **Persistent safety preserved** — No UAT write, product/category activation, stock inference or remote media access occurred.
+
+## 29 August 2026 — Workspace Vendor Prohibition
+
+- **Owner correction applied** — `/home/user/rythm/vendor` is forbidden as a directory, file or symlink for the remainder of the session.
+- **Supervisor guard strengthened** — Any workspace vendor entry is a critical finding and blocks planning/execution.
+- **External QA copy added** — `automation/prepare-external-qa.mjs` creates a disposable `/tmp/rythm-qa` source copy for dependencies, builds and PHP tests without polluting the workspace.
+- **Verification passed** — Workspace vendor absent, external copy excludes Git/vendor/generated runtime state, real audit safe, and 58 Supervisor tests passed.

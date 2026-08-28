@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { readState } from './state.mjs';
 
@@ -35,12 +35,12 @@ export function auditProject(root) {
     });
 
     const vendor = path.join(root, 'vendor');
-    const vendorState = !existsSync(vendor)
-        ? { status: 'missing', target: null }
-        : lstatSync(vendor).isSymbolicLink()
-            ? { status: 'external-symlink', target: realpathSync(vendor) }
-            : { status: 'forbidden-physical-directory', target: realpathSync(vendor) };
-    if (vendorState.status === 'forbidden-physical-directory') findings.push({ severity: 'critical', code: 'PHYSICAL_VENDOR', detail: vendorState.target });
+    let vendorEntry = null;
+    try { vendorEntry = lstatSync(vendor); } catch {}
+    const vendorState = vendorEntry === null
+        ? { status: 'absent', type: null }
+        : { status: 'forbidden-workspace-entry', type: vendorEntry.isSymbolicLink() ? 'symlink' : (vendorEntry.isDirectory() ? 'directory' : 'file') };
+    if (vendorEntry !== null) findings.push({ severity: 'critical', code: 'WORKSPACE_VENDOR_ENTRY', detail: `Workspace vendor ${vendorState.type} is forbidden; use an external QA copy.` });
 
     return {
         audited_at: new Date().toISOString(),

@@ -126,9 +126,9 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - A physical `vendor/` directory is forbidden inside `/home/user/rythm`.
 - Composer dependencies must be stored outside the workspace.
 - Current session path: `/tmp/rythm-vendor`.
-- Workspace may contain only the symlink `vendor -> /tmp/rythm-vendor`.
-- Before any Composer/PHP task, verify that `vendor` is a symlink to the external directory.
-- If external dependencies are missing, recreate the external path and run Composer from `/home/user/rythm`.
+- Workspace must contain no `vendor` directory or symlink. PHP tooling runs from a disposable external QA copy.
+- Before any Composer/PHP task, verify that the workspace has no `vendor` entry and prepare the disposable external QA copy.
+- If external dependencies are missing, recreate them only inside the disposable external QA copy and run tooling there.
 - `node_modules` and generated build directories remain disposable/excluded artifacts.
 
 ---

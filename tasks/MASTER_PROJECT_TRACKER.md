@@ -25,7 +25,7 @@
 | Shop reference | xstore.8theme.com/elementor3/electronic-mega-market/shop/ |
 | Product reference source | bajaao.com catalog, subject to legal/content ownership review before commercial launch |
 | Completion authority | Only Agent 0 may mark a module complete after specialist output and QA evidence |
-| Composer vendor storage | Physical `vendor` directory is forbidden inside `/home/user/rythm`; dependencies must live outside the workspace, with only a symlink allowed |
+| Composer vendor storage | No `vendor` directory or symlink is allowed inside `/home/user/rythm`; dependencies and PHP tooling must run from a disposable external QA copy |
 | Session vendor path | `/tmp/rythm-vendor`; Composer commands must run from `/home/user/rythm` so project autoload paths remain correct |
 | Auto Mode activation | Only exact user command `ACTIVATE AUTO MODE`; registered protocol is not itself activation |
 | Auto Mode pause | `PAUSE AUTO MODE`, genuine blocker, or full roadmap phase completion |
