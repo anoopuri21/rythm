@@ -521,3 +521,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Shared accessible presentation delivered** — Rows use labelled sections, category-filtered Shop links and existing shared product cards.
 - **Responsive behavior preserved** — Existing `.prod-mm` desktop and two-column mobile grid behavior is reused with no new JavaScript.
 - **External QA passed** — Production build and 15 tests / 50 assertions passed in `/tmp/rythm-qa`; workspace vendor remained absent.
+
+## 29 August 2026 — Phase 6A Chunk 4.3 Shop Qualification
+
+- **Realistic volume qualified** — An isolated 80-active-product catalogue passed category, brand, price, stock, search, sort and seven-page pagination checks with bounded query count.
+- **Full regression passed** — 302 tests / 1,178 assertions passed; Composer and npm audits reported no vulnerabilities.
+- **Chunk 4 accepted** — Agent 0 accepts all Chunk 4 subchunks; no persistent data, activation, stock or deployment action occurred.
+- **Human gate recorded** — Phase 6A remains in progress until the owner completes Chunk 3 persistent MySQL import/admin review and records exact totals.

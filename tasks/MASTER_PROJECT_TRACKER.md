@@ -4,7 +4,7 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current operational priority:** Phase 6A — urgent multi-category catalogue and homepage expansion IN PROGRESS before canonical Phase 8
-**Overall status:** PHASES 6–7 COMPLETE / PHASE 6A CHUNKS 0–2 COMPLETE, CHUNK 3 QA, CHUNK 4 NEXT / PHASE 8 PENDING / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Overall status:** PHASES 6–7 COMPLETE / PHASE 6A CHUNKS 0–2 AND 4 COMPLETE, CHUNK 3 OWNER UAT GATE / PHASE 8 PENDING / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
 
@@ -67,7 +67,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 5 | Agent 3, 6, 9, 11, 12, 14 | Verified reviews, moderated product Q&A and coupons | COMPLETE | Accepted 26 Aug 2026: 265 tests / 974 assertions, 4-width rendered gate and owner-reported MySQL 8.4.3 UAT migrations passed |
 | 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | COMPLETE | Accepted 26 Aug 2026: 271 tests / 1,017 assertions; owner confirmed exact-MySQL import plus Filament visibility/editability |
 | 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | COMPLETE | Accepted 26 Aug 2026: 280 tests / 1,081 assertions plus owner-confirmed TOTP, roles and protected staff creation UAT |
-| 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | IN PROGRESS | Chunks 0–2 complete; Chunk 3 reviewed import/activation is QA pending owner MySQL operation; Homepage/Shop and volume QA remain |
+| 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | IN PROGRESS | Chunks 0–2 and 4 complete; Chunk 3 awaits owner-operated persistent MySQL import/admin review and exact totals |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | PENDING | Real test-mode payment/refund/retry/reconciliation evidence passes |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
 | 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | PENDING | Professionally approved rules plus fulfillment/tax/RMA tests pass |

@@ -132,8 +132,8 @@ Each completed chunk requires applicable tests, a bounded commit, push attempt, 
 - **Chunk 1 — COMPLETE:** Manifest-driven one-/two-group acquisition, deterministic resume, exact handle/source-ID validation, combined reporting and publication-review flags passed automated and real metadata-only qualification. Evidence: `tasks/PHASE_6A_CHUNK_1_ACQUISITION.md`.
 - **Chunk 2 — COMPLETE:** Four real two-category runs acquired 80/80 selected products and 226 valid local images with zero product, media or integrity failures; every batch was cleaned after evidence extraction. Evidence: `tasks/PHASE_6A_CHUNK_2_REAL_BATCHES.md`.
 - **Chunk 3 — QA:** Batch dry-run/commit, durable review state, mapped categories, direct-activation lockout and audited authorized single/bulk activation passed isolated tests. Persistent MySQL import/admin review remains owner-operated. Evidence: `tasks/PHASE_6A_CHUNK_3_IMPORT_REVIEW.md`.
-- **Chunk 4 — NEXT:** Build and qualify the bounded Homepage category explorer/category-led rows and larger-catalogue Shop behavior using isolated realistic data.
+- **Chunk 4 — COMPLETE:** Bounded category-row configuration, cached Homepage queries, accessible responsive presentation and isolated 80-product Shop qualification passed. Evidence: `tasks/PHASE_6A_CHUNK_4_3_SHOP_QA.md`.
 
 ## Immediate next action
 
-Activate Agents 1, 2, 3, 6, 9 and 13 for Chunk 4 while owner-side non-destructive acquisition/import proceeds separately.
+Owner performs the documented non-destructive persistent MySQL import/admin review for Chunk 3 and records exact imported/active totals. Phase 6A remains `IN PROGRESS` at this unavoidable human gate; Phase 8 does not start first.

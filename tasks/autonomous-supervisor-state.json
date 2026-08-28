@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "6b9808b67016aed91d2efad2f5f2c286cc1f7b66",
-    "remote_head": "6b9808b67016aed91d2efad2f5f2c286cc1f7b66",
+    "local_head": "a326a06ab6e9937b911ce8c7e62825c01a461f36",
+    "remote_head": "a326a06ab6e9937b911ce8c7e62825c01a461f36",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "6A",
-    "chunk": "4.3",
-    "task": "Larger-catalogue Shop regression and final Chunk 4 QA",
-    "status": "ready"
+    "chunk": "3-owner-uat",
+    "task": "Persistent MySQL catalogue import and admin review evidence",
+    "status": "waiting_human"
   },
   "execution": {
-    "action_class": "idempotent_write",
+    "action_class": "non_idempotent_write",
     "attempt": 0,
-    "max_attempts": 1,
-    "last_verified_action": "Phase 6A Chunk 4.2 passed production build and 15 focused tests / 50 assertions in external QA; workspace vendor remained absent."
+    "max_attempts": 0,
+    "last_verified_action": "Phase 6A Chunk 4.3 passed 18 focused tests / 92 assertions, 302 full tests / 1,178 assertions, production build and dependency audits in external QA."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "af36548a4c3aa836d6477b5bb818aba5b4c6241fdaf5eb661a654a7a6e83006d",
-    "created_at": "2026-08-29T16:30:00.000Z"
+    "id": "bac0cdc4003f7e68feacf93d7bc350050b15a385051f181e3f6b67963392277e",
+    "created_at": "2026-08-29T17:15:00.000Z"
   },
   "decisions": [
     {
@@ -71,6 +71,11 @@
       "id": "AS-H001",
       "status": "closed",
       "summary": "Requirements and authority selections supplied by owner."
+    },
+    {
+      "id": "AS-H002",
+      "status": "open",
+      "summary": "Owner must run the documented non-destructive persistent MySQL import/admin review and provide exact imported/active totals for Phase 6A Chunk 3."
     }
   ],
   "gate_results": [
@@ -145,11 +150,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_6A_CHUNK_4_2_PRESENTATION.md",
       "verified_at": "2026-08-29T16:30:00.000Z"
+    },
+    {
+      "name": "Phase 6A Chunk 4.3 Shop qualification",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_6A_CHUNK_4_3_SHOP_QA.md",
+      "verified_at": "2026-08-29T17:15:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-6A-CHUNK-4.3",
-    "description": "Qualify Shop filters, sorting, pagination and truthful stock visibility against an isolated approximately-80-product catalogue, then run final Chunk 4 QA.",
-    "requires_human": false
+    "id": "PHASE-6A-CHUNK-3-OWNER-UAT",
+    "description": "Owner runs the documented persistent MySQL import/admin review and returns exact imported/active totals; Supervisor then verifies evidence before Phase 8.",
+    "requires_human": true
   }
 }
