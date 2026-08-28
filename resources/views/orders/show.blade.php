@@ -41,6 +41,16 @@
                 <p class="mt-6 rounded-xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand" role="alert">{{ session('order_error') }}</p>
             @endif
 
+            @if(auth()->check() && auth()->id() === $order->user_id && $order->status === 'pending' && in_array($order->payment_status, ['unpaid', 'failed'], true))
+                <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-6">
+                    @csrf
+                    <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
+                        Retry payment
+                    </button>
+                    <p class="mt-2 text-xs text-muted">A maximum of three payment attempts is allowed. Completed payments cannot be retried.</p>
+                </form>
+            @endif
+
             {{-- Cancel (owner, pending/confirmed) --}}
             @if(auth()->check() && auth()->id() === $order->user_id && in_array($order->status, ['pending', 'confirmed'], true))
                 <form method="POST" action="{{ route('orders.cancel', $order) }}" class="mt-6" x-data="{ confirm: false }">

@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "86b08416c277f6e15b9791cf7b3cf65a0c57fb16",
-    "remote_head": "86b08416c277f6e15b9791cf7b3cf65a0c57fb16",
+    "local_head": "21c3c449a684905ab579d2afcaa42e2a69da38f4",
+    "remote_head": "21c3c449a684905ab579d2afcaa42e2a69da38f4",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "8",
-    "chunk": "2",
-    "task": "Safe bounded payment retry",
+    "chunk": "3",
+    "task": "Full and partial refund operations",
     "status": "ready"
   },
   "execution": {
     "action_class": "idempotent_write",
     "attempt": 0,
     "max_attempts": 1,
-    "last_verified_action": "Phase 8 Chunk 1 passed 25 focused tests / 116 assertions and 306 full tests / 1,205 assertions in external QA."
+    "last_verified_action": "Phase 8 Chunk 2 passed 54 focused tests / 210 assertions, 311 full tests / 1,230 assertions and production build in external QA."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "dd09a11666213a482002df9a89ff77416a47b6cb5ffc2451d1aa67838ef6adbb",
-    "created_at": "2026-08-29T19:00:00.000Z"
+    "id": "f388ff62d1aacd2f59567c9a1e9bdfc6275a39b688a86def16c6a293d3877509",
+    "created_at": "2026-08-29T20:00:00.000Z"
   },
   "decisions": [
     {
@@ -174,11 +174,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_8_CHUNK_1_PAYMENT_EVENTS.md",
       "verified_at": "2026-08-29T19:00:00.000Z"
+    },
+    {
+      "name": "Phase 8 Chunk 2 safe payment retry",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_8_CHUNK_2_PAYMENT_RETRY.md",
+      "verified_at": "2026-08-29T20:00:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-8-CHUNK-2",
-    "description": "Implement an owned bounded retry flow for payable failed or abandoned orders without duplicate orders, coupon use or stock capture.",
+    "id": "PHASE-8-CHUNK-3",
+    "description": "Implement fake-qualified full and partial refund operations with aggregate amount bounds, idempotent provider identity, finance authorization, reasons and audit evidence.",
     "requires_human": false
   }
 }

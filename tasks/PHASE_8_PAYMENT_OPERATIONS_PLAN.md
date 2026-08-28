@@ -1,6 +1,6 @@
 # Phase 8 — Payment, Refund and Financial Reconciliation Plan
 
-**Status:** IN PROGRESS — Chunks 0–1 complete; Chunk 2 next
+**Status:** IN PROGRESS — Chunks 0–2 complete; Chunk 3 next
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 12, 3, 4 and 6

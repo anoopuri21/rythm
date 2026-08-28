@@ -549,3 +549,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Financial verification hardened** — Gateway order ownership, amount, currency, captured status and payment identity are checked before finalization.
 - **Collision and failure handling added** — Exact replays are harmless; conflicting event-ID payloads, mismatches and unknown orders are rejected and recorded without sensitive data.
 - **QA passed** — 25 focused tests / 116 assertions and 306 full tests / 1,205 assertions passed in external QA; no external financial action occurred.
+
+## 29 August 2026 — Phase 8 Chunk 2 Payment Retry
+
+- **Owner-only retry delivered** — Eligible pending orders can restart payment without creating another internal order.
+- **Unknown outcomes contained** — A local reservation precedes provider creation; unresolved provider calls block blind retry and require reconciliation.
+- **Attempts bounded** — Existing initiated attempts are reused, paid/cancelled/progressed orders are rejected and each order is capped at three attempts.
+- **QA passed** — 54 focused tests / 210 assertions, 311 full tests / 1,230 assertions and the production build passed in external QA; no external financial action occurred.
