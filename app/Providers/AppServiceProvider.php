@@ -13,6 +13,7 @@ use App\Models\Coupon;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
 use App\Models\HomepageSection;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
@@ -73,6 +74,7 @@ class AppServiceProvider extends ServiceProvider
             Faq::class => ContentPolicy::class,
             HeroSlide::class => ContentPolicy::class,
             HomepageBlock::class => ContentPolicy::class,
+            HomepageCategoryRow::class => ContentPolicy::class,
             HomepageSection::class => ContentPolicy::class,
         ] as $model => $policy) {
             Gate::policy($model, $policy);

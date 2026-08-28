@@ -11,6 +11,7 @@ use App\Models\Coupon;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
 use App\Models\HomepageSection;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
@@ -75,6 +76,7 @@ final class AdminAccess
         Faq::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HeroSlide::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HomepageBlock::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
+        HomepageCategoryRow::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HomepageSection::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
     ];
 

@@ -492,3 +492,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Existing sections preserved** — Current Homepage product sections and order remain regression-protected; configured category discovery is additive and bounded.
 - **Truthful public behavior locked** — Only active categories/products render; local media is required/preferred, empty rows degrade safely and stock is never inferred.
 - **Four implementation subchunks recorded** — Domain/admin, bounded queries, storefront presentation and realistic-catalogue Shop/QA.
+
+## 28 August 2026 — Phase 6A Chunk 4.0 Category-row Configuration
+
+- **Additive configuration domain delivered** — Dedicated category rows now store unique category, optional title, bounded product limit, display order and visibility; rows default inactive.
+- **Filament 5 management delivered** — Content-authorized staff can configure rows; catalogue-only staff and guests cannot.
+- **Cache safety delivered** — Row lifecycle changes flush Homepage data cache; relationships are explicit in both directions.
+- **Gates passed** — 21 focused tests / 106 assertions, PHP syntax, Pint, production build and isolated targeted migration forward/rollback/forward passed.
+- **Persistent safety preserved** — No UAT write, product/category activation, stock inference or remote media access occurred.
