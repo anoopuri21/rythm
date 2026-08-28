@@ -654,4 +654,4 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Duplicate-reservation defect fixed** — The prior admin action attempted to reserve a second full refund, correctly triggering the aggregate capture bound.
 - **Existing obligation processing added** — Finance now receives a separate action that processes the already-pending cancellation refund through the configured gateway.
 - **Unsafe overlap blocked** — Manual refund creation is hidden while a pending or processing refund exists; provider-pending outcomes remain reconciliation-only and are not blindly retried.
-- **QA candidate only** — Focused refund and full regression tests remain required before Agent 0 accepts this remediation.
+- **QA accepted** — Owner confirmed focused refund and full regression tests passed; Agent 0 accepted the remediation without an additional provider refund during automated qualification.

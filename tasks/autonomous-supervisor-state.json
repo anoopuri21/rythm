@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "1b6529b42a484e4ca8ef5de2cf7400e162c1106d",
-    "remote_head": "1b6529b42a484e4ca8ef5de2cf7400e162c1106d",
+    "local_head": "f57cdc95fb331e8c09e395394aac6e3040be065c",
+    "remote_head": "f57cdc95fb331e8c09e395394aac6e3040be065c",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "10",
-    "chunk": "cancellation-refund-admin-fix",
-    "task": "Process existing paid-cancellation refund without duplicate reservation",
-    "status": "qa"
+    "chunk": "2-manual-fulfillment",
+    "task": "Least-privilege manual fulfillment operations",
+    "status": "in_progress"
   },
   "execution": {
-    "action_class": "financial",
-    "attempt": 0,
-    "max_attempts": 0,
-    "last_verified_action": "Implemented a finance-only path that processes the existing pending cancellation refund; no provider call or financial write was executed in Arena."
+    "action_class": "read_only",
+    "attempt": 1,
+    "max_attempts": 1,
+    "last_verified_action": "Owner confirmed all focused and full regression tests passed for the paid-cancellation refund admin remediation; Agent 0 accepted it."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "52120be4a6cfca3faffc8efff953e859556997883c8c8121e2594e9d260decd2",
-    "created_at": "2026-08-29T15:00:00.000Z"
+    "id": "43834f4c534332418a060ecd735e3f21fc9259aa88894497900a815449564223",
+    "created_at": "2026-08-29T15:30:00.000Z"
   },
   "decisions": [
     {
@@ -94,7 +94,7 @@
     },
     {
       "id": "AS-H006",
-      "status": "open",
+      "status": "closed",
       "summary": "Owner runtime must run focused refund and full regression tests before the paid-cancellation admin fix is accepted; no additional real/test refund should be submitted for qualification."
     }
   ],
@@ -263,8 +263,8 @@
     }
   ],
   "next_action": {
-    "id": "PAID-CANCELLATION-REFUND-FIX-QA",
-    "description": "Owner runs isolated focused refund tests and full regression without submitting another provider refund, returning only counts or non-secret failures.",
-    "requires_human": true
+    "id": "PHASE-10-CHUNK-2-MANUAL-FULFILLMENT",
+    "description": "Add least-privilege admin shipment creation/transitions and customer-safe shipment evidence on the accepted fulfillment domain.",
+    "requires_human": false
   }
 }
