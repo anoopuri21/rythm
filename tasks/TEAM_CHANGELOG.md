@@ -619,3 +619,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Domain/rendering failures reported** — Multiple or unidentified SPF/DKIM/DMARC and HTML/plain-text/link checks failed.
 - **Internal reconciliation clean** — No stale, failed, exhausted or incomplete delivery record was reported, so blind retry or speculative code change is prohibited.
 - **Phase 9 blocked** — Owner/provider remediation of sender configuration, DNS and provider delivery evidence is required before Phase 10.
+
+
+## 29 August 2026 — Phase 9 Acceptance and Phase 10 Audit
+
+- **Mail remediation gate passed** — Owner attested exact-once receipt, aligned SPF/DKIM/DMARC, correct HTML/plain-text rendering, a working bounded signed order link and clean reconciliation for one new staging transaction.
+- **Phase 9 accepted** — Agent 0 closed the critical blocker without retaining recipient, credential, provider-token or complete-header evidence.
+- **Phase 10 activated** — Read-only audit found sound order, inventory, refund, notification and audit foundations, but no durable shipment, RMA, tax-classification or invoice domain.
+- **Safe boundary locked** — Manual configurable structures may proceed; unapproved legal/tax/shipping/return/warranty promises, carrier integration and real financial writes remain disabled.

@@ -1,6 +1,6 @@
 # Phase 9 — Notification and Integration Event Architecture
 
-**Status:** BLOCKED — Chunks 0–4 complete; Chunk 5 external mail/DNS UAT failed and requires owner/provider remediation
+**Status:** COMPLETE — accepted after owner-attested staging mail remediation and exact-once delivery gate
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 14, 3, 4 and 8
@@ -76,3 +76,7 @@
 ## Chunk 0 decision
 
 Agent 0 accepts the audit and bounded plan. Chunk 1 may proceed using isolated databases and local notification fakes. External mail delivery and credentials remain human-gated; deployment, Phase 18 and Agent 10 remain disabled.
+
+## Chunk 5 acceptance
+
+The owner attested that the remediated, uniquely identified staging transaction arrived exactly once, passed SPF/DKIM/DMARC alignment, rendered correctly in HTML and plain text, opened its bounded signed order link, and left notification reconciliation clean. Agent 0 accepts Phase 9. No secret or recipient evidence was retained.

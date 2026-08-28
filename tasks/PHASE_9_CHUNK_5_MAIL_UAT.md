@@ -1,7 +1,7 @@
 # Phase 9 Chunk 5 — Staging Mail UAT
 
-**Status:** BLOCKED — owner-reported external delivery/DNS/rendering gate failed
-**Date:** 30 August 2026
+**Status:** ACCEPTED — owner-attested remediation retest passed
+**Date:** 29 August 2026
 **Accountable:** Agent 0
 **Human operator:** Owner
 
@@ -32,3 +32,15 @@ Phase 9 remains blocked at this external human gate. Phase 10 does not start fir
 6. Run `notifications:reconcile` and report a clean result or the non-secret finding codes.
 
 Do not commit SMTP/API credentials, recipient addresses, full headers or provider tokens. Automatic retries remain disabled until the external outcome is known.
+
+## Remediation retest and acceptance
+
+After provider/sender and DNS remediation, the owner attested that one new uniquely identified staging transaction:
+
+- arrived in the intended inbox exactly once;
+- passed SPF, DKIM and DMARC alignment checks;
+- rendered correctly in HTML and plain text;
+- exposed a working bounded signed order link; and
+- left `notifications:reconcile` clean.
+
+Agent 0 accepts the external gate based on this owner-controlled evidence. No recipient address, credential, provider token, provider identifier or complete message header was supplied or retained. The earlier failed attempt remains documented above as audit history.
