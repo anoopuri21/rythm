@@ -1,6 +1,6 @@
 # Phase 10 Chunk 1 — Durable Fulfillment Domain
 
-**Status:** QA REQUIRED — implementation complete; PHP/MySQL qualification pending owner runtime
+**Status:** COMPLETE — owner migration/fulfillment checks and Windows catalogue regression rerun passed
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 
@@ -34,4 +34,4 @@ Report only test counts/assertions or non-secret errors. Persistent data must no
 
 ## Owner QA result — remediation pending
 
-The forward migration and new fulfillment coverage passed within the owner run. The full suite reported **344 passed / 4 failed / 1,388 assertions**; all failures were the pre-existing catalogue expansion command tests on Windows. Agent 0 traced them to absolute temporary-path detection and prepared a cross-platform fix. Chunk acceptance remains pending the focused four-test rerun.
+The forward migration and new fulfillment coverage passed within the owner run. The full suite initially reported **344 passed / 4 failed / 1,388 assertions**; all failures were the pre-existing catalogue expansion command tests on Windows. Agent 0 traced them to absolute temporary-path detection, delivered a cross-platform fix, and the owner confirmed the complete `CatalogueExpansionTest` class passed **5/5 tests**. Agent 0 accepts Chunk 1 with no remaining reported regression.

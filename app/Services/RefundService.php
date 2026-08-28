@@ -17,6 +17,30 @@ use RuntimeException;
 
 final class RefundService
 {
+    public function hasUnresolvedOperation(Payment $payment): bool
+    {
+        return $payment->refunds()
+            ->whereIn('status', [Refund::STATUS_PENDING, Refund::STATUS_PROCESSING])
+            ->exists();
+    }
+
+    public function processPendingForOrder(Order $order, PaymentGateway $gateway, User $approver): Refund
+    {
+        $this->authorizeFinance($approver);
+
+        $refund = Refund::query()
+            ->where('order_id', $order->id)
+            ->where('status', Refund::STATUS_PENDING)
+            ->oldest('id')
+            ->first();
+
+        if ($refund === null) {
+            throw new RuntimeException('No pending refund is available to process. Reconcile any processing outcome before retrying.');
+        }
+
+        return $this->process($refund, $gateway, $approver);
+    }
+
     public function requestForCancellation(Order $order): Refund
     {
         $payment = Payment::query()

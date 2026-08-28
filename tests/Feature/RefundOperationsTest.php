@@ -53,6 +53,29 @@ class RefundOperationsTest extends TestCase
         $this->assertDatabaseCount('refunds', 2);
     }
 
+    public function test_finance_processes_the_existing_cancellation_refund_without_duplicate_reservation(): void
+    {
+        [$order, $payment] = $this->paidOrder();
+        $finance = User::factory()->create(['role' => User::ROLE_FINANCE]);
+        $service = app(RefundService::class);
+        $pending = $service->requestForCancellation($order);
+        $gateway = \Mockery::mock(PaymentGateway::class);
+        $gateway->shouldReceive('refund')
+            ->once()
+            ->withArgs(fn (Payment $captured, Refund $refund): bool => $captured->is($payment) && $refund->is($pending))
+            ->andReturn(new RefundResult(true, 'processed', 'refund_cancelled_order'));
+
+        $processed = $service->processPendingForOrder($order, $gateway, $finance);
+
+        $this->assertTrue($processed->is($pending));
+        $this->assertSame(Refund::STATUS_REFUNDED, $processed->status);
+        $this->assertSame('100.00', $processed->amount);
+        $this->assertSame($finance->id, $processed->approved_by);
+        $this->assertSame(Order::PAYMENT_REFUNDED, $order->fresh()->payment_status);
+        $this->assertDatabaseCount('refunds', 1);
+        $this->assertFalse($service->hasUnresolvedOperation($payment));
+    }
+
     public function test_finance_can_process_partial_then_full_refund_with_aggregate_bound(): void
     {
         [$order, $payment] = $this->paidOrder();

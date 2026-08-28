@@ -646,4 +646,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 
 - **Root cause isolated** — The expansion manifest loader recognized POSIX absolute paths only; Windows drive-qualified temporary manifest paths were incorrectly prefixed with the repository path.
 - **Cross-platform path handling fixed** — POSIX, Windows rooted/UNC and Windows drive-qualified paths are now recognized without weakening manifest size, source-host or output-boundary controls.
-- **Observed scope** — This single pre-command manifest failure explains all four reported catalogue expansion failures and their missing expected command output. A focused owner rerun remains required.
+- **Observed scope** — This single pre-command manifest failure explained all four reported catalogue expansion failures and their missing expected command output; owner rerun passed 5/5 tests.
+
+## 29 August 2026 — Paid Cancellation Refund Admin Remediation
+
+- **Financial behavior clarified** — Paid customer cancellation creates one durable pending full-refund obligation but deliberately does not call Razorpay from the customer request.
+- **Duplicate-reservation defect fixed** — The prior admin action attempted to reserve a second full refund, correctly triggering the aggregate capture bound.
+- **Existing obligation processing added** — Finance now receives a separate action that processes the already-pending cancellation refund through the configured gateway.
+- **Unsafe overlap blocked** — Manual refund creation is hidden while a pending or processing refund exists; provider-pending outcomes remain reconciliation-only and are not blindly retried.
+- **QA candidate only** — Focused refund and full regression tests remain required before Agent 0 accepts this remediation.

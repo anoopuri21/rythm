@@ -1,6 +1,6 @@
 # Phase 10 — Shipping, Fulfillment, Returns and India Tax Workflow
 
-**Status:** IN PROGRESS — Chunk 1 implementation complete; PHP/MySQL qualification pending
+**Status:** IN PROGRESS — Chunk 1 complete; paid-cancellation refund admin remediation in QA
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 15, 3, 4, 6 and 12

@@ -188,6 +188,7 @@ class OrderResource extends Resource
             ])
             ->actions([
                 ViewAction::make(),
+                self::processPendingRefundAction(),
                 self::refundAction(),
                 self::statusAction(Order::STATUS_PROCESSING, 'Mark processing', 'heroicon-o-arrow-path', 'info'),
                 self::statusAction(Order::STATUS_SHIPPED, 'Mark shipped', 'heroicon-o-truck', 'info'),
@@ -199,6 +200,54 @@ class OrderResource extends Resource
             ]);
     }
 
+    private static function processPendingRefundAction(): Action
+    {
+        return Action::make('process_pending_refund')
+            ->label('Process pending refund')
+            ->icon('heroicon-o-arrow-path')
+            ->color('warning')
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::FINANCE_MANAGE) ?? false)
+                && $record->refunds()->where('status', Refund::STATUS_PENDING)->exists())
+            ->requiresConfirmation()
+            ->schema([
+                Textarea::make('reason')
+                    ->label('Approval note')
+                    ->required()
+                    ->minLength(5)
+                    ->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data): void {
+                $user = auth()->user();
+
+                if ($user === null) {
+                    Notification::make()->danger()->title('Finance authorization is required.')->send();
+
+                    return;
+                }
+
+                request()->merge(['audit_reason' => $data['reason']]);
+
+                try {
+                    $gateway = RazorpayGateway::isConfigured()
+                        ? RazorpayGateway::fromConfig()
+                        : app(FakePaymentGateway::class);
+                    $refund = app(RefundService::class)->processPendingForOrder($record, $gateway, $user);
+
+                    if ($refund->status === Refund::STATUS_REFUNDED) {
+                        Notification::make()->success()->title('Pending refund processed')->send();
+                    } elseif ($refund->status === Refund::STATUS_FAILED) {
+                        Notification::make()->danger()->title('Refund was rejected; review the recorded failure before retrying.')->send();
+                    } else {
+                        Notification::make()->warning()->title('Provider completion is pending reconciliation')->send();
+                    }
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->danger()->title($exception->getMessage())->send();
+                } catch (\Throwable) {
+                    Notification::make()->warning()->title('Refund outcome requires reconciliation before retry.')->send();
+                }
+            });
+    }
+
     private static function refundAction(): Action
     {
         return Action::make('request_refund')
@@ -206,7 +255,8 @@ class OrderResource extends Resource
             ->icon('heroicon-o-receipt-refund')
             ->color('danger')
             ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::FINANCE_MANAGE) ?? false)
-                && in_array($record->payment_status, [Order::PAYMENT_PAID, Order::PAYMENT_REFUND_PENDING], true))
+                && in_array($record->payment_status, [Order::PAYMENT_PAID, Order::PAYMENT_REFUND_PENDING], true)
+                && ! $record->refunds()->whereIn('status', [Refund::STATUS_PENDING, Refund::STATUS_PROCESSING])->exists())
             ->requiresConfirmation()
             ->schema([
                 TextInput::make('amount')
