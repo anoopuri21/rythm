@@ -627,3 +627,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phase 9 accepted** — Agent 0 closed the critical blocker without retaining recipient, credential, provider-token or complete-header evidence.
 - **Phase 10 activated** — Read-only audit found sound order, inventory, refund, notification and audit foundations, but no durable shipment, RMA, tax-classification or invoice domain.
 - **Safe boundary locked** — Manual configurable structures may proceed; unapproved legal/tax/shipping/return/warranty promises, carrier integration and real financial writes remain disabled.
+
+## 29 August 2026 — MySQL Refund Migration and Guest Cart Drawer Hotfix
+
+- **MySQL migration ordering fixed** — The partial-refund migration now creates a normal `order_id` index before dropping the unique index that MySQL was using for the existing foreign key; rollback restores uniqueness before removing the replacement index.
+- **Guest cart drawer fixed** — Cart refresh and drawer-toggle events now have separate Livewire handlers; the header event opens the drawer without requiring authentication and close controls use a dedicated action.
+- **Regression coverage added** — Guest cart drawer event/open/close behavior is covered. Supervisor tests passed; PHP qualification awaits the owner/runtime migration rerun because PHP/Composer is unavailable in the current sandbox.

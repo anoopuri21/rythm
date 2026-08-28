@@ -10,6 +10,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // MySQL may use the unique order_id index to support the foreign key.
+        // Add a replacement index first so dropping uniqueness never invalidates the FK.
+        Schema::table('refunds', function (Blueprint $table): void {
+            $table->index('order_id', 'refunds_order_id_idx');
+        });
+
         Schema::table('refunds', function (Blueprint $table): void {
             $table->dropUnique('refunds_order_id_unique');
             $table->string('idempotency_key', 100)->nullable()->unique()->after('payment_id');
@@ -30,6 +36,10 @@ return new class extends Migration
             $table->dropConstrainedForeignId('approved_by');
             $table->dropColumn(['idempotency_key', 'approved_at', 'processed_at']);
             $table->unique('order_id');
+        });
+
+        Schema::table('refunds', function (Blueprint $table): void {
+            $table->dropIndex('refunds_order_id_idx');
         });
     }
 };

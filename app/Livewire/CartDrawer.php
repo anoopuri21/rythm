@@ -24,14 +24,21 @@ final class CartDrawer extends Component
     }
 
     #[On('cart-updated')]
-    #[On('cart-drawer-toggle')]
-    public function refresh(CartService $cart, ?bool $toggle = null): void
+    public function refresh(CartService $cart): void
     {
-        if ($toggle === true) {
-            $this->open = ! $this->open;
-        }
-
         $this->syncQuantities($cart->items());
+    }
+
+    #[On('cart-drawer-toggle')]
+    public function toggle(CartService $cart): void
+    {
+        $this->open = ! $this->open;
+        $this->syncQuantities($cart->items());
+    }
+
+    public function close(): void
+    {
+        $this->open = false;
     }
 
     public function updateQty(int $itemId, int $qty, CartService $cart): void

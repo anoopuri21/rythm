@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Livewire\CartDrawer;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Services\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class CartTest extends TestCase
@@ -149,6 +151,21 @@ class CartTest extends TestCase
     public function test_cart_page_renders_for_guest(): void
     {
         $this->get('/cart')->assertOk()->assertSee('Your cart');
+    }
+
+    public function test_guest_cart_drawer_opens_from_header_event_and_closes(): void
+    {
+        $service = app(CartService::class);
+        $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
+        $service->addItem($product, null, 1);
+
+        Livewire::test(CartDrawer::class)
+            ->assertSet('open', false)
+            ->dispatch('cart-drawer-toggle')
+            ->assertSet('open', true)
+            ->assertSee($product->name)
+            ->call('close')
+            ->assertSet('open', false);
     }
 
     public function test_cart_badge_reflects_count(): void
