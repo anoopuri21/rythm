@@ -484,3 +484,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Legacy runner retired** — The old task agent remains inert; only the tested Supervisor entry point may plan/bootstrap.
 - **First project assignment** — Phase 6A Chunk 4 is assigned to Agents 2/3/6 with independent review by Agents 1/9/13 and Agent 0 accountability.
 - **Deployment remains excluded** — Phase 18 and Agent 10 are inactive; production and other mandatory human gates remain enforced.
+
+## 27 August 2026 — Phase 6A Chunk 4 Implementation Plan
+
+- **Supervisor first project action** — Post-activation audit selected Phase 6A Chunk 4 from canonical state and inspected existing Homepage/Shop services, views, admin resources and tests.
+- **Dedicated configuration approved** — Category-led rows will use a relational `homepage_category_rows` model rather than overloading generic HomepageBlock text.
+- **Existing sections preserved** — Current Homepage product sections and order remain regression-protected; configured category discovery is additive and bounded.
+- **Truthful public behavior locked** — Only active categories/products render; local media is required/preferred, empty rows degrade safely and stock is never inferred.
+- **Four implementation subchunks recorded** — Domain/admin, bounded queries, storefront presentation and realistic-catalogue Shop/QA.
