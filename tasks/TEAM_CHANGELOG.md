@@ -535,3 +535,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Filament and media verified** — Imported products and locally managed media were visible and editable.
 - **Activation safeguards verified** — Reviewed content, approved local media and explicitly entered real stock were required; stock was not inferred.
 - **Phase 6A accepted** — Agent 0 closed the owner gate and advanced the Supervisor to a read-only Phase 8 audit. Deployment and real financial actions remain disabled.
+
+## 29 August 2026 — Phase 8 Chunk 0 Payment Operations Audit
+
+- **Existing foundation qualified** — Signature verification, checkout idempotency, unique gateway identifiers, exactly-once stock capture, refund requests, event schema and finance permissions exist.
+- **Critical gaps bounded** — Webhook ledger use, amount/currency ownership checks, payment retry, provider refunds, partial-refund structure, finance workflow and reconciliation remain.
+- **Safety contract locked** — No external financial write without a human gate; retries require reconciliation, refund totals are bounded and secrets remain environment-only.
+- **Phase 8 started** — Agent 0 accepted a five-chunk implementation plan; replay-safe payment verification is next.
