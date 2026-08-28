@@ -570,3 +570,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Read-only reconciliation delivered** — `payments:reconcile` reports internal amount, currency, identity, state and unresolved-outcome findings with human/JSON output.
 - **Shared-hosting bounds preserved** — Scans default to 100 orders, cap at 500, report truncation and return failure status when findings need action.
 - **QA passed** — 43 focused tests / 173 assertions, 321 full tests / 1,282 assertions, production build and Pint passed; no provider or persistent financial action occurred.
+
+## 29 August 2026 — Phase 8 Owner Test-mode Acceptance
+
+- **Razorpay scenarios passed** — Owner reported successful test-mode capture, harmless replay, decline/retry, partial refund and cumulative full refund behavior.
+- **Reconciliation clean** — Provider and internal test-mode records matched with no unresolved findings.
+- **Phase 8 accepted** — Agent 0 closed the financial test-mode gate and advanced to Phase 9; no credentials or provider identifiers were retained.
+- **Live boundary preserved** — Live financial actions, deployment, Phase 18 and Agent 10 remain disabled.

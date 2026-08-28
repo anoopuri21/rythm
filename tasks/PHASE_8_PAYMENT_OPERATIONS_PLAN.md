@@ -1,6 +1,6 @@
 # Phase 8 — Payment, Refund and Financial Reconciliation Plan
 
-**Status:** IN PROGRESS — Chunks 0–4 complete; Chunk 5 owner-controlled test-mode gate next
+**Status:** COMPLETE — Chunks 0–5 accepted by Agent 0
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 12, 3, 4 and 6
@@ -75,6 +75,19 @@
 - Owner runs controlled Razorpay test-mode payment, replay, failure, full/partial refund and reconciliation scenarios.
 - Record exact provider IDs only in protected operational evidence, never in Git if sensitive.
 
-## Chunk 0 decision
+## Chunk 5 owner-controlled test-mode result — 29 August 2026
 
-Agent 0 accepts the audit and bounded plan. Chunk 1 may proceed with isolated implementation. Real Razorpay activity, secrets, live payments, deployment and Phase 18 remain disabled.
+The owner reported that controlled Razorpay test-mode qualification passed:
+
+- expected-INR payment capture and paid/confirmed order state;
+- harmless callback/webhook replay;
+- declined payment and retry without duplicate order or stock capture;
+- partial refund with truthful remaining balance;
+- cumulative full refund with matching provider/internal state;
+- final reconciliation with no unresolved findings.
+
+No credentials or provider identifiers were supplied or committed.
+
+## Agent 0 decision
+
+Agent 0 accepts Chunks 0–5 and marks Phase 8 complete. This test-mode acceptance does not authorize live financial actions, deployment, Phase 18 or Agent 10.

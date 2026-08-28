@@ -3,7 +3,7 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current operational priority:** Phase 8 — payment, refund and financial reconciliation operations
+**Current operational priority:** Phase 9 — central notifications and external-integration event architecture
 **Overall status:** PHASES 0–7 AND 6A COMPLETE / PHASE 8 NEXT / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
@@ -68,8 +68,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 6 | Agent 5, 4, 8, 9, 15 | Controlled catalogue acquisition and import pipeline | COMPLETE | Accepted 26 Aug 2026: 271 tests / 1,017 assertions; owner confirmed exact-MySQL import plus Filament visibility/editability |
 | 7 | Agent 6, 3, 4, 8, 11 | Admin governance, staff RBAC and auditability | COMPLETE | Accepted 26 Aug 2026: 280 tests / 1,081 assertions plus owner-confirmed TOTP, roles and protected staff creation UAT |
 | 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | COMPLETE | Accepted 29 Aug 2026: 80 imported / 80 active / 0 held owner-reported MySQL UAT, Filament/local-media controls verified, Chunk 4 full regression 302 tests / 1,178 assertions |
-| 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | IN PROGRESS | Chunks 0–4 complete with 321 tests / 1,282 assertions; owner-controlled Razorpay test-mode payment/refund/reconciliation gate remains |
-| 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | PENDING | Idempotent event matrix, preferences, delivery logs and cron-safe retries pass |
+| 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | COMPLETE | Accepted 29 Aug 2026: 321 tests / 1,282 assertions plus owner-reported Razorpay test-mode payment, replay, failure/retry, partial/full refund and clean reconciliation |
+| 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | NEXT | Read-only implementation audit and bounded event-matrix plan next |
 | 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | PENDING | Professionally approved rules plus fulfillment/tax/RMA tests pass |
 | 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | PENDING | Realistic-catalog search, merchandising, SEO and responsive conversion gates pass |
 | 12 | Agent 8, 3, 4, 9, 11, 13, 15 | Security, privacy, compliance and accessibility hardening | PENDING | No unresolved critical/high finding; privacy/legal/accessibility gates pass |
