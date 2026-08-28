@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "c202cb8d624730fa814c3cbf64f652eb6c17abac",
-    "remote_head": "c202cb8d624730fa814c3cbf64f652eb6c17abac",
+    "local_head": "dbdfd3d670189aaf7d58397e2f898209a0449a3a",
+    "remote_head": "dbdfd3d670189aaf7d58397e2f898209a0449a3a",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "autonomous-supervisor-build",
-    "chunk": "5",
-    "task": "Evidence gate evaluation and canonical tracker reconciliation",
+    "chunk": "6",
+    "task": "Bootstrap, resume, status and operational runbook",
     "status": "complete"
   },
   "execution": {
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Chunk 5 evidence gates passed 41 combined Supervisor tests and zero-finding audit."
+    "last_verified_action": "Chunk 6 lifecycle and runbook passed 48 combined tests; dirty-tree bootstrap safely refused execution."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -39,8 +39,8 @@
     ]
   },
   "checkpoint": {
-    "id": "cbfb53c3ceb48cef065e79ff50de0e7057816503439368b487a01de28ffe3dc1",
-    "created_at": "2026-08-27T16:37:20.052Z"
+    "id": "5685d292132e430d0f83216bdfd13b7083f9004e4c81c3c7b93056366d08f3db",
+    "created_at": "2026-08-28T20:00:23.699Z"
   },
   "decisions": [
     {
@@ -101,11 +101,17 @@
       "outcome": "passed",
       "evidence": "tasks/AUTONOMOUS_SUPERVISOR_CHUNK_5_GATES.md",
       "verified_at": "2026-08-27T12:30:00.000Z"
+    },
+    {
+      "name": "Chunk 6 bootstrap and resume",
+      "outcome": "passed",
+      "evidence": "tasks/AUTONOMOUS_SUPERVISOR_CHUNK_6_RUNBOOK.md",
+      "verified_at": "2026-08-27T12:45:00.000Z"
     }
   ],
   "next_action": {
-    "id": "AS-BUILD-6-RUNBOOK",
-    "description": "Implement bootstrap, resume, status and copy-safe operational runbook.",
+    "id": "AS-BUILD-7-SIMULATION",
+    "description": "Run integrated timeout, recovery, security, gate and activation safety simulations.",
     "requires_human": false
   }
 }

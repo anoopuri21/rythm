@@ -460,3 +460,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **False completion prevented** — Missing/failed gates retain QA; critical blockers force BLOCKED; only reasoned Agent 0 acceptance permits COMPLETE.
 - **Phase self-completion prevented** — Passed chunks still require full phase regression and Agent 0 acceptance.
 - **Combined tests passed** — Forty-one Supervisor tests passed; real repository audit remained zero-finding.
+
+## 27 August 2026 — Autonomous Supervisor Build Chunk 6
+
+- **Lifecycle CLI delivered** — Read-only status, resume and plan plus guarded bootstrap now expose checkpoint and Git reconciliation.
+- **Interrupted work protected** — Dirty trees, branch mismatch, remote outage and local/remote divergence stop execution for inspection; no automatic reset occurs.
+- **Transport recovery documented** — Windows/Laragon and Arena commands resume from actual Git/checkpoint state after timeouts.
+- **Activation remains locked** — Bootstrap refuses writes throughout build and correctly blocked against the real dirty build tree.
+- **Combined tests passed** — Forty-eight Supervisor tests passed with zero failures.
