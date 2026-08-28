@@ -612,3 +612,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Bounded operations delivered** — Read-only reconciliation caps at 500 records; retry caps at 50 records and three known-failure attempts.
 - **Least-privilege evidence delivered** — Support and super-admin roles can inspect a read-only Filament delivery log; unrelated roles cannot.
 - **QA passed** — 23 focused tests / 134 assertions, 340 full tests / 1,376 assertions and Pint passed; no external email was sent.
+
+## 30 August 2026 — Phase 9 Chunk 5 Mail UAT Blocker
+
+- **External gate failed** — Owner reported that the staging transactional email was not received.
+- **Domain/rendering failures reported** — Multiple or unidentified SPF/DKIM/DMARC and HTML/plain-text/link checks failed.
+- **Internal reconciliation clean** — No stale, failed, exhausted or incomplete delivery record was reported, so blind retry or speculative code change is prohibited.
+- **Phase 9 blocked** — Owner/provider remediation of sender configuration, DNS and provider delivery evidence is required before Phase 10.
