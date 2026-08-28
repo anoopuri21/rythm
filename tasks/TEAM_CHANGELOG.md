@@ -577,3 +577,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Reconciliation clean** — Provider and internal test-mode records matched with no unresolved findings.
 - **Phase 8 accepted** — Agent 0 closed the financial test-mode gate and advanced to Phase 9; no credentials or provider identifiers were retained.
 - **Live boundary preserved** — Live financial actions, deployment, Phase 18 and Agent 10 remain disabled.
+
+## 29 August 2026 — Phase 9 Chunk 0 Notification Audit
+
+- **Existing queue foundation qualified** — Queued order mail, database jobs and a bounded shared-hosting scheduler already exist.
+- **Architecture gaps bounded** — Direct mail triggers, missing delivery identity/logs, payment/refund events, customer notification center, preferences and retry evidence remain.
+- **Safety contract locked** — Transactional messages cannot be disabled, duplicate identities are deterministic, metadata is redacted and retries require known failure.
+- **Phase 9 started** — Agent 0 accepted a five-chunk plan; the durable notification domain is next.
