@@ -1,6 +1,6 @@
 # Phase 9 — Notification and Integration Event Architecture
 
-**Status:** IN PROGRESS — Chunk 0 audit complete; Chunk 1 next
+**Status:** IN PROGRESS — Chunks 0–1 complete; Chunk 2 next
 **Date:** 29 August 2026
 **Accountable:** Agent 0
 **Primary:** Agents 14, 3, 4 and 8

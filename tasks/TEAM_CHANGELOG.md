@@ -584,3 +584,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Architecture gaps bounded** — Direct mail triggers, missing delivery identity/logs, payment/refund events, customer notification center, preferences and retry evidence remain.
 - **Safety contract locked** — Transactional messages cannot be disabled, duplicate identities are deterministic, metadata is redacted and retries require known failure.
 - **Phase 9 started** — Agent 0 accepted a five-chunk plan; the durable notification domain is next.
+
+## 29 August 2026 — Phase 9 Chunk 1 Notification Domain
+
+- **Immutable event ledger delivered** — Deterministic commerce-event identities and payload hashes reject changed-data collisions.
+- **Delivery deduplication delivered** — Recipient/channel records use unique delivery keys and hashed recipients with bounded status/failure evidence.
+- **Inbox and preferences delivered** — Laravel database notifications are active; only approved optional categories are configurable and mandatory transactions stay enabled.
+- **QA passed** — 20 focused tests / 114 assertions, 326 full tests / 1,306 assertions, migration cycle and Pint passed; no external notification was sent.
