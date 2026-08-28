@@ -14,6 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
@@ -97,6 +98,19 @@ Route::middleware('auth')->group(function () {
 
     // Account dashboard — profile, password, addresses, orders
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::get('/account/notifications', [NotificationController::class, 'index'])->name('account.notifications.index');
+    Route::patch('/account/notifications/preferences', [NotificationController::class, 'updatePreferences'])
+        ->middleware('throttle:10,1')
+        ->name('account.notifications.preferences');
+    Route::patch('/account/notifications/read-all', [NotificationController::class, 'markAllRead'])
+        ->middleware('throttle:20,1')
+        ->name('account.notifications.read-all');
+    Route::patch('/account/notifications/{notification}/read', [NotificationController::class, 'markRead'])
+        ->middleware('throttle:30,1')
+        ->name('account.notifications.read');
+    Route::patch('/account/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
+        ->middleware('throttle:30,1')
+        ->name('account.notifications.unread');
     Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
     Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
     Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');

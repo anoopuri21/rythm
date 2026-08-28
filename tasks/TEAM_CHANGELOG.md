@@ -598,3 +598,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Exactly-once delivery reservations delivered** — Immutable event and recipient/channel identities suppress listener replay duplicates.
 - **Transactional channels delivered** — Customers receive queued mail and database notifications with signed order links and no sensitive provider data.
 - **QA passed** — 54 focused tests / 197 assertions, 329 full tests / 1,316 assertions and Pint passed; no external email was sent.
+
+## 30 August 2026 — Phase 9 Chunk 3 Notification Center
+
+- **Protected inbox delivered** — Customers receive a paginated latest-first center with truthful unread count and accessible empty/unread states.
+- **Owned controls delivered** — Read, unread and mark-all actions are authenticated, throttled and cannot mutate another customer’s records.
+- **Optional preferences delivered** — Email/database settings cover approved optional categories while mandatory transactional messages remain enabled.
+- **QA passed** — 27 focused tests / 112 assertions, 334 full tests / 1,347 assertions, production build and Pint passed; no external email was sent.

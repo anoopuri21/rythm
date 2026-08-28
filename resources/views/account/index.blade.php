@@ -18,12 +18,17 @@
                     <h1 class="section-title">{{ auth()->user()->name }}</h1>
                     <p class="mt-3 text-sm text-muted">{{ auth()->user()->email }}</p>
                 </div>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
-                        Sign out
-                    </button>
-                </form>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('account.notifications.index') }}" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        Notifications
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                            Sign out
+                        </button>
+                    </form>
+                </div>
             </div>
 
             {{-- Tabs --}}
