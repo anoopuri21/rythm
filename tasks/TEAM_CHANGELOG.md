@@ -528,3 +528,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Full regression passed** — 302 tests / 1,178 assertions passed; Composer and npm audits reported no vulnerabilities.
 - **Chunk 4 accepted** — Agent 0 accepts all Chunk 4 subchunks; no persistent data, activation, stock or deployment action occurred.
 - **Human gate recorded** — Phase 6A remains in progress until the owner completes Chunk 3 persistent MySQL import/admin review and records exact totals.
+
+## 29 August 2026 — Phase 6A Owner UAT Acceptance
+
+- **Persistent MySQL evidence supplied** — Owner reported 80 imported, 80 active and 0 held products.
+- **Filament and media verified** — Imported products and locally managed media were visible and editable.
+- **Activation safeguards verified** — Reviewed content, approved local media and explicitly entered real stock were required; stock was not inferred.
+- **Phase 6A accepted** — Agent 0 closed the owner gate and advanced the Supervisor to a read-only Phase 8 audit. Deployment and real financial actions remain disabled.

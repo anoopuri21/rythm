@@ -131,9 +131,9 @@ Each completed chunk requires applicable tests, a bounded commit, push attempt, 
 - **Chunk 0 — COMPLETE:** Eight public collections qualified, exact 80-record manifest produced with zero internal duplicate handles, UAT/local-fixture boundaries documented and capacity/request budget accepted. Evidence: `tasks/PHASE_6A_CHUNK_0_QUALIFICATION.md`.
 - **Chunk 1 — COMPLETE:** Manifest-driven one-/two-group acquisition, deterministic resume, exact handle/source-ID validation, combined reporting and publication-review flags passed automated and real metadata-only qualification. Evidence: `tasks/PHASE_6A_CHUNK_1_ACQUISITION.md`.
 - **Chunk 2 — COMPLETE:** Four real two-category runs acquired 80/80 selected products and 226 valid local images with zero product, media or integrity failures; every batch was cleaned after evidence extraction. Evidence: `tasks/PHASE_6A_CHUNK_2_REAL_BATCHES.md`.
-- **Chunk 3 — QA:** Batch dry-run/commit, durable review state, mapped categories, direct-activation lockout and audited authorized single/bulk activation passed isolated tests. Persistent MySQL import/admin review remains owner-operated. Evidence: `tasks/PHASE_6A_CHUNK_3_IMPORT_REVIEW.md`.
+- **Chunk 3 — COMPLETE:** Batch dry-run/commit, durable review state and activation safeguards passed automated qualification; owner-reported persistent MySQL UAT recorded 80 imported, 80 active and 0 held with Filament/local-media and real-stock controls verified. Evidence: `tasks/PHASE_6A_CHUNK_3_IMPORT_REVIEW.md`.
 - **Chunk 4 — COMPLETE:** Bounded category-row configuration, cached Homepage queries, accessible responsive presentation and isolated 80-product Shop qualification passed. Evidence: `tasks/PHASE_6A_CHUNK_4_3_SHOP_QA.md`.
 
 ## Immediate next action
 
-Owner performs the documented non-destructive persistent MySQL import/admin review for Chunk 3 and records exact imported/active totals. Phase 6A remains `IN PROGRESS` at this unavoidable human gate; Phase 8 does not start first.
+Phase 6A is complete. Begin Phase 8 with a read-only audit and bounded implementation plan; real financial actions remain human-gated.

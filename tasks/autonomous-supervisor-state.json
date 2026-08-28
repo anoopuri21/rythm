@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "a326a06ab6e9937b911ce8c7e62825c01a461f36",
-    "remote_head": "a326a06ab6e9937b911ce8c7e62825c01a461f36",
+    "local_head": "c60eb69901b53182d83fd7ee859bab0c85542ec8",
+    "remote_head": "c60eb69901b53182d83fd7ee859bab0c85542ec8",
     "working_tree_clean": false
   },
   "delivery": {
-    "phase": "6A",
-    "chunk": "3-owner-uat",
-    "task": "Persistent MySQL catalogue import and admin review evidence",
-    "status": "waiting_human"
+    "phase": "8",
+    "chunk": "0",
+    "task": "Read-only payment, refund and reconciliation audit",
+    "status": "ready"
   },
   "execution": {
-    "action_class": "non_idempotent_write",
+    "action_class": "read_only",
     "attempt": 0,
-    "max_attempts": 0,
-    "last_verified_action": "Phase 6A Chunk 4.3 passed 18 focused tests / 92 assertions, 302 full tests / 1,178 assertions, production build and dependency audits in external QA."
+    "max_attempts": 2,
+    "last_verified_action": "Owner reported Phase 6A persistent MySQL UAT: 80 imported, 80 active, 0 held; Filament/local media and real-stock activation controls verified. Agent 0 accepted Phase 6A."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "bac0cdc4003f7e68feacf93d7bc350050b15a385051f181e3f6b67963392277e",
-    "created_at": "2026-08-29T17:15:00.000Z"
+    "id": "ead1a3eef9c330ecb504b5273c4a72040f467689f7f8489657bb53a4053a4075",
+    "created_at": "2026-08-29T17:45:00.000Z"
   },
   "decisions": [
     {
@@ -74,7 +74,7 @@
     },
     {
       "id": "AS-H002",
-      "status": "open",
+      "status": "closed",
       "summary": "Owner must run the documented non-destructive persistent MySQL import/admin review and provide exact imported/active totals for Phase 6A Chunk 3."
     }
   ],
@@ -156,11 +156,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_6A_CHUNK_4_3_SHOP_QA.md",
       "verified_at": "2026-08-29T17:15:00.000Z"
+    },
+    {
+      "name": "Phase 6A persistent MySQL catalogue UAT",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_6A_CHUNK_3_IMPORT_REVIEW.md",
+      "verified_at": "2026-08-29T17:45:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-6A-CHUNK-3-OWNER-UAT",
-    "description": "Owner runs the documented persistent MySQL import/admin review and returns exact imported/active totals; Supervisor then verifies evidence before Phase 8.",
-    "requires_human": true
+    "id": "PHASE-8-CHUNK-0-AUDIT",
+    "description": "Audit existing payment, refund and reconciliation implementation without performing real financial actions, then record a bounded Phase 8 plan.",
+    "requires_human": false
   }
 }

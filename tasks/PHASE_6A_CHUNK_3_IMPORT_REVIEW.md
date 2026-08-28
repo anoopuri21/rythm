@@ -1,6 +1,6 @@
 # Phase 6A Chunk 3 — Safe Import, Review and Activation
 
-**Status:** QA — implementation and isolated gates passed; persistent MySQL batch import/admin review remains owner-operated
+**Status:** COMPLETE — implementation, isolated gates and owner-reported persistent MySQL UAT accepted
 **Date:** 26 August 2026
 
 ## Delivered import workflow
@@ -75,6 +75,16 @@ Persistent UAT has not yet been imported by the agent. The owner must first pull
 
 If the first five Acoustic source payloads have genuinely changed, they remain conflicts for owner review and are never overwritten. After inspecting the dry-run report, `--commit --allow-conflicts` may be used to import only ready records while explicitly holding those existing conflicts. The command reports both created and held counts and still fails on actual validation/media errors.
 
+## Persistent UAT result — 29 August 2026
+
+The owner reported the following results from persistent MySQL UAT:
+
+- **Imported:** 80
+- **Active:** 80
+- **Held from publication:** 0
+- Imported products and locally managed media were visible and editable in Filament.
+- Activation controls required reviewed content, approved local media and explicitly entered real stock; stock was not inferred.
+
 ## Agent 0 gate decision
 
-Chunk 3 implementation passes independent local qualification and is `QA` pending persistent MySQL import/admin review. Chunk 4 Homepage/Shop development may proceed independently using isolated realistic data, but Phase 6A cannot be marked complete until persistent catalogue totals and owner review are recorded.
+Agent 0 accepts the owner-reported persistent MySQL evidence together with the existing automated qualification. Chunk 3 and Phase 6A are complete. This acceptance is not production or deployment authorization.
