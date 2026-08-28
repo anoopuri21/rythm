@@ -144,12 +144,31 @@
 
                     <section aria-label="Payment" class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
                         <h2 class="font-playfair text-lg font-bold text-ink">Payment</h2>
-                        <p class="mt-4 text-sm text-ink/80">
-                            {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }} ·
-                            @if($order->payments->isNotEmpty())
-                                <span class="text-xs text-muted">{{ $order->payments->last()->gateway }} · {{ $order->payments->last()->gateway_payment_id }}</span>
-                            @endif
+                        <p class="mt-4 text-sm font-semibold text-ink/80">
+                            {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}
                         </p>
+                        @if($order->payments->isNotEmpty())
+                            <ol class="mt-4 space-y-3" aria-label="Payment and refund history">
+                                @foreach($order->payments->sortBy('created_at') as $payment)
+                                    <li class="rounded-xl bg-paper px-4 py-3 text-xs">
+                                        <div class="flex justify-between gap-3">
+                                            <span class="font-semibold text-ink">Payment attempt</span>
+                                            <span class="capitalize text-muted">{{ str_replace('_', ' ', $payment->status) }}</span>
+                                        </div>
+                                        <p class="mt-1 text-muted">₹{{ number_format((float) $payment->amount, 2) }} · {{ $payment->currency }} · {{ $payment->created_at?->format('d M Y, h:i A') }}</p>
+                                    </li>
+                                    @foreach($payment->refunds->sortBy('created_at') as $refund)
+                                        <li class="rounded-xl bg-brand/5 px-4 py-3 text-xs">
+                                            <div class="flex justify-between gap-3">
+                                                <span class="font-semibold text-ink">Refund</span>
+                                                <span class="capitalize text-muted">{{ str_replace('_', ' ', $refund->status) }}</span>
+                                            </div>
+                                            <p class="mt-1 text-muted">₹{{ number_format((float) $refund->amount, 2) }} · {{ $refund->currency }} · {{ $refund->created_at?->format('d M Y, h:i A') }}</p>
+                                        </li>
+                                    @endforeach
+                                @endforeach
+                            </ol>
+                        @endif
                     </section>
 
                     <div class="flex flex-wrap gap-3">

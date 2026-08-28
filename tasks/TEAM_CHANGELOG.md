@@ -563,3 +563,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Finance governance delivered** — Requester/approver evidence, mandatory reasons, finance-only processing and existing audit observation protect financial actions.
 - **Unknown outcomes remain truthful** — Provider-pending or interrupted operations stay processing and cannot be blindly retried or described as refunded.
 - **QA passed** — 60 focused tests / 251 assertions, 317 full tests / 1,259 assertions, migration forward/rollback/forward and Pint passed; no external refund occurred.
+
+## 29 August 2026 — Phase 8 Chunk 4 Financial Reconciliation
+
+- **Safe timelines delivered** — Customers see payment/refund state without provider identifiers; finance admins receive bounded payment, event and refund evidence.
+- **Read-only reconciliation delivered** — `payments:reconcile` reports internal amount, currency, identity, state and unresolved-outcome findings with human/JSON output.
+- **Shared-hosting bounds preserved** — Scans default to 100 orders, cap at 500, report truncation and return failure status when findings need action.
+- **QA passed** — 43 focused tests / 173 assertions, 321 full tests / 1,282 assertions, production build and Pint passed; no provider or persistent financial action occurred.

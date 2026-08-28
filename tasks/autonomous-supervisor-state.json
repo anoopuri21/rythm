@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "8f97e5ce7416a123ac6485b42a62887cc174c51e",
-    "remote_head": "8f97e5ce7416a123ac6485b42a62887cc174c51e",
+    "local_head": "cded1da3742f113e51a1db4f36fe379343410382",
+    "remote_head": "cded1da3742f113e51a1db4f36fe379343410382",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "8",
-    "chunk": "4",
-    "task": "Payment/refund timelines and reconciliation",
-    "status": "ready"
+    "chunk": "5-owner-test-mode",
+    "task": "Razorpay test-mode payment, refund and provider reconciliation evidence",
+    "status": "waiting_human"
   },
   "execution": {
-    "action_class": "idempotent_write",
+    "action_class": "financial",
     "attempt": 0,
-    "max_attempts": 1,
-    "last_verified_action": "Phase 8 Chunk 3 passed 60 focused tests / 251 assertions, 317 full tests / 1,259 assertions and migration cycle in external QA."
+    "max_attempts": 0,
+    "last_verified_action": "Phase 8 Chunk 4 passed 43 focused tests / 173 assertions, 321 full tests / 1,282 assertions and production build in external QA."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "38483f83fb94978c780be1f6bf88970657d3db8e90b042cd7c6c8f427527436c",
-    "created_at": "2026-08-29T21:00:00.000Z"
+    "id": "fa14b27faeff4e798c30af8299dd85ade44a0b60471a74798d35f5ea34caff80",
+    "created_at": "2026-08-29T22:00:00.000Z"
   },
   "decisions": [
     {
@@ -76,6 +76,11 @@
       "id": "AS-H002",
       "status": "closed",
       "summary": "Owner must run the documented non-destructive persistent MySQL import/admin review and provide exact imported/active totals for Phase 6A Chunk 3."
+    },
+    {
+      "id": "AS-H003",
+      "status": "open",
+      "summary": "Owner must run controlled Razorpay test-mode payment, replay, failure, full/partial refund and provider reconciliation scenarios without exposing credentials."
     }
   ],
   "gate_results": [
@@ -186,11 +191,17 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_8_CHUNK_3_REFUNDS.md",
       "verified_at": "2026-08-29T21:00:00.000Z"
+    },
+    {
+      "name": "Phase 8 Chunk 4 financial timelines and reconciliation",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_8_CHUNK_4_RECONCILIATION.md",
+      "verified_at": "2026-08-29T22:00:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-8-CHUNK-4",
-    "description": "Add safe customer/admin payment and refund timelines plus a bounded read-only reconciliation command and mismatch evidence.",
-    "requires_human": false
+    "id": "PHASE-8-CHUNK-5-OWNER-TEST-MODE",
+    "description": "Owner runs controlled Razorpay test-mode payment, replay, failure, full/partial refund and reconciliation scenarios and reports non-secret outcomes.",
+    "requires_human": true
   }
 }

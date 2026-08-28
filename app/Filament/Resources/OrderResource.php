@@ -101,6 +101,29 @@ class OrderResource extends Resource
                                 ->state(fn (Order $record): string => $record->payments->last()?->gateway ?? '—'),
                         ]),
                     ]),
+                Section::make('Payment activity')
+                    ->schema([
+                        RepeatableEntry::make('payments')
+                            ->schema([
+                                TextEntry::make('amount')->money('INR'),
+                                TextEntry::make('currency'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('gateway_order_id')->label('Gateway order')->placeholder('—'),
+                                TextEntry::make('gateway_payment_id')->label('Gateway payment')->placeholder('—'),
+                                TextEntry::make('created_at')->dateTime('d M Y, h:i A'),
+                            ])
+                            ->columns(6),
+                        RepeatableEntry::make('paymentEvents')
+                            ->label('Webhook events')
+                            ->schema([
+                                TextEntry::make('event_type'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('gateway_event_id')->label('Provider event'),
+                                TextEntry::make('failure_message')->placeholder('—'),
+                                TextEntry::make('received_at')->dateTime('d M Y, h:i A'),
+                            ])
+                            ->columns(5),
+                    ]),
                 Section::make('Refunds')
                     ->schema([
                         RepeatableEntry::make('refunds')
