@@ -1,8 +1,8 @@
 {
     "schema_version": 2,
-    "enabled": false,
-    "status": "LEGACY_DISABLED_PENDING_SUPERVISOR_ACTIVATION",
-    "reason": "The legacy task agent used superseded branch, tracker and framework rules. It must remain write-disabled until the Autonomous Supervisor passes activation QA.",
+    "enabled": true,
+    "status": "AUTONOMOUS_SUPERVISOR_ACTIVE",
+    "reason": "Agent 0 accepted activation evidence after Build Chunks 0\u20137 and 58-test integrated simulation QA.",
     "branch": "rhythm-uat",
     "authoritative_sources": [
         "tasks/MASTER_PROJECT_TRACKER.md",

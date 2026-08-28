@@ -13,14 +13,15 @@ test('read-only auditor verifies branch, authorities and disabled deployment', (
     const audit = auditProject(root);
     assert.equal(audit.mode, 'read-only');
     assert.equal(audit.git.branch, 'rhythm-uat');
-    assert.equal(audit.state.lifecycle, 'building');
+    assert.equal(audit.state.lifecycle, 'executing');
     assert.equal(audit.authority_sources.every((source) => source.exists && /^[a-f0-9]{64}$/.test(source.sha256)), true);
     assert.equal(audit.findings.some((finding) => finding.code === 'PREMATURE_AUTOMATION_ENABLE'), false);
     assert.equal(audit.findings.some((finding) => finding.code === 'DEPLOYMENT_ENABLED'), false);
 });
 
 test('building lifecycle selects exact checkpointed build action', () => {
-    const state = readState(path.join(root, 'tasks', 'autonomous-supervisor-state.json'));
+    const committed = readState(path.join(root, 'tasks', 'autonomous-supervisor-state.json'));
+    const state = { ...committed, lifecycle: 'building', next_action: { id: 'AS-BUILD-8-ACTIVATION' } };
     const result = chooseNextTask({ state, audit: safeAudit, trackerMarkdown: '', expansionMarkdown: '' });
     assert.equal(result.status, 'ready');
     assert.equal(result.source, 'supervisor-build-state');

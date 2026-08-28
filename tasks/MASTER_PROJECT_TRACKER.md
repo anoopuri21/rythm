@@ -4,9 +4,9 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current operational priority:** Phase 6A — urgent multi-category catalogue and homepage expansion IN PROGRESS before canonical Phase 8
-**Overall status:** PHASES 6–7 COMPLETE / PHASE 6A CHUNKS 0–2 COMPLETE, CHUNK 3 QA, CHUNK 4 NEXT / PHASE 8 PENDING / CONTINUOUS AUTO MODE THROUGH PHASE 11 / NOT PRODUCTION-READY
+**Overall status:** PHASES 6–7 COMPLETE / PHASE 6A CHUNKS 0–2 COMPLETE, CHUNK 3 QA, CHUNK 4 NEXT / PHASE 8 PENDING / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** ACTIVE — owner authorized continuous execution and urgent catalogue expansion
+**Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
 
 ---
 

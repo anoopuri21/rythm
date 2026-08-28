@@ -2,7 +2,7 @@
 
 **Owner:** Project owner
 **Governance reviewer:** Agent 0 — Project Lead
-**Status:** REQUIREMENTS COMPLETE — BUILD IN PROGRESS (CHUNKS 0–7 COMPLETE; CHUNK 8 ACTIVATION REVIEW NEXT)
+**Status:** COMPLETE — AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17; PHASE 18 EXCLUDED
 **Recorded:** 27 August 2026
 **Target authorization:** Canonical Phases 6A and 8–17; Phase 18/deployment excluded
 

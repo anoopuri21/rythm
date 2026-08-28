@@ -21,7 +21,7 @@ export function auditProject(root) {
     const findings = [];
 
     if (branch !== config.branch) findings.push({ severity: 'critical', code: 'WRONG_BRANCH', detail: `Expected ${config.branch}; found ${branch}` });
-    if (config.enabled !== false) findings.push({ severity: 'critical', code: 'PREMATURE_AUTOMATION_ENABLE', detail: 'Legacy automation must remain disabled during Supervisor build.' });
+    if (config.enabled === true && state.lifecycle !== 'executing' && state.lifecycle !== 'recovering' && state.lifecycle !== 'blocked' && state.lifecycle !== 'complete') findings.push({ severity: 'critical', code: 'PREMATURE_AUTOMATION_ENABLE', detail: 'Supervisor cannot be enabled during inactive/planning/building lifecycle.' });
     if (state.authorization.deployment_enabled) findings.push({ severity: 'critical', code: 'DEPLOYMENT_ENABLED', detail: 'Phase 18 is not authorized.' });
     if (remoteAvailable && localHead !== remoteHead) findings.push({ severity: 'warning', code: 'HEAD_DIVERGENCE', detail: 'Local and remote branch heads differ; reconcile before writes.' });
 

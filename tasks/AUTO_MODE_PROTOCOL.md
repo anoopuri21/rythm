@@ -2,7 +2,7 @@
 
 **Owner:** Agent 0 — Project Lead
 **Status:** ACTIVE — Phase 6A in progress; current Agent 0 authority through Phase 11
-**Target Supervisor authority:** Phase 17 after build, QA and Agent 0 activation; Phase 18 excluded
+**Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 acceptance; Phase 18 excluded
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -151,7 +151,7 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 
 - **Registered:** Yes
 - **Active:** Yes — existing Agent 0 Auto Mode is owner-authorized through Phase 11.
-- **Autonomous Supervisor:** Requirements complete; build/QA/activation pending. Its approved horizon is through Phase 17, but that authority is not active until Agent 0 accepts activation evidence.
+- **Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 accepted build and simulation evidence; Phase 18 remains excluded.
 - **Completed phases:** Canonical Phases 0–7 (`COMPLETE`).
 - **Current priority:** Phase 6A multi-category catalogue and Homepage/Shop expansion (`IN PROGRESS`) before Phase 8.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.

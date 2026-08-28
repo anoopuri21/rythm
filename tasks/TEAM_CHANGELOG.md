@@ -476,3 +476,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Independent review accepted** — Agent 9 QA, Agent 8 security boundaries and Agent 11 architecture review are accepted by Agent 0.
 - **Full Supervisor regression passed** — Fifty-eight tests passed with zero failures; real read-only audit remained safe and zero-finding.
 - **Activation remains separate** — Chunk 8 must reconcile the clean pushed Chunk 7 commit before enabling controlled execution.
+
+## 27 August 2026 — Autonomous Supervisor Activated
+
+- **Agent 0 activation accepted** — Clean pushed Chunk 7 evidence, 58-test simulation regression, zero-finding audit, secret scan and npm audit were accepted.
+- **Lifecycle executing** — Supervisor is active for Phase 6A and canonical Phases 8–17 using durable checkpoints and canonical planning.
+- **Legacy runner retired** — The old task agent remains inert; only the tested Supervisor entry point may plan/bootstrap.
+- **First project assignment** — Phase 6A Chunk 4 is assigned to Agents 2/3/6 with independent review by Agents 1/9/13 and Agent 0 accountability.
+- **Deployment remains excluded** — Phase 18 and Agent 10 are inactive; production and other mandatory human gates remain enforced.
