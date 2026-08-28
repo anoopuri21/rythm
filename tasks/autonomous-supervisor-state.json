@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "f026de28ccdad76f23289cca0c701c51e68e81c3",
-    "remote_head": "f026de28ccdad76f23289cca0c701c51e68e81c3",
+    "local_head": "3d05701150f18f285ad3be08ec2d96a80d6ede7b",
+    "remote_head": "3d05701150f18f285ad3be08ec2d96a80d6ede7b",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "10",
-    "chunk": "0-audit",
-    "task": "Shipping, fulfillment, returns and India tax architecture audit",
-    "status": "in_progress"
+    "chunk": "1-fulfillment-domain",
+    "task": "Durable manual fulfillment domain qualification",
+    "status": "qa"
   },
   "execution": {
-    "action_class": "read_only",
+    "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Agent 0 accepted the owner-attested Phase 9 remediated mail gate and completed the Phase 10 read-only architecture audit."
+    "last_verified_action": "Implemented the bounded fulfillment domain; static contracts and Supervisor tests are available, while PHP/MySQL QA requires the owner runtime."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "862906de90ef96b38728c541fb074de7fc521f30017085e396fbbd192a7f5a48",
-    "created_at": "2026-08-29T13:00:00.000Z"
+    "id": "22b7bbaffa30ca1132839bf9167b569636413ba49cea1b3203b006094e6af91a",
+    "created_at": "2026-08-29T14:00:00.000Z"
   },
   "decisions": [
     {
@@ -86,6 +86,11 @@
       "id": "AS-H004",
       "status": "closed",
       "summary": "Owner must verify controlled staging transactional email delivery, SPF/DKIM/DMARC status and HTML/plain-text rendering without sharing credentials."
+    },
+    {
+      "id": "AS-H005",
+      "status": "open",
+      "summary": "Owner runtime must run the non-destructive Phase 10 Chunk 1 migration plus focused/full tests because PHP and Composer are unavailable in Arena."
     }
   ],
   "gate_results": [
@@ -253,8 +258,8 @@
     }
   ],
   "next_action": {
-    "id": "PHASE-10-CHUNK-1-FULFILLMENT-DOMAIN",
-    "description": "Implement durable manual shipment, shipment-item and event records with bounded fulfillment transitions and allocation integrity.",
-    "requires_human": false
+    "id": "PHASE-10-CHUNK-1-OWNER-QA",
+    "description": "Owner runs the forward migration and focused/full fulfillment tests, returning only counts or non-secret failures for Agent 0 acceptance.",
+    "requires_human": true
   }
 }

@@ -633,3 +633,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **MySQL migration ordering fixed** — The partial-refund migration now creates a normal `order_id` index before dropping the unique index that MySQL was using for the existing foreign key; rollback restores uniqueness before removing the replacement index.
 - **Guest cart drawer fixed** — Cart refresh and drawer-toggle events now have separate Livewire handlers; the header event opens the drawer without requiring authentication and close controls use a dedicated action.
 - **Regression coverage added** — Guest cart drawer event/open/close behavior is covered. Supervisor tests passed; PHP qualification awaits the owner/runtime migration rerun because PHP/Composer is unavailable in the current sandbox.
+
+## 29 August 2026 — Phase 10 Chunk 1 Fulfillment Domain
+
+- **Durable manual fulfillment implemented** — Shipment, item-allocation and transition-event records preserve fulfillment identity, actor, reason and timestamps.
+- **Allocation/state safety implemented** — Paid active orders only, row locks, over-allocation/cross-order rejection, replay conflict detection and bounded transitions protect partial shipment operations.
+- **Truthful order synchronization implemented** — Dispatch can mark an order shipped; delivery requires every ordered unit to be allocated and every active shipment to be delivered.
+- **External integrations excluded** — Carrier calls, credentials, rates, serviceability and delivery promises remain disabled.
+- **QA pending** — Focused and full PHP/MySQL checks require the owner runtime because PHP/Composer is unavailable in Arena; the chunk is not yet accepted.
