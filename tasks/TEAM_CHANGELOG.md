@@ -664,3 +664,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Error rendering hardened** — Navbar category composition returns an empty list when the configured database has no categories table, preventing error pages from recursively failing.
 - **Configuration blocker identified** — `rythm.test` is pointed at unrelated database `maverick_academy`; owner must restore `DB_DATABASE=rhythm_db` and clear cached configuration. No tables will be created in the wrong database.
 - **QA pending** — Focused homepage/admin tests, full regression and rendered desktop/mobile checks remain required.
+
+## 29 August 2026 — Current-State Architecture Re-audit
+
+- **Inventory refreshed** — Routes, controllers, Livewire, Filament, Blade/JS, models, relationships, migrations, seeders, services, media, authorization, payments and shared-host operations were mapped against current `rhythm-uat`.
+- **Commerce flows documented** — Browse/search, cart/login merge, checkout, callback/webhook, order, cancellation/refund, notifications, catalogue activation and fulfillment paths are traced end to end.
+- **Risks prioritized** — Wrong-database selection remains the immediate critical owner blocker; tax/legal, fulfillment/RMA, security, backups, observability and release packaging remain explicit later gates.
+- **Backlog reconciled** — Work stays in the canonical Phase 10–17 sequence; this re-audit does not reset completed delivery phases or activate Phase 18.
