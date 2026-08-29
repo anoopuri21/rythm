@@ -37,6 +37,7 @@
                     'overview' => ['Overview', 'heroicon-o-home'],
                     'orders' => ['Orders', 'heroicon-o-shopping-bag'],
                     'addresses' => ['Addresses', 'heroicon-o-map-pin'],
+                    'support' => ['Support', 'heroicon-o-chat-bubble-left-right'],
                     'settings' => ['Settings', 'heroicon-o-cog-6-tooth'],
                 ] as $key => [$label, $icon])
                     <button type="button" role="tab" id="account-tab-{{ $key }}" aria-controls="account-panel-{{ $key }}"
@@ -221,6 +222,26 @@
                             <button type="submit" class="rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">Save address</button>
                         </div>
                     </form>
+                </div>
+            </section>
+
+            {{-- ===== SUPPORT ===== --}}
+            <section x-show="tab === 'support'" x-cloak id="account-panel-support" role="tabpanel" aria-labelledby="account-tab-support" class="py-10">
+                <h2 class="text-2xl font-bold text-ink">Customer support</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-muted">Choose the shortest route for an order, product, delivery or post-delivery question. Include your order number when one exists.</p>
+                <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <a href="{{ route('contact') }}" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Contact the team</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">Send a product, account or service question.</p>
+                    </a>
+                    <a href="{{ route('orders.lookup') }}" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Track an order</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">View the latest recorded order status securely.</p>
+                    </a>
+                    <a href="/returns" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Return or refund help</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
+                    </a>
                 </div>
             </section>
 

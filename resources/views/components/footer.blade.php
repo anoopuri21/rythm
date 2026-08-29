@@ -88,6 +88,9 @@
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
                     <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
+                    <li><a href="/shipping" class="footer-link text-sm text-white/60">Shipping information</a></li>
+                    <li><a href="/returns" class="footer-link text-sm text-white/60">Returns &amp; refund requests</a></li>
+                    <li><a href="/faqs" class="footer-link text-sm text-white/60">Frequently asked questions</a></li>
                 </ul>
             </nav>
 

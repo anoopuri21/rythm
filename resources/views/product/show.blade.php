@@ -134,6 +134,12 @@
                             <span class="text-[11px] font-semibold leading-tight text-ink">Gateway payment options</span>
                         </div>
                     </div>
+                    <nav class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted" aria-label="Purchase policies">
+                        <a href="/shipping" class="underline underline-offset-4 hover:text-brand">Shipping information</a>
+                        <a href="/returns" class="underline underline-offset-4 hover:text-brand">Returns and refund requests</a>
+                        <a href="/privacy" class="underline underline-offset-4 hover:text-brand">Payment and privacy safety</a>
+                        <a href="{{ route('orders.lookup') }}" class="underline underline-offset-4 hover:text-brand">Track an order</a>
+                    </nav>
                 </div>
             </div>
 
@@ -177,8 +183,8 @@
                             <dd class="text-sm font-semibold text-ink">Brand New</dd>
                         </div>
                         <div class="flex items-center justify-between gap-6 px-6 py-4">
-                            <dt class="text-sm text-muted">Warranty</dt>
-                            <dd class="text-sm font-semibold text-ink">1 Year</dd>
+                            <dt class="text-sm text-muted">Product support</dt>
+                            <dd class="text-sm font-semibold text-ink"><a href="{{ route('contact', ['product' => $product->slug]) }}" class="text-brand underline underline-offset-4">Ask the team</a></dd>
                         </div>
                     </dl>
                 </div>
@@ -189,6 +195,41 @@
 
             {{-- ===== PRODUCT Q&A ===== --}}
             <livewire:product-question-section :product="$product" :key="'questions-' . $product->id" />
+
+            @if($productFaqs->isNotEmpty())
+                <section class="mt-16 max-w-4xl" aria-labelledby="product-faq-title">
+                    <div class="mb-6 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="section-kicker mb-3">Buying with confidence</p>
+                            <h2 id="product-faq-title" class="text-2xl font-bold text-ink sm:text-3xl">Frequently asked questions</h2>
+                        </div>
+                        <a href="/faqs" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                    </div>
+                    <div class="divide-y divide-ink/10">
+                        @foreach($productFaqs as $faq)
+                            <details class="group py-5 first:pt-0">
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-5 font-semibold text-ink">
+                                    {{ $faq->question }}
+                                    <span class="text-xl font-normal text-brand transition group-open:rotate-45" aria-hidden="true">＋</span>
+                                </summary>
+                                <div class="prose-sm max-w-none pt-3 leading-7 text-muted">{!! $faq->answer !!}</div>
+                            </details>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($recentlyViewed->isNotEmpty())
+                <section aria-labelledby="recently-viewed-title" class="mt-20">
+                    <p class="section-kicker mb-3">Continue exploring</p>
+                    <h2 id="recently-viewed-title" class="text-2xl font-bold text-ink sm:text-3xl">Recently viewed</h2>
+                    <div class="mt-8 grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($recentlyViewed as $recentProduct)
+                            <x-shop-card :product="$recentProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
 
             {{-- ===== RELATED ===== --}}
             @if($related->isNotEmpty())

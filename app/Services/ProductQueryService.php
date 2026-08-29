@@ -73,6 +73,37 @@ final class ProductQueryService
     }
 
     /**
+     * Resolve a bounded, session-supplied recently-viewed list while preserving
+     * its customer-visible order. Only active products can reappear.
+     *
+     * @param list<int> $productIds
+     * @return Collection<int, Product>
+     */
+    public function recentlyViewed(array $productIds, int $take = 4): Collection
+    {
+        $ids = array_slice(array_values(array_unique(array_filter(
+            array_map('intval', $productIds),
+            fn (int $id): bool => $id > 0,
+        ))), 0, max(1, min(12, $take)));
+
+        if ($ids === []) {
+            return new Collection();
+        }
+
+        $products = Product::query()
+            ->active()
+            ->whereKey($ids)
+            ->with(['brand', 'category', 'media'])
+            ->get()
+            ->keyBy('id');
+
+        return new Collection(array_values(array_filter(array_map(
+            fn (int $id): ?Product => $products->get($id),
+            $ids,
+        ))));
+    }
+
+    /**
      * Matches a child category directly, or every product inside a
      * parent category (and its children).
      */

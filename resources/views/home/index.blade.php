@@ -20,4 +20,5 @@
     @include('home._category-banners')
     @include('home._recently-launched', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._brands', ['homeSections' => $homeSections, 'homepage' => $homepage])
+    @include('home._confidence', ['homepage' => $homepage])
 @endsection

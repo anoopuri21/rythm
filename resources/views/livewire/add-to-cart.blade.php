@@ -11,8 +11,8 @@
             </span>
         @endif
     </div>
-    <p class="mt-1.5 text-xs text-muted">
-        MRP inclusive of all taxes · <span class="font-semibold text-ink">EMI from ₹{{ number_format((int) round($price / 12)) }}/mo</span>
+    <p class="mt-1.5 text-xs leading-5 text-muted">
+        Displayed price is revalidated at checkout. Shipping, tax and available payment methods are shown before payment.
     </p>
 
     {{-- Variant selector --}}
@@ -67,6 +67,12 @@
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
             Added to your cart!
         </p>
+    @endif
+
+    @if($stock === 0)
+        <a href="{{ route('contact', ['product' => $product->slug]) }}" class="mt-5 inline-flex text-sm font-semibold text-brand underline underline-offset-4">
+            Ask about availability
+        </a>
     @endif
 
     {{-- CTAs --}}
