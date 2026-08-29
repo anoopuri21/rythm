@@ -19,6 +19,8 @@ final class SiteSettingsService
         'shipping_flat_fee' => '0',
         'shipping_free_above' => '0',
         'tax_rate' => '0',           // GST % (0 = disabled until configured)
+        'returns_enabled' => '0',    // disabled until an approved business policy is configured
+        'return_window_days' => '0', // no eligibility window is assumed
         'contact_email' => 'support@rythme.store',
         'contact_phone' => '+91 98765 43210',
         'address_line' => '42, Music Lane, Karol Bagh, New Delhi 110005',

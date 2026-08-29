@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -47,22 +48,33 @@ class Settings extends Page implements HasForms
             ->schema([
                 Section::make('Shipping & taxes')
                     ->schema([
-                        TextInput::make('data.shipping_flat_fee')->label('Shipping flat fee (₹)')->numeric()->prefix('₹'),
-                        TextInput::make('data.shipping_free_above')->label('Free shipping above (₹)')->numeric()->prefix('₹'),
-                        TextInput::make('data.tax_rate')->label('GST / tax rate (%)')->numeric()->suffix('%'),
+                        TextInput::make('shipping_flat_fee')->label('Shipping flat fee (₹)')->numeric()->prefix('₹'),
+                        TextInput::make('shipping_free_above')->label('Free shipping above (₹)')->numeric()->prefix('₹'),
+                        TextInput::make('tax_rate')->label('GST / tax rate (%)')->numeric()->suffix('%'),
                     ])->columns(3),
+                Section::make('Return requests')
+                    ->description('Disabled by default. Enable only after the business has approved and published its return policy.')
+                    ->schema([
+                        Toggle::make('returns_enabled')->label('Enable customer return requests'),
+                        TextInput::make('return_window_days')
+                            ->label('Eligibility window after recorded delivery (days)')
+                            ->integer()
+                            ->minValue(1)
+                            ->maxValue(3650)
+                            ->helperText('No legal or business window is assumed. Enter only an approved value.'),
+                    ])->columns(2),
                 Section::make('Contact & address')
                     ->schema([
-                        TextInput::make('data.contact_email')->email(),
-                        TextInput::make('data.contact_phone'),
-                        TextInput::make('data.address_line'),
+                        TextInput::make('contact_email')->email(),
+                        TextInput::make('contact_phone'),
+                        TextInput::make('address_line'),
                     ])->columns(1),
                 Section::make('Social links')
                     ->schema([
-                        TextInput::make('data.social_instagram')->url(),
-                        TextInput::make('data.social_youtube')->url(),
-                        TextInput::make('data.social_facebook')->url(),
-                        TextInput::make('data.social_x')->url(),
+                        TextInput::make('social_instagram')->url(),
+                        TextInput::make('social_youtube')->url(),
+                        TextInput::make('social_facebook')->url(),
+                        TextInput::make('social_x')->url(),
                     ])->columns(2),
             ])
             ->statePath('data');
@@ -70,7 +82,7 @@ class Settings extends Page implements HasForms
 
     public function save(SiteSettingsService $settings): void
     {
-        $settings->saveAll($this->form->getState()['data'] ?? []);
+        $settings->saveAll($this->form->getState());
 
         Notification::make()->success()->title('Settings saved')->send();
     }

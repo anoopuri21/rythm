@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\ReturnReason;
 use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
 use App\Services\PaymentRetryService;
 use App\Services\SeoService;
+use App\Services\SiteSettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -21,11 +23,11 @@ final class OrderController extends Controller
     /**
      * Order detail + tracking timeline — owner (or admin) only.
      */
-    public function show(Request $request, Order $order): View
+    public function show(Request $request, Order $order, SiteSettingsService $settings): View
     {
         $this->authorizeView($request, $order);
 
-        $order->load(['items.product.brand', 'payments.refunds', 'statusHistory', 'shipments.items.orderItem']);
+        $order->load(['items.product.brand', 'payments.refunds', 'statusHistory', 'shipments.items.orderItem', 'returnRequests.items.orderItem']);
 
         $this->seo->apply([
             'meta_title' => "Order {$order->order_number} — Rhythm Exports",
@@ -36,6 +38,10 @@ final class OrderController extends Controller
         return view('orders.show', [
             'order' => $order,
             'timeline' => $order->trackingTimeline(),
+            'returnsAvailable' => $settings->get('returns_enabled', '0') === '1'
+                && (int) $settings->get('return_window_days', '0') > 0
+                && $order->status === Order::STATUS_DELIVERED
+                && ReturnReason::query()->where('is_active', true)->exists(),
         ]);
     }
 

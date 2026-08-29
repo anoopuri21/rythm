@@ -119,6 +119,11 @@ class Order extends Model
         return $this->hasMany(Shipment::class);
     }
 
+    public function returnRequests(): HasMany
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;

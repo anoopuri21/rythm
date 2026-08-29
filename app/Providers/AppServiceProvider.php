@@ -25,6 +25,8 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
+use App\Models\ReturnReason;
+use App\Models\ReturnRequest;
 use App\Models\Review;
 use App\Models\SiteSetting;
 use App\Models\User;
@@ -104,6 +106,8 @@ class AppServiceProvider extends ServiceProvider
             NewsletterSubscriber::class,
             Order::class,
             Refund::class,
+            ReturnReason::class,
+            ReturnRequest::class,
             Coupon::class,
             SiteSetting::class,
             User::class,

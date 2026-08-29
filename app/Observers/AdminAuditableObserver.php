@@ -19,6 +19,8 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
+use App\Models\ReturnReason;
+use App\Models\ReturnRequest;
 use App\Models\Review;
 use App\Models\SiteSetting;
 use App\Models\User;
@@ -31,7 +33,7 @@ use Illuminate\Support\Str;
 final class AdminAuditableObserver
 {
     /** @var list<string> */
-    private const HASHED_FIELDS = ['description', 'short_description', 'content', 'answer', 'copy', 'email'];
+    private const HASHED_FIELDS = ['description', 'short_description', 'content', 'answer', 'copy', 'email', 'customer_guidance'];
 
     /** @var array<class-string, list<string>> */
     private const TRACKED = [
@@ -47,6 +49,8 @@ final class AdminAuditableObserver
         NewsletterSubscriber::class => ['email', 'status'],
         Order::class => ['status', 'payment_status', 'shipping_fee', 'tax', 'total'],
         Refund::class => ['amount', 'currency', 'status', 'gateway_refund_id'],
+        ReturnReason::class => ['name', 'customer_guidance', 'is_active', 'sort_order'],
+        ReturnRequest::class => ['status', 'refund_id', 'approved_at', 'received_at', 'closed_at'],
         Coupon::class => ['type', 'value', 'min_order', 'max_discount', 'starts_at', 'expires_at', 'max_uses', 'is_active'],
         SiteSetting::class => ['value'],
         User::class => ['role'],

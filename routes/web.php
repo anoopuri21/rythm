@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\ReturnRequestController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
@@ -117,6 +118,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
     Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('account.addresses.default');
     Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
+    Route::get('/orders/{order}/returns/create', [ReturnRequestController::class, 'create'])->name('returns.create');
+    Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('returns.store');
+    Route::post('/return-requests/{returnRequest}/cancel', [ReturnRequestController::class, 'cancel'])
+        ->middleware('throttle:5,1')
+        ->name('returns.cancel');
 });
 
 // Payment callbacks — Razorpay posts here (CSRF excluded in bootstrap/app.php)
