@@ -18,7 +18,8 @@ final class SiteSettingsService
     public const DEFAULTS = [
         'shipping_flat_fee' => '0',
         'shipping_free_above' => '0',
-        'tax_rate' => '0',           // GST % (0 = disabled until configured)
+        'tax_rules_enabled' => '0', // disabled until professional approval
+        'tax_rate' => '0',           // optional approved default rate
         'returns_enabled' => '0',    // disabled until an approved business policy is configured
         'return_window_days' => '0', // no eligibility window is assumed
         'contact_email' => 'support@rythme.store',

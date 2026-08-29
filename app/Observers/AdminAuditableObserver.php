@@ -37,7 +37,7 @@ final class AdminAuditableObserver
 
     /** @var array<class-string, list<string>> */
     private const TRACKED = [
-        Product::class => ['name', 'slug', 'sku', 'category_id', 'brand_id', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'is_trending', 'short_description', 'description'],
+        Product::class => ['name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'category_id', 'brand_id', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'is_trending', 'short_description', 'description'],
         Category::class => ['parent_id', 'name', 'slug', 'sort_order', 'is_active', 'description'],
         Brand::class => ['name', 'slug', 'sort_order', 'is_active', 'description'],
         Page::class => ['slug', 'title', 'template', 'content', 'sort_order', 'is_active'],

@@ -21,7 +21,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('products')]
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
 class Product extends Model implements HasMedia
 {
     use HasFactory;
@@ -31,6 +31,7 @@ class Product extends Model implements HasMedia
     protected $casts = [
         'description' => SanitizedHtml::class,
         'price' => 'decimal:2',
+        'tax_rate' => 'decimal:4',
         'compare_at_price' => 'decimal:2',
         'stock' => 'integer',
         'low_stock_threshold' => 'integer',

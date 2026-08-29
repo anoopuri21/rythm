@@ -50,8 +50,14 @@ class Settings extends Page implements HasForms
                     ->schema([
                         TextInput::make('shipping_flat_fee')->label('Shipping flat fee (₹)')->numeric()->prefix('₹'),
                         TextInput::make('shipping_free_above')->label('Free shipping above (₹)')->numeric()->prefix('₹'),
-                        TextInput::make('tax_rate')->label('GST / tax rate (%)')->numeric()->suffix('%'),
-                    ])->columns(3),
+                        Toggle::make('tax_rules_enabled')
+                            ->label('Enable configured tax calculation')
+                            ->helperText('Enable only after professional approval of rates and treatment.'),
+                        TextInput::make('tax_rate')
+                            ->label('Approved default tax rate (%)')
+                            ->numeric()->minValue(0)->maxValue(100)->suffix('%')
+                            ->helperText('No rate is assumed. Product-specific approved rates may override this value.'),
+                    ])->columns(2),
                 Section::make('Return requests')
                     ->description('Disabled by default. Enable only after the business has approved and published its return policy.')
                     ->schema([

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Table('order_items')]
-#[Fillable(['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'options', 'unit_price', 'qty', 'total'])]
+#[Fillable(['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'hsn_code_snapshot', 'tax_classification_snapshot', 'tax_rate_snapshot', 'taxable_amount_snapshot', 'tax_amount_snapshot', 'tax_calculation_enabled_snapshot', 'tax_destination_region_snapshot', 'options', 'unit_price', 'qty', 'total'])]
 class OrderItem extends Model
 {
     use HasFactory;
@@ -22,9 +22,32 @@ class OrderItem extends Model
     protected $casts = [
         'options' => 'array',
         'unit_price' => 'decimal:2',
+        'tax_rate_snapshot' => 'decimal:4',
+        'taxable_amount_snapshot' => 'decimal:2',
+        'tax_amount_snapshot' => 'decimal:2',
+        'tax_calculation_enabled_snapshot' => 'boolean',
         'qty' => 'integer',
         'total' => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (OrderItem $item): void {
+            $snapshots = [
+                'hsn_code_snapshot',
+                'tax_classification_snapshot',
+                'tax_rate_snapshot',
+                'taxable_amount_snapshot',
+                'tax_amount_snapshot',
+                'tax_calculation_enabled_snapshot',
+                'tax_destination_region_snapshot',
+            ];
+
+            if ($item->isDirty($snapshots)) {
+                throw new \DomainException('Order-line tax snapshots are immutable after checkout.');
+            }
+        });
+    }
 
     public function order(): BelongsTo
     {

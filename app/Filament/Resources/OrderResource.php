@@ -86,6 +86,12 @@ class OrderResource extends Resource
                                 TextEntry::make('qty'),
                                 TextEntry::make('unit_price')->money('INR'),
                                 TextEntry::make('total')->money('INR')->weight('bold'),
+                                TextEntry::make('hsn_code_snapshot')->label('HSN snapshot')->placeholder('—'),
+                                TextEntry::make('tax_classification_snapshot')->label('Tax class snapshot')->placeholder('—'),
+                                TextEntry::make('tax_rate_snapshot')->label('Rate snapshot')->suffix('%')->placeholder('Disabled'),
+                                TextEntry::make('taxable_amount_snapshot')->label('Taxable snapshot')->money('INR')->placeholder('Disabled'),
+                                TextEntry::make('tax_amount_snapshot')->label('Tax snapshot')->money('INR'),
+                                TextEntry::make('tax_destination_region_snapshot')->label('Destination snapshot')->placeholder('Disabled'),
                             ])
                             ->columns(6),
                     ]),

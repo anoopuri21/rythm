@@ -92,6 +92,16 @@ class ProductResource extends Resource
                                 Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
                                 RichEditor::make('description')->maxLength(100000)->columnSpanFull(),
                             ]),
+                        Section::make('Optional tax classification')
+                            ->description('Leave blank unless approved product classification and rate values are available.')
+                            ->columns(3)
+                            ->schema([
+                                TextInput::make('hsn_code')->label('HSN code')->maxLength(20),
+                                TextInput::make('tax_classification')->maxLength(80),
+                                TextInput::make('tax_rate')
+                                    ->label('Approved tax rate (%)')
+                                    ->numeric()->minValue(0)->maxValue(100)->suffix('%'),
+                            ]),
                         Section::make('Variants')
                             ->description('Optional — finishes, sizes or configurations.')
                             ->collapsible()
@@ -141,6 +151,9 @@ class ProductResource extends Resource
                 TextColumn::make('category.name')->badge()->color('gray'),
                 TextColumn::make('brand.name')->badge()->color('gray'),
                 TextColumn::make('price')->money('INR')->sortable(),
+                TextColumn::make('hsn_code')->label('HSN')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('tax_classification')->label('Tax class')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('tax_rate')->label('Tax rate')->suffix('%')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('compare_at_price')->money('INR')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('stock')
                     ->badge()
