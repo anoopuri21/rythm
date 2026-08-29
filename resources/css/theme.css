@@ -210,6 +210,7 @@ body { font-family: var(--ry-font-sans); line-height: var(--ry-leading-body); }
 .pcard, .mcard, .shop-shortcut { border-color: var(--ry-color-border); box-shadow: none; }
 .pcard:hover, .mcard:hover, .shop-shortcut:hover { box-shadow: var(--ry-shadow-md); }
 .pcard__img, .mcard__img, .shop-card__media { aspect-ratio: 1 / 1; }
+.mcard__img-fallback { display: grid; width: 100%; height: 100%; place-items: center; padding: 1rem; color: var(--ry-color-muted); font-size: 0.7rem; text-align: center; }
 .pcard__body, .mcard__body { padding: 1rem 1.125rem 1.125rem; border-top-color: transparent; }
 .pcard__name, .mcard__name { margin-top: 0.45rem; line-height: 1.45; }
 .pcard__price, .mcard__price { padding-top: 0.9rem; margin-top: auto; }

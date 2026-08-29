@@ -19,7 +19,7 @@
         <div class="deal-mm__grid">
             @foreach($deals as $product)
                 @php
-                    $image = $product->heroImage();
+                    $image = $product->thumbnailImage();
                     $available = max((int) $product->stock, 0);
                     $href = route('product.show', $product->slug);
                 @endphp

@@ -92,6 +92,7 @@
                 @if($orders->isNotEmpty())
                     <div class="mt-6">
                         <x-order-list :orders="$orders" />
+                        <div class="mt-8">{{ $orders->links() }}</div>
                     </div>
                 @else
                     <p class="mt-6 rounded-2xl border border-dashed border-ink/15 bg-white px-6 py-12 text-center text-sm text-muted">

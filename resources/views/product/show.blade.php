@@ -54,7 +54,9 @@
                         <template x-for="(img, i) in images" :key="i">
                             <div x-show="active === i" x-transition.opacity.duration.300 class="absolute inset-0 flex items-center justify-center p-8 sm:p-12">
                                 <img x-show="img" :src="img" :alt="$el.closest('div').parentElement?.dataset?.name ?? '{{ $product->name }}'"
-                                     class="h-full w-full object-contain" loading="lazy" decoding="async">
+                                     class="h-full w-full object-contain"
+                                     :loading="i === 0 ? 'eager' : 'lazy'"
+                                     :fetchpriority="i === 0 ? 'high' : 'low'" decoding="async">
                                 <div x-show="!img"
                                      class="flex h-full w-full flex-col items-center justify-center gap-4 rounded-3xl bg-gradient-to-br from-paper-dark via-paper to-paper-dark">
                                     <svg class="h-20 w-20 text-brand/25" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -30,8 +30,8 @@
             @foreach($products as $product)
                 <article class="group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:shadow-[0_24px_50px_rgba(10,10,10,0.12)] sm:p-4" wire:key="wl-product-{{ $product->id }}">
                     <div class="relative aspect-square overflow-hidden rounded-xl bg-paper-dark">
-                        @if($product->getFirstMediaUrl('gallery'))
-                            <img src="{{ $product->getFirstMediaUrl('gallery') }}" alt="{{ $product->name }}" class="h-full w-full object-contain transition duration-700 group-hover:scale-105" loading="lazy">
+                        @if($product->thumbnailImage())
+                            <img src="{{ $product->thumbnailImage() }}" alt="{{ $product->name }}" class="h-full w-full object-contain transition duration-700 group-hover:scale-105" loading="lazy">
                         @else
                             <div class="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-paper-dark via-paper to-paper-dark p-6 text-center">
                                 <svg class="h-10 w-10 text-brand/25" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" /></svg>

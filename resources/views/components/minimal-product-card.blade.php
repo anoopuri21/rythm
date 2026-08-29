@@ -4,7 +4,7 @@
     // Supports BOTH: config-array products AND Eloquent Product models.
     $isModel = is_object($product) && method_exists($product, 'getFirstMediaUrl');
     $image = $isModel
-        ? ($product->heroImage() ?: 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name))
+        ? ($product->thumbnailImage() ?: '')
         : ($product['image'] ?? '');
     $name = $isModel ? $product->name : $product['name'];
     $brand = $isModel ? ($product->brand?->name ?? '') : ($product['brand'] ?? '');
@@ -22,8 +22,12 @@
     <a href="{{ $href }}" class="flex h-full flex-col" aria-label="View {{ $name }}">
         {{-- Image — 1:1, object-contain (kabhi cut nahi), no heavy shadows --}}
         <div class="mcard__img">
-            <img src="{{ $image }}" alt="{{ $name }} — real product photo from Bajaao"
-                 width="800" height="800" class="mcard__img-el" loading="lazy" decoding="async">
+            @if($image)
+                <img src="{{ $image }}" alt="{{ $name }}"
+                     width="480" height="480" class="mcard__img-el" loading="lazy" decoding="async">
+            @else
+                <span class="mcard__img-fallback" aria-hidden="true">Product image unavailable</span>
+            @endif
             @if($badge)
                 @php
                     $badgeVariant = match (Str::lower(trim($badge))) {

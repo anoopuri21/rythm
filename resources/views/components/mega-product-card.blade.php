@@ -1,7 +1,7 @@
 @props(['product'])
 
 @php
-    $image = $product->heroImage();
+    $image = $product->thumbnailImage();
     $onSale = $product->compare_at_price !== null && (float) $product->compare_at_price > (float) $product->price;
     $rating = $product->reviews_avg_rating ?? null;
     $href = route('product.show', $product->slug);

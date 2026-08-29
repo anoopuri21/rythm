@@ -40,8 +40,8 @@
             @forelse($items as $item)
                 <div class="flex gap-4 border-b border-ink/5 py-5 first:pt-0" wire:key="drawer-item-{{ $item->id }}">
                     <a href="/product/{{ $item->product->slug }}" class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-white p-2">
-                        @if($item->product->heroImage())
-                            <img src="{{ $item->product->heroImage() }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
+                        @if($item->product->thumbnailImage())
+                            <img src="{{ $item->product->thumbnailImage() }}" alt="{{ $item->product->name }}" width="480" height="480" class="h-full w-full object-contain" loading="lazy" decoding="async">
                         @else
                             <div class="flex h-full w-full items-center justify-center bg-paper-dark text-[9px] font-bold uppercase tracking-widest text-muted">{{ $item->product->brand?->name ?? 'Rythme' }}</div>
                         @endif

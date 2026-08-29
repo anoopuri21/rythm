@@ -182,12 +182,9 @@ final class HomepageDataService
                 $ids = $category->children->pluck('id')->push($category->id);
                 $count = $ids->sum(fn (int $id): int => (int) ($counts[$id] ?? 0));
                 $asset = 'images/categories/'.$category->slug.'.jpg';
-                $image = is_file(public_path($asset)) ? '/'.$asset : Product::query()
-                    ->active()
-                    ->whereIn('category_id', $ids)
-                    ->with('media')
-                    ->latest('updated_at')
-                    ->first()?->heroImage();
+                // Category art is a local managed asset. Avoid a per-category
+                // product/media fallback query on a cold homepage cache.
+                $image = is_file(public_path($asset)) ? '/'.$asset : null;
                 $configuredRank = $configuredOrder->search($category->slug);
 
                 return [

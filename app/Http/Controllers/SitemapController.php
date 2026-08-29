@@ -24,17 +24,17 @@ final class SitemapController extends Controller
             ->whereNotNull('slug')
             ->where('is_active', true)
             ->whereNotIn('slug', config('rythme.withheld_public_pages', []))
-            ->get() as $page) {
+            ->get(['slug']) as $page) {
             $urls[] = ['loc' => url('/'.$page->slug), 'priority' => '0.8', 'changefreq' => 'monthly'];
         }
 
         // Categories
-        foreach (Category::query()->where('is_active', true)->get() as $category) {
+        foreach (Category::query()->where('is_active', true)->get(['slug']) as $category) {
             $urls[] = ['loc' => route('shop.index', ['category' => $category->slug]), 'priority' => '0.7', 'changefreq' => 'weekly'];
         }
 
         // Products
-        foreach (Product::query()->active()->get() as $product) {
+        foreach (Product::query()->active()->get(['id', 'slug']) as $product) {
             $urls[] = ['loc' => route('product.show', $product), 'priority' => '0.6', 'changefreq' => 'weekly'];
         }
 

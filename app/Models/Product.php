@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('products')]
 #[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
@@ -140,6 +141,25 @@ class Product extends Model implements HasMedia
             ->singleFile();
     }
 
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        // Conversions run through the bounded, stop-when-empty scheduled
+        // worker; no persistent shared-hosting daemon is required.
+        $this->addMediaConversion('thumb-webp')
+            ->width(480)
+            ->height(480)
+            ->format('webp')
+            ->quality(82)
+            ->queued();
+
+        $this->addMediaConversion('gallery-webp')
+            ->width(1200)
+            ->height(1200)
+            ->format('webp')
+            ->quality(84)
+            ->queued();
+    }
+
     /**
      * Best available product image URL.
      *
@@ -150,8 +170,11 @@ class Product extends Model implements HasMedia
      */
     public function heroImage(): ?string
     {
-        if ($media = $this->getFirstMediaUrl('gallery')) {
-            return $media;
+        $media = $this->getFirstMedia('gallery');
+        if ($media !== null) {
+            return $media->hasGeneratedConversion('gallery-webp')
+                ? $media->getUrl('gallery-webp')
+                : $media->getUrl();
         }
 
         $file = 'images/products/'.$this->slug.'.jpg';
@@ -159,11 +182,26 @@ class Product extends Model implements HasMedia
         return is_file(public_path($file)) ? '/'.$file : null;
     }
 
+    public function thumbnailImage(): ?string
+    {
+        $media = $this->getFirstMedia('gallery');
+
+        if ($media !== null) {
+            return $media->hasGeneratedConversion('thumb-webp')
+                ? $media->getUrl('thumb-webp')
+                : $media->getUrl();
+        }
+
+        return $this->heroImage();
+    }
+
     /** Gallery image URLs (media first, committed fallback, else []). */
     public function galleryImages(): array
     {
         $urls = $this->getMedia('gallery')
-            ->map(fn ($m) => $m->getUrl())
+            ->map(fn (Media $media): string => $media->hasGeneratedConversion('gallery-webp')
+                ? $media->getUrl('gallery-webp')
+                : $media->getUrl())
             ->values()
             ->all();
 

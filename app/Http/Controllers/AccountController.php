@@ -35,9 +35,9 @@ final class AccountController extends Controller
             'orders' => Order::query()
                 ->where('user_id', $user->id)
                 ->withCount('items')
-                ->orderByDesc('created_at')
-                ->limit(10)
-                ->get(),
+                ->orderByDesc('placed_at')
+                ->orderByDesc('id')
+                ->paginate(10),
             'wishlistCount' => $wishlists->countFor($user->id),
             'addresses' => $addresses->forUser($user->id),
         ]);
