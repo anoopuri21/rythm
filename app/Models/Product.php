@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\SanitizedHtml;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,6 +29,7 @@ class Product extends Model implements HasMedia
     use SoftDeletes;
 
     protected $casts = [
+        'description' => SanitizedHtml::class,
         'price' => 'decimal:2',
         'compare_at_price' => 'decimal:2',
         'stock' => 'integer',

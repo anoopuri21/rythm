@@ -37,6 +37,8 @@ class Order extends Model
 
     public const PAYMENT_UNPAID = OrderPaymentStatus::Unpaid->value;
 
+    public const PAYMENT_AUTHORIZED = OrderPaymentStatus::Authorized->value;
+
     public const PAYMENT_PAID = OrderPaymentStatus::Paid->value;
 
     public const PAYMENT_FAILED = OrderPaymentStatus::Failed->value;
@@ -57,6 +59,7 @@ class Order extends Model
 
     public const PAYMENT_STATUSES = [
         self::PAYMENT_UNPAID,
+        self::PAYMENT_AUTHORIZED,
         self::PAYMENT_PAID,
         self::PAYMENT_FAILED,
         self::PAYMENT_REFUND_PENDING,

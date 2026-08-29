@@ -52,7 +52,7 @@
                                 @endif
                                 <p class="mt-4 max-w-sm text-sm leading-6 text-white/70 line-clamp-2">{{ $slide->copy }}</p>
                                 <div class="mt-7">
-                                    <a href="{{ $slide->cta_href }}" class="hero-mm__cta">{{ $slide->cta_label ?: 'View details' }}</a>
+                                    <a href="{{ str_starts_with((string) $slide->cta_href, '/') && ! str_starts_with((string) $slide->cta_href, '//') ? $slide->cta_href : '/shop' }}" class="hero-mm__cta">{{ $slide->cta_label ?: 'View details' }}</a>
                                 </div>
                             </div>
                         </article>

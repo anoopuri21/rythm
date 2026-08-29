@@ -66,7 +66,7 @@ class OrderResource extends Resource
                             'cancelled', 'refunded' => 'danger',
                             default => 'gray',
                         }),
-                        TextEntry::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
+                        TextEntry::make('payment_status')->badge()->color(fn (string $state): string => match ($state) { 'paid' => 'success', 'authorized' => 'warning', default => 'danger' }),
                         TextEntry::make('placed_at')->dateTime('d M Y, h:i A'),
                         TextEntry::make('total')->money('INR')->weight('bold')->size(TextSize::Large),
                     ]),
@@ -172,7 +172,7 @@ class OrderResource extends Resource
                         default => 'gray',
                     })
                     ->sortable(),
-                TextColumn::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
+                TextColumn::make('payment_status')->badge()->color(fn (string $state): string => match ($state) { 'paid' => 'success', 'authorized' => 'warning', default => 'danger' }),
                 TextColumn::make('placed_at')->dateTime('d M Y')->sortable(),
             ])
             ->defaultSort('placed_at', 'desc')

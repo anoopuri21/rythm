@@ -7,6 +7,7 @@ namespace App\Enums;
 enum PaymentStatus: string
 {
     case Initiated = 'initiated';
+    case Authorized = 'authorized';
     case Paid = 'paid';
     case Failed = 'failed';
     case Refunded = 'refunded';

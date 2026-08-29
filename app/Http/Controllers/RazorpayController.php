@@ -61,7 +61,7 @@ final class RazorpayController extends Controller
 
             return redirect(URL::signedRoute('checkout.success', ['order' => $order]));
         } catch (\Throwable $e) {
-            Log::error('Razorpay callback error', ['error' => $e->getMessage()]);
+            Log::error('Razorpay callback error', ['exception' => $e::class]);
 
             return redirect()->route('checkout.index')->with('cart-error', 'Something went wrong processing your payment.');
         }
@@ -82,12 +82,17 @@ final class RazorpayController extends Controller
             }
 
             $payload = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+            $eventType = (string) ($payload['event'] ?? '');
+            $acceptedEvents = ['payment.authorized', 'payment.captured', 'order.paid'];
             $entity = $payload['payload']['payment']['entity'] ?? [];
             $gatewayOrderId = is_array($entity) ? (string) ($entity['order_id'] ?? '') : '';
-            $payment = Payment::query()
-                ->where('gateway_order_id', $gatewayOrderId)
-                ->latest()
-                ->first();
+            $payment = in_array($eventType, $acceptedEvents, true)
+                ? Payment::query()
+                    ->where('gateway', 'razorpay')
+                    ->where('gateway_order_id', $gatewayOrderId)
+                    ->latest()
+                    ->first()
+                : null;
             $receipt = $events->receive(
                 $rawBody,
                 $payload,
@@ -110,26 +115,40 @@ final class RazorpayController extends Controller
                 };
             }
 
-            if ($payment === null) {
+            if (! in_array($eventType, $acceptedEvents, true)) {
+                $events->processed($event);
+
+                return response()->json(['status' => 'ignored']);
+            }
+
+            if ($payment === null || $payment->order === null) {
                 $events->failed($event, 'Gateway order not found.');
                 Log::warning('Razorpay webhook: order not found');
 
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
-            $result = $events->verifyCapturedPayment($payment, $payload);
+            $result = $eventType === 'payment.authorized'
+                ? $events->verifyAuthorizedPayment($payment, $payload)
+                : $events->verifyCapturedPayment($payment, $payload);
             if (! $result->success) {
                 $events->failed($event, $result->message ?? 'Webhook rejected.');
 
                 return response()->json(['error' => $result->message ?? 'Webhook rejected'], 422);
             }
 
-            $orders->markPaid($payment->order, $result, $gatewayOrderId);
+            if ($eventType === 'payment.authorized') {
+                $orders->markPaymentAuthorized($payment->order, $result, $gatewayOrderId);
+            } else {
+                $orders->markPaid($payment->order, $result, $gatewayOrderId);
+            }
             $events->processed($event);
 
             return response()->json(['status' => 'ok']);
+        } catch (\JsonException) {
+            return response()->json(['error' => 'Invalid JSON'], 400);
         } catch (\Throwable $e) {
-            Log::error('Razorpay webhook error', ['error' => $e->getMessage()]);
+            Log::error('Razorpay webhook error', ['exception' => $e::class]);
 
             return response()->json(['error' => 'Internal error'], 500);
         }

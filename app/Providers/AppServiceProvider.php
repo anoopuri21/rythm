@@ -92,6 +92,15 @@ class AppServiceProvider extends ServiceProvider
 
         foreach ([
             Product::class,
+            Category::class,
+            Brand::class,
+            Page::class,
+            Faq::class,
+            HeroSlide::class,
+            HomepageBlock::class,
+            HomepageCategoryRow::class,
+            HomepageSection::class,
+            NewsletterSubscriber::class,
             Order::class,
             Refund::class,
             Coupon::class,

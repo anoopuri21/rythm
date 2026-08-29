@@ -23,7 +23,7 @@ final class SeoFields
     {
         return [
             Section::make('On-page SEO')
-                ->description('Meta tags, Open Graph, Schema JSON and head scripts rendered on this page. Leave blank to inherit defaults.')
+                ->description('Meta tags, Open Graph and Schema JSON rendered on this page. Leave blank to inherit defaults.')
                 ->relationship('seoEntry')
                 ->columns(2)
                 ->collapsible()
@@ -44,10 +44,8 @@ final class SeoFields
                     TextInput::make('robots')->maxLength(100)
                         ->placeholder('index, follow')
                         ->helperText('Robots meta value.'),
-                    Textarea::make('schema_json')->rows(5)->json()
-                        ->helperText('Valid JSON-LD schema (object or array) — rendered as <script type="application/ld+json">.'),
-                    Textarea::make('head_scripts')->rows(4)
-                        ->helperText('Raw HTML/JS injected into <head> (analytics, verification, custom tags). Admin-only input.'),
+                    Textarea::make('schema_json')->rows(5)->json()->maxLength(50000)
+                        ->helperText('Valid JSON-LD schema (object or array) — rendered with script-safe JSON encoding.'),
                 ]),
         ];
     }

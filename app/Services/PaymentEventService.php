@@ -51,6 +51,26 @@ final class PaymentEventService
     /** @param array<string, mixed> $payload */
     public function verifyCapturedPayment(Payment $payment, array $payload): PaymentResult
     {
+        $result = $this->verifyPaymentStatus($payment, $payload, 'captured');
+        $entity = $this->entity($payload);
+
+        if ($result->success
+            && ! filter_var($entity['captured'] ?? false, FILTER_VALIDATE_BOOL)) {
+            return new PaymentResult(false, 'failed', message: 'Payment capture flag is not set.');
+        }
+
+        return $result;
+    }
+
+    /** @param array<string, mixed> $payload */
+    public function verifyAuthorizedPayment(Payment $payment, array $payload): PaymentResult
+    {
+        return $this->verifyPaymentStatus($payment, $payload, 'authorized');
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function verifyPaymentStatus(Payment $payment, array $payload, string $expectedStatus): PaymentResult
+    {
         $entity = $this->entity($payload);
 
         if ($entity === []) {
@@ -72,8 +92,8 @@ final class PaymentEventService
             return new PaymentResult(false, 'failed', message: 'Payment currency mismatch.');
         }
 
-        if (($entity['status'] ?? '') !== 'captured') {
-            return new PaymentResult(false, 'failed', message: 'Payment not captured.');
+        if (($entity['status'] ?? '') !== $expectedStatus) {
+            return new PaymentResult(false, 'failed', message: "Payment not {$expectedStatus}.");
         }
 
         $paymentId = (string) ($entity['id'] ?? '');
@@ -81,7 +101,7 @@ final class PaymentEventService
             return new PaymentResult(false, 'failed', message: 'Gateway payment identifier is missing.');
         }
 
-        return new PaymentResult(true, 'paid', $paymentId);
+        return new PaymentResult(true, $expectedStatus, $paymentId);
     }
 
     public function processed(PaymentEvent $event): void

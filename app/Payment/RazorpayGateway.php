@@ -11,8 +11,8 @@ use Razorpay\Api\Api;
 use RuntimeException;
 
 /**
- * Razorpay integration (test mode by default — RYTHME_RAZORPAY_KEY_ID /
- * RYTHME_RAZORPAY_KEY_SECRET envs). Signature verified on every callback;
+ * Razorpay integration (test mode by default — RAZORPAY_KEY_ID /
+ * RAZORPAY_KEY_SECRET envs). Signature verified on every callback;
  * webhook verified via HMAC SHA-256 over the raw body.
  */
 final class RazorpayGateway implements PaymentGateway
@@ -142,20 +142,20 @@ final class RazorpayGateway implements PaymentGateway
 
     public static function isConfigured(): bool
     {
-        return config('rythme.razorpay.key_id') !== null
-            && config('rythme.razorpay.key_secret') !== null;
+        return config('services.razorpay.key_id') !== null
+            && config('services.razorpay.key_secret') !== null;
     }
 
     public static function fromConfig(): self
     {
         if (! self::isConfigured()) {
-            throw new RuntimeException('Razorpay is not configured. Set RYTHME_RAZORPAY_KEY_ID and RYTHME_RAZORPAY_KEY_SECRET.');
+            throw new RuntimeException('Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
         }
 
         return new self(
-            (string) config('rythme.razorpay.key_id'),
-            (string) config('rythme.razorpay.key_secret'),
-            config('rythme.razorpay.webhook_secret'),
+            (string) config('services.razorpay.key_id'),
+            (string) config('services.razorpay.key_secret'),
+            config('services.razorpay.webhook_secret'),
         );
     }
 }

@@ -44,7 +44,6 @@ final class SeoService
             'og_image' => $entry->og_image,
             'canonical_url' => $entry->canonical_url,
             'schema_json' => $entry->schema_json,
-            'head_scripts' => $entry->head_scripts,
             'robots' => $entry->robots,
         ];
 

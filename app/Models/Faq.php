@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\SanitizedHtml;
 use App\Observers\HomepageDataObserver;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +21,7 @@ class Faq extends Model
     use HasFactory;
 
     protected $casts = [
+        'answer' => SanitizedHtml::class,
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];

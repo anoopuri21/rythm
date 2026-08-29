@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\SanitizedHtml;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +33,7 @@ class Page extends Model
     public const TEMPLATES = ['generic', 'about', 'contact'];
 
     protected $casts = [
+        'content' => SanitizedHtml::class,
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];

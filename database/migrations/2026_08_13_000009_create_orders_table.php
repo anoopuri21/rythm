@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('email')->nullable();
             $table->string('status')->default('pending'); // pending|confirmed|processing|shipped|delivered|cancelled|refunded
-            $table->string('payment_status')->default('unpaid'); // unpaid|paid|failed|refunded
+            $table->string('payment_status')->default('unpaid'); // unpaid|authorized|paid|failed|refund_pending|refunded
             $table->decimal('subtotal', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('shipping_fee', 12, 2)->default(0);

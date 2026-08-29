@@ -10,10 +10,7 @@ return [
     */
     'brand_name' => 'Rhythm Exports',
     'brand_short' => 'RHYTHM',
-    'logo_url' => env(
-        'RYTHME_LOGO_URL',
-        'https://www.rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'
-    ),
+    'logo_url' => env('RYTHME_LOGO_URL', '/images/logo-rythme.svg'),
 
     /*
     |--------------------------------------------------------------------------
@@ -51,23 +48,6 @@ return [
         'RYTHME_VIDEO_URL',
         'https://videos.pexels.com/video-files/854924/854924-hd_1920_1080_25fps.mp4'
     ),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Payments — Razorpay (test mode by default)
-    |--------------------------------------------------------------------------
-    | When keys are missing the app falls back to FakePaymentGateway so the
-    | full checkout flow works locally / in preview. Production must set:
-    |   RYTHME_RAZORPAY_KEY_ID=rzp_test_xxx
-    |   RYTHME_RAZORPAY_KEY_SECRET=xxx
-    |   RYTHME_RAZORPAY_WEBHOOK_SECRET=xxx   (for async webhooks)
-    |--------------------------------------------------------------------------
-    */
-    'razorpay' => [
-        'key_id' => env('RYTHME_RAZORPAY_KEY_ID'),
-        'key_secret' => env('RYTHME_RAZORPAY_KEY_SECRET'),
-        'webhook_secret' => env('RYTHME_RAZORPAY_WEBHOOK_SECRET'),
-    ],
 
     /*
     | Public policy/content pages withheld until the owner approves their

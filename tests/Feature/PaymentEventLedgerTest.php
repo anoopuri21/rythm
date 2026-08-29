@@ -19,9 +19,9 @@ class PaymentEventLedgerTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('rythme.razorpay.key_id', 'rzp_test_key');
-        config()->set('rythme.razorpay.key_secret', 'test_secret');
-        config()->set('rythme.razorpay.webhook_secret', 'webhook_secret');
+        config()->set('services.razorpay.key_id', 'rzp_test_key');
+        config()->set('services.razorpay.key_secret', 'test_secret');
+        config()->set('services.razorpay.webhook_secret', 'webhook_secret');
     }
 
     public function test_verified_webhook_is_ledgered_processed_and_replay_safe(): void
@@ -90,6 +90,44 @@ class PaymentEventLedgerTest extends TestCase
         }
     }
 
+    public function test_authorized_signal_is_recorded_without_granting_paid_state(): void
+    {
+        [$order, $payment] = $this->pendingPayment();
+        $payload = $this->capturedPayload($payment, ['status' => 'authorized', 'captured' => false]);
+        $payload['event'] = 'payment.authorized';
+        $body = json_encode($payload, JSON_THROW_ON_ERROR);
+
+        $this->withHeaders($this->headers($body, 'evt_payment_authorized_1'))
+            ->postJson(route('payment.razorpay.webhook'), $payload)
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertSame(Order::PAYMENT_AUTHORIZED, $order->fresh()->payment_status);
+        $this->assertSame(Order::STATUS_PENDING, $order->fresh()->status);
+        $this->assertSame(Payment::STATUS_AUTHORIZED, $payment->fresh()->status);
+        $this->assertDatabaseCount('inventory_movements', 0);
+    }
+
+    public function test_valid_unrelated_event_is_acknowledged_without_payment_mutation(): void
+    {
+        [$order, $payment] = $this->pendingPayment();
+        $payload = $this->capturedPayload($payment, ['status' => 'failed', 'captured' => false]);
+        $payload['event'] = 'payment.failed';
+        $body = json_encode($payload, JSON_THROW_ON_ERROR);
+
+        $this->withHeaders($this->headers($body, 'evt_payment_failed_ignored'))
+            ->postJson(route('payment.razorpay.webhook'), $payload)
+            ->assertOk()
+            ->assertJson(['status' => 'ignored']);
+
+        $this->assertSame(Order::PAYMENT_UNPAID, $order->fresh()->payment_status);
+        $this->assertSame(Payment::STATUS_INITIATED, $payment->fresh()->status);
+        $this->assertDatabaseHas('payment_events', [
+            'gateway_event_id' => 'evt_payment_failed_ignored',
+            'status' => PaymentEvent::STATUS_PROCESSED,
+        ]);
+    }
+
     public function test_invalid_signature_stores_no_untrusted_event(): void
     {
         [, $payment] = $this->pendingPayment();
@@ -150,6 +188,7 @@ class PaymentEventLedgerTest extends TestCase
                         'amount' => 10000,
                         'currency' => 'INR',
                         'status' => 'captured',
+                        'captured' => true,
                         'email' => 'must-not-be-retained@example.test',
                         'contact' => '9999999999',
                     ], $changes),

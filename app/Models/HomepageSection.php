@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\SanitizedHtml;
 use App\Observers\HomepageSectionObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -24,6 +25,7 @@ class HomepageSection extends Model
     use HasFactory;
 
     protected $casts = [
+        'content' => SanitizedHtml::class,
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
