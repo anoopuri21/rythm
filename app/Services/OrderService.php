@@ -30,6 +30,7 @@ final class OrderService
         private readonly SiteSettingsService $settings,
         private readonly RefundService $refunds,
         private readonly InventoryService $inventory,
+        private readonly OrderStateMachine $states,
     ) {}
 
     public function createFromCheckout(Cart $cart, CheckoutData $data, int $userId): Order
@@ -133,7 +134,7 @@ final class OrderService
                     ]);
                 }
 
-                $this->transitionStatus($order, Order::STATUS_PENDING, 'Order placed');
+                $this->recordInitialStatus($order);
 
                 return $order;
             });
@@ -297,6 +298,17 @@ final class OrderService
         });
     }
 
+    private function recordInitialStatus(Order $order): void
+    {
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'from' => null,
+            'to' => Order::STATUS_PENDING,
+            'note' => 'Order placed',
+            'actor' => auth()->check() ? 'customer' : 'system',
+        ]);
+    }
+
     public function transitionStatus(Order $order, string $to, ?string $note = null, ?string $actor = null, ?string $from = null): void
     {
         // Explicit $from wins — call sites must capture the previous
@@ -331,18 +343,7 @@ final class OrderService
      */
     public function changeStatus(Order $order, string $to, ?string $note = null): void
     {
-        $allowed = match ($order->status) {
-            Order::STATUS_CONFIRMED => [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
-            Order::STATUS_PROCESSING => [Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
-            Order::STATUS_SHIPPED => [Order::STATUS_DELIVERED, Order::STATUS_CANCELLED],
-            default => [],
-        };
-
-        if (! in_array($to, $allowed, true)) {
-            throw new RuntimeException(
-                "Cannot move order from '{$order->status}' to '{$to}'."
-            );
-        }
+        $this->states->assertTransition($order->status, $to);
 
         $from = $order->status;
 

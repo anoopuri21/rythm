@@ -13,95 +13,125 @@ use RuntimeException;
 final class InventoryService
 {
     /**
-     * Decrement the exact stock source and append its immutable ledger entry.
-     * The caller owns the surrounding transaction and order row lock.
+     * Atomically decrement the exact stock source and append its immutable
+     * ledger entry. Safe both standalone and inside the order transaction.
      */
     public function capture(Order $order, OrderItem $item): void
     {
-        if ($item->product_variant_id !== null) {
-            $updated = DB::table('product_variants')
-                ->where('id', $item->product_variant_id)
-                ->where('is_active', true)
-                ->where('stock', '>=', $item->qty)
-                ->decrement('stock', $item->qty);
+        DB::transaction(function () use ($order, $item): void {
+            Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+            $key = "order:{$order->id}:item:{$item->id}:capture";
 
-            $productId = null;
-            $variantId = $item->product_variant_id;
-            $balance = $this->variantBalance($variantId);
-        } elseif ($item->product_id !== null) {
-            $updated = DB::table('products')
-                ->where('id', $item->product_id)
-                ->where('is_active', true)
-                ->where('stock', '>=', $item->qty)
-                ->decrement('stock', $item->qty);
+            if ($this->movementExists($key)) {
+                return;
+            }
 
-            $productId = $item->product_id;
-            $variantId = null;
-            $balance = $this->productBalance($productId);
-        } else {
-            return;
-        }
+            if ($item->product_variant_id !== null) {
+                $updated = DB::table('product_variants')
+                    ->where('id', $item->product_variant_id)
+                    ->where('is_active', true)
+                    ->where('stock', '>=', $item->qty)
+                    ->decrement('stock', $item->qty);
 
-        if ($updated !== 1) {
-            throw new RuntimeException("Not enough stock for {$item->name}.");
-        }
+                $productId = null;
+                $variantId = $item->product_variant_id;
+                $balance = $this->variantBalance($variantId);
+            } elseif ($item->product_id !== null) {
+                $updated = DB::table('products')
+                    ->where('id', $item->product_id)
+                    ->where('is_active', true)
+                    ->where('stock', '>=', $item->qty)
+                    ->decrement('stock', $item->qty);
 
-        InventoryMovement::create([
-            'product_id' => $productId,
-            'product_variant_id' => $variantId,
-            'order_id' => $order->id,
-            'type' => InventoryMovement::TYPE_ORDER_CAPTURE,
-            'quantity_delta' => -$item->qty,
-            'balance_after' => $balance,
-            'idempotency_key' => "order:{$order->id}:item:{$item->id}:capture",
-            'reference_type' => 'order_item',
-            'reference_id' => $item->id,
-            'reason' => 'Stock captured after payment confirmation',
-            'occurred_at' => now(),
-        ]);
+                $productId = $item->product_id;
+                $variantId = null;
+                $balance = $this->productBalance($productId);
+            } else {
+                throw new RuntimeException("Inventory source for {$item->name} is missing.");
+            }
+
+            if ($updated !== 1) {
+                throw new RuntimeException("Not enough stock for {$item->name}.");
+            }
+
+            $this->record($order, $item, $key, $productId, $variantId, -$item->qty, $balance,
+                InventoryMovement::TYPE_ORDER_CAPTURE, 'Stock captured after payment confirmation');
+        });
     }
 
     /**
-     * Restore the source used by a captured item and append its ledger entry.
-     * The caller owns the surrounding transaction and order row lock.
+     * Atomically restore the source used by a captured item and append its
+     * ledger entry. Duplicate cancellation calls become no-ops.
      */
     public function restoreForCancellation(Order $order, OrderItem $item): void
     {
-        if ($item->product_variant_id !== null) {
-            $updated = DB::table('product_variants')
-                ->where('id', $item->product_variant_id)
-                ->increment('stock', $item->qty);
+        DB::transaction(function () use ($order, $item): void {
+            Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+            $key = "order:{$order->id}:item:{$item->id}:cancellation";
 
-            $productId = null;
-            $variantId = $item->product_variant_id;
-            $balance = $this->variantBalance($variantId);
-        } elseif ($item->product_id !== null) {
-            $updated = DB::table('products')
-                ->where('id', $item->product_id)
-                ->increment('stock', $item->qty);
+            if ($this->movementExists($key)) {
+                return;
+            }
 
-            $productId = $item->product_id;
-            $variantId = null;
-            $balance = $this->productBalance($productId);
-        } else {
-            return;
-        }
+            if ($item->product_variant_id !== null) {
+                $updated = DB::table('product_variants')
+                    ->where('id', $item->product_variant_id)
+                    ->increment('stock', $item->qty);
 
-        if ($updated !== 1) {
-            throw new RuntimeException("Inventory source for {$item->name} no longer exists.");
-        }
+                $productId = null;
+                $variantId = $item->product_variant_id;
+                $balance = $this->variantBalance($variantId);
+            } elseif ($item->product_id !== null) {
+                $updated = DB::table('products')
+                    ->where('id', $item->product_id)
+                    ->increment('stock', $item->qty);
 
+                $productId = $item->product_id;
+                $variantId = null;
+                $balance = $this->productBalance($productId);
+            } else {
+                throw new RuntimeException("Inventory source for {$item->name} is missing.");
+            }
+
+            if ($updated !== 1) {
+                throw new RuntimeException("Inventory source for {$item->name} no longer exists.");
+            }
+
+            $this->record($order, $item, $key, $productId, $variantId, $item->qty, $balance,
+                InventoryMovement::TYPE_ORDER_CANCELLATION, 'Stock restored after paid order cancellation');
+        });
+    }
+
+    private function movementExists(string $key): bool
+    {
+        return InventoryMovement::query()
+            ->where('idempotency_key', $key)
+            ->lockForUpdate()
+            ->exists();
+    }
+
+    private function record(
+        Order $order,
+        OrderItem $item,
+        string $key,
+        ?int $productId,
+        ?int $variantId,
+        int $delta,
+        int $balance,
+        string $type,
+        string $reason,
+    ): void {
         InventoryMovement::create([
             'product_id' => $productId,
             'product_variant_id' => $variantId,
             'order_id' => $order->id,
-            'type' => InventoryMovement::TYPE_ORDER_CANCELLATION,
-            'quantity_delta' => $item->qty,
+            'type' => $type,
+            'quantity_delta' => $delta,
             'balance_after' => $balance,
-            'idempotency_key' => "order:{$order->id}:item:{$item->id}:cancellation",
+            'idempotency_key' => $key,
             'reference_type' => 'order_item',
             'reference_id' => $item->id,
-            'reason' => 'Stock restored after paid order cancellation',
+            'reason' => $reason,
             'occurred_at' => now(),
         ]);
     }

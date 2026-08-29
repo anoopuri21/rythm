@@ -16,6 +16,8 @@ use RuntimeException;
 
 final class FulfillmentService
 {
+    public function __construct(private readonly OrderService $orders) {}
+
     /** @var array<string, list<string>> */
     private const TRANSITIONS = [
         Shipment::STATUS_DRAFT => [Shipment::STATUS_READY, Shipment::STATUS_CANCELLED],
@@ -209,7 +211,9 @@ final class FulfillmentService
 
         if ($allocatedQuantity === $orderedQuantity
             && $active->every(fn (Shipment $record): bool => $record->status === Shipment::STATUS_DELIVERED)) {
-            $order->update(['status' => Order::STATUS_DELIVERED]);
+            if ($order->status !== Order::STATUS_DELIVERED) {
+                $this->orders->changeStatus($order, Order::STATUS_DELIVERED, 'Synchronized from delivered shipments');
+            }
 
             return;
         }
@@ -218,8 +222,8 @@ final class FulfillmentService
             $record->status,
             [Shipment::STATUS_DISPATCHED, Shipment::STATUS_DELIVERED],
             true,
-        ))) {
-            $order->update(['status' => Order::STATUS_SHIPPED]);
+        )) && $order->status !== Order::STATUS_SHIPPED) {
+            $this->orders->changeStatus($order, Order::STATUS_SHIPPED, 'Synchronized from dispatched shipments');
         }
     }
 

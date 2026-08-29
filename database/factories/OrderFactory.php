@@ -16,17 +16,21 @@ class OrderFactory extends Factory
 {
     public function definition(): array
     {
+        $subtotal = fake()->numberBetween(500, 50000);
+        $shippingFee = fake()->randomElement([0, 99, 199]);
+        $tax = 0;
+
         return [
             'order_number' => 'RYM-'.now()->format('Y').'-'.strtoupper(Str::random(6)),
             'user_id' => User::factory(),
             'email' => fake()->safeEmail(),
             'status' => Order::STATUS_CONFIRMED,
             'payment_status' => Order::PAYMENT_PAID,
-            'subtotal' => fake()->numberBetween(500, 50000),
+            'subtotal' => $subtotal,
             'discount' => 0,
-            'shipping_fee' => 0,
-            'tax' => 0,
-            'total' => fake()->numberBetween(500, 50000),
+            'shipping_fee' => $shippingFee,
+            'tax' => $tax,
+            'total' => $subtotal + $shippingFee + $tax,
             'currency' => 'INR',
             'shipping_address' => [
                 'name' => fake()->name(),

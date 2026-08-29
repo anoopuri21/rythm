@@ -17,6 +17,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         $name = fake()->unique()->words(3, true);
+        $price = fake()->numberBetween(500, 100000);
 
         return [
             'category_id' => Category::factory(),
@@ -26,8 +27,8 @@ class ProductFactory extends Factory
             'sku' => 'RYM-'.strtoupper(Str::random(8)),
             'short_description' => fake()->sentence(10),
             'description' => '<p>'.implode('</p><p>', fake()->paragraphs(2)).'</p>',
-            'price' => fake()->numberBetween(500, 100000),
-            'compare_at_price' => fake()->boolean(40) ? fake()->numberBetween(600, 120000) : null,
+            'price' => $price,
+            'compare_at_price' => fake()->boolean(40) ? $price + fake()->numberBetween(100, 20000) : null,
             'stock' => fake()->numberBetween(0, 60),
             'low_stock_threshold' => 5,
             'is_active' => true,
