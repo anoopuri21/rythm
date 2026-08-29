@@ -82,7 +82,7 @@
 
         {{-- Footer / checkout --}}
         @if($items->isNotEmpty())
-            <div class="border-t border-ink/10 bg-white px-6 py-5">
+            <div class="ui-summary-panel mx-4 mb-4 rounded-2xl px-5 py-5">
                 <div class="mb-4 flex items-center justify-between">
                     <span class="text-sm text-muted">Subtotal</span>
                     <span class="text-xl font-bold text-ink">₹{{ number_format($totals['subtotal']) }}</span>

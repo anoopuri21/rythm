@@ -62,7 +62,7 @@
             {{ $product->stock > 0 ? 'In stock' : 'Out of stock' }}
         </p>
 
-        <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 pt-3.5">
+        <div class="shop-card__price mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span class="text-lg font-bold text-ink">₹{{ $price }}</span>
             @if($old)
                 <span class="text-xs text-muted line-through">₹{{ $old }}</span>

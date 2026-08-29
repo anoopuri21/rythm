@@ -86,7 +86,7 @@
 
             {{-- Price details (Flipkart-style sticky) --}}
             <aside class="lg:sticky lg:top-28 lg:self-start">
-                <div class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-7">
+                <div class="ui-summary-panel p-6 sm:p-7">
                     <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-muted">Price details</h2>
                     <dl class="mt-5 space-y-3.5 text-sm">
                         <div class="flex items-center justify-between">

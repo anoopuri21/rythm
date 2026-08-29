@@ -214,7 +214,7 @@
 
         {{-- ===== ORDER SUMMARY ===== --}}
         <aside class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-            <div class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-7">
+            <div class="ui-summary-panel p-6 sm:p-7">
                 <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-muted">Order summary</h2>
                 <div class="mt-5 max-h-72 space-y-4 overflow-y-auto pr-1">
                     @forelse($cartItems as $item)

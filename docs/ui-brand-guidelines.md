@@ -43,8 +43,8 @@ Use the `--ry-space-*` scale. Prefer 4, 8, 12, 16, 24, 32, 40, 48 and 64px rhyth
 
 ## Depth and effects
 
-- Default surfaces use a faint border and nearly flat shadow.
-- Interactive cards may lift up to 3px and use `--ry-shadow-md`.
+- Default product surfaces use a faint border and no resting shadow.
+- Interactive cards may lift up to 3px and use `--ry-shadow-md` only on hover or keyboard focus.
 - Primary CTAs may use the red-to-strong-red gradient.
 - Do not add continuous decorative animation.
 - Respect `prefers-reduced-motion` and preserve keyboard focus.
@@ -69,7 +69,7 @@ Product cards should preserve this order: image, truthful badge, category/brand,
 
 ## Badges and alerts
 
-Use `<x-ui.badge variant="…">` and `<x-ui.alert variant="…">`. Variants are `neutral`, `brand`, `success`, `warning` and `danger` where applicable. Color never replaces text. Errors use `role="alert"`; informational outcomes use polite status semantics.
+Use `<x-ui.badge variant="…">` and `<x-ui.alert variant="…">`. Standard variants are `neutral`, `brand`, `success`, `warning` and `danger`. Premium catalogue variants are `new`, `best-seller` and `limited`; use them only when backed by a real product flag or curated merchandising assignment. Never infer “Limited” from low or unavailable stock. Color never replaces text. Errors use `role="alert"`; informational outcomes use polite status semantics.
 
 ## Forms
 

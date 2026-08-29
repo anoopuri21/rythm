@@ -35,13 +35,32 @@ test('shared UI primitives and standardized media ratios exist', async () => {
 });
 
 test('shared product cards opt into the visual system without changing their grids', async () => {
-    const [shop, homepage] = await Promise.all([
+    const [shop, homepage, legacy] = await Promise.all([
         read('resources/views/components/shop-card.blade.php'),
         read('resources/views/components/mega-product-card.blade.php'),
+        read('resources/views/components/product-card.blade.php'),
     ]);
 
-    for (const card of [shop, homepage]) {
+    for (const card of [shop, homepage, legacy]) {
         assert.match(card, /ui-card/);
         assert.match(card, /ui-media--product/);
     }
+});
+
+test('luxury additions remain semantic and restrained', async () => {
+    const [theme, cart, checkout, badge] = await Promise.all([
+        read('resources/css/theme.css'),
+        read('resources/views/livewire/cart-page.blade.php'),
+        read('resources/views/livewire/checkout-wizard.blade.php'),
+        read('resources/views/components/ui/badge.blade.php'),
+    ]);
+
+    for (const variant of ['new', 'best-seller', 'limited']) {
+        assert.ok(theme.includes(`.ui-badge--${variant}`), `missing premium ${variant} badge`);
+    }
+    assert.match(theme, /\.ui-card\s*\{\s*box-shadow:\s*none/);
+    assert.match(theme, /\.ui-summary-panel/);
+    assert.match(cart, /ui-summary-panel/);
+    assert.match(checkout, /ui-summary-panel/);
+    assert.match(badge, /ui-badge--/);
 });

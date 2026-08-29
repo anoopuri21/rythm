@@ -15,7 +15,7 @@
 <article class="pcard ui-card ui-card--interactive">
     <div class="pcard__media ui-media ui-media--product ui-media--contain">
         @if($onSale)
-            <span class="pcard__badge">Sale!</span>
+            <x-ui.badge variant="brand" class="pcard__badge">Sale</x-ui.badge>
         @endif
 
         <a href="{{ $href }}" class="pcard__img" aria-label="{{ $product->name }}" tabindex="-1">

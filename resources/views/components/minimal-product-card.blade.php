@@ -25,7 +25,15 @@
             <img src="{{ $image }}" alt="{{ $name }} — real product photo from Bajaao"
                  width="800" height="800" class="mcard__img-el" loading="lazy" decoding="async">
             @if($badge)
-                <span class="mcard__badge">{{ $badge }}</span>
+                @php
+                    $badgeVariant = match (Str::lower(trim($badge))) {
+                        'new' => 'new',
+                        'best seller', 'bestseller' => 'best-seller',
+                        'limited', 'limited edition' => 'limited',
+                        default => 'brand',
+                    };
+                @endphp
+                <x-ui.badge :variant="$badgeVariant" class="mcard__badge">{{ $badge }}</x-ui.badge>
             @endif
         </div>
         {{-- Body — category → name → price (+ stock hint) --}}
