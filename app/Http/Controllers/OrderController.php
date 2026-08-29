@@ -112,7 +112,7 @@ final class OrderController extends Controller
             return view('orders.retry-payment', [
                 'order' => $order,
                 'options' => [
-                    'key' => (string) config('rythme.razorpay.key_id'),
+                    'key' => (string) config('services.razorpay.key_id'),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),

@@ -65,7 +65,7 @@ class PageResource extends Resource
                             ->default('generic'),
                         TextInput::make('sort_order')->numeric()->default(0),
                         Toggle::make('is_active')->default(true),
-                        RichEditor::make('content')
+                        RichEditor::make('content')->maxLength(200000)
                             ->label('Page content')
                             ->profile('default')
                             ->columnSpanFull()

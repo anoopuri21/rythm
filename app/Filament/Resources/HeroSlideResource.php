@@ -39,15 +39,20 @@ class HeroSlideResource extends Resource
                     TextInput::make('accent')->maxLength(120)->helperText('The emphasised part (renders in gray).'),
                     TextInput::make('copy')->maxLength(500)->columnSpan(2)->placeholder('Short punchline for the slide.'),
                     TextInput::make('cta_label')->maxLength(60)->placeholder('Explore instruments'),
-                    TextInput::make('cta_href')->maxLength(255)->placeholder('/shop'),
+                    TextInput::make('cta_href')->maxLength(255)
+                        ->regex('/^\/(?!\/)[A-Za-z0-9\/_?&=%#.+-]*$/')
+                        ->helperText('Internal path only, beginning with one slash (for example /shop).')
+                        ->placeholder('/shop'),
                     Toggle::make('is_active')->default(true),
                 ])->columns(2),
                 Tabs\Tab::make('Images')->schema([
                     SpatieMediaLibraryFileUpload::make('desktop_image')
-                        ->collection('desktop_image')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)
+                        ->collection('desktop_image')->image()->maxFiles(1)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(8192)
                         ->helperText('Desktop (≥768px): large landscape banner, ~1500×800.'),
                     SpatieMediaLibraryFileUpload::make('mobile_image')
-                        ->collection('mobile_image')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)
+                        ->collection('mobile_image')->image()->maxFiles(1)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(6144)
                         ->helperText('Mobile (<768px): portrait banner, ~900×1200.'),
                 ])->columns(2),
             ])->columnSpanFull(),

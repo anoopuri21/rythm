@@ -6,7 +6,7 @@ Designed for Laravel 12 / PHP 8.3 / MySQL 8 on shared hosting or cPanel without 
 
 - Confirm the approved commit/hash, clean tree, environment-only secrets and no uploaded temporary files.
 - Back up database and user-managed storage; verify backup files are outside webroot.
-- Set production `APP_ENV`, `APP_DEBUG=false`, HTTPS URL, secure session cookie, mail, database, queue and canonical `RYTHME_RAZORPAY_*` values.
+- Set production `APP_ENV`, `APP_DEBUG=false`, HTTPS URL, secure session cookie, mail, database, queue and canonical `RAZORPAY_*` values.
 - Run tests/build in an isolated QA copy. Never run destructive tests or migrations against persistent UAT/production.
 
 ## Deploy sequence (human authorization required)

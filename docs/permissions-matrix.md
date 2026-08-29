@@ -1,38 +1,52 @@
 # Permissions matrix
 
-`super_admin` and the temporary legacy `admin` alias have all permissions. All other roles are deny-by-default.
+Deny by default applies. A checkmark means the role has the named permission; it does not bypass record ownership, workflow invariants, validation, or required audit reasons.
 
-| Capability | Super admin | Legacy admin | Catalogue manager | Order manager | Support | Marketing | Finance | Customer |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Filament access | Yes | Yes | Yes | Yes | Yes | Yes | Yes | No |
-| Catalogue view | Yes | Yes | Yes | Yes | Yes | Yes | No | No |
-| Catalogue manage/media | Yes | Yes | Yes | No | No | No | No | No |
-| Orders view | Yes | Yes | No | Yes | Yes | No | Yes | Own only |
-| Orders manage/fulfilment | Yes | Yes | No | Yes | No | No | No | No |
-| Customers view | Yes | Yes | No | Yes | Yes | No | Yes | Self only |
-| Reviews/questions/contact manage | Yes | Yes | No | No | Yes | No | No | Own submissions |
-| Content/homepage manage | Yes | Yes | No | No | No | Yes | No | No |
-| Marketing/coupons/newsletter | Yes | Yes | No | No | No | Yes | No | No |
-| Finance view | Yes | Yes | No | No | No | No | Yes | No |
-| Refund/finance manage | Yes | Yes | No | No | No | No | Yes | No |
-| Settings manage | Yes | Yes | No | No | No | No | No | No |
-| Staff manage | Yes | Yes | No | No | No | No | No | No |
-| Audit log view | Yes | Yes | No | No | No | No | No | No |
-| Notification delivery view | Yes | Yes | No | No | Yes | No | No | No |
+| Capability | Super Admin | Admin (legacy) | Catalogue Manager | Order Manager | Support | Marketing | Finance |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Enter authenticated admin panel | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Catalogue view | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Catalogue manage | ✓ | ✓ | ✓ | — | — | — | — |
+| Orders view | ✓ | ✓ | — | ✓ | ✓ | — | ✓ |
+| Orders manage | ✓ | ✓ | — | ✓ | — | — | — |
+| Customers view | ✓ | ✓ | — | ✓ | ✓ | — | ✓ |
+| Interactions manage | ✓ | ✓ | — | — | ✓ | — | — |
+| Content manage | ✓ | ✓ | — | — | — | ✓ | — |
+| Marketing manage | ✓ | ✓ | — | — | — | ✓ | — |
+| Finance view/manage | ✓ | ✓ | — | — | — | — | ✓ |
+| Notification delivery view | ✓ | ✓ | — | — | ✓ | — | — |
+| Settings manage | ✓ | ✓ | — | — | — | — | — |
+| Staff access manage | ✓ | ✓ | — | — | — | — | — |
+| Audit ledger view | ✓ | ✓ | — | — | — | — | — |
 
-## Enforcement map
+## Resource mapping
 
-| Boundary | Enforcement |
-|---|---|
-| `/admin` panel | Auth middleware, known staff role, required MFA |
-| Filament resource lists/records | Strict authorization plus registered model policy |
-| Resource actions | Policy and/or explicit permission check; sensitive service invariants remain authoritative |
-| Storefront account/order routes | Auth/ownership, signed URLs, or scoped guest lookup grant |
-| Livewire cart/wishlist writes | Auth where required, validation, server-owned models and inventory checks |
-| Refunds | `finance.manage`, confirmation/reason, captured payment and refund-service guards |
-| Imported product activation | `catalogue.manage`, review attestations, real positive stock and activation service |
-| Audit records | `audit.view`; immutable/read-only resource |
+| Resource/model | View permission | Mutation permission |
+|---|---|---|
+| Product, Category, Brand | `catalogue.view` | `catalogue.manage` |
+| Order | `orders.view` | `orders.manage` |
+| Refund | `finance.view` | `finance.manage` |
+| Customer/User | `customers.view` | staff mutations use `staff.manage` |
+| Review, ProductQuestion, ContactMessage | `interactions.manage` | `interactions.manage` |
+| Coupon, NewsletterSubscriber | `marketing.manage` | `marketing.manage` |
+| Page, FAQ, HeroSlide, HomepageBlock, HomepageCategoryRow, HomepageSection | `content.manage` | `content.manage` |
+| NotificationDelivery | `notifications.view` | delivery inspection only |
+| AdminAuditLog | `audit.view` | immutable/no normal mutation |
 
-## Role-review procedure
+## Important boundaries
 
-Quarterly and before each production release: export staff users, identify dormant or shared accounts, confirm each role with the owner, demote excess privilege, and inspect recent audit events. Never use `admin` for a new account. The legacy alias is removed only after every owner account is confirmed as `super_admin` and the change is separately tested so the store cannot lose its final privileged operator.
+- `customer` is not a staff role and cannot access Filament.
+- `admin` remains an all-permissions compatibility alias; migrate owner accounts to `super_admin` before retiring it.
+- Finance cannot change order fulfilment state. Order managers cannot perform refund operations.
+- Support can moderate interactions and inspect orders/customers but cannot mutate orders, catalogue or finance state.
+- Marketing can manage content/coupons but cannot inject arbitrary head scripts.
+- Imported product activation performs its own `catalogue.manage` and policy authorization inside the service, requires review attestations and real stock, and writes an audit event.
+- Staff deletion is disabled. Staff role/MFA changes require `staff.manage`, confirmation where applicable, and audit evidence.
+
+## Enforcement points
+
+1. `User::canAccessPanel()` gates the panel.
+2. Filament `strictAuthorization()` makes missing policy authorization fail closed.
+3. `AppServiceProvider` explicitly registers model policies.
+4. `AdminAccess::permissionForModelAbility()` supplies the central model/ability mapping.
+5. Sensitive custom actions authorize again in their service/action body; visibility is not treated as authorization.

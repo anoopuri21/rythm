@@ -30,9 +30,21 @@ use Illuminate\Support\Str;
 
 final class AdminAuditableObserver
 {
+    /** @var list<string> */
+    private const HASHED_FIELDS = ['description', 'short_description', 'content', 'answer', 'copy', 'email'];
+
     /** @var array<class-string, list<string>> */
     private const TRACKED = [
-        Product::class => ['category_id', 'brand_id', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'is_trending'],
+        Product::class => ['name', 'slug', 'sku', 'category_id', 'brand_id', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'is_trending', 'short_description', 'description'],
+        Category::class => ['parent_id', 'name', 'slug', 'sort_order', 'is_active', 'description'],
+        Brand::class => ['name', 'slug', 'sort_order', 'is_active', 'description'],
+        Page::class => ['slug', 'title', 'template', 'content', 'sort_order', 'is_active'],
+        Faq::class => ['question', 'answer', 'sort_order', 'is_active'],
+        HeroSlide::class => ['eyebrow', 'title', 'accent', 'copy', 'cta_label', 'cta_href', 'sort_order', 'is_active'],
+        HomepageBlock::class => ['section_key', 'title', 'subtitle', 'content', 'sort_order', 'is_active'],
+        HomepageCategoryRow::class => ['title', 'subtitle', 'category_ids', 'sort_order', 'is_active'],
+        HomepageSection::class => ['section_key', 'kicker', 'title', 'title_accent', 'content', 'sort_order', 'is_active'],
+        NewsletterSubscriber::class => ['email', 'status'],
         Order::class => ['status', 'payment_status', 'shipping_fee', 'tax', 'total'],
         Refund::class => ['amount', 'currency', 'status', 'gateway_refund_id'],
         Coupon::class => ['type', 'value', 'min_order', 'max_discount', 'starts_at', 'expires_at', 'max_uses', 'is_active'],
@@ -41,15 +53,6 @@ final class AdminAuditableObserver
         Review::class => ['status', 'is_approved'],
         ProductQuestion::class => ['status', 'answered_at'],
         ContactMessage::class => ['status'],
-        Category::class => ['name', 'slug', 'parent_id', 'is_active', 'sort_order'],
-        Brand::class => ['name', 'slug', 'is_active'],
-        Page::class => ['title', 'slug', 'is_active', 'published_at'],
-        Faq::class => ['question', 'is_active', 'sort_order'],
-        HeroSlide::class => ['title', 'is_active', 'sort_order'],
-        HomepageBlock::class => ['title', 'type', 'is_active', 'sort_order'],
-        HomepageCategoryRow::class => ['title', 'is_active', 'sort_order'],
-        HomepageSection::class => ['title', 'is_active', 'sort_order'],
-        NewsletterSubscriber::class => ['status'],
     ];
 
     public function created(Model $model): void
@@ -60,10 +63,7 @@ final class AdminAuditableObserver
             return;
         }
 
-        $after = Arr::only($model->getAttributes(), $tracked);
-        if ($model instanceof SiteSetting && $this->sensitiveSetting($model->key)) {
-            $after['value'] = '[REDACTED]';
-        }
+        $after = $this->protectedValues($model, Arr::only($model->getAttributes(), $tracked));
 
         app(AdminAuditService::class)->record(
             $actor,
@@ -88,12 +88,8 @@ final class AdminAuditableObserver
             return;
         }
 
-        $before = Arr::only($model->getOriginal(), $changed);
-        $after = Arr::only($model->getAttributes(), $changed);
-        if ($model instanceof SiteSetting && $this->sensitiveSetting($model->key)) {
-            $before['value'] = '[REDACTED]';
-            $after['value'] = '[REDACTED]';
-        }
+        $before = $this->protectedValues($model, Arr::only($model->getOriginal(), $changed));
+        $after = $this->protectedValues($model, Arr::only($model->getAttributes(), $changed));
 
         app(AdminAuditService::class)->record(
             $actor,
@@ -113,19 +109,35 @@ final class AdminAuditableObserver
             return;
         }
 
-        $before = Arr::only($model->getOriginal(), $tracked);
-        if ($model instanceof SiteSetting && $this->sensitiveSetting($model->key)) {
-            $before['value'] = '[REDACTED]';
-        }
-
         app(AdminAuditService::class)->record(
             $actor,
             Str::snake(class_basename($model)).'.deleted',
             $model,
-            $before,
+            $this->protectedValues($model, Arr::only($model->getOriginal(), $tracked)),
             [],
             request()->input('audit_reason'),
         );
+    }
+
+    /** @param array<string, mixed> $values
+     *  @return array<string, mixed>
+     */
+    private function protectedValues(Model $model, array $values): array
+    {
+        foreach ($values as $field => $value) {
+            if (in_array($field, self::HASHED_FIELDS, true) && $value !== null) {
+                $serialized = is_scalar($value)
+                    ? (string) $value
+                    : (string) json_encode($value, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE);
+                $values[$field] = 'sha256:'.hash('sha256', $serialized);
+            }
+        }
+
+        if ($model instanceof SiteSetting && $this->sensitiveSetting($model->key) && array_key_exists('value', $values)) {
+            $values['value'] = '[REDACTED]';
+        }
+
+        return $values;
     }
 
     private function actor(): ?User

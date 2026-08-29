@@ -20,6 +20,8 @@ class Payment extends Model
 
     public const STATUS_INITIATED = PaymentStatus::Initiated->value;
 
+    public const STATUS_AUTHORIZED = PaymentStatus::Authorized->value;
+
     public const STATUS_PAID = PaymentStatus::Paid->value;
 
     public const STATUS_FAILED = PaymentStatus::Failed->value;

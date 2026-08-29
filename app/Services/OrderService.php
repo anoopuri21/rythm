@@ -199,6 +199,54 @@ final class OrderService
     }
 
     /**
+     * Record a provider-confirmed authorization without granting paid state,
+     * confirming the order, or moving inventory.
+     */
+    public function markPaymentAuthorized(
+        Order $order,
+        PaymentResult $result,
+        string $gatewayOrderId,
+    ): bool {
+        return DB::transaction(function () use ($order, $result, $gatewayOrderId): bool {
+            $lockedOrder = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedOrder->isPaid() || $lockedOrder->isCancelled()) {
+                return false;
+            }
+
+            $payment = Payment::query()
+                ->where('order_id', $lockedOrder->id)
+                ->where('gateway', 'razorpay')
+                ->where('gateway_order_id', $gatewayOrderId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($payment === null) {
+                throw new RuntimeException('Payment initiation record not found.');
+            }
+
+            if ($payment->status === Payment::STATUS_AUTHORIZED
+                && $payment->gateway_payment_id === $result->gatewayPaymentId) {
+                return false;
+            }
+
+            if ($payment->status === Payment::STATUS_PAID) {
+                return false;
+            }
+
+            $payment->update([
+                'gateway_payment_id' => $result->gatewayPaymentId,
+                'amount' => $lockedOrder->total,
+                'currency' => $lockedOrder->currency,
+                'status' => Payment::STATUS_AUTHORIZED,
+            ]);
+            $lockedOrder->update(['payment_status' => Order::PAYMENT_AUTHORIZED]);
+
+            return true;
+        });
+    }
+
+    /**
      * Finalize a captured payment exactly once.
      *
      * @return bool true only when this call performed the first transition
@@ -379,6 +427,9 @@ final class OrderService
 
             if (! in_array($lockedOrder->status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED], true)) {
                 throw new RuntimeException('This order can no longer be cancelled.');
+            }
+            if ($lockedOrder->payment_status === Order::PAYMENT_AUTHORIZED) {
+                throw new RuntimeException('Payment authorization is settling. Please wait before cancelling.');
             }
 
             $wasPaid = $lockedOrder->isPaid();

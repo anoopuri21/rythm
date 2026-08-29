@@ -427,8 +427,8 @@ class CheckoutTest extends TestCase
 
     public function test_invalid_razorpay_callback_cannot_mutate_payment_state(): void
     {
-        config()->set('rythme.razorpay.key_id', 'rzp_test_key');
-        config()->set('rythme.razorpay.key_secret', 'test_secret');
+        config()->set('services.razorpay.key_id', 'rzp_test_key');
+        config()->set('services.razorpay.key_secret', 'test_secret');
 
         $this->fillCart();
         $addressId = $this->addAddress();

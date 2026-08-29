@@ -11,8 +11,8 @@ use Razorpay\Api\Api;
 use RuntimeException;
 
 /**
- * Razorpay integration (test mode by default — RYTHME_RAZORPAY_KEY_ID /
- * RYTHME_RAZORPAY_KEY_SECRET envs). Signature verified on every callback;
+ * Razorpay integration (test mode by default — RAZORPAY_KEY_ID /
+ * RAZORPAY_KEY_SECRET envs). Signature verified on every callback;
  * webhook verified via HMAC SHA-256 over the raw body.
  */
 final class RazorpayGateway implements PaymentGateway
@@ -142,8 +142,8 @@ final class RazorpayGateway implements PaymentGateway
 
     public static function isConfigured(): bool
     {
-        return trim((string) config('rythme.razorpay.key_id', '')) !== ''
-            && trim((string) config('rythme.razorpay.key_secret', '')) !== '';
+        return trim((string) config('services.razorpay.key_id', '')) !== ''
+            && trim((string) config('services.razorpay.key_secret', '')) !== '';
     }
 
     public static function resolve(): PaymentGateway
@@ -152,7 +152,7 @@ final class RazorpayGateway implements PaymentGateway
             return self::fromConfig();
         }
 
-        if (app()->runningUnitTests() || (app()->environment('local') && (bool) config('rythme.payments.allow_fake', false))) {
+        if (app()->runningUnitTests() || (app()->environment('local') && (bool) config('services.razorpay.allow_fake', false))) {
             return app(FakePaymentGateway::class);
         }
 
@@ -162,13 +162,13 @@ final class RazorpayGateway implements PaymentGateway
     public static function fromConfig(): self
     {
         if (! self::isConfigured()) {
-            throw new RuntimeException('Razorpay is not configured. Set RYTHME_RAZORPAY_KEY_ID and RYTHME_RAZORPAY_KEY_SECRET.');
+            throw new RuntimeException('Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
         }
 
         return new self(
-            (string) config('rythme.razorpay.key_id'),
-            (string) config('rythme.razorpay.key_secret'),
-            config('rythme.razorpay.webhook_secret'),
+            (string) config('services.razorpay.key_id'),
+            (string) config('services.razorpay.key_secret'),
+            config('services.razorpay.webhook_secret'),
         );
     }
 }

@@ -13,6 +13,7 @@ use App\Services\CartService;
 use App\Services\CouponService;
 use App\Services\OrderService;
 use App\Services\SiteSettingsService;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -96,6 +97,7 @@ final class CheckoutWizard extends Component
 
     public function saveNewAddress(AddressService $addresses, CartService $cart): void
     {
+        abort_unless(auth()->check(), 403);
         $this->validate();
 
         $data = [
@@ -122,6 +124,7 @@ final class CheckoutWizard extends Component
         $this->couponError = null;
 
         try {
+            $this->guardRateLimit('coupon', 20, 60);
             $totals = app(CartService::class)->totals();
             $result = $coupons->validateAndApply((string) $this->couponCode, $totals['subtotal']);
 
@@ -163,6 +166,7 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('Please sign in to continue.');
             }
 
+            $this->guardRateLimit('place-order', 5, 60);
             $cartModel = $cart->getOrCreateCart();
             $totals = $cart->totals();
 
@@ -216,7 +220,7 @@ final class CheckoutWizard extends Component
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
             } else {
                 $this->dispatch('razorpay-open', options: [
-                    'key' => (string) config('rythme.razorpay.key_id'),
+                    'key' => (string) config('services.razorpay.key_id'),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),
@@ -250,6 +254,7 @@ final class CheckoutWizard extends Component
         $this->confirming = true;
 
         try {
+            $this->guardRateLimit('confirm-payment', 10, 60);
             if ($this->orderId === null) {
                 throw new RuntimeException('No pending order found.');
             }
@@ -335,5 +340,17 @@ final class CheckoutWizard extends Component
     private function resetFormFields(): void
     {
         $this->reset('name', 'phone', 'email', 'line1', 'line2', 'city', 'state', 'pincode', 'isDefault');
+    }
+
+    private function guardRateLimit(string $action, int $attempts, int $decaySeconds): void
+    {
+        $identity = auth()->id() !== null ? 'user:'.auth()->id() : 'ip:'.request()->ip();
+        $key = "checkout:{$action}:{$identity}";
+
+        if (RateLimiter::tooManyAttempts($key, $attempts)) {
+            throw new RuntimeException('Too many attempts. Please wait a moment and try again.');
+        }
+
+        RateLimiter::hit($key, $decaySeconds);
     }
 }

@@ -178,7 +178,7 @@
 
                         {{-- Razorpay script (only when configured) --}}
                         @if($razorpayConfigured)
-                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('rythme.razorpay.key_id') }}" defer></script>
+                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('services.razorpay.key_id') }}" defer></script>
                         @endif
 
                         @if($razorpayConfigured)

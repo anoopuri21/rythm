@@ -50,7 +50,8 @@ class CategoryResource extends Resource
             Toggle::make('is_active')->default(true),
             Textarea::make('description')->rows(3),
             SpatieMediaLibraryFileUpload::make('icon')
-                ->collection('icon')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)->label('Category icon'),
+                ->collection('icon')->image()->maxFiles(1)->label('Category icon')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(2048),
             TextInput::make('seo_title')->maxLength(70),
             Textarea::make('seo_description')->rows(2)->maxLength(160),
         ])->columns(2);

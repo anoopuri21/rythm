@@ -1,51 +1,71 @@
 # Payment security
 
-## Authoritative state
+## Principle
 
-Frontend success messages and request fields are never payment evidence. An order becomes paid only after backend verification of a Razorpay signature plus provider data showing capture, with exact gateway order ID, payment ID, amount and currency matching the server-created payment/order.
+Only server-verified Razorpay state may advance an order. Browser values can initiate a verification attempt but cannot set amount, currency, order ownership, inventory, `payment_status`, or fulfilment status.
 
-Accepted state-changing webhook families:
+## Local initiation
 
-- `payment.captured`
-- `order.paid` (only when the included/fetched payment evidence satisfies captured invariants)
-
-`payment.authorized` is acknowledged with HTTP 200 and recorded, but does not mark a payment/order paid. Other correctly signed event types are recorded and acknowledged as ignored. Invalid signatures are rejected and never persisted as trusted events.
+1. Checkout requires an authenticated account and an address owned by that account.
+2. The server locks cart/product rows and calculates line prices, discounts, shipping, tax and total from database state.
+3. Checkout uses a per-mount UUID idempotency key and a unique database constraint.
+4. The server creates the Razorpay order and stores its gateway order ID against one local order/payment.
+5. Payment retry locks the order, checks ownership and eligible state, and prevents duplicate active reservations.
 
 ## Browser callback
 
-1. Rate limit the endpoint.
-2. Require callback fields and a configured gateway.
-3. Locate the local payment by gateway order ID; never accept an order total from the browser.
-4. Verify HMAC over `order_id|payment_id` using the environment secret.
-5. Fetch provider payment and require `captured` status.
-6. Require local gateway order, exact paise amount, currency and payment ID invariants.
-7. Mark paid transactionally through `PaymentEventService`/`OrderService`.
-8. Redirect only through a temporary signed success URL.
+The callback locates the local payment by gateway order ID, verifies Razorpay's callback signature, then independently fetches the payment from Razorpay. Paid transition is allowed only when provider data says `captured` and its payment ID, order ID, amount and currency match local state. A failed/untrusted callback does not mark the order failed or paid; a later authenticated provider signal can reconcile it.
 
-## Webhook
+## Webhook handling
 
-1. Capture the raw body and `X-Razorpay-Signature`.
-2. Verify HMAC before interpreting or mutating payload data.
-3. Decode valid JSON, derive provider event ID when present, and store a payload-hash fallback.
-4. Insert/deduplicate the payment event under transaction/unique constraints.
-5. Return fast 2XX for replayed processed/rejected events, authorized-only events, unknown signed event types, and poison events that cannot match a local payment. This avoids unbounded provider retries; operations reviews the recorded failure.
-6. For capture-capable types only, enforce local payment existence and all captured invariants before marking paid.
+1. Read the exact raw request body.
+2. Verify `X-Razorpay-Signature` as HMAC-SHA256 over that raw body with `RAZORPAY_WEBHOOK_SECRET` using constant-time comparison.
+3. Decode JSON only after signature verification.
+4. Derive idempotency identity from `X-Razorpay-Event-Id`; if absent, use SHA-256 of the raw body.
+5. Store only bounded redacted metadata and the payload hash. Reuse of one event identity with another payload is rejected with 409.
+6. Explicitly allow payment-state handling only for:
+   - `payment.authorized`: verify local gateway order, payment ID, amount, currency and `authorized` status; record `authorized` but do **not** confirm the order, capture inventory, or grant paid state;
+   - `payment.captured`: require matching fields, `captured` status, and the capture flag, then perform the paid transition;
+   - `order.paid`: require the included payment entity to satisfy the same captured-payment checks, then perform the paid transition.
+7. Other correctly signed events are recorded as processed/ignored and receive a fast 200 response without touching commerce state.
+8. Previously processed identical deliveries receive 200. Conflicting or previously rejected identities are not silently accepted.
 
-The handler is safe under repeated delivery: a provider event ID or stable payload hash identifies replay, payment provider IDs are unique, and paid transitions are idempotent.
+## Atomic paid transition
 
-## Tamper and failure behavior
+`OrderService::markPaid()` runs in a database transaction and locks the order/payment. It rejects cancelled orders, returns without effect if already paid, requires a matching locally initiated payment, records the provider payment ID, captures inventory once, confirms the order, writes status history and dispatches an idempotently keyed notification.
 
-| Condition | Result |
+`markPaymentAuthorized()` also locks and correlates local rows, but changes only payment authorization state. Authorization is deliberately not equivalent to capture.
+
+## Failure and response policy
+
+| Condition | Response/effect |
 |---|---|
-| Missing/invalid signature | 400; no trusted processing or mutation |
-| Unknown signed event | 200 ignored; event retained |
-| `payment.authorized` | 200 accepted; no paid transition |
+| Invalid/missing signature | 400, no receipt/state mutation |
+| Malformed signed JSON | 400, no payment-state mutation |
+| Signed ignored event | 200 `ignored` |
 | Duplicate processed event | 200 replay acknowledgement |
-| Duplicate rejected event | 200 replay acknowledgement; no retry loop |
-| Amount/currency/order/payment mismatch | Event failed, 200 accepted, no paid transition |
-| Captured valid event | Payment/order marked paid once |
-| Ambiguous refund provider outcome | Do not blindly retry; reconcile provider state first |
+| Event ID reused with different body | 409 |
+| Unknown local gateway order | 200 accepted with failed receipt for operations review |
+| Amount/currency/order/status mismatch | 200 accepted with failed receipt; no commerce mutation |
+| Transition failure | non-2XX; no partial paid transition due to DB transaction |
 
-## Operations
+Endpoint throttles are an abuse backstop, not a substitute for signature verification or idempotency. Razorpay source IP allowlisting may be added only if operationally maintained; stale IP rules must not replace HMAC verification.
 
-Use test-mode keys outside production. Configure separate webhook secrets per environment and subscribe only to needed events. Monitor failed `payment_events`, initiated/failed payments, refund-pending orders and provider dashboard discrepancies. Never log key material, full payment credentials, signatures, or sensitive payload fields. Rotate secrets through the hosting environment, clear/rebuild config cache, then send a signed test event.
+## Secrets and logging
+
+Canonical configuration is `config/services.php`, backed only by:
+
+- `RAZORPAY_KEY_ID` (public checkout key),
+- `RAZORPAY_KEY_SECRET`,
+- `RAZORPAY_WEBHOOK_SECRET`.
+
+Secret values, signatures, raw webhook bodies and full provider payloads must not be logged or stored in Git/database audit records. Error logs use event/order identifiers or exception classes, not credential-bearing request bodies.
+
+## Operations and testing
+
+- Configure HTTPS and preserve the raw body through the proxy/web server.
+- Subscribe at minimum to `payment.authorized`, `payment.captured`, and `order.paid`.
+- Replay fixed signed fixtures for accepted, ignored, duplicate, conflict and mismatch cases.
+- Test authorization followed by capture, capture arriving first, duplicates, cancellation races and amount/currency tampering.
+- Reconcile authorized payments that do not capture within the operational window.
+- Runtime qualification remains blocked until the owner points `rythm.test` at `rhythm_db`; never test financial writes against the unrelated database.

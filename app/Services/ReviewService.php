@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\RateLimiter;
 use RuntimeException;
 
 /**
@@ -18,8 +19,17 @@ final class ReviewService
 {
     public function submit(int $userId, Product $product, int $rating, ?string $comment): Review
     {
+        $key = "review-submit:user:{$userId}";
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw new RuntimeException('Too many review attempts. Please try again later.');
+        }
+        RateLimiter::hit($key, 3600);
+
         if ($rating < 1 || $rating > 5) {
             throw new RuntimeException('Rating must be between 1 and 5.');
+        }
+        if (mb_strlen((string) $comment) > 2000) {
+            throw new RuntimeException('Review comments must not exceed 2000 characters.');
         }
 
         $purchased = Order::query()
