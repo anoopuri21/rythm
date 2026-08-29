@@ -4,7 +4,7 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current operational priority:** Phase 10 — shipping, fulfillment, returns and India tax workflow
-**Overall status:** PHASES 0–7 AND 6A COMPLETE / PHASE 8 NEXT / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Overall status:** PHASES 0–9 AND 6A COMPLETE / PHASE 10 IN PROGRESS / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
 
@@ -331,6 +331,8 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 ## 14. Current Next Action
 
-Phase 7 is accepted after automated qualification and owner-reported UAT of TOTP, roles and protected staff creation. The owner then prioritized a bounded post-Phase-6 catalogue operation before canonical Phase 8: approximately ten products in each of eight product groups, plus additional Homepage category sections and realistic Homepage/Shop QA.
+Phase 10 Chunks 1–4 are implemented. Chunk 1 has prior accepted domain evidence; Chunks 2–4 require the external-runtime and professional qualification defined in `docs/phase10-qualification.md`.
 
-Execution is controlled by `tasks/PHASE_6A_CATALOGUE_EXPANSION_PLAN.md`. Chunk 0 is a read-only inventory, public collection qualification and exact manifest; acquisition/import must not begin before that gate. Canonical Phase 8 remains pending during this urgent operation. Agent 10 and deployment remain inactive, and no production sign-off is implied.
+The next authorized action is a non-destructive run against an isolated restored MySQL 8 QA database: apply forward migrations through `2026_08_29_000008_add_optional_tax_classification_snapshots`, run focused and full PHP suites, capture rendered fulfillment/RMA/tax workflow evidence, and obtain professional approval before enabling any return or tax rule. Invoice/credit-note identity remains unimplemented until numbering and correction rules are professionally approved.
+
+Phase 10 remains `IN PROGRESS`. Phase 11 must not be marked active until Agent 0 accepts Phase 10 qualification evidence. Agent 10 and Phase 18 remain inactive.

@@ -26,10 +26,10 @@
 | 4 | Accounts, cart, wishlist, checkout and orders | E1, E2 | COMPLETE |
 | 5 | Verified reviews, moderated product Q&A and coupons | E3 | COMPLETE |
 | 6 | Controlled catalogue acquisition and import pipeline | Catalog acquisition prerequisite absent from legacy roadmap | COMPLETE |
-| 7 | Admin governance, staff RBAC and auditability | E7 | IN PROGRESS |
-| 8 | Payment, refund and financial reconciliation operations | E2 | PENDING |
-| 9 | Central notifications and external-integration event architecture | E4 | PENDING |
-| 10 | Shipping, fulfillment, returns and India tax workflow | E5 | PENDING |
+| 7 | Admin governance, staff RBAC and auditability | E7 | COMPLETE |
+| 8 | Payment, refund and financial reconciliation operations | E2 | COMPLETE |
+| 9 | Central notifications and external-integration event architecture | E4 | COMPLETE |
+| 10 | Shipping, fulfillment, returns and India tax workflow | E5 | IN PROGRESS |
 | 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | PENDING |
 | 12 | Security, privacy, compliance and accessibility hardening | E8 plus cross-cutting accessibility/legal gates | PENDING |
 | 13 | Performance, scalability and resilience | E9 | PENDING |

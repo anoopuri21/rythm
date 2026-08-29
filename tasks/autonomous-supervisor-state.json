@@ -11,36 +11,39 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "6f654e65d6e5d867b070a887a1ef14d805e4ff76",
-    "remote_head": "6f654e65d6e5d867b070a887a1ef14d805e4ff76",
+    "local_head": "862275310007e426086efc3cb899438f63cd1ad1",
+    "remote_head": "862275310007e426086efc3cb899438f63cd1ad1",
     "working_tree_clean": false
   },
   "delivery": {
-    "phase": "7",
-    "chunk": "qa-launch-stabilization",
-    "task": "Phase 7 QA and launch readiness",
+    "phase": "10",
+    "chunk": "qualification-and-professional-gate",
+    "task": "Phase 10 external runtime, rendered workflow and professional qualification",
     "status": "qa"
   },
   "execution": {
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner runtime exposed one Windows POSIX-mode assertion, an over-broad Node discovery command and one stale admin-audit expectation; Agent 9 implemented cross-platform bounded remediation. Three pending migrations were reviewed as additive indexes only."
+    "last_verified_action": "Phase 10 Chunks 2–4 were implemented and pushed; Node automation reached 102/102, Vite build passed, and a non-destructive external qualification checklist was prepared."
   },
   "agents": {
     "accountable": "Agent 0",
     "primary": [
-      "Agent 9"
+      "Agent 15",
+      "Agent 3",
+      "Agent 4",
+      "Agent 6",
+      "Agent 12"
     ],
     "reviewers": [
-      "Agent 1",
-      "Agent 6",
-      "Agent 13"
+      "Agent 9",
+      "Agent 11"
     ]
   },
   "checkpoint": {
-    "id": "f9daf30087a82b34396b2f83e49fdbc4f72299fd676f4e5f10d046c093be867b",
-    "created_at": "2026-08-29T03:32:29.505Z"
+    "id": "c2503165c1f1ddc01d714b2f6e887c7b1051c350d9a6b0b9db14fe0daa8f8d43",
+    "created_at": "2026-08-29T23:45:00.000+05:30"
   },
   "decisions": [
     {
@@ -99,6 +102,11 @@
       "id": "AS-H007",
       "status": "closed",
       "summary": "Owner confirmed rythm.test now resolves to the rhythm_db MySQL database and cached configuration was cleared."
+    },
+    {
+      "id": "AS-H008",
+      "status": "open",
+      "summary": "Owner external runtime must execute the non-destructive Phase 10 MySQL/PHP/rendered qualification checklist, and qualified professional approval is required before any return/tax values or invoice identities are enabled."
     }
   ],
   "gate_results": [
@@ -323,11 +331,29 @@
       "outcome": "passed",
       "evidence": "tests/automation/supervisor-state.test.mjs; tests/Feature/AdminGovernanceTest.php; package.json test:automation; 96/96 bounded Node automation; Vite production build",
       "verified_at": "2026-08-29T22:15:00.000Z"
+    },
+    {
+      "name": "Phase 10 Chunk 2 manual fulfillment implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_2_MANUAL_FULFILLMENT.md; 96/96 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T21:45:00.000+05:30"
+    },
+    {
+      "name": "Phase 10 Chunk 3 disabled return workflow implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_3_RETURN_RMA_WORKFLOW.md; 99/99 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T22:45:00.000+05:30"
+    },
+    {
+      "name": "Phase 10 Chunk 4 gated tax snapshot implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_4_TAX_SNAPSHOT_FRAMEWORK.md; 102/102 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T23:30:00.000+05:30"
     }
   ],
   "next_action": {
-    "id": "PHASE-7-OWNER-RERUN-AFTER-INDEX-MIGRATIONS",
-    "description": "Owner pulls the remediation, takes a rhythm_db backup, applies the three reviewed additive index migrations, then reruns the full PHP suite and bounded npm run test:automation command and reports exact summaries.",
+    "id": "PHASE-10-EXTERNAL-QUALIFICATION-AND-PROFESSIONAL-GATE",
+    "description": "Owner runs docs/phase10-qualification.md against an isolated restored MySQL 8 QA database, reports focused/full PHP and rendered workflow evidence, and records a non-sensitive professional approval reference before any return or tax enablement.",
     "requires_human": true
   }
 }
