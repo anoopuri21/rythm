@@ -45,9 +45,7 @@ final class SeoFields
                         ->placeholder('index, follow')
                         ->helperText('Robots meta value.'),
                     Textarea::make('schema_json')->rows(5)->json()
-                        ->helperText('Valid JSON-LD schema (object or array) — rendered as <script type="application/ld+json">.'),
-                    Textarea::make('head_scripts')->rows(4)
-                        ->helperText('Raw HTML/JS injected into <head> (analytics, verification, custom tags). Admin-only input.'),
+                        ->helperText('Valid JSON-LD schema (object or array). Arbitrary scripts are not accepted.'),
                 ]),
         ];
     }

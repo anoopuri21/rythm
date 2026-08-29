@@ -30,6 +30,7 @@ use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
 use App\Observers\ProductHomepageObserver;
+use App\Observers\SanitizeRichTextObserver;
 use App\Policies\AuditPolicy;
 use App\Policies\CataloguePolicy;
 use App\Policies\ContentPolicy;
@@ -90,6 +91,10 @@ class AppServiceProvider extends ServiceProvider
 
         Product::observe(ProductHomepageObserver::class);
 
+        foreach ([Product::class, Page::class, HomepageSection::class, Faq::class] as $richTextModel) {
+            $richTextModel::observe(SanitizeRichTextObserver::class);
+        }
+
         foreach ([
             Product::class,
             Order::class,
@@ -100,6 +105,15 @@ class AppServiceProvider extends ServiceProvider
             Review::class,
             ProductQuestion::class,
             ContactMessage::class,
+            Category::class,
+            Brand::class,
+            Page::class,
+            Faq::class,
+            HeroSlide::class,
+            HomepageBlock::class,
+            HomepageCategoryRow::class,
+            HomepageSection::class,
+            NewsletterSubscriber::class,
         ] as $auditedModel) {
             $auditedModel::observe(AdminAuditableObserver::class);
         }

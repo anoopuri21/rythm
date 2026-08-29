@@ -8,7 +8,6 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Refund;
-use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
 use App\Services\RefundService;
@@ -228,9 +227,7 @@ class OrderResource extends Resource
                 request()->merge(['audit_reason' => $data['reason']]);
 
                 try {
-                    $gateway = RazorpayGateway::isConfigured()
-                        ? RazorpayGateway::fromConfig()
-                        : app(FakePaymentGateway::class);
+                    $gateway = RazorpayGateway::resolve();
                     $refund = app(RefundService::class)->processPendingForOrder($record, $gateway, $user);
 
                     if ($refund->status === Refund::STATUS_REFUNDED) {
@@ -287,9 +284,7 @@ class OrderResource extends Resource
                 try {
                     $service = app(RefundService::class);
                     $refund = $service->request($payment, (float) $data['amount'], $data['reason'], $user);
-                    $gateway = RazorpayGateway::isConfigured()
-                        ? RazorpayGateway::fromConfig()
-                        : app(FakePaymentGateway::class);
+                    $gateway = RazorpayGateway::resolve();
                     $refund = $service->process($refund, $gateway, $user);
                     $notification = Notification::make()->title(
                         $refund->status === Refund::STATUS_REFUNDED

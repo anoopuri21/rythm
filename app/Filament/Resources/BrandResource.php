@@ -41,7 +41,7 @@ class BrandResource extends Resource
             Toggle::make('is_active')->default(true),
             Textarea::make('description')->rows(3),
             SpatieMediaLibraryFileUpload::make('logo')
-                ->collection('logo')->image()->maxFiles(1)->label('Brand logo'),
+                ->collection('logo')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)->label('Brand logo'),
         ])->columns(2);
     }
 

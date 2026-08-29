@@ -31,11 +31,12 @@
     @if(!empty($seo['canonical_url']))
         <link rel="canonical" href="{{ $seo['canonical_url'] }}">
     @endif
-    @if(!empty($seo['schema_json']))
-        <script type="application/ld+json">{!! is_array($seo['schema_json']) ? json_encode($seo['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : $seo['schema_json'] !!}</script>
-    @endif
-    @if(!empty($seo['head_scripts']))
-        {!! $seo['head_scripts'] !!}
+    @php
+        $schemaJson = $seo['schema_json'] ?? null;
+        $schemaPayload = is_array($schemaJson) ? $schemaJson : (is_string($schemaJson) ? json_decode($schemaJson, true) : null);
+    @endphp
+    @if(is_array($schemaPayload))
+        <script type="application/ld+json">{!! json_encode($schemaPayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
     @endif
     <meta name="theme-color" content="#B20202">
     <script>document.documentElement.classList.add('js');</script>

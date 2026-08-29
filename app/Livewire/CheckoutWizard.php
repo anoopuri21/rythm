@@ -7,7 +7,6 @@ namespace App\Livewire;
 use App\DTOs\CheckoutData;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
@@ -177,6 +176,10 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('Please choose a delivery address.');
             }
 
+            // Fail closed before creating/reserving an order when no approved
+            // payment gateway is available for this environment.
+            $gateway = RazorpayGateway::resolve();
+
             $data = new CheckoutData(
                 addressId: $address->id,
                 shippingAddress: $addresses->snapshot($address),
@@ -195,10 +198,6 @@ final class CheckoutWizard extends Component
 
                 return;
             }
-
-            $gateway = RazorpayGateway::isConfigured()
-                ? RazorpayGateway::fromConfig()
-                : app(FakePaymentGateway::class);
 
             $payment = $order->payments()
                 ->where('status', Payment::STATUS_INITIATED)
@@ -228,7 +227,7 @@ final class CheckoutWizard extends Component
                     'prefill' => [
                         'name' => $user->name,
                         'email' => $user->email,
-                        'contact' => (string) ($shippingAddress['phone'] ?? ''),
+                        'contact' => (string) ($data->shippingAddress['phone'] ?? ''),
                     ],
                     'theme' => ['color' => '#b20202'],
                 ]);
@@ -265,9 +264,7 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('No pending order found.');
             }
 
-            $gateway = RazorpayGateway::isConfigured()
-                ? RazorpayGateway::fromConfig()
-                : app(FakePaymentGateway::class);
+            $gateway = RazorpayGateway::resolve();
 
             $result = $gateway->verify($order, $payload);
 

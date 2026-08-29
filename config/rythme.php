@@ -54,19 +54,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Payments — Razorpay (test mode by default)
+    | Payments — Razorpay
     |--------------------------------------------------------------------------
-    | When keys are missing the app falls back to FakePaymentGateway so the
-    | full checkout flow works locally / in preview. Production must set:
-    |   RYTHME_RAZORPAY_KEY_ID=rzp_test_xxx
+    | Missing keys fail closed. Fake checkout is permitted only during unit
+    | tests or local development with the explicit flag below. Production sets:
+    |   RYTHME_RAZORPAY_KEY_ID=rzp_live_xxx
     |   RYTHME_RAZORPAY_KEY_SECRET=xxx
-    |   RYTHME_RAZORPAY_WEBHOOK_SECRET=xxx   (for async webhooks)
+    |   RYTHME_RAZORPAY_WEBHOOK_SECRET=xxx
     |--------------------------------------------------------------------------
     */
     'razorpay' => [
         'key_id' => env('RYTHME_RAZORPAY_KEY_ID'),
         'key_secret' => env('RYTHME_RAZORPAY_KEY_SECRET'),
         'webhook_secret' => env('RYTHME_RAZORPAY_WEBHOOK_SECRET'),
+    ],
+
+    'payments' => [
+        'allow_fake' => env('RYTHME_ALLOW_FAKE_PAYMENTS', false),
     ],
 
     /*

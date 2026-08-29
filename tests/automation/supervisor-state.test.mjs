@@ -74,9 +74,10 @@ test('readState rejects malformed JSON and CLI reports compact status', () => {
 
     const output = execFileSync(process.execPath, ['automation/supervisor-state.mjs', 'status'], { cwd: root, encoding: 'utf8' });
     const status = JSON.parse(output);
-    assert.equal(status.lifecycle, 'executing');
-    assert.equal(status.phase, '10');
-    assert.equal(status.next_action, 'PHASE-4-SHARED-HOSTING-PERFORMANCE-QA');
+    const current = load();
+    assert.equal(status.lifecycle, current.lifecycle);
+    assert.equal(status.phase, current.delivery.phase);
+    assert.equal(status.next_action, current.next_action.id);
 });
 
 test('published JSON schema is parseable and identifies state version one', () => {

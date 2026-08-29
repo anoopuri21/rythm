@@ -105,23 +105,41 @@ final class RazorpayController extends Controller
             if (! $receipt['is_new']) {
                 return match ($event->status) {
                     PaymentEvent::STATUS_PROCESSED => response()->json(['status' => 'ok', 'replayed' => true]),
-                    PaymentEvent::STATUS_FAILED => response()->json(['error' => 'Previously rejected event'], 422),
+                    PaymentEvent::STATUS_FAILED => response()->json(['status' => 'accepted', 'replayed' => true]),
                     default => response()->json(['status' => 'processing'], 202),
                 };
+            }
+
+            $eventType = (string) ($payload['event'] ?? '');
+
+            // Authorization is a reliable provider signal, but not proof of
+            // capture. Record/acknowledge it without promoting the order to paid.
+            if ($eventType === 'payment.authorized') {
+                $events->processed($event);
+
+                return response()->json(['status' => 'accepted', 'payment_state' => 'authorized']);
+            }
+
+            // Acknowledge unrelated signed events quickly so Razorpay does not
+            // retry them. Only captured/paid event families can mutate payment.
+            if (! in_array($eventType, ['payment.captured', 'order.paid'], true)) {
+                $events->processed($event);
+
+                return response()->json(['status' => 'ignored']);
             }
 
             if ($payment === null) {
                 $events->failed($event, 'Gateway order not found.');
                 Log::warning('Razorpay webhook: order not found');
 
-                return response()->json(['error' => 'Order not found'], 404);
+                return response()->json(['status' => 'accepted']);
             }
 
             $result = $events->verifyCapturedPayment($payment, $payload);
             if (! $result->success) {
                 $events->failed($event, $result->message ?? 'Webhook rejected.');
 
-                return response()->json(['error' => $result->message ?? 'Webhook rejected'], 422);
+                return response()->json(['status' => 'accepted']);
             }
 
             $orders->markPaid($payment->order, $result, $gatewayOrderId);

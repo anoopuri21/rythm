@@ -4,9 +4,18 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\ContactMessage;
 use App\Models\Coupon;
+use App\Models\Faq;
+use App\Models\HeroSlide;
+use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
+use App\Models\HomepageSection;
+use App\Models\NewsletterSubscriber;
 use App\Models\Order;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
@@ -32,6 +41,15 @@ final class AdminAuditableObserver
         Review::class => ['status', 'is_approved'],
         ProductQuestion::class => ['status', 'answered_at'],
         ContactMessage::class => ['status'],
+        Category::class => ['name', 'slug', 'parent_id', 'is_active', 'sort_order'],
+        Brand::class => ['name', 'slug', 'is_active'],
+        Page::class => ['title', 'slug', 'is_active', 'published_at'],
+        Faq::class => ['question', 'is_active', 'sort_order'],
+        HeroSlide::class => ['title', 'is_active', 'sort_order'],
+        HomepageBlock::class => ['title', 'type', 'is_active', 'sort_order'],
+        HomepageCategoryRow::class => ['title', 'is_active', 'sort_order'],
+        HomepageSection::class => ['title', 'is_active', 'sort_order'],
+        NewsletterSubscriber::class => ['status'],
     ];
 
     public function created(Model $model): void
@@ -83,6 +101,29 @@ final class AdminAuditableObserver
             $model,
             $before,
             $after,
+            request()->input('audit_reason'),
+        );
+    }
+
+    public function deleted(Model $model): void
+    {
+        $actor = $this->actor();
+        $tracked = self::TRACKED[$model::class] ?? [];
+        if ($actor === null || $tracked === []) {
+            return;
+        }
+
+        $before = Arr::only($model->getOriginal(), $tracked);
+        if ($model instanceof SiteSetting && $this->sensitiveSetting($model->key)) {
+            $before['value'] = '[REDACTED]';
+        }
+
+        app(AdminAuditService::class)->record(
+            $actor,
+            Str::snake(class_basename($model)).'.deleted',
+            $model,
+            $before,
+            [],
             request()->input('audit_reason'),
         );
     }

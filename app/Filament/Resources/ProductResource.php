@@ -116,9 +116,9 @@ class ProductResource extends Resource
                             ->collapsible()
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('gallery')
-                                    ->collection('gallery')->multiple()->image()->maxFiles(12),
+                                    ->collection('gallery')->multiple()->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(12),
                                 SpatieMediaLibraryFileUpload::make('og')
-                                    ->collection('og')->image()->maxFiles(1)->label('Social share image'),
+                                    ->collection('og')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)->label('Social share image'),
                             ]),
                     ]),
                 Tabs\Tab::make('SEO')

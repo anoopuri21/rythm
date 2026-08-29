@@ -47,7 +47,7 @@ class HomepageBlockResource extends Resource
                 ->helperText('Role, promo kicker, or "other stores" text (comparison).'),
             Textarea::make('content')->rows(3)
                 ->helperText('Quote, story excerpt, stat label, USP copy, or shop URL for promos.'),
-            SpatieMediaLibraryFileUpload::make('image')->collection('image')->image()->maxFiles(1)
+            SpatieMediaLibraryFileUpload::make('image')->collection('image')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)
                 ->helperText('Optional image (stories/UGC/promos).'),
             TextInput::make('sort_order')->numeric()->default(0),
             Toggle::make('is_active')->default(true),

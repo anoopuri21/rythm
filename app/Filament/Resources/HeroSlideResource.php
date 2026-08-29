@@ -44,10 +44,10 @@ class HeroSlideResource extends Resource
                 ])->columns(2),
                 Tabs\Tab::make('Images')->schema([
                     SpatieMediaLibraryFileUpload::make('desktop_image')
-                        ->collection('desktop_image')->image()->maxFiles(1)
+                        ->collection('desktop_image')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)
                         ->helperText('Desktop (≥768px): large landscape banner, ~1500×800.'),
                     SpatieMediaLibraryFileUpload::make('mobile_image')
-                        ->collection('mobile_image')->image()->maxFiles(1)
+                        ->collection('mobile_image')->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5120)->maxFiles(1)
                         ->helperText('Mobile (<768px): portrait banner, ~900×1200.'),
                 ])->columns(2),
             ])->columnSpanFull(),

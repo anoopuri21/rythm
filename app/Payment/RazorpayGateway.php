@@ -142,8 +142,21 @@ final class RazorpayGateway implements PaymentGateway
 
     public static function isConfigured(): bool
     {
-        return config('rythme.razorpay.key_id') !== null
-            && config('rythme.razorpay.key_secret') !== null;
+        return trim((string) config('rythme.razorpay.key_id', '')) !== ''
+            && trim((string) config('rythme.razorpay.key_secret', '')) !== '';
+    }
+
+    public static function resolve(): PaymentGateway
+    {
+        if (self::isConfigured()) {
+            return self::fromConfig();
+        }
+
+        if (app()->runningUnitTests() || (app()->environment('local') && (bool) config('rythme.payments.allow_fake', false))) {
+            return app(FakePaymentGateway::class);
+        }
+
+        throw new RuntimeException('A real payment gateway is not configured. Fake payments are disabled.');
     }
 
     public static function fromConfig(): self

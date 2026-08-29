@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
 use App\Services\PaymentRetryService;
@@ -96,10 +95,8 @@ final class OrderController extends Controller
         abort_unless(auth()->check() && auth()->id() === $order->user_id, 403);
 
         try {
+            $gateway = RazorpayGateway::resolve();
             $payment = $retries->reserve($order, (int) auth()->id());
-            $gateway = RazorpayGateway::isConfigured()
-                ? RazorpayGateway::fromConfig()
-                : app(FakePaymentGateway::class);
 
             if (str_starts_with((string) $payment->gateway_order_id, 'pending_retry_')) {
                 $payment = $retries->attachGatewayOrder($payment, $gateway->createOrder($order));

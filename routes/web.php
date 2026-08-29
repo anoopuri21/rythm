@@ -124,7 +124,7 @@ Route::post('/payment/razorpay/callback', [RazorpayController::class, 'callback'
     ->middleware('throttle:10,1')
     ->name('payment.razorpay.callback');
 Route::post('/payment/razorpay/webhook', [RazorpayController::class, 'webhook'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:120,1')
     ->name('payment.razorpay.webhook');
 
 Route::post('/newsletter', NewsletterSubscriptionController::class)
