@@ -5,7 +5,13 @@ import { readFile } from 'node:fs/promises';
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 test('launch smoke suite covers the core storefront release paths', async () => {
-    const smoke = await read('tests/Feature/LaunchSmokeTest.php');
+    const [smoke, packageJson, supervisorStateTest] = await Promise.all([
+        read('tests/Feature/LaunchSmokeTest.php'),
+        read('package.json'),
+        read('tests/automation/supervisor-state.test.mjs'),
+    ]);
+    assert.match(packageJson, /"test:automation": "node --test tests\/automation"/);
+    assert.match(supervisorStateTest, /process\.platform === 'win32'/);
     for (const contract of ["route('home')", "route('shop.index'", "route('cart.index')", "route('checkout.index')", "signedRoute('checkout.success'"]) {
         assert.ok(smoke.includes(contract), `missing smoke contract: ${contract}`);
     }

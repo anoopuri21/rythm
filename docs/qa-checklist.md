@@ -22,7 +22,7 @@ php artisan test
 npm ci --no-audit --no-fund
 npm audit --omit=dev
 npm run build
-node --test tests/automation/*.test.mjs
+npm run test:automation
 ```
 
 Required focused suites:

@@ -172,13 +172,13 @@ class AdminGovernanceTest extends TestCase
         $product = Product::factory()->create(['price' => 100, 'stock' => 4]);
         $this->actingAs($actor);
 
-        $product->update(['price' => 120, 'stock' => 3, 'name' => 'Name is intentionally not audited']);
+        $product->update(['price' => 120, 'stock' => 3, 'name' => 'Audited product name']);
         $audit = AdminAuditLog::sole();
         $this->assertSame('product.updated', $audit->action);
-        $this->assertSame(['price', 'stock'], array_keys($audit->before_values));
+        $this->assertSame(['name', 'price', 'stock'], array_keys($audit->before_values));
         $this->assertSame('100.00', $audit->before_values['price']);
         $this->assertSame('120', (string) $audit->after_values['price']);
-        $this->assertArrayNotHasKey('name', $audit->after_values);
+        $this->assertSame('Audited product name', $audit->after_values['name']);
 
         SiteSetting::create(['key' => 'provider_api_secret', 'value' => 'old'])->update(['value' => 'new-secret']);
         $settingAudit = AdminAuditLog::query()->where('action', 'site_setting.updated')->sole();

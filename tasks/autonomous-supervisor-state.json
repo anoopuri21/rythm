@@ -25,7 +25,7 @@
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Agent 9 added Phase 7 smoke, exhaustive role and 520-product qualification contracts plus release and rollback runbooks; Agent 0 runtime/browser/MySQL sign-off remains gated on the correct isolated Rythme runtime."
+    "last_verified_action": "Owner runtime exposed one Windows POSIX-mode assertion, an over-broad Node discovery command and one stale admin-audit expectation; Agent 9 implemented cross-platform bounded remediation. Three pending migrations were reviewed as additive indexes only."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -39,8 +39,8 @@
     ]
   },
   "checkpoint": {
-    "id": "4f7961be905cf008e1b909512ea8c2d1cdec3bb99ad8f97c30c7bc8f34de7713",
-    "created_at": "2026-08-29T02:35:25.484Z"
+    "id": "f9daf30087a82b34396b2f83e49fdbc4f72299fd676f4e5f10d046c093be867b",
+    "created_at": "2026-08-29T03:32:29.505Z"
   },
   "decisions": [
     {
@@ -97,8 +97,8 @@
     },
     {
       "id": "AS-H007",
-      "status": "open",
-      "summary": "Owner must restore rythm.test DB_DATABASE to rhythm_db, clear cached configuration, then run focused/full and rendered homepage QA without sharing credentials."
+      "status": "closed",
+      "summary": "Owner confirmed rythm.test now resolves to the rhythm_db MySQL database and cached configuration was cleared."
     }
   ],
   "gate_results": [
@@ -311,11 +311,23 @@
       "outcome": "passed",
       "evidence": "docs/qa-checklist.md; docs/release-checklist.md; docs/rollback-plan.md; tests/Feature/LaunchSmokeTest.php; tests/Feature/AdminGovernanceTest.php; tests/Feature/ShopLargeCatalogueQualificationTest.php; tests/automation/qa-launch-phase7.test.mjs",
       "verified_at": "2026-08-29T21:30:00.000Z"
+    },
+    {
+      "name": "Phase 7 initial owner runtime regression",
+      "outcome": "failed",
+      "evidence": "Owner reported 7 PHP failures and 3 Node failures; first actionable failures were Windows mode semantics, vendor test discovery, and stale admin audit expectations.",
+      "verified_at": "2026-08-29T22:00:00.000Z"
+    },
+    {
+      "name": "Phase 7 Windows QA remediation candidate",
+      "outcome": "passed",
+      "evidence": "tests/automation/supervisor-state.test.mjs; tests/Feature/AdminGovernanceTest.php; package.json test:automation; 96/96 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T22:15:00.000Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-7-RUNTIME-BROWSER-MYSQL-QA",
-    "description": "Owner selects the isolated rhythm_db runtime and clears cached configuration; Agent 0 then runs full PHP tests, Razorpay test-mode replay/refund scenarios, mobile browser matrix, role-by-role Filament checks, media/import workflows and MySQL 8 EXPLAIN ANALYZE with 500+ products.",
+    "id": "PHASE-7-OWNER-RERUN-AFTER-INDEX-MIGRATIONS",
+    "description": "Owner pulls the remediation, takes a rhythm_db backup, applies the three reviewed additive index migrations, then reruns the full PHP suite and bounded npm run test:automation command and reports exact summaries.",
     "requires_human": true
   }
 }

@@ -57,7 +57,14 @@ test('atomic writer replaces valid state and refuses invalid state without damag
     const valid = checkpointState(load(), '2026-08-27T10:31:00.000Z');
     writeStateAtomic(target, valid);
     assert.deepEqual(readState(target), valid);
-    assert.equal(statSync(target).mode & 0o777, 0o600);
+    const mode = statSync(target).mode & 0o777;
+    if (process.platform === 'win32') {
+        // NTFS ACLs are not represented by POSIX chmod bits in Node. Verify
+        // the file remains owner-writable; Unix hosts enforce exact 0600.
+        assert.ok((mode & 0o200) !== 0);
+    } else {
+        assert.equal(mode, 0o600);
+    }
 
     const original = readFileSync(target, 'utf8');
     const invalid = structuredClone(valid);
