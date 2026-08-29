@@ -25,7 +25,7 @@ final class OrderController extends Controller
     {
         $this->authorizeView($request, $order);
 
-        $order->load(['items.product.brand', 'payments.refunds', 'statusHistory']);
+        $order->load(['items.product.brand', 'payments.refunds', 'statusHistory', 'shipments.items.orderItem']);
 
         $this->seo->apply([
             'meta_title' => "Order {$order->order_number} — Rhythm Exports",

@@ -389,17 +389,17 @@ final class OrderService
      *
      * @throws RuntimeException on invalid transitions
      */
-    public function changeStatus(Order $order, string $to, ?string $note = null): void
+    public function changeStatus(Order $order, string $to, ?string $note = null, bool $notify = true): void
     {
         $this->states->assertTransition($order->status, $to);
 
         $from = $order->status;
 
-        DB::transaction(function () use ($order, $to, $note, $from): void {
+        DB::transaction(function () use ($order, $to, $note, $from, $notify): void {
             $order->update(['status' => $to]);
             $this->transitionStatus($order, $to, $note, from: $from);
 
-            if (in_array($to, [
+            if ($notify && in_array($to, [
                 Order::STATUS_PROCESSING,
                 Order::STATUS_SHIPPED,
                 Order::STATUS_DELIVERED,

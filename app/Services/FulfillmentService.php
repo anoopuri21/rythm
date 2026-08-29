@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Events\CommerceNotificationRequested;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Shipment;
@@ -188,6 +189,15 @@ final class FulfillmentService
             ]);
             $this->synchronizeOrder($locked->order);
 
+            if (in_array($toStatus, [Shipment::STATUS_DISPATCHED, Shipment::STATUS_DELIVERED], true)) {
+                CommerceNotificationRequested::dispatch(
+                    "shipment:{$locked->id}:status:{$toStatus}",
+                    "shipment.{$toStatus}",
+                    $locked->order_id,
+                    ['shipment_id' => $locked->id, 'shipment_status' => $toStatus],
+                );
+            }
+
             return $locked->fresh(['items', 'events']);
         });
     }
@@ -212,7 +222,7 @@ final class FulfillmentService
         if ($allocatedQuantity === $orderedQuantity
             && $active->every(fn (Shipment $record): bool => $record->status === Shipment::STATUS_DELIVERED)) {
             if ($order->status !== Order::STATUS_DELIVERED) {
-                $this->orders->changeStatus($order, Order::STATUS_DELIVERED, 'Synchronized from delivered shipments');
+                $this->orders->changeStatus($order, Order::STATUS_DELIVERED, 'Synchronized from delivered shipments', notify: false);
             }
 
             return;
@@ -223,7 +233,7 @@ final class FulfillmentService
             [Shipment::STATUS_DISPATCHED, Shipment::STATUS_DELIVERED],
             true,
         )) && $order->status !== Order::STATUS_SHIPPED) {
-            $this->orders->changeStatus($order, Order::STATUS_SHIPPED, 'Synchronized from dispatched shipments');
+            $this->orders->changeStatus($order, Order::STATUS_SHIPPED, 'Synchronized from dispatched shipments', notify: false);
         }
     }
 
@@ -247,9 +257,11 @@ final class FulfillmentService
                 throw new RuntimeException("{$key} is too long.");
             }
 
-            if ($key === 'tracking_url' && $value !== null && $value !== ''
-                && filter_var($value, FILTER_VALIDATE_URL) === false) {
-                throw new RuntimeException('Tracking URL must be a valid URL.');
+            if ($key === 'tracking_url' && $value !== null && $value !== '') {
+                $scheme = mb_strtolower((string) parse_url($value, PHP_URL_SCHEME));
+                if (filter_var($value, FILTER_VALIDATE_URL) === false || ! in_array($scheme, ['http', 'https'], true)) {
+                    throw new RuntimeException('Tracking URL must be a valid HTTP or HTTPS URL.');
+                }
             }
 
             $clean[$key] = $value === '' ? null : $value;

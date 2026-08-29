@@ -83,6 +83,7 @@ class FulfillmentDomainTest extends TestCase
         [$order, $first] = $this->orderWithItems();
         $actor = User::factory()->create(['role' => User::ROLE_ORDER_MANAGER]);
         $service = app(FulfillmentService::class);
+        \Illuminate\Support\Facades\Event::fake([\App\Events\CommerceNotificationRequested::class]);
         $shipment = $service->create($order, [$first->id => 1], 'transition-one', $actor);
         $shipment = $service->transition($shipment, Shipment::STATUS_READY, 'Parcel checked and ready', $actor);
 
@@ -104,6 +105,27 @@ class FulfillmentDomainTest extends TestCase
         $this->assertNotNull($dispatched->dispatched_at);
         $this->assertSame(Order::STATUS_SHIPPED, $order->fresh()->status);
         $this->assertCount(3, $dispatched->events);
+        \Illuminate\Support\Facades\Event::assertDispatchedTimes(
+            \App\Events\CommerceNotificationRequested::class,
+            1,
+        );
+        \Illuminate\Support\Facades\Event::assertDispatched(
+            \App\Events\CommerceNotificationRequested::class,
+            fn ($event): bool => $event->eventKey === 'shipment:'.$shipment->id.':status:dispatched'
+                && $event->eventType === 'shipment.dispatched',
+        );
+    }
+
+    public function test_tracking_url_rejects_non_web_schemes(): void
+    {
+        [$order, $first] = $this->orderWithItems();
+        $actor = User::factory()->create(['role' => User::ROLE_ORDER_MANAGER]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tracking URL must be a valid HTTP or HTTPS URL.');
+        app(FulfillmentService::class)->create($order, [$first->id => 1], 'unsafe-url', $actor, [
+            'tracking_url' => 'javascript://alert.example',
+        ]);
     }
 
     public function test_only_complete_delivery_marks_the_order_delivered(): void
@@ -139,6 +161,47 @@ class FulfillmentDomainTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Only a paid, active order can be fulfilled.');
         $service->create($order->fresh(), [$first->id => 1], 'unpaid', $actor);
+    }
+
+    public function test_customer_parcel_timeline_exposes_tracking_but_not_internal_fulfillment_evidence(): void
+    {
+        [$order, $first] = $this->orderWithItems();
+        $actor = User::factory()->create(['role' => User::ROLE_ORDER_MANAGER]);
+        $service = app(FulfillmentService::class);
+        $shipment = $service->create($order, [$first->id => 1], 'private-fulfillment-identity', $actor, [
+            'note' => 'Warehouse shelf and internal handling note',
+        ]);
+        $shipment = $service->transition($shipment, Shipment::STATUS_READY, 'Internal packing approval', $actor);
+        $service->transition($shipment, Shipment::STATUS_DISPATCHED, 'Internal dispatch evidence', $actor, [
+            'carrier' => 'Manual carrier',
+            'awb' => 'CUSTOMER-SAFE-REFERENCE',
+            'tracking_url' => 'https://example.test/track/customer-safe',
+        ]);
+
+        $customer = User::query()->findOrFail($order->user_id);
+        $this->actingAs($customer)
+            ->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('Your parcels')
+            ->assertSee('CUSTOMER-SAFE-REFERENCE')
+            ->assertSee('Guitar')
+            ->assertDontSee('private-fulfillment-identity')
+            ->assertDontSee('Warehouse shelf and internal handling note')
+            ->assertDontSee('Internal dispatch evidence');
+    }
+
+    public function test_shipment_admin_pages_follow_order_view_permissions(): void
+    {
+        [$order, $first] = $this->orderWithItems();
+        $manager = User::factory()->create(['role' => User::ROLE_ORDER_MANAGER]);
+        $shipment = app(FulfillmentService::class)->create($order, [$first->id => 1], 'admin-access-shipment', $manager);
+        $support = User::factory()->create(['role' => User::ROLE_SUPPORT]);
+        $catalogue = User::factory()->create(['role' => User::ROLE_CATALOGUE_MANAGER]);
+
+        $this->actingAs($support)->get('/admin/shipments')->assertOk();
+        $this->actingAs($support)->get('/admin/shipments/'.$shipment->id)->assertOk();
+        $this->actingAs($catalogue)->get('/admin/shipments')->assertForbidden();
+        $this->actingAs($catalogue)->get('/admin/shipments/'.$shipment->id)->assertForbidden();
     }
 
     private function deliver(Shipment $shipment, FulfillmentService $service, User $actor): Shipment

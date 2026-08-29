@@ -99,6 +99,55 @@
                 </ol>
             </section>
 
+            @if($order->shipments->isNotEmpty())
+                <section aria-label="Parcel tracking" class="mt-8 rounded-3xl border border-ink/10 bg-white p-6 sm:p-10">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="section-kicker mb-2">Fulfillment</p>
+                            <h2 class="font-playfair text-xl font-bold text-ink">Your parcels</h2>
+                        </div>
+                        @if($order->shipments->whereNotIn('status', ['delivered', 'cancelled'])->count() > 0)
+                            <p class="text-xs text-muted">Items may arrive in separate parcels.</p>
+                        @endif
+                    </div>
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        @foreach($order->shipments->sortBy('id') as $shipment)
+                            <article class="rounded-2xl border border-ink/10 bg-paper p-5">
+                                <div class="flex items-center justify-between gap-3">
+                                    <h3 class="text-sm font-bold text-ink">Parcel {{ $loop->iteration }}</h3>
+                                    <span class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand">
+                                        {{ str_replace('_', ' ', $shipment->status) }}
+                                    </span>
+                                </div>
+                                <ul class="mt-4 space-y-2 text-sm text-ink/80">
+                                    @foreach($shipment->items as $shipmentItem)
+                                        <li class="flex justify-between gap-3">
+                                            <span>{{ $shipmentItem->orderItem->name }}</span>
+                                            <span class="shrink-0 font-semibold">Qty {{ $shipmentItem->quantity }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                @if($shipment->carrier || $shipment->awb)
+                                    <dl class="mt-4 space-y-1 border-t border-ink/10 pt-4 text-xs">
+                                        @if($shipment->carrier)<div class="flex justify-between gap-3"><dt class="text-muted">Carrier</dt><dd class="font-semibold text-ink">{{ $shipment->carrier }}</dd></div>@endif
+                                        @if($shipment->awb)<div class="flex justify-between gap-3"><dt class="text-muted">Tracking reference</dt><dd class="break-all font-semibold text-ink">{{ $shipment->awb }}</dd></div>@endif
+                                    </dl>
+                                @endif
+                                @if($shipment->tracking_url)
+                                    <a href="{{ $shipment->tracking_url }}" target="_blank" rel="noopener noreferrer" class="text-link mt-4 inline-flex text-sm">Track with carrier</a>
+                                @endif
+                                @if($shipment->dispatched_at)
+                                    <p class="mt-3 text-[11px] text-muted">Dispatched {{ $shipment->dispatched_at->format('d M Y, h:i A') }}</p>
+                                @endif
+                                @if($shipment->delivered_at)
+                                    <p class="mt-1 text-[11px] font-semibold text-emerald-700">Delivered {{ $shipment->delivered_at->format('d M Y, h:i A') }}</p>
+                                @endif
+                            </article>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
             <div class="mt-8 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
                 {{-- Items --}}
                 <section aria-label="Order items" class="min-w-0 rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
