@@ -96,12 +96,19 @@
                         {{ $product->name }}
                     </h1>
 
-                    {{-- Rating line --}}
+                    {{-- Server-derived verified-buyer rating --}}
                     <div class="mt-4 flex items-center gap-2.5 text-sm">
-                        <span class="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-0.5 text-xs font-bold text-white">
-                            4.8 <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                        </span>
-                        <span class="text-muted">Verified buyers rating</span>
+                        @if($reviewSummary['count'] > 0)
+                            <span class="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-0.5 text-xs font-bold text-white"
+                                  aria-label="{{ $reviewSummary['avg'] }} out of 5 stars">
+                                {{ number_format($reviewSummary['avg'], 1) }} <span aria-hidden="true">★</span>
+                            </span>
+                            <a href="#customer-reviews" class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand">
+                                {{ $reviewSummary['count'] }} verified {{ Str::plural('review', $reviewSummary['count']) }}
+                            </a>
+                        @else
+                            <span class="text-muted">No verified customer reviews yet</span>
+                        @endif
                     </div>
 
                     {{-- Livewire price box + variant + qty + add-to-cart --}}
@@ -116,15 +123,15 @@
                     <div class="mt-8 grid grid-cols-3 gap-3 rounded-2xl border border-ink/10 bg-white p-4 text-center">
                         <div class="flex flex-col items-center gap-1.5">
                             <svg class="h-6 w-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7" /></svg>
-                            <span class="text-[11px] font-semibold leading-tight text-ink">1-Year Warranty</span>
+                            <span class="text-[11px] font-semibold leading-tight text-ink">Product support</span>
                         </div>
                         <div class="flex flex-col items-center gap-1.5">
                             <svg class="h-6 w-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a2 2 0 11-4 0m4 0a2 2 0 104 0m-4 0h4" /></svg>
-                            <span class="text-[11px] font-semibold leading-tight text-ink">Free Shipping</span>
+                            <span class="text-[11px] font-semibold leading-tight text-ink">Shipping at checkout</span>
                         </div>
                         <div class="flex flex-col items-center gap-1.5">
                             <svg class="h-6 w-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h2m4 0h4M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            <span class="text-[11px] font-semibold leading-tight text-ink">EMI Available</span>
+                            <span class="text-[11px] font-semibold leading-tight text-ink">Gateway payment options</span>
                         </div>
                     </div>
                 </div>
@@ -177,8 +184,11 @@
                 </div>
             </div>
 
-            {{-- ===== REVIEWS ===== --}}
+            {{-- ===== VERIFIED REVIEWS ===== --}}
             <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
+
+            {{-- ===== PRODUCT Q&A ===== --}}
+            <livewire:product-question-section :product="$product" :key="'questions-' . $product->id" />
 
             {{-- ===== RELATED ===== --}}
             @if($related->isNotEmpty())

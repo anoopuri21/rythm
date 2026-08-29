@@ -6,14 +6,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HomepageBlockResource\Pages;
 use App\Models\HomepageBlock;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -24,13 +25,13 @@ class HomepageBlockResource extends Resource
 {
     protected static ?string $model = HomepageBlock::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-plus';
 
-    protected static ?string $navigationGroup = 'HOMEPAGE';
+    protected static string|\UnitEnum|null $navigationGroup = 'HOMEPAGE';
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('section_key')
@@ -70,8 +71,8 @@ class HomepageBlockResource extends Resource
                 SelectFilter::make('section_key')->label('Section')->options(HomepageBlock::SECTIONS),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

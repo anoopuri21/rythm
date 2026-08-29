@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-08-25T19:48:06.058Z",
+  "base": "http://127.0.0.1:8011",
+  "runs": {
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:8011/product/yamaha-f310-acoustic-guitar",
+      "submittedQuestion": true,
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440,
+        "overflowing": false
+      },
+      "violations": [],
+      "consoleErrors": []
+    },
+    "tablet": {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "url": "http://127.0.0.1:8011/product/yamaha-f310-acoustic-guitar",
+      "submittedQuestion": false,
+      "overflow": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "overflowing": false
+      },
+      "violations": [],
+      "consoleErrors": []
+    },
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "http://127.0.0.1:8011/product/yamaha-f310-acoustic-guitar",
+      "submittedQuestion": false,
+      "overflow": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "overflowing": false
+      },
+      "violations": [],
+      "consoleErrors": []
+    },
+    "narrow": {
+      "viewport": {
+        "width": 320,
+        "height": 700
+      },
+      "url": "http://127.0.0.1:8011/product/yamaha-f310-acoustic-guitar",
+      "submittedQuestion": false,
+      "overflow": {
+        "scrollWidth": 320,
+        "clientWidth": 320,
+        "overflowing": false
+      },
+      "violations": [],
+      "consoleErrors": []
+    }
+  }
+}

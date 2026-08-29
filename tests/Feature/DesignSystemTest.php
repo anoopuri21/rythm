@@ -8,9 +8,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Design system guard rails (v2 MINIMAL-TECH): MONOCHROME (black/white/grays)
- * only — no red/gold/yellow anywhere; Inter font only; product slider images
- * use object-fit: contain.
+ * Design-system guard rails (v3 RYTHME RED MARKETPLACE): approved deep-red
+ * accent, neutral surfaces, Inter-only typography and contained catalog media.
  */
 class DesignSystemTest extends TestCase
 {
@@ -22,7 +21,7 @@ class DesignSystemTest extends TestCase
         $this->seed();
     }
 
-    public function test_no_gold_colors_in_css_tailwind_or_views(): void
+    public function test_no_legacy_gold_colors_in_css_tailwind_or_views(): void
     {
         $haystacks = [
             file_get_contents(resource_path('css/app.css')),
@@ -37,31 +36,29 @@ class DesignSystemTest extends TestCase
         }
     }
 
-    public function test_tailwind_theme_is_monochrome_black_white(): void
+    public function test_tailwind_theme_uses_approved_rythme_red_and_neutrals(): void
     {
         $config = file_get_contents(base_path('tailwind.config.js'));
 
-        $this->assertStringContainsString("DEFAULT: '#111111'", $config);
-        $this->assertStringContainsString("black: '#111111'", $config);
-        $this->assertStringContainsString("cream: '#ffffff'", $config);
-        // No red/gold anywhere in the theme
-        $this->assertStringNotContainsString('d50808', $config);
-        $this->assertStringNotContainsString('FF5252', $config);
-        $this->assertStringNotContainsString('a30404', $config);
+        $this->assertStringContainsString("DEFAULT: '#B20202'", $config);
+        $this->assertStringContainsString("dark: '#930303'", $config);
+        $this->assertStringContainsString("light: '#E7F4F1'", $config);
+        $this->assertStringContainsString("black: '#222222'", $config);
+        $this->assertStringContainsString("cream: '#FFFFFF'", $config);
+        $this->assertStringContainsString("'cream-dark': '#F7F7F8'", $config);
     }
 
-    public function test_no_red_or_gold_colors_in_css_or_views(): void
+    public function test_css_theme_exposes_approved_semantic_tokens(): void
     {
-        $haystacks = [
-            file_get_contents(resource_path('css/app.css')),
-            implode("\n", array_map('file_get_contents', glob(resource_path('views/**/*.blade.php')))),
-        ];
+        $css = file_get_contents(resource_path('css/app.css'));
 
-        foreach (['#D50808', '#FF5252', '#A30404', '#D4A843', '#F5D061', '#B8860B', 'rgba(213, 8, 8', 'rgba(212, 168, 67'] as $red) {
-            foreach ($haystacks as $i => $haystack) {
-                $this->assertStringNotContainsString($red, $haystack, "red token $red found in source #$i");
-            }
-        }
+        $this->assertStringContainsString('--color-brand: #B20202;', $css);
+        $this->assertStringContainsString('--color-brand-dark: #930303;', $css);
+        $this->assertStringContainsString('--color-brand-soft: #E7F4F1;', $css);
+        $this->assertStringContainsString('--color-ink: #222222;', $css);
+        $this->assertStringContainsString('--color-paper: #FFFFFF;', $css);
+        $this->assertStringContainsString('--color-paper-dark: #F7F7F8;', $css);
+        $this->assertStringContainsString('--color-border: #E5E7EB;', $css);
     }
 
     public function test_inter_is_the_only_loaded_font(): void
@@ -83,13 +80,11 @@ class DesignSystemTest extends TestCase
             ->assertSee('images/categories/electric-guitars.jpg', escape: false);
     }
 
-    public function test_monochrome_buttons_and_cards_render(): void
+    public function test_legacy_button_classes_render_with_token_backed_system(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSee('btn-gold btn-shine', escape: false)
-            ->assertSee('btn-ghost-light', escape: false)
-            ->assertDontSee('hover:bg-rythme-red-dark', escape: false)
-            ->assertDontSee('bg-rythme-red', escape: false);
+            ->assertSee('btn-ghost-light', escape: false);
     }
 }

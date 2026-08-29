@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Payment;
 
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Refund;
 
 /**
  * Deterministic fake used in development and tests when Razorpay keys
@@ -14,7 +16,7 @@ final class FakePaymentGateway implements PaymentGateway
 {
     public function createOrder(Order $order): string
     {
-        return 'fake_order_' . $order->order_number;
+        return 'fake_order_'.$order->order_number;
     }
 
     public function verify(Order $order, array $payload): PaymentResult
@@ -22,7 +24,7 @@ final class FakePaymentGateway implements PaymentGateway
         $accepted = ['authorized', 'captured', 'paid', 'fake_success'];
 
         if (in_array((string) ($payload['status'] ?? ''), $accepted, true)) {
-            return new PaymentResult(true, 'paid', 'fake_pay_' . $order->order_number);
+            return new PaymentResult(true, 'paid', 'fake_pay_'.$order->order_number);
         }
 
         return new PaymentResult(false, 'failed', message: 'Fake payment declined.');
@@ -30,6 +32,11 @@ final class FakePaymentGateway implements PaymentGateway
 
     public function handleWebhook(array $payload): PaymentResult
     {
-        return new PaymentResult(true, 'paid', 'fake_webhook_' . now()->timestamp);
+        return new PaymentResult(true, 'paid', 'fake_webhook_'.now()->timestamp);
+    }
+
+    public function refund(Payment $payment, Refund $refund): RefundResult
+    {
+        return new RefundResult(true, 'refunded', 'fake_refund_'.$refund->idempotency_key);
     }
 }

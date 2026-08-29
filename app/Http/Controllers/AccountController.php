@@ -46,10 +46,23 @@ final class AccountController extends Controller
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
     {
         $user = auth()->user();
+        $validated = $request->validated();
+        $emailChanged = strcasecmp((string) $user->email, $validated['email']) !== 0;
 
-        $user->update($request->validated());
+        $user->fill($validated);
 
-        return back()->with('profile_success', 'Profile updated.');
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return back()->with(
+            'profile_success',
+            $emailChanged
+                ? 'Profile updated. Please verify your new email address.'
+                : 'Profile updated.',
+        );
     }
 
     public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
@@ -72,6 +85,20 @@ final class AccountController extends Controller
         $addresses->store((int) auth()->id(), $request->validated());
 
         return back()->with('address_success', 'Address added.');
+    }
+
+    public function updateAddress(StoreAddressRequest $request, Address $address, AddressService $addresses): RedirectResponse
+    {
+        $addresses->update($address, (int) auth()->id(), $request->validated());
+
+        return back()->with('address_success', 'Address updated.');
+    }
+
+    public function setDefaultAddress(Address $address, AddressService $addresses): RedirectResponse
+    {
+        $addresses->setDefault($address, (int) auth()->id());
+
+        return back()->with('address_success', 'Default address updated.');
     }
 
     public function destroyAddress(Address $address, AddressService $addresses): RedirectResponse

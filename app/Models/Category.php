@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -22,8 +24,6 @@ class Category extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
-
-    
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -43,6 +43,17 @@ class Category extends Model implements HasMedia
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function homepageCategoryRow(): HasOne
+    {
+        return $this->hasOne(HomepageCategoryRow::class);
+    }
+
+    public function productAttributes(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductAttribute::class)
+            ->withPivot(['is_required', 'is_filterable', 'sort_order']);
     }
 
     public function registerMediaCollections(): void

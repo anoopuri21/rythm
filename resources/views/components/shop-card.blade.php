@@ -5,6 +5,8 @@
     $discount = $product->discountPercent();
     $price = number_format((float) $product->price);
     $old = $product->compare_at_price !== null ? number_format((float) $product->compare_at_price) : null;
+    $rating = $product->reviews_avg_rating !== null ? (float) $product->reviews_avg_rating : null;
+    $reviewCount = (int) ($product->reviews_count ?? 0);
     $href = '/product/' . $product->slug;
 @endphp
 
@@ -34,7 +36,7 @@
                                   wire:key="wl-{{ $product->id }}" />
 
         <a href="{{ $href }}"
-           class="absolute inset-x-3 bottom-3 translate-y-14 rounded-full bg-ink/90 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur transition duration-300 group-hover:translate-y-0 hover:bg-brand"
+           class="shop-card__view absolute inset-x-3 bottom-3 translate-y-14 rounded-full bg-ink/90 py-2.5 text-center text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur transition duration-300 group-hover:translate-y-0 hover:bg-brand"
            aria-label="View {{ $product->name }}">
             View product
         </a>
@@ -47,6 +49,18 @@
         <h3 class="mt-1.5 text-sm font-semibold leading-snug text-ink">
             <a href="{{ $href }}" class="transition hover:text-brand">{{ $product->name }}</a>
         </h3>
+
+        @if($rating !== null && $reviewCount > 0)
+            <p class="mt-2 flex items-center gap-1.5 text-xs text-muted" aria-label="Rated {{ number_format($rating, 1) }} out of 5 from {{ $reviewCount }} {{ Str::plural('review', $reviewCount) }}">
+                <span class="font-bold text-brand" aria-hidden="true">★</span>
+                <span class="font-semibold text-ink">{{ number_format($rating, 1) }}</span>
+                <span>({{ $reviewCount }})</span>
+            </p>
+        @endif
+
+        <p class="mt-2 text-[11px] font-semibold {{ $product->stock > 0 ? 'text-ink' : 'text-muted' }}">
+            {{ $product->stock > 0 ? 'In stock' : 'Out of stock' }}
+        </p>
 
         <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 pt-3.5">
             <span class="text-lg font-bold text-ink">₹{{ $price }}</span>

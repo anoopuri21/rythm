@@ -1,0 +1,715 @@
+{
+  "schema_version": 1,
+  "generated_on": "2026-08-26",
+  "source_host": "www.bajaao.com",
+  "selection_policy": "Public collection candidates; available variant and image required; obvious open-box and unsuitable accessory/bundle records excluded.",
+  "target_total": 80,
+  "expected_existing_uat": 5,
+  "expected_create_before_dry_run": 75,
+  "groups": [
+    {
+      "name": "Acoustic Guitars",
+      "category_slug": "acoustic-guitars",
+      "source_collection": "acoustic-guitars",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "316900573208",
+          "handle": "henrix-38c-38-inch-cutaway-acoustic-guitar",
+          "title": "Henrix 38C 38 Inch Cutaway Acoustic Guitar with Dual Action Truss Rod, Gigbag, Picks, String Set, Strap, Cloth & Ebook",
+          "vendor": "Henrix",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": true
+        },
+        {
+          "source_product_id": "316948480024",
+          "handle": "vault-ea20-40-inch-learn-to-play-kit-6-string-cutaway-acoustic-guitar-with-ebook-strap-picks-bag-polishing-cloth",
+          "title": "Vault EA20 Guitar Kit with Learn to Play Ebook, Bag, Strings, Straps, Picks, String winder & Polishing Cloth - 40 inch Cutaway Acoustic Guitar",
+          "vendor": "Vault",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": true
+        },
+        {
+          "source_product_id": "282613219352",
+          "handle": "ibanez-md39c-39-cutaway-acoustic-guitar",
+          "title": "Ibanez MD39C 39 inch Cutaway Acoustic Guitar with Strap, Picks, Polishing Cloth & Ebook",
+          "vendor": "Ibanez",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": true
+        },
+        {
+          "source_product_id": "403918383",
+          "handle": "yamaha-f310-acoustic-guitar",
+          "title": "Yamaha F310 Dreadnought Acoustic Guitar",
+          "vendor": "Yamaha",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": true
+        },
+        {
+          "source_product_id": "403661239",
+          "handle": "cort-ad810-dreadnought-acoustic-guitar",
+          "title": "Cort AD810 Dreadnought Acoustic Guitar with E-Book",
+          "vendor": "Cort",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": true
+        },
+        {
+          "source_product_id": "5438763204769",
+          "handle": "henrix-pro-38-inch-6-string-cutaway-acoustic-guitar",
+          "title": "Henrix PRO 38C 38 Inch 6 String Cutaway Acoustic Guitar",
+          "vendor": "Henrix",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "316954083352",
+          "handle": "vault-ea40-40-inch-premium-cutaway-acoustic-guitar-zebrawood",
+          "title": "Vault EA40 41 inch Premium Solid Spruce-Top Cutaway Acoustic Guitar",
+          "vendor": "Vault",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403918451",
+          "handle": "fender-cd-60s-dreadnought-acoustic-guitar",
+          "title": "Fender CD-60S Dreadnought Acoustic Guitar",
+          "vendor": "Fender",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "3963070349384",
+          "handle": "fender-cd-60-dread-v3-ds-6-string-acoustic-guitar-walnut-fretboard",
+          "title": "Fender CD-60 Dread V3 DS 6 String Acoustic Guitar",
+          "vendor": "Fender",
+          "product_type": "Acoustic Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403816875",
+          "handle": "cort-ad810e-dreadnought-electro-acoustic-guitar",
+          "title": "Cort AD810E Dreadnought Electro Acoustic Guitar",
+          "vendor": "Cort",
+          "product_type": "Electro Acoustic Guitars",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Electric Guitars",
+      "category_slug": "electric-guitars",
+      "source_collection": "electric-guitars",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "466237023",
+          "handle": "fender-squier-sonic-stratocaster-electric-guitar",
+          "title": "Fender Squier Sonic Stratocaster Electric Guitar",
+          "vendor": "Fender",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "9454189006",
+          "handle": "vault-rg1rw-rg-style-electric-guitar",
+          "title": "Vault RG1 Soloist Premium Electric Guitar",
+          "vendor": "Vault",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5316518117537",
+          "handle": "vault-st1rw-strat-style-electric-guitar",
+          "title": "Vault ST1 Premium Electric Guitar",
+          "vendor": "Vault",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "1663278022728",
+          "handle": "fender-squier-affinity-series-stratocaster-electric-guitar-indian-laurel-fretboard",
+          "title": "Fender Squier Affinity Series Stratocaster Electric Guitar",
+          "vendor": "Fender",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403657959",
+          "handle": "fender-squier-electric-guitar-affinity-series-telecaster",
+          "title": "Fender Squier Affinity Series Telecaster Electric Guitar",
+          "vendor": "Fender",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403808055",
+          "handle": "cort-cr100-les-paul-style-electric-guitar",
+          "title": "Cort CR100 Les Paul Style Electric Guitar",
+          "vendor": "Cort",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "459241527",
+          "handle": "jackson-js11-dinky-electric-guitar",
+          "title": "Jackson JS11 Dinky 6 String Electric Guitar",
+          "vendor": "Jackson",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "291788095512",
+          "handle": "vault-tl1-telecaster-style-electric-guitar",
+          "title": "Vault TL1 Tele Style Electric Guitar",
+          "vendor": "Vault",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403658975",
+          "handle": "ibanez-grx40-electric-guitar",
+          "title": "Ibanez GRX40 RG Gio Series Maple Neck 6 String Electric Guitar",
+          "vendor": "Ibanez",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6747454111923",
+          "handle": "newen-telecaster-6-string-electric-guitar",
+          "title": "Newen Telecaster 6 String Electric Guitar",
+          "vendor": "Newen",
+          "product_type": "Electric Guitars",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Portable Keyboards",
+      "category_slug": "portable-keyboards",
+      "source_collection": "portable-keyboards",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "4383575539784",
+          "handle": "casio-casiotone-ct-s200-61-key-portable-keyboard",
+          "title": "Casio Casiotone CT S200 61 Key Portable Keyboard With Adapter",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5480003436705",
+          "handle": "casio-ct-x870in-61-key-portable-keyboard-with-adapter",
+          "title": "CAS-CTX870IN Portable Keyboard With Adapter",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "10325564942",
+          "handle": "casio-sa-46-mini-portable-keyboard-with-power-adapter",
+          "title": "Casio SA-50 Casiotone 32 Key Kids Mini Portable Keyboard",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "1386930634824",
+          "handle": "casio-ct-x9000in-61-key-portable-keyboard",
+          "title": "Casio CT-X9000IN 61-Key Portable Keyboard",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6891006754995",
+          "handle": "vault-kt-61-keytone-61-key-keyboard",
+          "title": "Vault KT-61 Keytone Touch Sensitive 61-Key Keyboard - Black",
+          "vendor": "Vault",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "10325694798",
+          "handle": "casio-sa47-mini-portable-keyboard-with-power-adapter",
+          "title": "Casio SA-51 Casiotone 32 Key Kids Mini Portable Keyboard",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6891001938099",
+          "handle": "vault-kt-54-keytone-54-key-keyboard",
+          "title": "Vault KT-54 Keytone 54-Key Keyboard - Black",
+          "vendor": "Vault",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "8076267028659",
+          "handle": "elektrofm-surtaal-st-50-61-keys-keyboard",
+          "title": "Elektrofm Surtaal ST-50 61 Keys Portable Keyboard",
+          "vendor": "Elektrofm",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "237520683032",
+          "handle": "casio-ctk-2550-61-key-standard-portable-keyboard",
+          "title": "Casio CTK 2550 61 Key Standard Portable Keyboard With Adapter",
+          "vendor": "Casio",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6633265365171",
+          "handle": "alesis-harmony-32-32-key-portable-keyboard-with-built-in-speakers",
+          "title": "Alesis HARMONY 32 32-Key Portable Keyboard with Built-In Speakers",
+          "vendor": "Alesis",
+          "product_type": "Portable Keyboards",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Electronic Drum Kits",
+      "category_slug": "electronic-drum-kits",
+      "source_collection": "electronic-drum-kits",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "8302424686771",
+          "handle": "vault-impact-fusion-electronic-drumkit",
+          "title": "Vault Impact Fusion Electronic Drum Kit with Dual Zone Mesh Pads, Dual Zone Cymbals and Advanced Module with 300+ Sounds",
+          "vendor": "Vault",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "8302414397619",
+          "handle": "vault-impact-junior-electronic-drumkit",
+          "title": "Vault Impact Junior Electronic Drum Kit for Kids with All-Mesh Pads, USB-C Module and 60+ Built-In Sounds – Junior Sized for Kids Under 12",
+          "vendor": "Vault",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "1693780770888",
+          "handle": "alesis-turbo-mesh-7-piece-electronic-drum-kit-with-mesh-heads",
+          "title": "Alesis Turbo Mesh 7-Piece Electronic Drum Kit with Mesh Heads",
+          "vendor": "Alesis",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6660488724659",
+          "handle": "roland-td-07kv-v-drums-electronic-drum-kit",
+          "title": "Roland TD-07KV V-Drums Electronic Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7032661016755",
+          "handle": "roland-td-07dmk-v-drum-electric-drum-kit",
+          "title": "Roland TD-07DMK V-Drum Electric Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7301151228083",
+          "handle": "roland-td-17kvx2-v-drums-electronic-drum-mesh-kit-with-mds-compact-drum-stand",
+          "title": "Roland V Drums Electronic Drum Mesh Kit with MDS-Compact Drum Stand",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7510339584179",
+          "handle": "roland-td-02k-v-drums-electronic-drum-kit",
+          "title": "Roland TD-02K V-Drums Electronic Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "324047994904",
+          "handle": "roland-td-1kpx2-electronic-drum-kit",
+          "title": "Roland TD-1KPX2 Electronic Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7032657641651",
+          "handle": "roland-td-25k-v-drum-electric-drum-kit",
+          "title": "Roland TD-25K V-Drum Electric Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5462940287137",
+          "handle": "roland-td-27kv-v-drums-electronic-drum-kit",
+          "title": "Roland TD-27KV V-Drums Electronic Drum Kit",
+          "vendor": "Roland",
+          "product_type": "Electronic Drum Kits",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Microphones",
+      "category_slug": "microphones",
+      "source_collection": "microphones",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "6963361743027",
+          "handle": "behringer-bc110-handheld-dynamic-vocal-microphone-set",
+          "title": "Behringer BC110 Handheld Dynamic Vocal Microphone Set",
+          "vendor": "Behringer",
+          "product_type": "Dynamic Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7290229194931",
+          "handle": "rode-x-xdm-100-professional-dynamic-usb-microphone",
+          "title": "Rode X XDM-100 Professional Dynamic USB Microphone",
+          "vendor": "Rode X",
+          "product_type": "Usb Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7290249707699",
+          "handle": "rode-x-xcm-50-professional-condenser-usb-microphone",
+          "title": "Rode X XCM-50 Professional Condenser USB Microphone",
+          "vendor": "Rode X",
+          "product_type": "Usb Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "198929055768",
+          "handle": "audix-adx-51-studio-condenser-microphone",
+          "title": "Audix ADX 51 Studio Condenser Microphone",
+          "vendor": "Audix",
+          "product_type": "Condenser Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6714722189491",
+          "handle": "boya-by-mm1-pro-ultracompact-camera-mount-dual-capsule-shotgun-microphone",
+          "title": "Boya BY-MM1 PRO Ultracompact Camera-Mount Dual-Capsule Shotgun Microphone",
+          "vendor": "Boya",
+          "product_type": "Condenser Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6145112735923",
+          "handle": "boya-by-bm58-professional-cardioid-dynamic-vocal-microphone",
+          "title": "Boya BY-BM58 Professional Cardioid Dynamic Vocal Microphone",
+          "vendor": "Boya",
+          "product_type": "Dynamic Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7220947288243",
+          "handle": "vault-dcm-87-dynamic-cardioid-microphone-with-mic-clip-and-xlr-cable",
+          "title": "Vault DCM-87 Dynamic Cardioid Microphone with Mic Clip and XLR cable",
+          "vendor": "Vault",
+          "product_type": "Dynamic Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7450757136563",
+          "handle": "beyerdynamic-tg-v50-dynamic-vocal-microphone-cardioid",
+          "title": "Beyerdynamic TG V50 Dynamic Vocal Microphone (Cardioid)",
+          "vendor": "Beyerdynamic",
+          "product_type": "Dynamic Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "150169911320",
+          "handle": "beyerdynamic-tg-v70-s-dynamic-microphone",
+          "title": "Beyerdynamic TG V70 S Dynamic Microphone",
+          "vendor": "Beyerdynamic",
+          "product_type": "Dynamic Microphones",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7450757693619",
+          "handle": "beyerdynamic-fox-usb-cardioid-studio-microphone",
+          "title": "Beyerdynamic FOX USB Cardioid Studio Microphone",
+          "vendor": "Beyerdynamic",
+          "product_type": "Microphones",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Audio Interfaces",
+      "category_slug": "audio-interfaces",
+      "source_collection": "audio-interfaces",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "427015887",
+          "handle": "focusrite-scarlett-solo-3rd-gen-usb-audio-interface-with-pro-tools-first",
+          "title": "Focusrite Scarlett SOLO USB Audio Interface",
+          "vendor": "Focusrite",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403625771",
+          "handle": "focusrite-scarlett-2i2-usb-2-0-award-winning-audio-interface-3rd-generation",
+          "title": "Focusrite Scarlett 2i2 4th Gen USB 2.0 Audio Interface",
+          "vendor": "Focusrite",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "4066034435",
+          "handle": "numark-dj-io2-usb-dj-audio-interface",
+          "title": "Numark DJ iO2 USB DJ Audio Interface",
+          "vendor": "Numark",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7444483801267",
+          "handle": "rode-x-streamer-x-audio-interface-and-video-capture-card",
+          "title": "Rode X Streamer X Audio Interface and Video Capture Card",
+          "vendor": "Rode X",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6938378830003",
+          "handle": "universal-audio-volt-176-usb-c-1x2-audio-interface",
+          "title": "Universal Audio Volt 176 USB C 1x2 Audio Interface",
+          "vendor": "Universal Audio",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "3899272396872",
+          "handle": "focusrite-scarlett-8i6-3rd-gen-8-input-6-output-audio-interface",
+          "title": "Focusrite Scarlett 8i6 3rd Gen 8 Input 6 Output Audio Interface",
+          "vendor": "Focusrite",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6938400424115",
+          "handle": "universal-audio-volt-476-usb-c-4x4-audio-interface",
+          "title": "Universal Audio Volt 476 USB C 4x4 Audio Interface with UAD Plug-Ins",
+          "vendor": "Universal Audio",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7032799887539",
+          "handle": "eikon-ekusbx1-xlr-usb-converter-audio-interface",
+          "title": "Eikon EKUSBX1 XLR-USB Converter Audio Interface",
+          "vendor": "Eikon",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7984958275763",
+          "handle": "arturia-audiofuse-x8-in-8-premium-line-level-audio-interface",
+          "title": "Arturia AudioFuse X8 IN 8 Premium line-level Audio Interface",
+          "vendor": "Arturia",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7391342887091",
+          "handle": "focusrite-vocaster-two-usb-c-podcasting-audio-interface",
+          "title": "Focusrite Vocaster Two USB-C Podcasting Audio Interface",
+          "vendor": "Focusrite",
+          "product_type": "Audio Interfaces",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Studio Monitors",
+      "category_slug": "studio-monitors",
+      "source_collection": "monitors-speakers",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "316955328536",
+          "handle": "vault-c5-two-way-bi-amp-monitor-speakers-pair",
+          "title": "Vault C5 5-Inch Powered Studio Monitor Speakers Pair",
+          "vendor": "Vault",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "316955361304",
+          "handle": "vault-c6-two-way-bi-amp-monitor-speakers-pair",
+          "title": "Vault C6 6\" Powered Studio Monitors With Isolation Foam Pads - Pair",
+          "vendor": "Vault",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5752545869985",
+          "handle": "kali-audio-lp-8-active-near-field-studio-monitor-pair",
+          "title": "Kali Audio LP-8 2nd Wave Lone Pine Series 8\" Active Studio Monitor - Pair",
+          "vendor": "Kali Audio",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "8083902659",
+          "handle": "yamaha-hs7-two-way-6-5-active-monitor-single",
+          "title": "Yamaha HS7 Two Way 6.5inch Active Monitor - Single Unit",
+          "vendor": "Yamaha",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "1435759509576",
+          "handle": "mackie-mr-series-powered-active-studio-monitor-speakers-pair",
+          "title": "Mackie MR Series Powered Active Studio Monitor Speakers - Single",
+          "vendor": "Mackie",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5791608176801",
+          "handle": "yamaha-hs7-two-way-6-5inch-active-monitor-pair",
+          "title": "Yamaha HS7 Two Way 6.5inch Active Monitor - Pair",
+          "vendor": "Yamaha",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "5752478826657",
+          "handle": "yamaha-hs-5-studio-monitor-speaker-pair",
+          "title": "Yamaha HS5 Studio Monitor Speaker- Pair",
+          "vendor": "Yamaha",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403915963",
+          "handle": "yamaha-hs-5-studio-monitor-speaker-single-unit",
+          "title": "Yamaha HS5 Studio Monitor Speaker- Single Unit",
+          "vendor": "Yamaha",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "316955525144",
+          "handle": "vault-c8-8-inch-two-way-bi-amp-monitor-speakers-pair",
+          "title": "Vault C8 8\" Powered Studio Monitors With Isolation Foam Pads",
+          "vendor": "Vault",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7590199689395",
+          "handle": "focal-trio6-st6-3-way-active-studio-monitor-speaker",
+          "title": "Focal Trio6 ST6 3-Way Active Studio Monitor Speaker - Single",
+          "vendor": "Focal",
+          "product_type": "Monitor Speakers",
+          "existing_uat_expected": false
+        }
+      ]
+    },
+    {
+      "name": "Guitar Accessories",
+      "category_slug": "guitar-accessories",
+      "source_collection": "guitar-accessories",
+      "target": 10,
+      "products": [
+        {
+          "source_product_id": "403916615",
+          "handle": "bajaao-standard-instrument-cable-3-meter",
+          "title": "Bajaao Standard Instrument Cable",
+          "vendor": "Bajaao",
+          "product_type": "Instrument Cables",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "4123261632584",
+          "handle": "fender-original-series-straight-to-straight-instrument-cables",
+          "title": "Fender Original Series Straight to Straight Instrument Connector Cables",
+          "vendor": "Fender",
+          "product_type": "Guitar Cables",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403899543",
+          "handle": "dunlop-tortex-standard-guitar-picks-set-of-6",
+          "title": "Dunlop 418R Tortex Standard Guitar Picks - Set of 6",
+          "vendor": "Dunlop",
+          "product_type": "Picks",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403899727",
+          "handle": "dunlop-fretboard-65-ultimate-lemon-oil",
+          "title": "Dunlop Fretboard 65 Ultimate Lemon Oil - Guitar Maintenance",
+          "vendor": "Dunlop",
+          "product_type": "Cleaners and Conditioners",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403916347",
+          "handle": "jim-dunlop-47r3n-jazz-iii-picks-set-of-6",
+          "title": "Dunlop 47R3N Jazz III Stiffo Nylon Guitar Pick- Pack of 6",
+          "vendor": "Dunlop",
+          "product_type": "Picks",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "7097110560947",
+          "handle": "bajaao-metal-capo",
+          "title": "Bajaao Metal Capo For Guitar, Ukulele, Mandolin & Banjo",
+          "vendor": "Bajaao",
+          "product_type": "Capos",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "6755938238643",
+          "handle": "bajaao-5mm-padded-acoustic-guitar-bag-for-vault-fender-yamaha-cort-ibanez-kadence-juarez-other-brands",
+          "title": "Bajaao AGC-B41 Premium 8mm Padded Acoustic Guitar Gig Bag For Vault, Fender, Yamaha, Cort, Ibanez & Other Leading Brands",
+          "vendor": "Bajaao",
+          "product_type": "Acoustic Guitar Gigbags",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403905251",
+          "handle": "ernie-ball-2222-nickel-hybrid-slinky-electric-guitar-strings",
+          "title": "Ernie Ball 2222 Electric Guitar Strings - Nickel, Hybrid Slinky - 0.09-0.46",
+          "vendor": "Ernie Ball",
+          "product_type": "Electric Guitar Strings",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403905411",
+          "handle": "ernie-ball-2215-skinny-top-heavy-bottom-electric-guitar-strings",
+          "title": "Ernie Ball 2215 Electric Guitar Strings - Skinny Top, Heavy Bottom - 0.10-0.52",
+          "vendor": "Ernie Ball",
+          "product_type": "Electric Guitar Strings",
+          "existing_uat_expected": false
+        },
+        {
+          "source_product_id": "403910559",
+          "handle": "ernie-ball-2006-earthwood-80-20-bronze-extra-light-acoustic-guitar-strings",
+          "title": "Ernie Ball 2006 Earthwood Acoustic Strings 10-50",
+          "vendor": "Ernie Ball",
+          "product_type": "Acoustic Guitar Strings",
+          "existing_uat_expected": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,14 +1,25 @@
 {
-    "interval_seconds": 1800,
-    "branch": "feature/dev",
-    "single_branch_rule": "NEVER create new branches or new PRs — all work lands on feature/dev, single open PR #22",
-    "health": [
-        "php artisan --version",
-        "php artisan config:clear",
-        "npm run build"
+    "schema_version": 2,
+    "enabled": true,
+    "status": "AUTONOMOUS_SUPERVISOR_ACTIVE",
+    "reason": "Agent 0 accepted activation evidence after Build Chunks 0\u20137 and 58-test integrated simulation QA.",
+    "branch": "rhythm-uat",
+    "authoritative_sources": [
+        "tasks/MASTER_PROJECT_TRACKER.md",
+        "tasks/CANONICAL_PHASE_SEQUENCE.md",
+        "tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md",
+        "tasks/AUTO_MODE_PROTOCOL.md",
+        "tasks/TEAM_ROSTER.md",
+        "tasks/TEAM_CHANGELOG.md"
     ],
-    "gates": [
-        "php artisan test"
+    "legacy_non_authoritative_sources": [
+        "tasks/tasks.json",
+        "docs/AGENT_RULES_STRICT.md"
     ],
-    "logs_dir": "logs"
+    "persistent_data_policy": "Never run destructive tests, migrate:fresh or db:wipe against persistent UAT or production data.",
+    "secrets_policy": "Environment only; never write secrets to repository state or logs.",
+    "health": [],
+    "gates": [],
+    "logs_dir": "logs",
+    "workspace_dependency_policy": "The workspace must contain no vendor directory or vendor symlink. Run PHP tooling from a disposable external QA copy."
 }

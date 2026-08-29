@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
 use App\Models\Product;
 use App\Observers\HomepageDataObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * Single source of truth for ALL homepage data.
@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Schema;
  */
 final class HomepageDataService
 {
+    private const MAX_CATEGORY_ROWS = 4;
+
+    private const MAX_DISCOVERY_CATEGORIES = 10;
     /**
      * @return array{
      *   heroSlides: Collection<int, HeroSlide>,
@@ -35,55 +38,15 @@ final class HomepageDataService
      *   bestsellers: Collection<int, Product>,
      *   newArrivals: Collection<int, Product>,
      *   trending: Collection<int, Product>,
-     *   popularCategories: Collection<int, array{name:string, slug:string, count:int}>,
+     *   bestDeals: Collection<int, Product>,
+     *   categoryRows: Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>,
+     *   popularCategories: Collection<int, array{name:string, slug:string, count:int, image:?string}>,
      * }
      */
     public function all(): array
     {
-        // #region agent log
-        $heroExists = Schema::hasTable('hero_slides');
-        $blocksExists = Schema::hasTable('homepage_blocks');
-        $faqsExists = Schema::hasTable('faqs');
-        $heroMigrationRecorded = DB::table('migrations')->where('migration', 'like', '%hero_slides%')->exists();
-        $dbPath = config('database.connections.sqlite.database');
-        file_put_contents(
-            base_path('debug-2b7ff0.log'),
-            json_encode([
-                'sessionId' => '2b7ff0',
-                'runId' => 'pre-fix',
-                'hypothesisId' => 'A',
-                'location' => 'HomepageDataService.php:all',
-                'message' => 'homepage data schema check',
-                'data' => [
-                    'hero_slides_exists' => $heroExists,
-                    'homepage_blocks_exists' => $blocksExists,
-                    'faqs_exists' => $faqsExists,
-                    'hero_migration_recorded' => $heroMigrationRecorded,
-                    'sqlite_database' => $dbPath,
-                    'default_connection' => config('database.default'),
-                ],
-                'timestamp' => (int) (microtime(true) * 1000),
-            ])."\n",
-            FILE_APPEND | LOCK_EX
-        );
-        // #endregion
-
         return Cache::remember(HomepageDataObserver::CACHE_KEY, 3600, function (): array {
-            // #region agent log
-            file_put_contents(
-                base_path('debug-2b7ff0.log'),
-                json_encode([
-                    'sessionId' => '2b7ff0',
-                    'runId' => 'pre-fix',
-                    'hypothesisId' => 'B',
-                    'location' => 'HomepageDataService.php:cache-callback',
-                    'message' => 'about to query hero_slides',
-                    'data' => ['schema_has_hero_slides' => Schema::hasTable('hero_slides')],
-                    'timestamp' => (int) (microtime(true) * 1000),
-                ])."\n",
-                FILE_APPEND | LOCK_EX
-            );
-            // #endregion
+            $categoryRows = $this->categoryRows();
 
             return [
                 'heroSlides' => HeroSlide::query()->where('is_active', true)->orderBy('sort_order')->get(),
@@ -98,29 +61,20 @@ final class HomepageDataService
                 'bestsellers' => Product::query()->active()->featured()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
-                // Curated (not pure created_at): deterministic set, every product
-                // has a hero image, and order never drifts when new rows are seeded.
-                'newArrivals' => $this->curatedProducts([
-                    'yamaha-f310-acoustic-guitar',
-                    'squier-affinity-stratocaster-hss',
-                    'yamaha-trbx174-bass-guitar',
-                    'yamaha-p-145-digital-piano',
-                    'yamaha-psr-e373-portable-keyboard',
-                    'alesis-nitro-mesh-kit',
-                    'shure-sm58-vocal-microphone',
-                    'pioneer-dj-ddj-flx4-controller',
-                    'boss-katana-50-mkii',
-                    'focusrite-scarlett-solo-3rd-gen',
-                ]),
+                'newArrivals' => Product::query()->active()
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->latest('created_at')->latest('id')->limit(10)->get(),
                 'trending' => Product::query()->active()->trending()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->orderByDesc('updated_at')->limit(8)->get(),
-                'dealsOfDay' => $this->curatedProducts([
-                    'boss-katana-50-mkii',
-                    'shure-sm58-vocal-microphone',
-                    'focusrite-scarlett-solo-3rd-gen',
-                    'alesis-nitro-mesh-kit',
-                ]),
+                    ->orderByDesc('updated_at')->orderByDesc('id')->limit(10)->get(),
+                'bestDeals' => Product::query()->active()
+                    ->whereNotNull('compare_at_price')
+                    ->whereColumn('compare_at_price', '>', 'price')
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->orderByRaw('(compare_at_price - price) / NULLIF(compare_at_price, 0) DESC')
+                    ->orderByDesc('updated_at')
+                    ->limit(8)
+                    ->get(),
                 // Distinct set from New Arrivals (reference uses a separate pool) —
                 // fresh gear that has just landed in the store.
                 'recentlyLaunched' => $this->curatedProducts([
@@ -131,8 +85,9 @@ final class HomepageDataService
                     'casio-ct-s300-portable-keyboard',
                     'numark-mixtrack-pro-fx',
                 ]),
-                'brandNames' => \App\Models\Brand::query()->orderBy('name')->limit(16)->pluck('name'),
-                'popularCategories' => $this->popularCategories(),
+                'brandNames' => Brand::query()->orderBy('name')->limit(16)->pluck('name'),
+                'categoryRows' => $categoryRows,
+                'popularCategories' => $this->popularCategories($categoryRows->pluck('category')),
             ];
         });
     }
@@ -157,43 +112,99 @@ final class HomepageDataService
     }
 
     /**
-     * Category cards for the "Popular Categories" carousel —
-     * curated order: 6 roots + 4 popular subcategories.
-     * Root counts include products from all child categories.
-     *
-     * @return Collection<int, array{name:string, slug:string, count:int}>
+     * @return Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>
      */
-    private function popularCategories(): Collection
+    private function categoryRows(): Collection
     {
-        $order = [
-            'guitars', 'electric-guitars', 'acoustic-guitars',
-            'keyboards-pianos', 'digital-pianos',
-            'drums-percussion', 'pro-audio',
-            'dj-stage', 'dj-controllers', 'accessories',
-        ];
-
-        $categories = Category::query()
-            ->whereIn('slug', $order)
+        return HomepageCategoryRow::query()
             ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query
+                ->where('is_active', true)
+                ->whereHas('products', fn ($products) => $products->active()))
+            ->with('category:id,name,slug,is_active')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->limit(self::MAX_CATEGORY_ROWS)
+            ->get()
+            ->map(function (HomepageCategoryRow $row): array {
+                $products = Product::query()
+                    ->active()
+                    ->where('category_id', $row->category_id)
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->orderByRaw('featured_rank IS NULL')
+                    ->orderBy('featured_rank')
+                    ->orderByDesc('updated_at')
+                    ->limit($row->boundedProductLimit())
+                    ->get();
+
+                return [
+                    'row' => $row,
+                    'category' => $row->category,
+                    'products' => $products,
+                ];
+            });
+    }
+
+    /**
+     * Configured row categories lead the existing curated fallback.
+     * Root counts include direct products and immediate child categories.
+     *
+     * @param  Collection<int, Category>  $configured
+     * @return Collection<int, array{name:string, slug:string, count:int, image:?string}>
+     */
+    private function popularCategories(Collection $configured): Collection
+    {
+        $configuredOrder = $configured->pluck('slug')->values();
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->where(function ($query): void {
+                $query->whereHas('products', fn ($products) => $products->active())
+                    ->orWhereHas('children.products', fn ($products) => $products->active());
+            })
             ->with('children:id,parent_id')
-            ->get(['id', 'parent_id', 'name', 'slug']);
+            ->orderByRaw('parent_id IS NOT NULL')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->limit(self::MAX_DISCOVERY_CATEGORIES * 2)
+            ->get(['id', 'parent_id', 'name', 'slug', 'sort_order']);
+        $categoryIds = $categories
+            ->flatMap(fn (Category $category) => $category->children->pluck('id')->push($category->id))
+            ->unique();
+        $counts = Product::query()
+            ->active()
+            ->whereIn('category_id', $categoryIds)
+            ->selectRaw('category_id, count(*) as aggregate')
+            ->groupBy('category_id')
+            ->pluck('aggregate', 'category_id');
 
-        return collect($order)
-            ->map(function (string $slug) use ($categories): ?array {
-                $category = $categories->firstWhere('slug', $slug);
-                if ($category === null) {
-                    return null;
-                }
-
+        return $categories
+            ->map(function (Category $category) use ($counts, $configuredOrder): array {
                 $ids = $category->children->pluck('id')->push($category->id);
+                $count = $ids->sum(fn (int $id): int => (int) ($counts[$id] ?? 0));
+                $asset = 'images/categories/'.$category->slug.'.jpg';
+                $image = is_file(public_path($asset)) ? '/'.$asset : Product::query()
+                    ->active()
+                    ->whereIn('category_id', $ids)
+                    ->with('media')
+                    ->latest('updated_at')
+                    ->first()?->heroImage();
+                $configuredRank = $configuredOrder->search($category->slug);
 
                 return [
                     'name' => $category->name,
                     'slug' => $category->slug,
-                    'count' => Product::query()->active()->whereIn('category_id', $ids)->count(),
+                    'count' => $count,
+                    'image' => $image,
+                    '_configured_rank' => $configuredRank === false ? PHP_INT_MAX : $configuredRank,
                 ];
             })
-            ->filter()
+            ->sortBy(fn (array $category): array => [$category['_configured_rank'], -$category['count'], $category['name']])
+            ->take(self::MAX_DISCOVERY_CATEGORIES)
+            ->map(function (array $category): array {
+                unset($category['_configured_rank']);
+
+                return $category;
+            })
             ->values();
     }
 }

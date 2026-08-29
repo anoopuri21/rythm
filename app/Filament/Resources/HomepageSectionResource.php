@@ -6,13 +6,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HomepageSectionResource\Pages;
 use App\Models\HomepageSection;
-use FilamentTiptapEditor\TiptapEditor;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -22,13 +23,13 @@ class HomepageSectionResource extends Resource
 {
     protected static ?string $model = HomepageSection::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home-modern';
 
-    protected static ?string $navigationGroup = 'HOMEPAGE';
+    protected static string|\UnitEnum|null $navigationGroup = 'HOMEPAGE';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Select::make('section_key')
@@ -63,7 +64,7 @@ class HomepageSectionResource extends Resource
                 ->label('Title accent')
                 ->maxLength(255)
                 ->helperText('The emphasised part of the heading (brand colour).'),
-            TiptapEditor::make('content')
+            RichEditor::make('content')
                 ->label('Body content')
                 ->profile('default')
                 ->helperText('Long-form body shown in this section (optional).'),
@@ -87,8 +88,8 @@ class HomepageSectionResource extends Resource
                 TernaryFilter::make('is_active'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

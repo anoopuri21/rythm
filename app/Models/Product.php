@@ -12,20 +12,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[Table('products')]
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'meta_title', 'meta_description'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
 class Product extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
     use SoftDeletes;
-
-    
 
     protected $casts = [
         'price' => 'decimal:2',
@@ -37,6 +36,32 @@ class Product extends Model implements HasMedia
         'featured_rank' => 'integer',
         'is_trending' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (Product $product): void {
+            if (! $product->isDirty('is_active') || ! $product->is_active) {
+                return;
+            }
+
+            $source = $product->importSource()->first();
+            if ($source === null) {
+                return;
+            }
+
+            $hasStock = $product->stock > 0 || $product->variants()->where('is_active', true)->where('stock', '>', 0)->exists();
+            $mediaApproved = $product->getMedia('gallery')->isNotEmpty()
+                && $product->getMedia('gallery')->every(fn ($media): bool => (bool) $media->getCustomProperty('commercial_use_approved', false));
+
+            if ($source->publication_reviewed_at === null
+                || $source->commercial_use_approved_at === null
+                || (float) $product->price <= 0
+                || ! $hasStock
+                || ! $mediaApproved) {
+                throw new \DomainException('Imported products require reviewed content, approved local media, a positive price and verified real stock before activation.');
+            }
+        });
+    }
 
     public function category(): BelongsTo
     {
@@ -51,6 +76,31 @@ class Product extends Model implements HasMedia
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function attributeValues(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductAttributeValue::class, 'product_attribute_value_product');
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
+    public function importSource(): HasOne
+    {
+        return $this->hasOne(ProductImportSource::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
     }
 
     public function cartItems(): HasMany
@@ -104,8 +154,9 @@ class Product extends Model implements HasMedia
             return $media;
         }
 
-        $file = 'images/products/' . $this->slug . '.jpg';
-        return is_file(public_path($file)) ? '/' . $file : null;
+        $file = 'images/products/'.$this->slug.'.jpg';
+
+        return is_file(public_path($file)) ? '/'.$file : null;
     }
 
     /** Gallery image URLs (media first, committed fallback, else []). */

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\HeroSlide;
+use App\Models\Product;
+use App\Observers\HomepageDataObserver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 /**
  * Per-section UI test cases — matches the MAIN (arena) homepage design:
  * mega-market layout (hero-mm, cat-mm, prod-mm, promo-mm, adv-mm, deal-mm,
- * catban-mm, launch-mm, brand-mm) with monochrome styling.
+ * catban-mm, launch-mm, brand-mm) with token-backed Rythme styling.
  */
 class HomepageSectionsTest extends TestCase
 {
@@ -54,7 +58,8 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('hero-swiper swiper', escape: false)
             ->assertSee('hero-slide-image', escape: false)
             ->assertSee('hero-pagination', escape: false)
-            ->assertSee('hero-mm__cta', escape: false);
+            ->assertSee('hero-mm__cta', escape: false)
+            ->assertSee('aria-label="Pause featured collections"', escape: false);
     }
 
     public function test_hero_has_admin_driven_slides(): void
@@ -70,12 +75,26 @@ class HomepageSectionsTest extends TestCase
         $this->assertStringContainsString('Feel the music.', $html);
     }
 
-    public function test_usp_strip_renders(): void
+    public function test_hero_keeps_one_descriptive_h1_when_admin_slides_are_empty(): void
+    {
+        HeroSlide::query()->delete();
+        Cache::forget(HomepageDataObserver::CACHE_KEY);
+
+        $response = $this->get('/')->assertOk()
+            ->assertSee('Find your instrument.', escape: false);
+
+        $this->assertSame(1, substr_count($response->getContent(), '<h1'));
+    }
+
+    public function test_usp_strip_renders_without_unapproved_commerce_claims(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSee('class="usp-strip"', escape: false)
-            ->assertSee('Free express', escape: false);
+            ->assertSee('Instrument-first', escape: false)
+            ->assertDontSee('Free express', escape: false)
+            ->assertDontSee('7-day returns', escape: false)
+            ->assertDontSee('Easy EMI', escape: false);
     }
 
     public function test_categories_carousel_renders_with_db_categories(): void
@@ -107,22 +126,39 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('Shop now', escape: false);
     }
 
-    public function test_advantages_section_renders(): void
+    public function test_advantages_section_renders_verified_platform_capabilities_only(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('adv-mm', escape: false);
+            ->assertSee('adv-mm', escape: false)
+            ->assertSee('Server-Verified Totals')
+            ->assertSee('Order Status Tracking')
+            ->assertDontSee('Fee-Free EMI')
+            ->assertDontSee('Best Price Guarantee')
+            ->assertDontSee('Store Pickup In 15 Min');
     }
 
-    public function test_deals_section_renders_with_countdown(): void
+    public function test_deals_section_uses_real_stock_without_synthetic_sales_or_deadline(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSee('deal-mm', escape: false)
-            ->assertSee('Days', escape: false)
-            ->assertSee('Hours', escape: false)
-            ->assertSee('Mins', escape: false)
+            ->assertSee('Available now', escape: false)
+            ->assertDontSee('Sold:', escape: false)
+            ->assertDontSee('data-deal-timer', escape: false)
             ->assertSee('View product', escape: false);
+    }
+
+    public function test_empty_product_collections_do_not_render_broken_sections(): void
+    {
+        Product::query()->delete();
+        Cache::forget(HomepageDataObserver::CACHE_KEY);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('id="new-arrivals"', escape: false)
+            ->assertDontSee('class="deal-mm"', escape: false)
+            ->assertDontSee('class="launch-mm"', escape: false);
     }
 
     public function test_category_banners_section_renders(): void
@@ -149,6 +185,14 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('brand-mm', escape: false);
     }
 
+    public function test_homepage_has_self_canonical_and_index_policy(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('home').'">', escape: false)
+            ->assertSee('<meta name="robots" content="index, follow">', escape: false);
+    }
+
     public function test_footer_renders(): void
     {
         $this->get('/')
@@ -156,6 +200,19 @@ class HomepageSectionsTest extends TestCase
             ->assertSee('id="footer"', escape: false)
             ->assertSee('footer-shop', escape: false)
             ->assertSee('footer-brands', escape: false);
+    }
+
+    public function test_footer_uses_verified_capabilities_without_placeholder_contacts_or_policy_claims(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Catalogue filters')
+            ->assertSee('Server-verified checkout totals')
+            ->assertDontSee('24×7')
+            ->assertDontSee('Free setup on every instrument')
+            ->assertDontSee('wa.me/919000000000', escape: false)
+            ->assertDontSee('Shipping &amp; delivery', escape: false)
+            ->assertDontSee('Returns &amp; refunds', escape: false);
     }
 
     public function test_scroll_to_top_button_is_present(): void

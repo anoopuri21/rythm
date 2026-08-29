@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Payment\FakePaymentGateway;
+use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
+use App\Services\PaymentRetryService;
 use App\Services\SeoService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 final class OrderController extends Controller
@@ -22,7 +26,7 @@ final class OrderController extends Controller
     {
         $this->authorizeView($request, $order);
 
-        $order->load(['items.product.brand', 'payments', 'statusHistory']);
+        $order->load(['items.product.brand', 'payments.refunds', 'statusHistory']);
 
         $this->seo->apply([
             'meta_title' => "Order {$order->order_number} — Rhythm Exports",
@@ -44,7 +48,7 @@ final class OrderController extends Controller
         return view('orders.lookup');
     }
 
-    public function lookupPost(Request $request): \Illuminate\Http\RedirectResponse
+    public function lookupPost(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'order_number' => ['required', 'string', 'max:30'],
@@ -60,7 +64,11 @@ final class OrderController extends Controller
             return back()->withErrors(['order_number' => 'No order matches that number and email.'])->withInput();
         }
 
-        return redirect()->route('orders.show', $order);
+        return redirect(URL::temporarySignedRoute(
+            'orders.show',
+            now()->addMinutes(15),
+            ['order' => $order],
+        ));
     }
 
     /**
@@ -80,6 +88,56 @@ final class OrderController extends Controller
         return view('orders.invoice', ['order' => $order]);
     }
 
+    public function retryPayment(
+        Order $order,
+        PaymentRetryService $retries,
+        OrderService $orders,
+    ): RedirectResponse|View {
+        abort_unless(auth()->check() && auth()->id() === $order->user_id, 403);
+
+        try {
+            $payment = $retries->reserve($order, (int) auth()->id());
+            $gateway = RazorpayGateway::isConfigured()
+                ? RazorpayGateway::fromConfig()
+                : app(FakePaymentGateway::class);
+
+            if (str_starts_with((string) $payment->gateway_order_id, 'pending_retry_')) {
+                $payment = $retries->attachGatewayOrder($payment, $gateway->createOrder($order));
+            }
+
+            if (! RazorpayGateway::isConfigured()) {
+                $result = $gateway->verify($order, ['status' => 'captured']);
+                $orders->markPaid($order, $result, (string) $payment->gateway_order_id);
+
+                return redirect(URL::signedRoute('checkout.success', ['order' => $order]));
+            }
+
+            return view('orders.retry-payment', [
+                'order' => $order,
+                'options' => [
+                    'key' => (string) config('rythme.razorpay.key_id'),
+                    'amount' => (int) round((float) $order->total * 100),
+                    'currency' => $order->currency,
+                    'name' => config('app.name'),
+                    'description' => "Retry payment for {$order->order_number}",
+                    'order_id' => $payment->gateway_order_id,
+                    'callback_url' => route('payment.razorpay.callback'),
+                    'redirect' => true,
+                    'prefill' => [
+                        'name' => auth()->user()->name,
+                        'email' => auth()->user()->email,
+                        'contact' => (string) ($order->shipping_address['phone'] ?? ''),
+                    ],
+                    'theme' => ['color' => '#b20202'],
+                ],
+            ]);
+        } catch (\RuntimeException $e) {
+            return back()->with('order_error', $e->getMessage());
+        } catch (\Throwable) {
+            return back()->with('order_error', 'The payment attempt could not be confirmed. Check this order before trying again.');
+        }
+    }
+
     /**
      * Cancel this order (owner only, pending/confirmed).
      */
@@ -93,7 +151,7 @@ final class OrderController extends Controller
             return back()->with('order_error', $e->getMessage());
         }
 
-        return back()->with('order_success', 'Order cancelled. Refund will be processed within 5–7 business days.');
+        return back()->with('order_success', 'Order cancelled. If payment was captured, your refund request is now pending processing.');
     }
 
     private function authorizeView(Request $request, Order $order): void

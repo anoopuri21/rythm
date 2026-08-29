@@ -6,9 +6,12 @@ namespace Tests\Feature;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\NewsletterSubscriber;
+use App\Models\OrderStatusHistory;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -99,6 +102,40 @@ class CommerceCatalogTest extends TestCase
         $this->get('/admin/products')->assertRedirect('/admin/login');
     }
 
+    public function test_customer_is_forbidden_from_admin_panel(): void
+    {
+        $customer = User::factory()->create();
+
+        $this->actingAs($customer)
+            ->get('/admin/products')
+            ->assertForbidden();
+
+        $this->assertFalse($customer->canAccessPanel(Filament::getDefaultPanel()));
+    }
+
+    public function test_only_explicit_admin_role_can_access_panel(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->assertTrue($admin->canAccessPanel(Filament::getDefaultPanel()));
+        $this->assertSame(User::ROLE_ADMIN, $admin->role);
+    }
+
+    public function test_role_cannot_be_mass_assigned(): void
+    {
+        $customer = User::create([
+            'name' => 'Customer',
+            'email' => 'customer-role-test@example.com',
+            'password' => 'Password123!',
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        $customer->refresh();
+
+        $this->assertSame(User::ROLE_CUSTOMER, $customer->role);
+        $this->assertFalse($customer->isAdmin());
+    }
+
     public function test_mass_assignment_protection_blocks_unknown_attributes(): void
     {
         $this->seed();
@@ -137,7 +174,7 @@ class CommerceCatalogTest extends TestCase
     {
         $this->assertSame('products', (new Product)->getTable());
         $this->assertSame('categories', (new Category)->getTable());
-        $this->assertSame('order_status_history', (new \App\Models\OrderStatusHistory)->getTable());
-        $this->assertSame('newsletter_subscribers', (new \App\Models\NewsletterSubscriber)->getTable());
+        $this->assertSame('order_status_history', (new OrderStatusHistory)->getTable());
+        $this->assertSame('newsletter_subscribers', (new NewsletterSubscriber)->getTable());
     }
 }

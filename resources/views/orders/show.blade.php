@@ -22,7 +22,7 @@
                     <h1 class="section-title">Order {{ $order->order_number }}</h1>
                     <p class="mt-3 text-sm text-muted">
                         Placed {{ $order->placed_at?->format('d M Y, h:i A') }} ·
-                        <span class="font-bold text-ink">₹{{ number_format((float) $order->total) }}</span>
+                        <span class="font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</span>
                     </p>
                 </div>
                 <div class="text-right">
@@ -41,6 +41,16 @@
                 <p class="mt-6 rounded-xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand" role="alert">{{ session('order_error') }}</p>
             @endif
 
+            @if(auth()->check() && auth()->id() === $order->user_id && $order->status === 'pending' && in_array($order->payment_status, ['unpaid', 'failed'], true))
+                <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-6">
+                    @csrf
+                    <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
+                        Retry payment
+                    </button>
+                    <p class="mt-2 text-xs text-muted">A maximum of three payment attempts is allowed. Completed payments cannot be retried.</p>
+                </form>
+            @endif
+
             {{-- Cancel (owner, pending/confirmed) --}}
             @if(auth()->check() && auth()->id() === $order->user_id && in_array($order->status, ['pending', 'confirmed'], true))
                 <form method="POST" action="{{ route('orders.cancel', $order) }}" class="mt-6" x-data="{ confirm: false }">
@@ -50,7 +60,7 @@
                         Cancel order
                     </button>
                     <span x-show="confirm" x-cloak class="inline-flex items-center gap-3 rounded-full bg-brand/10 px-5 py-2.5 text-sm">
-                        <span class="font-semibold text-brand">Sure? Refund in 5–7 days.</span>
+                        <span class="font-semibold text-brand">Confirm cancellation? Paid orders create a pending refund request.</span>
                         <button type="submit" class="rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white">Yes, cancel</button>
                         <button type="button" @click="confirm = false" class="text-xs font-semibold text-muted">Keep order</button>
                     </span>
@@ -89,9 +99,9 @@
                 </ol>
             </section>
 
-            <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+            <div class="mt-8 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
                 {{-- Items --}}
-                <section aria-label="Order items" class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
+                <section aria-label="Order items" class="min-w-0 rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
                     <h2 class="font-playfair text-xl font-bold text-ink">Items</h2>
                     <ul class="mt-5 divide-y divide-ink/5">
                         @foreach($order->items as $item)
@@ -102,23 +112,26 @@
                                         {{ $item->sku }} @if(!empty($item->options)) · {{ $item->options['finish'] ?? '' }} @endif · Qty {{ $item->qty }}
                                     </p>
                                 </div>
-                                <p class="shrink-0 text-sm font-bold text-ink">₹{{ number_format((float) $item->total) }}</p>
+                                <p class="shrink-0 text-sm font-bold text-ink">₹{{ number_format((float) $item->total, 2) }}</p>
                             </li>
                         @endforeach
                     </ul>
 
                     <dl class="mt-4 space-y-2.5 border-t border-ink/10 pt-5 text-sm">
-                        <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal) }}</dd></div>
-                        <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-emerald-600">FREE</dd></div>
+                        <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                         @if((float) $order->discount > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount) }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount, 2) }}</dd></div>
                         @endif
-                        <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total) }}</dd></div>
+                        @if((float) $order->tax > 0)
+                            <div class="flex justify-between"><dt class="text-muted">Tax</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->tax, 2) }}</dd></div>
+                        @endif
+                        <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</dd></div>
                     </dl>
                 </section>
 
                 {{-- Address + payment --}}
-                <aside class="space-y-6">
+                <aside class="min-w-0 space-y-6">
                     <section aria-label="Delivery address" class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
                         <h2 class="font-playfair text-lg font-bold text-ink">Delivering to</h2>
                         <p class="mt-4 text-sm leading-6 text-ink/80">
@@ -131,16 +144,35 @@
 
                     <section aria-label="Payment" class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
                         <h2 class="font-playfair text-lg font-bold text-ink">Payment</h2>
-                        <p class="mt-4 text-sm text-ink/80">
-                            {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }} ·
-                            @if($order->payments->isNotEmpty())
-                                <span class="text-xs text-muted">{{ $order->payments->last()->gateway }} · {{ $order->payments->last()->gateway_payment_id }}</span>
-                            @endif
+                        <p class="mt-4 text-sm font-semibold text-ink/80">
+                            {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}
                         </p>
+                        @if($order->payments->isNotEmpty())
+                            <ol class="mt-4 space-y-3" aria-label="Payment and refund history">
+                                @foreach($order->payments->sortBy('created_at') as $payment)
+                                    <li class="rounded-xl bg-paper px-4 py-3 text-xs">
+                                        <div class="flex justify-between gap-3">
+                                            <span class="font-semibold text-ink">Payment attempt</span>
+                                            <span class="capitalize text-muted">{{ str_replace('_', ' ', $payment->status) }}</span>
+                                        </div>
+                                        <p class="mt-1 text-muted">₹{{ number_format((float) $payment->amount, 2) }} · {{ $payment->currency }} · {{ $payment->created_at?->format('d M Y, h:i A') }}</p>
+                                    </li>
+                                    @foreach($payment->refunds->sortBy('created_at') as $refund)
+                                        <li class="rounded-xl bg-brand/5 px-4 py-3 text-xs">
+                                            <div class="flex justify-between gap-3">
+                                                <span class="font-semibold text-ink">Refund</span>
+                                                <span class="capitalize text-muted">{{ str_replace('_', ' ', $refund->status) }}</span>
+                                            </div>
+                                            <p class="mt-1 text-muted">₹{{ number_format((float) $refund->amount, 2) }} · {{ $refund->currency }} · {{ $refund->created_at?->format('d M Y, h:i A') }}</p>
+                                        </li>
+                                    @endforeach
+                                @endforeach
+                            </ol>
+                        @endif
                     </section>
 
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        <a href="{{ \Illuminate\Support\Facades\URL::signedRoute('orders.invoice', ['order' => $order]) }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" /></svg>
                             Download invoice
                         </a>

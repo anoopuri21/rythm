@@ -4,9 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Events\CommerceNotificationRequested;
+use App\Models\InventoryMovement;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Refund;
 use App\Models\User;
+use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class OrderTrackingTest extends TestCase
@@ -99,10 +109,23 @@ class OrderTrackingTest extends TestCase
         auth()->logout();
 
         $order = $this->makeOrder();
-        $signed = \Illuminate\Support\Facades\URL::signedRoute('orders.show', ['order' => $order]);
+        $signed = URL::signedRoute('orders.show', ['order' => $order]);
 
         $this->get($signed)
             ->assertOk()
+            ->assertSee($order->order_number);
+    }
+
+    public function test_signed_invoice_link_allows_guest_access(): void
+    {
+        auth()->logout();
+
+        $order = $this->makeOrder();
+        $signed = URL::signedRoute('orders.invoice', ['order' => $order]);
+
+        $this->get($signed)
+            ->assertOk()
+            ->assertSee('Tax invoice')
             ->assertSee($order->order_number);
     }
 
@@ -121,10 +144,18 @@ class OrderTrackingTest extends TestCase
 
         $order = $this->makeOrder();
 
-        $this->post('/track-order', [
+        $response = $this->post('/track-order', [
             'order_number' => $order->order_number,
             'email' => $this->user->email,
-        ])->assertRedirect(route('orders.show', $order));
+        ]);
+
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringContainsString('/orders/'.$order->id, $location);
+        $this->assertStringContainsString('signature=', $location);
+
+        $this->get($location)
+            ->assertOk()
+            ->assertSee($order->order_number);
     }
 
     public function test_guest_lookup_rejects_mismatch(): void
@@ -167,17 +198,18 @@ class OrderTrackingTest extends TestCase
             ->assertOk()
             ->assertSee(route('orders.show', $order), escape: false);
     }
+
     public function test_shipped_status_queues_email(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
-        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_SHIPPED);
+        app(OrderService::class)->changeStatus($order, Order::STATUS_SHIPPED);
 
         $this->assertSame(Order::STATUS_SHIPPED, $order->fresh()->status);
-        \Illuminate\Support\Facades\Mail::assertQueued(
-            \App\Mail\OrderStatusMail::class,
-            fn ($mail) => $mail->order->is($order) && $mail->newStatus === Order::STATUS_SHIPPED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.shipped'
         );
 
         // Audit history has the transition
@@ -192,24 +224,25 @@ class OrderTrackingTest extends TestCase
         $order = $this->makeOrder(Order::STATUS_SHIPPED);
 
         $this->expectException(\RuntimeException::class);
-        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
+        app(OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
     }
 
     public function test_cancelled_queues_email(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
-        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_CANCELLED);
+        app(OrderService::class)->changeStatus($order, Order::STATUS_CANCELLED);
 
-        \Illuminate\Support\Facades\Mail::assertQueued(
-            \App\Mail\OrderStatusMail::class,
-            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.cancelled'
         );
     }
+
     public function test_admin_order_resource_lists_and_views(): void
     {
-        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+        $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
         $order = $this->makeOrder();
 
         $this->actingAs($admin)
@@ -225,35 +258,44 @@ class OrderTrackingTest extends TestCase
 
     public function test_admin_can_change_status_from_resource(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Mail::fake();
 
-        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+        $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
 
         $this->actingAs($admin)->get('/admin/orders/'.$order->id)->assertOk();
 
         // Service level change (resource action wraps this)
-        app(\App\Services\OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
+        app(OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
         $this->assertSame(Order::STATUS_PROCESSING, $order->fresh()->status);
     }
 
     public function test_admin_cannot_create_orders(): void
     {
-        $admin = \App\Models\User::where('email', 'admin@rythme.test')->firstOrFail();
+        $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
 
         $this->actingAs($admin)
             ->get('/admin/orders/create')
             ->assertNotFound();
     }
+
     public function test_user_can_cancel_confirmed_order_with_stock_restore(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
 
-        $product = \App\Models\Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
+        $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
         $stockBefore = $product->stock;
 
         $order = $this->makeOrder(Order::STATUS_CONFIRMED, Order::PAYMENT_PAID);
-        \App\Models\OrderItem::create([
+        $payment = $order->payments()->create([
+            'gateway' => 'fake',
+            'gateway_order_id' => 'order_refund_test',
+            'gateway_payment_id' => 'pay_refund_test',
+            'amount' => $order->total,
+            'currency' => $order->currency,
+            'status' => Payment::STATUS_PAID,
+        ]);
+        OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
             'name' => $product->name,
@@ -269,13 +311,32 @@ class OrderTrackingTest extends TestCase
 
         $order->refresh();
         $this->assertSame(Order::STATUS_CANCELLED, $order->status);
-        $this->assertSame(Order::PAYMENT_REFUNDED, $order->payment_status);
-        // stock restored
+        $this->assertSame(Order::PAYMENT_REFUND_PENDING, $order->payment_status);
+        $this->assertDatabaseHas('refunds', [
+            'order_id' => $order->id,
+            'payment_id' => $payment->id,
+            'status' => Refund::STATUS_PENDING,
+        ]);
+        $this->assertSame(Payment::STATUS_PAID, $payment->fresh()->status);
+        // Stock restoration is immediate, while the financial refund remains truthful and pending.
+        $this->assertSame($stockBefore + 2, $product->fresh()->stock);
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'type' => InventoryMovement::TYPE_ORDER_CANCELLATION,
+            'quantity_delta' => 2,
+            'balance_after' => $stockBefore + 2,
+        ]);
+
+        $this->post(route('orders.cancel', $order))
+            ->assertSessionHas('order_error');
+        $this->assertDatabaseCount('refunds', 1);
+        $this->assertSame(1, $order->inventoryMovements()->count());
         $this->assertSame($stockBefore + 2, $product->fresh()->stock);
 
-        \Illuminate\Support\Facades\Mail::assertQueued(
-            \App\Mail\OrderStatusMail::class,
-            fn ($mail) => $mail->newStatus === Order::STATUS_CANCELLED
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.cancelled'
         );
     }
 

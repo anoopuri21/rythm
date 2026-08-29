@@ -5,33 +5,40 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Refund;
+use App\Payment\FakePaymentGateway;
+use App\Payment\RazorpayGateway;
 use App\Services\OrderService;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
+use App\Services\RefundService;
+use App\Support\AdminAccess;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\TextSize;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = 'COMMERCE';
+    protected static string|\UnitEnum|null $navigationGroup = 'COMMERCE';
 
     protected static ?int $navigationSort = 1;
 
@@ -42,7 +49,7 @@ class OrderResource extends Resource
         return false; // orders are created by checkout only
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $infolist): Schema
     {
         return $infolist
             ->schema([
@@ -61,7 +68,7 @@ class OrderResource extends Resource
                         }),
                         TextEntry::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
                         TextEntry::make('placed_at')->dateTime('d M Y, h:i A'),
-                        TextEntry::make('total')->money('INR')->weight('bold')->size(TextEntry\TextEntrySize::Large),
+                        TextEntry::make('total')->money('INR')->weight('bold')->size(TextSize::Large),
                     ]),
                 Section::make('Items')
                     ->schema([
@@ -79,20 +86,55 @@ class OrderResource extends Resource
                 Section::make('Addresses')
                     ->columns(2)
                     ->schema([
-                        Group::make([
+                        Section::make('Shipping')->schema([
                             TextEntry::make('shipping_address.name')->label('Name'),
                             TextEntry::make('shipping_address.phone')->label('Phone'),
                             TextEntry::make('shipping_address.line1')->label('Address'),
                             TextEntry::make('shipping_address.city')->label('City'),
                             TextEntry::make('shipping_address.state')->label('State'),
                             TextEntry::make('shipping_address.pincode')->label('PIN'),
-                        ])->label('Shipping'),
-                        Group::make([
+                        ]),
+                        Section::make('Payment')->schema([
                             TextEntry::make('payment_transaction')->label('Gateway payment id')
                                 ->state(fn (Order $record): ?string => $record->payments->last()?->gateway_payment_id),
                             TextEntry::make('payment_gateway')->label('Gateway')
                                 ->state(fn (Order $record): string => $record->payments->last()?->gateway ?? '—'),
-                        ])->label('Payment'),
+                        ]),
+                    ]),
+                Section::make('Payment activity')
+                    ->schema([
+                        RepeatableEntry::make('payments')
+                            ->schema([
+                                TextEntry::make('amount')->money('INR'),
+                                TextEntry::make('currency'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('gateway_order_id')->label('Gateway order')->placeholder('—'),
+                                TextEntry::make('gateway_payment_id')->label('Gateway payment')->placeholder('—'),
+                                TextEntry::make('created_at')->dateTime('d M Y, h:i A'),
+                            ])
+                            ->columns(6),
+                        RepeatableEntry::make('paymentEvents')
+                            ->label('Webhook events')
+                            ->schema([
+                                TextEntry::make('event_type'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('gateway_event_id')->label('Provider event'),
+                                TextEntry::make('failure_message')->placeholder('—'),
+                                TextEntry::make('received_at')->dateTime('d M Y, h:i A'),
+                            ])
+                            ->columns(5),
+                    ]),
+                Section::make('Refunds')
+                    ->schema([
+                        RepeatableEntry::make('refunds')
+                            ->schema([
+                                TextEntry::make('amount')->money('INR'),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('reason'),
+                                TextEntry::make('gateway_refund_id')->placeholder('Not processed'),
+                                TextEntry::make('processed_at')->dateTime('d M Y, h:i A')->placeholder('Pending'),
+                            ])
+                            ->columns(5),
                     ]),
                 Section::make('Status history')
                     ->schema([
@@ -145,15 +187,122 @@ class OrderResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
+                self::processPendingRefundAction(),
+                self::refundAction(),
                 self::statusAction(Order::STATUS_PROCESSING, 'Mark processing', 'heroicon-o-arrow-path', 'info'),
                 self::statusAction(Order::STATUS_SHIPPED, 'Mark shipped', 'heroicon-o-truck', 'info'),
                 self::statusAction(Order::STATUS_DELIVERED, 'Mark delivered', 'heroicon-o-check-circle', 'success'),
                 self::statusAction(Order::STATUS_CANCELLED, 'Cancel order', 'heroicon-o-x-circle', 'danger'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([]),
+                BulkActionGroup::make([]),
             ]);
+    }
+
+    private static function processPendingRefundAction(): Action
+    {
+        return Action::make('process_pending_refund')
+            ->label('Process pending refund')
+            ->icon('heroicon-o-arrow-path')
+            ->color('warning')
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::FINANCE_MANAGE) ?? false)
+                && $record->refunds()->where('status', Refund::STATUS_PENDING)->exists())
+            ->requiresConfirmation()
+            ->schema([
+                Textarea::make('reason')
+                    ->label('Approval note')
+                    ->required()
+                    ->minLength(5)
+                    ->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data): void {
+                $user = auth()->user();
+
+                if ($user === null) {
+                    Notification::make()->danger()->title('Finance authorization is required.')->send();
+
+                    return;
+                }
+
+                request()->merge(['audit_reason' => $data['reason']]);
+
+                try {
+                    $gateway = RazorpayGateway::isConfigured()
+                        ? RazorpayGateway::fromConfig()
+                        : app(FakePaymentGateway::class);
+                    $refund = app(RefundService::class)->processPendingForOrder($record, $gateway, $user);
+
+                    if ($refund->status === Refund::STATUS_REFUNDED) {
+                        Notification::make()->success()->title('Pending refund processed')->send();
+                    } elseif ($refund->status === Refund::STATUS_FAILED) {
+                        Notification::make()->danger()->title('Refund was rejected; review the recorded failure before retrying.')->send();
+                    } else {
+                        Notification::make()->warning()->title('Provider completion is pending reconciliation')->send();
+                    }
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->danger()->title($exception->getMessage())->send();
+                } catch (\Throwable) {
+                    Notification::make()->warning()->title('Refund outcome requires reconciliation before retry.')->send();
+                }
+            });
+    }
+
+    private static function refundAction(): Action
+    {
+        return Action::make('request_refund')
+            ->label('Refund')
+            ->icon('heroicon-o-receipt-refund')
+            ->color('danger')
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::FINANCE_MANAGE) ?? false)
+                && in_array($record->payment_status, [Order::PAYMENT_PAID, Order::PAYMENT_REFUND_PENDING], true)
+                && ! $record->refunds()->whereIn('status', [Refund::STATUS_PENDING, Refund::STATUS_PROCESSING])->exists())
+            ->requiresConfirmation()
+            ->schema([
+                TextInput::make('amount')
+                    ->numeric()
+                    ->prefix('₹')
+                    ->minValue(0.01)
+                    ->required(),
+                Textarea::make('reason')
+                    ->required()
+                    ->minLength(5)
+                    ->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data): void {
+                $user = auth()->user();
+                $payment = $record->payments()
+                    ->whereIn('status', [Payment::STATUS_PAID, Payment::STATUS_REFUNDED])
+                    ->latest('id')
+                    ->first();
+
+                if ($user === null || $payment === null) {
+                    Notification::make()->danger()->title('A captured payment is required.')->send();
+
+                    return;
+                }
+
+                request()->merge(['audit_reason' => $data['reason']]);
+
+                try {
+                    $service = app(RefundService::class);
+                    $refund = $service->request($payment, (float) $data['amount'], $data['reason'], $user);
+                    $gateway = RazorpayGateway::isConfigured()
+                        ? RazorpayGateway::fromConfig()
+                        : app(FakePaymentGateway::class);
+                    $refund = $service->process($refund, $gateway, $user);
+                    $notification = Notification::make()->title(
+                        $refund->status === Refund::STATUS_REFUNDED
+                                                    ? 'Refund processed'
+                                                    : 'Refund submitted; provider completion is pending reconciliation'
+                    );
+                    ($refund->status === Refund::STATUS_REFUNDED ? $notification->success() : $notification->warning())->send();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->danger()->title($exception->getMessage())->send();
+                } catch (\Throwable) {
+                    Notification::make()->warning()->title('Refund outcome requires reconciliation before retry.')->send();
+                }
+            });
     }
 
     private static function statusAction(string $to, string $label, string $icon, string $color): Action
@@ -162,10 +311,17 @@ class OrderResource extends Resource
             ->label($label)
             ->icon($icon)
             ->color($color)
+            ->visible(fn (): bool => auth()->user()?->hasAdminPermission(AdminAccess::ORDERS_MANAGE) ?? false)
             ->requiresConfirmation()
-            ->action(function (Order $record) use ($to): void {
+            ->schema([
+                Textarea::make('reason')->label('Reason / operational note')->required()->minLength(5)->maxLength(500),
+            ])
+            ->action(function (Order $record, array $data) use ($to): void {
+                Gate::authorize('update', $record);
+                request()->merge(['audit_reason' => $data['reason']]);
+
                 try {
-                    app(OrderService::class)->changeStatus($record, $to);
+                    app(OrderService::class)->changeStatus($record, $to, $data['reason']);
                     Notification::make()->success()->title("Order marked {$to}")->send();
                 } catch (\RuntimeException $e) {
                     Notification::make()->danger()->title($e->getMessage())->send();

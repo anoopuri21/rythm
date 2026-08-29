@@ -39,10 +39,15 @@ final class HomeController extends Controller
             ->with('seoEntry')
             ->first());
 
-        $this->seo->apply(SeoService::fromEntry($homePage?->seoEntry, [
+        $safeDescription = 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories from leading brands at Rhythm Exports.';
+        $seo = SeoService::fromEntry($homePage?->seoEntry, [
             'meta_title' => 'Rhythm Exports - Feel The Music, Own The Sound',
-            'meta_description' => 'Shop premium musical instruments at Rhythm Exports. Guitars, Keyboards, Drums, Pro Audio and more from top brands. Free shipping all over India.',
-        ]));
+        ]);
+        $seo['meta_description'] = $safeDescription;
+        $seo['og_description'] = $safeDescription;
+        $seo['canonical_url'] = route('home');
+        $seo['robots'] = 'index, follow';
+        $this->seo->apply($seo);
 
         // ALL homepage content — DB-driven + cached (hero, blocks, faqs, products)
         $homepage = $this->homepage->all();

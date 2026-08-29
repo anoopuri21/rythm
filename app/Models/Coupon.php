@@ -15,6 +15,15 @@ class Coupon extends Model
 {
     use HasFactory;
 
+    public const TYPE_PERCENT = 'percent';
+
+    public const TYPE_FIXED = 'fixed';
+
+    public function setCodeAttribute(string $value): void
+    {
+        $this->attributes['code'] = strtoupper(trim($value));
+    }
+
     protected $casts = [
         'value' => 'decimal:2',
         'min_order' => 'decimal:2',

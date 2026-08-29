@@ -23,7 +23,7 @@
         <div class="hero-mm__slider">
             <div class="hero-swiper swiper h-full">
                 <div class="swiper-wrapper">
-                    @foreach($slides as $slide)
+                    @forelse($slides as $slide)
                         <article class="swiper-slide relative overflow-hidden">
                             <picture class="absolute inset-0">
                                 @if($slide->getFirstMediaUrl('mobile_image'))
@@ -56,9 +56,27 @@
                                 </div>
                             </div>
                         </article>
-                    @endforeach
+                    @empty
+                        <article class="swiper-slide relative overflow-hidden">
+                            <img src="{{ $fallbackSlideImages[0] }}" alt="" width="1200" height="896"
+                                 class="hero-slide-image absolute inset-0 h-full w-full object-cover"
+                                 fetchpriority="high" decoding="async">
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent"></div>
+                            <div class="hero-copy relative z-10 flex h-full flex-col justify-center px-7 py-10 text-white sm:px-10 lg:px-12">
+                                <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">Rhythm Exports</p>
+                                <h1 class="max-w-md text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+                                    Find your instrument. <span class="text-white/70">Shape your sound.</span>
+                                </h1>
+                                <p class="mt-4 max-w-sm text-sm leading-6 text-white/70">Explore guitars, keyboards, drums and studio gear for every stage of your musical journey.</p>
+                                <div class="mt-7"><a href="{{ route('shop.index') }}" class="hero-mm__cta">Explore instruments</a></div>
+                            </div>
+                        </article>
+                    @endforelse
                 </div>
                 <div class="hero-pagination swiper-pagination !bottom-5 !text-left"></div>
+                <button type="button" class="hero-pause hero-mm__pause" aria-pressed="false" aria-label="Pause featured collections">
+                    <span data-hero-pause-label>Pause</span>
+                </button>
                 <button type="button" class="hero-prev hero-mm__navbtn hero-mm__navbtn--prev" aria-label="Previous slide">←</button>
                 <button type="button" class="hero-next hero-mm__navbtn hero-mm__navbtn--next" aria-label="Next slide">→</button>
             </div>
@@ -80,7 +98,7 @@
             <img src="{{ asset('images/hero/grid-banner-tabla.jpg') }}" alt="Tabla set" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
                 <span class="hero-mm__banner-title">Tabla Sets</span>
-                <span class="hero-mm__banner-sub">Handcrafted · concert ready</span>
+                <span class="hero-mm__banner-sub">Explore percussion instruments</span>
                 <span class="hero-mm__banner-link">Shop now →</span>
             </span>
         </a>
@@ -90,7 +108,7 @@
             <img src="{{ asset('images/hero/grid-banner-headphones.jpg') }}" alt="Studio headphones" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
                 <span class="hero-mm__banner-title">Studio Gear</span>
-                <span class="hero-mm__banner-sub">Up to 30% discount</span>
+                <span class="hero-mm__banner-sub">Explore current studio offers</span>
                 <span class="hero-mm__banner-link">Shop now →</span>
             </span>
         </a>

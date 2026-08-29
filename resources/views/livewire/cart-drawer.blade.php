@@ -1,13 +1,13 @@
-<div x-data @keydown.escape.window="if ({{ $open ? 'true' : 'false' }}) $wire.refresh(false, false)"
-     x-init="$watch('$wire.open', v => { document.body.classList.toggle('overflow-hidden', v); })">
+<div x-data @keydown.escape.window="if ($wire.open) $wire.close()"
+     x-effect="document.body.classList.toggle('overflow-hidden', $wire.open)">
 
     {{-- Backdrop --}}
-    <div x-cloak x-show="{{ $open ? 'true' : 'false' }}" x-transition.opacity.duration.200ms
+    <div x-cloak x-show="$wire.open" x-transition.opacity.duration.200ms
          class="fixed inset-0 z-[80] bg-black/55 backdrop-blur-sm"
-         @click="$wire.refresh(false, false)" aria-hidden="true"></div>
+         @click="$wire.close()" aria-hidden="true"></div>
 
     {{-- Panel --}}
-    <div x-cloak x-show="{{ $open ? 'true' : 'false' }}"
+    <div x-cloak x-show="$wire.open"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="translate-x-full"
          x-transition:enter-end="translate-x-0"
@@ -23,7 +23,7 @@
                 Your Cart
                 <span class="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">{{ $totals['count'] }}</span>
             </h2>
-            <button type="button" @click="$wire.refresh(false, false)"
+            <button type="button" @click="$wire.close()"
                     class="rounded-full p-2 text-ink transition hover:bg-ink/5" aria-label="Close cart">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
@@ -73,7 +73,7 @@
                     <p class="text-5xl" aria-hidden="true">🛒</p>
                     <h3 class="mt-5 font-playfair text-xl font-bold text-ink">Your cart is empty</h3>
                     <p class="mt-2 max-w-[240px] text-sm text-muted">Fill it with something that makes a sound you love.</p>
-                    <a href="/shop" @click="$wire.refresh(false, false)" class="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                    <a href="/shop" @click="$wire.close()" class="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
                         Browse the shop
                     </a>
                 </div>

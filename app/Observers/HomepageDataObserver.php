@@ -7,6 +7,7 @@ namespace App\Observers;
 use App\Models\Faq;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
+use App\Models\HomepageCategoryRow;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -22,17 +23,17 @@ final class HomepageDataObserver
         Cache::forget(self::CACHE_KEY);
     }
 
-    public function saved(HeroSlide|HomepageBlock|Faq $model): void
+    public function saved(HeroSlide|HomepageBlock|HomepageCategoryRow|Faq $model): void
     {
         self::flush();
     }
 
-    public function deleted(HeroSlide|HomepageBlock|Faq $model): void
+    public function deleted(HeroSlide|HomepageBlock|HomepageCategoryRow|Faq $model): void
     {
         self::flush();
     }
 
-    public function restored(HeroSlide|HomepageBlock|Faq $model): void
+    public function restored(HeroSlide|HomepageBlock|HomepageCategoryRow|Faq $model): void
     {
         self::flush();
     }

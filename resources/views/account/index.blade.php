@@ -18,12 +18,17 @@
                     <h1 class="section-title">{{ auth()->user()->name }}</h1>
                     <p class="mt-3 text-sm text-muted">{{ auth()->user()->email }}</p>
                 </div>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
-                        Sign out
-                    </button>
-                </form>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('account.notifications.index') }}" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        Notifications
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                            Sign out
+                        </button>
+                    </form>
+                </div>
             </div>
 
             {{-- Tabs --}}
@@ -34,7 +39,8 @@
                     'addresses' => ['Addresses', 'heroicon-o-map-pin'],
                     'settings' => ['Settings', 'heroicon-o-cog-6-tooth'],
                 ] as $key => [$label, $icon])
-                    <button type="button" role="tab" :aria-selected="tab === '{{ $key }}' ? 'true' : 'false'"
+                    <button type="button" role="tab" id="account-tab-{{ $key }}" aria-controls="account-panel-{{ $key }}"
+                            :aria-selected="tab === '{{ $key }}' ? 'true' : 'false'"
                             @click="tab = '{{ $key }}'"
                             class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition"
                             :class="tab === '{{ $key }}' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
@@ -44,7 +50,7 @@
             </div>
 
             {{-- ===== OVERVIEW ===== --}}
-            <section x-show="tab === 'overview'" class="py-10">
+            <section x-show="tab === 'overview'" id="account-panel-overview" role="tabpanel" aria-labelledby="account-tab-overview" class="py-10">
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     @foreach([
                         ['Orders', $orders->count(), '/'],
@@ -80,7 +86,7 @@
             </section>
 
             {{-- ===== ORDERS ===== --}}
-            <section x-show="tab === 'orders'" x-cloak class="py-10">
+            <section x-show="tab === 'orders'" x-cloak id="account-panel-orders" role="tabpanel" aria-labelledby="account-tab-orders" class="py-10">
                 <h2 class="font-playfair text-2xl font-bold text-ink">Order history</h2>
                 @if($orders->isNotEmpty())
                     <div class="mt-6">
@@ -94,7 +100,7 @@
             </section>
 
             {{-- ===== ADDRESSES ===== --}}
-            <section x-show="tab === 'addresses'" x-cloak class="py-10">
+            <section x-show="tab === 'addresses'" x-cloak id="account-panel-addresses" role="tabpanel" aria-labelledby="account-tab-addresses" class="py-10">
                 <div class="flex items-end justify-between gap-4">
                     <h2 class="font-playfair text-2xl font-bold text-ink">Saved addresses</h2>
                     <button type="button" @click="$refs.newAddress.scrollIntoView({behavior:'smooth'})" class="text-link text-sm">Add new <span aria-hidden="true">＋</span></button>
@@ -116,11 +122,43 @@
                                 {{ $address->city }}, {{ $address->state }} — {{ $address->pincode }}
                             </p>
                             <p class="mt-2 text-xs text-muted">📞 {{ $address->phone }}</p>
-                            <form method="POST" action="{{ route('account.addresses.destroy', $address) }}" class="mt-4">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-xs font-semibold text-muted transition hover:text-brand">Remove</button>
-                            </form>
+                            <div class="mt-4 flex flex-wrap items-center gap-4">
+                                @if(!$address->is_default)
+                                    <form method="POST" action="{{ route('account.addresses.default', $address) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-xs font-semibold text-muted transition hover:text-brand">Make default</button>
+                                    </form>
+                                @endif
+                                <form method="POST" action="{{ route('account.addresses.destroy', $address) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-semibold text-muted transition hover:text-brand">Remove</button>
+                                </form>
+                            </div>
+                            <details class="mt-4 border-t border-ink/10 pt-4">
+                                <summary class="cursor-pointer text-xs font-semibold text-brand">Edit address</summary>
+                                <form method="POST" action="{{ route('account.addresses.update', $address) }}" class="mt-4 grid gap-3">
+                                    @csrf
+                                    @method('PATCH')
+                                    @foreach([
+                                        'name' => ['Full name', $address->name],
+                                        'phone' => ['Phone', $address->phone],
+                                        'line1' => ['Address line 1', $address->line1],
+                                        'line2' => ['Address line 2', $address->line2],
+                                        'city' => ['City', $address->city],
+                                        'state' => ['State', $address->state],
+                                        'pincode' => ['PIN code', $address->pincode],
+                                    ] as $field => [$label, $value])
+                                        <label class="block">
+                                            <span class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-muted">{{ $label }}</span>
+                                            <input type="text" name="{{ $field }}" value="{{ $value }}" {{ $field === 'line2' ? '' : 'required' }}
+                                                   class="h-10 w-full rounded-xl border border-ink/15 bg-paper px-3 text-sm text-ink outline-none focus:border-brand">
+                                        </label>
+                                    @endforeach
+                                    <button type="submit" class="rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-brand">Save changes</button>
+                                </form>
+                            </details>
                         </div>
                     @empty
                         <p class="rounded-2xl border border-dashed border-ink/15 bg-white px-6 py-12 text-center text-sm text-muted sm:col-span-2 lg:col-span-3">
@@ -187,7 +225,7 @@
             </section>
 
             {{-- ===== SETTINGS ===== --}}
-            <section x-show="tab === 'settings'" x-cloak class="max-w-2xl py-10">
+            <section x-show="tab === 'settings'" x-cloak id="account-panel-settings" role="tabpanel" aria-labelledby="account-tab-settings" class="max-w-2xl py-10">
                 <h2 class="font-playfair text-2xl font-bold text-ink">Profile settings</h2>
 
                 @if(session('profile_success'))

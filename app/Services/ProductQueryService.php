@@ -7,8 +7,10 @@ namespace App\Services;
 use App\DTOs\ShopFilters;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Single responsibility: build the filtered, sorted, eager-loaded shop
@@ -22,7 +24,13 @@ final class ProductQueryService
     {
         $query = Product::query()
             ->active()
-            ->with(['brand', 'category', 'media']);
+            ->with(['brand', 'category', 'media'])
+            ->withAvg(['reviews as reviews_avg_rating' => fn (Builder $review): Builder => $review
+                ->where('status', Review::STATUS_APPROVED)
+                ->where('is_approved', true)], 'rating')
+            ->withCount(['reviews as reviews_count' => fn (Builder $review): Builder => $review
+                ->where('status', Review::STATUS_APPROVED)
+                ->where('is_approved', true)]);
 
         $this->applyCategoryFilter($query, $filters->category);
         $this->applyBrandFilter($query, $filters->brands);
@@ -30,6 +38,8 @@ final class ProductQueryService
         $this->applyAvailabilityFilter($query, $filters->inStockOnly);
         $this->applySaleFilter($query, $filters->onSale);
         $this->applySearchFilter($query, $filters->search);
+        $this->applyRatingFilter($query, $filters->minRating);
+        $this->applyAttributeFilters($query, $filters->attributes);
         $this->applySort($query, $filters->sort);
 
         return $query;
@@ -44,9 +54,9 @@ final class ProductQueryService
      * Related products: same category (or parent category), excluding self,
      * highest discount first. Eager-loaded, capped.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
+     * @return Collection<int, Product>
      */
-    public function related(Product $product, int $take = 4): \Illuminate\Database\Eloquent\Collection
+    public function related(Product $product, int $take = 4): Collection
     {
         return Product::query()
             ->active()
@@ -145,6 +155,52 @@ final class ProductQueryService
         });
     }
 
+    private function applyRatingFilter(Builder $query, ?int $minRating): void
+    {
+        if ($minRating === null) {
+            return;
+        }
+
+        $minimum = min(5, max(1, $minRating));
+        $ratedProductIds = Review::query()
+            ->select('product_id')
+            ->where('status', Review::STATUS_APPROVED)
+            ->where('is_approved', true)
+            ->groupBy('product_id')
+            ->havingRaw('AVG(rating) >= ?', [$minimum]);
+
+        $query->whereIn('id', $ratedProductIds);
+    }
+
+    /**
+     * Values inside one attribute are ORed; separate attributes are ANDed.
+     * Product-level and variant-level normalized assignments both qualify.
+     *
+     * @param  array<string, string[]>  $attributes
+     */
+    private function applyAttributeFilters(Builder $query, array $attributes): void
+    {
+        foreach ($attributes as $attributeSlug => $valueSlugs) {
+            $values = array_values(array_filter(array_map('strval', (array) $valueSlugs)));
+
+            if ($values === []) {
+                continue;
+            }
+
+            $query->where(function (Builder $product) use ($attributeSlug, $values): void {
+                $matchesValue = fn (Builder $value): Builder => $value
+                    ->whereIn('slug', $values)
+                    ->whereHas('attribute', fn (Builder $attribute): Builder => $attribute
+                        ->where('slug', (string) $attributeSlug)
+                        ->where('is_active', true)
+                        ->where('is_filterable', true));
+
+                $product->whereHas('attributeValues', $matchesValue)
+                    ->orWhereHas('variants.attributeValues', $matchesValue);
+            });
+        }
+    }
+
     private function applySort(Builder $query, string $sort): void
     {
         switch ($sort) {
@@ -165,7 +221,7 @@ final class ProductQueryService
                 $query->orderByRaw('(COALESCE(compare_at_price, 0) - price) DESC')->orderBy('id');
                 break;
 
-            default: // popularity
+            default: // featured
                 $query->orderByDesc('is_featured')->orderByDesc('id');
         }
     }

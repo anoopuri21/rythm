@@ -69,8 +69,14 @@ return [
         'webhook_secret' => env('RYTHME_RAZORPAY_WEBHOOK_SECRET'),
     ],
 
+    /*
+    | Public policy/content pages withheld until the owner approves their
+    | business terms. Admin records may exist, but are not publication consent.
+    */
+    'withheld_public_pages' => ['shipping', 'returns', 'warranty', 'faqs'],
+
     'shipping' => [
-        'flat_fee' => 0,        // free shipping (INR)
-        'free_above' => 0,      // always free
+        'flat_fee' => 0,
+        'free_above' => 0,
     ],
 ];

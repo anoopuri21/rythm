@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\DTOs\CheckoutData;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
-use App\Services\SiteSettingsService;
 use App\Services\OrderService;
+use App\Services\SiteSettingsService;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
 use RuntimeException;
@@ -62,6 +66,13 @@ final class CheckoutWizard extends Component
     public bool $placing = false;
 
     public bool $confirming = false;
+
+    public string $checkoutToken = '';
+
+    public function mount(): void
+    {
+        $this->checkoutToken = (string) Str::uuid();
+    }
 
     protected function rules(): array
     {
@@ -141,7 +152,7 @@ final class CheckoutWizard extends Component
     /**
      * Create the order + payment initiation, then return gateway info.
      */
-    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses, SiteSettingsService $settings): void
+    public function placeOrder(OrderService $orders, CartService $cart, AddressService $addresses): void
     {
         $this->placing = true;
         $this->paymentError = null;
@@ -170,29 +181,57 @@ final class CheckoutWizard extends Component
                 addressId: $address->id,
                 shippingAddress: $addresses->snapshot($address),
                 billingAddress: $addresses->snapshot($address),
-                subtotal: $totals['subtotal'],
-                discount: $this->couponDiscount,
-                shippingFee: $this->shippingFeeFor($totals['subtotal'], $settings),
-                tax: $this->taxFor($totals['subtotal'] - $this->couponDiscount, $settings),
                 currency: 'INR',
                 couponCode: $this->appliedCoupon,
+                idempotencyKey: $this->checkoutToken,
             );
 
             $order = $orders->createFromCheckout($cartModel, $data, $user->id);
 
+            $this->orderId = $order->id;
+
+            if ($order->isPaid()) {
+                $this->redirect(URL::signedRoute('checkout.success', ['order' => $order]));
+
+                return;
+            }
+
             $gateway = RazorpayGateway::isConfigured()
                 ? RazorpayGateway::fromConfig()
-                : app(\App\Payment\FakePaymentGateway::class);
+                : app(FakePaymentGateway::class);
 
-            $gatewayOrderId = $gateway->createOrder($order);
-            $orders->recordPaymentInitiation($order, $gatewayOrderId);
+            $payment = $order->payments()
+                ->where('status', Payment::STATUS_INITIATED)
+                ->latest()
+                ->first();
+            $gatewayOrderId = $payment?->gateway_order_id ?? $gateway->createOrder($order);
 
-            $this->orderId = $order->id;
+            if ($payment === null) {
+                $orders->recordPaymentInitiation($order, $gatewayOrderId);
+            }
+
             $this->gatewayOrderId = $gatewayOrderId;
 
             // Fake gateway (no keys configured) — simulate immediate success.
             if (! RazorpayGateway::isConfigured()) {
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
+            } else {
+                $this->dispatch('razorpay-open', options: [
+                    'key' => (string) config('rythme.razorpay.key_id'),
+                    'amount' => (int) round((float) $order->total * 100),
+                    'currency' => $order->currency,
+                    'name' => config('app.name'),
+                    'description' => "Order {$order->order_number}",
+                    'order_id' => $gatewayOrderId,
+                    'callback_url' => route('payment.razorpay.callback'),
+                    'redirect' => true,
+                    'prefill' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'contact' => (string) ($shippingAddress['phone'] ?? ''),
+                    ],
+                    'theme' => ['color' => '#b20202'],
+                ]);
             }
         } catch (RuntimeException $e) {
             $this->paymentError = $e->getMessage();
@@ -216,11 +255,19 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('No pending order found.');
             }
 
-            $order = \App\Models\Order::with('items.product')->findOrFail($this->orderId);
+            $order = Order::query()
+                ->whereKey($this->orderId)
+                ->where('user_id', auth()->id())
+                ->with('items.product')
+                ->first();
+
+            if ($order === null) {
+                throw new RuntimeException('No pending order found.');
+            }
 
             $gateway = RazorpayGateway::isConfigured()
                 ? RazorpayGateway::fromConfig()
-                : app(\App\Payment\FakePaymentGateway::class);
+                : app(FakePaymentGateway::class);
 
             $result = $gateway->verify($order, $payload);
 
@@ -232,13 +279,6 @@ final class CheckoutWizard extends Component
             }
 
             $orders->markPaid($order, $result, $this->gatewayOrderId);
-
-            if ($this->appliedCoupon !== null) {
-                $coupon = \App\Models\Coupon::where('code', $this->appliedCoupon)->first();
-                if ($coupon !== null) {
-                    app(CouponService::class)->incrementUsage($coupon);
-                }
-            }
 
             $cart->clear();
 

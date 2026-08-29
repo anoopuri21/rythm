@@ -12,13 +12,14 @@
      Menu / Categories tabs; collapsible search bar.
      ============================================================ --}}
 <header id="navbar" class="nav" x-data="{ mobileMenu: false, mobileSearch: false, mobileTab: 'menu' }"
-        @keydown.escape.window="mobileMenu = false">
+        @keydown.escape.window="if (mobileMenu) { mobileMenu = false; $nextTick(() => $refs.mobileMenuTrigger.focus()) }">
 
     {{-- ===== ROW 1 · Logo | Search | Help | Icons ===== --}}
     <div class="nav__row1-wrap">
         <div class="nav__inner nav__row1">
-            <button class="nav__burger" type="button" aria-label="Open menu" aria-expanded="false"
-                    aria-controls="mobile-menu" @click="mobileMenu = true">
+            <button x-ref="mobileMenuTrigger" class="nav__burger" type="button" aria-label="Open menu"
+                    :aria-expanded="mobileMenu" aria-controls="mobile-menu"
+                    @click="mobileMenu = true; $nextTick(() => $refs.mobileMenuClose.focus())">
                 <span></span><span></span><span></span>
             </button>
 
@@ -39,11 +40,11 @@
             </form>
 
             {{-- Help / phone (desktop only) --}}
-            <a href="tel:+919876543210" class="nav__help">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
+            <a href="{{ url('/contact') }}" class="nav__help">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0 4.556 4.365 8.25 9.75 8.25a11.2 11.2 0 0 0 4.683-.992l3.817.992-1.105-3.276A7.44 7.44 0 0 0 21.75 12c0-4.556-4.365-8.25-9.75-8.25S2.25 7.444 2.25 12Z"/></svg>
                 <span class="nav__help-text">
-                    <em>Need help? Call us</em>
-                    <strong>+91 98765 43210</strong>
+                    <em>Questions about an instrument?</em>
+                    <strong>Contact our team</strong>
                 </span>
             </a>
 
@@ -57,7 +58,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"/></svg>
                     <span class="nav__icon-label">Account</span>
                 </a>
-                <a href="{{ auth()->check() ? route('wishlist.index') : route('login') }}" class="nav__icon" aria-label="Wishlist">
+                <a href="{{ auth()->check() ? route('wishlist.index') : route('login') }}" class="nav__icon nav__icon--wishlist" aria-label="Wishlist">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0z"/></svg>
                     <livewire:wishlist-badge :key="'wish-' . (auth()->id() ?? 'guest')" />
                     <span class="nav__icon-label">Wishlist</span>
@@ -148,14 +149,15 @@
                         <li><button type="button" @click="open = false">USD $</button></li>
                     </ul>
                 </div>
-                <a href="/shop?on_sale=1" class="nav__sale">Sale! Up to 30% Off</a>
+                <a href="/shop?on_sale=1" class="nav__sale">Browse current offers</a>
             </div>
         </div>
     </div>
 
     {{-- ===== MOBILE DRAWER (left off-canvas, Menu/Categories tabs) ===== --}}
-    <div x-cloak x-show="mobileMenu" x-transition.opacity.duration.250ms class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden" @click="mobileMenu = false" aria-hidden="true"></div>
-    <aside id="mobile-menu" x-cloak x-show="mobileMenu"
+    <div x-cloak x-show="mobileMenu" x-transition.opacity.duration.250ms class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden"
+         @click="mobileMenu = false; $nextTick(() => $refs.mobileMenuTrigger.focus())" aria-hidden="true"></div>
+    <aside id="mobile-menu" x-cloak x-show="mobileMenu" x-trap.inert.noscroll="mobileMenu"
            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
            role="dialog" aria-modal="true" aria-label="Mobile navigation"
@@ -166,20 +168,24 @@
                      onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                 <span class="drawer__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>
-            <button class="drawer__close" type="button" aria-label="Close menu" @click="mobileMenu = false">&times;</button>
+            <button x-ref="mobileMenuClose" class="drawer__close" type="button" aria-label="Close menu"
+                    @click="mobileMenu = false; $nextTick(() => $refs.mobileMenuTrigger.focus())">&times;</button>
         </div>
 
         {{-- Tabs: Menu | Categories --}}
         <div class="drawer__tabs" role="tablist" aria-label="Drawer sections">
-            <button type="button" role="tab" :aria-selected="mobileTab === 'menu'"
+            <button id="drawer-menu-tab" type="button" role="tab" aria-controls="drawer-menu-panel"
+                    :tabindex="mobileTab === 'menu' ? 0 : -1" :aria-selected="mobileTab === 'menu'"
                     :class="mobileTab === 'menu' && 'is-active'" @click="mobileTab = 'menu'">Menu</button>
-            <button type="button" role="tab" :aria-selected="mobileTab === 'cats'"
+            <button id="drawer-categories-tab" type="button" role="tab" aria-controls="drawer-categories-panel"
+                    :tabindex="mobileTab === 'cats' ? 0 : -1" :aria-selected="mobileTab === 'cats'"
                     :class="mobileTab === 'cats' && 'is-active'" @click="mobileTab = 'cats'">Categories</button>
         </div>
 
         <div class="flex-1 overflow-y-auto px-5 py-4">
             {{-- MENU TAB --}}
-            <div x-show="mobileTab === 'menu'">
+            <div id="drawer-menu-panel" role="tabpanel" aria-labelledby="drawer-menu-tab"
+                 x-show="mobileTab === 'menu'">
                 <form action="/shop" method="GET" role="search" class="relative mb-4">
                     <svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m21 21-4.3-4.3"/></svg>
                     <label for="nav-search-mobile" class="sr-only">Search instruments</label>
@@ -194,12 +200,13 @@
                 <a href="/contact" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Contact</a>
 
                 <div class="mt-4 border-t border-ink/10 pt-4">
-                    <a href="/shop?on_sale=1" @click="mobileMenu = false" class="drawer__sale">Sale! Up to 30% Off</a>
+                    <a href="/shop?on_sale=1" @click="mobileMenu = false" class="drawer__sale">Browse current offers</a>
                 </div>
             </div>
 
             {{-- CATEGORIES TAB (accordion) --}}
-            <div x-show="mobileTab === 'cats'" x-cloak>
+            <div id="drawer-categories-panel" role="tabpanel" aria-labelledby="drawer-categories-tab"
+                 x-show="mobileTab === 'cats'" x-cloak>
                 @foreach($navCategories as $cat)
                     <div x-data="{ sub: false }" class="border-b border-ink/5">
                         <div class="flex items-center">

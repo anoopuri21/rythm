@@ -4,21 +4,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\SeoFields;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use FilamentTiptapEditor\TiptapEditor;
-use Filament\Forms\Components\Grid;
+use App\Services\ImportedProductActivationService;
+use App\Support\AdminAccess;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -27,14 +37,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-musical-note';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-musical-note';
 
-    protected static ?string $navigationGroup = 'SHOP';
+    protected static string|\UnitEnum|null $navigationGroup = 'SHOP';
 
     protected static ?int $navigationSort = 1;
 
@@ -42,10 +53,10 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['category', 'brand', 'media']);
+            ->with(['category', 'brand', 'media', 'importSource']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form->schema([
             Tabs::make('Product editor')->tabs([
@@ -69,14 +80,17 @@ class ProductResource extends Resource
                                     ->helperText('MRP — shown as strikethrough on the storefront'),
                                 TextInput::make('stock')->numeric()->required()->default(0)->minValue(0),
                                 TextInput::make('low_stock_threshold')->numeric()->default(5)->minValue(0),
-                                Toggle::make('is_active')->default(true),
+                                Toggle::make('is_active')
+                                    ->default(true)
+                                    ->disabled(fn (?Product $record): bool => $record?->importSource !== null)
+                                    ->helperText('Imported products use the reviewed activation action after real stock is entered.'),
                                 Toggle::make('is_featured'),
                                 Toggle::make('is_trending')->label('Trending (homepage carousel)'),
                                 TextInput::make('featured_rank')->numeric()->minValue(0)
                                     ->label('Featured rank')
                                     ->helperText('Order in homepage Best Sellers (0 = first).'),
                                 Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
-                                TiptapEditor::make('description')->profile('default')->columnSpanFull(),
+                                RichEditor::make('description')->columnSpanFull(),
                             ]),
                         Section::make('Variants')
                             ->description('Optional — finishes, sizes or configurations.')
@@ -109,7 +123,7 @@ class ProductResource extends Resource
                     ]),
                 Tabs\Tab::make('SEO')
                     ->icon('heroicon-o-magnifying-glass-circle')
-                    ->schema(\App\Filament\Components\SeoFields::schema()),
+                    ->schema(SeoFields::schema()),
             ])->columnSpanFull(),
         ]);
     }
@@ -131,7 +145,9 @@ class ProductResource extends Resource
                 IconColumn::make('is_featured')->boolean()->sortable()->label('Featured'),
                 ToggleColumn::make('is_trending')->sortable()->label('Trending'),
                 TextColumn::make('featured_rank')->sortable()->label('Rank')->toggleable(),
-                ToggleColumn::make('is_active')->sortable(),
+                ToggleColumn::make('is_active')
+                    ->disabled(fn (Product $record): bool => $record->importSource !== null)
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('category')->relationship('category', 'name')->searchable(),
@@ -141,14 +157,66 @@ class ProductResource extends Resource
                 TernaryFilter::make('is_trending'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Action::make('approve_activate_import')
+                    ->label('Approve & activate')
+                    ->icon('heroicon-o-shield-check')
+                    ->color('success')
+                    ->visible(fn (Product $record): bool => ! $record->is_active
+                        && $record->importSource !== null
+                        && (auth()->user()?->hasAdminPermission(AdminAccess::CATALOGUE_MANAGE) ?? false))
+                    ->requiresConfirmation()
+                    ->schema(self::activationSchema())
+                    ->action(function (Product $record, array $data): void {
+                        app(ImportedProductActivationService::class)->approveAndActivate($record, auth()->user(), $data['reason']);
+                        Notification::make()->success()->title('Imported product reviewed and activated')->send();
+                    }),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    BulkAction::make('approve_activate_imports')
+                        ->label('Approve & activate imported products')
+                        ->icon('heroicon-o-shield-check')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->schema(self::activationSchema())
+                        ->action(function (Collection $records, array $data): void {
+                            if ($records->count() > 20) {
+                                throw new \RuntimeException('Activate no more than 20 reviewed products at a time.');
+                            }
+                            foreach ($records as $record) {
+                                app(ImportedProductActivationService::class)->approveAndActivate($record, auth()->user(), $data['reason']);
+                            }
+                            Notification::make()->success()->title($records->count().' imported products activated')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private static function activationSchema(): array
+    {
+        return [
+            Checkbox::make('content_verified')
+                ->label('Description and title contain no unsupported retailer promises')
+                ->accepted()
+                ->required(),
+            Checkbox::make('price_stock_verified')
+                ->label('Price and real Rythme stock have been verified')
+                ->accepted()
+                ->required(),
+            Checkbox::make('media_rights_verified')
+                ->label('Local product media is approved for Rythme commercial use')
+                ->accepted()
+                ->required(),
+            Textarea::make('reason')
+                ->label('Activation reason / review note')
+                ->required()
+                ->minLength(5)
+                ->maxLength(500),
+        ];
     }
 
     public static function getPages(): array

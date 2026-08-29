@@ -21,15 +21,15 @@ class HomepageSectionSeeder extends Seeder
             ['bestsellers', 'Played. Loved. Recommended.', 'Recently', 'Launched', 'Our most-loved instruments — handpicked and road-tested by the Rythme team.', 2],
             ['why-rythme', 'The Rythme standard', 'Our', 'Advantages', 'Every instrument is set up, intonated and inspected before it ships — because the right feel matters.', 3],
             ['brands', 'The names behind the music', 'Popular', 'Brands', 'Fender, Yamaha, Roland, Shure and more — the brands that shaped popular music, all under one roof.', 4],
-            ['numbers', 'In tune with India', 'A community that keeps', 'growing.', 'Thousands of musicians across India trust Rythme for their first chord and their hundredth gig.', 5],
-            ['new-arrivals', 'Fresh from the flight case', 'New Arrival', 'Products', 'The latest instruments and gear, unboxed, tested and ready to play.', 6],
-            ['deals', 'The encore sale', 'Deals Of The', 'Day', 'Limited-time offers on guitars, keyboards and pro audio — while stock lasts.', 7],
+            ['numbers', 'Storefront capabilities', 'Built for clearer', 'shopping.', 'Explore verified catalogue, checkout and order-management capabilities.', 5],
+            ['new-arrivals', 'Recently added', 'New Arrival', 'Products', 'Active products ordered by their recorded catalogue date.', 6],
+            ['deals', 'Current catalogue savings', 'Available', 'Deals', 'Products with a current compare-at price greater than their selling price.', 7],
             ['video-showcase', 'Rythme Sound', 'Feel the music.', 'Live the moment.', 'Watch what happens when the right instrument meets the right hands.', 8],
             ['stories', 'The Rythme journal', 'Ideas for a life', 'lived in music.', 'Practice tips, gear guides and stories from the Rythme community.', 9],
-            ['testimonials', 'Stories from the Rythme community', 'Loved by players,', 'across India.', 'Real words from real customers — from first-time learners to touring artists.', 10],
-            ['comparison', 'The Rythme difference', 'Why buy', 'from Rythme.', 'Expert setup, honest pricing, free shipping and a 1-year warranty on everything we sell.', 11],
-            ['ugc', 'Community', 'Play it.', 'Tag it. #RythmeFamily.', 'Share your sound with the community — the best setups get featured here.', 12],
-            ['faq', 'Good to know', 'Questions,', 'answered.', 'Everything about shipping, EMI, warranty, returns and setup — before you buy.', 13],
+            ['testimonials', 'Verified customer feedback', 'Approved reviews,', 'from delivered orders.', 'Only moderated reviews tied to paid, delivered purchases may appear publicly.', 10],
+            ['comparison', 'Verified capabilities', 'How the', 'storefront works.', 'Server-derived totals, moderated interactions and protected order access.', 11],
+            ['ugc', 'Product help', 'Ask it.', 'Get a staff answer.', 'Signed-in customers can submit product questions for moderation.', 12],
+            ['faq', 'Good to know', 'Questions,', 'answered.', 'Storefront guidance without invented shipping, warranty, payment or return promises.', 13],
         ];
 
         foreach ($sections as [$key, $kicker, $title, $accent, $content, $sort]) {

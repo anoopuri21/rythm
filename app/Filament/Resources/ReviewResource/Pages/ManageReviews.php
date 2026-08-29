@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ReviewResource\Pages;
 
 use App\Filament\Resources\ReviewResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageReviews extends ManageRecords

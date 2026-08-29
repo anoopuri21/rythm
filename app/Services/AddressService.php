@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Address;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * User address book: CRUD + default handling. Orders snapshot the address
@@ -31,15 +32,19 @@ final class AddressService
      */
     public function store(int $userId, array $data): Address
     {
-        $data['user_id'] = $userId;
-        $data['type'] = $data['type'] ?? 'shipping';
-        $data['country'] = $data['country'] ?? 'IN';
+        return DB::transaction(function () use ($userId, $data): Address {
+            $data['user_id'] = $userId;
+            $data['type'] = $data['type'] ?? 'shipping';
+            $data['country'] = $data['country'] ?? 'IN';
+            $data['is_default'] = ! Address::query()->where('user_id', $userId)->exists()
+                || ! empty($data['is_default']);
 
-        if (! empty($data['is_default'])) {
-            $this->clearDefault($userId);
-        }
+            if ($data['is_default']) {
+                $this->clearDefault($userId);
+            }
 
-        return Address::create($data);
+            return Address::create($data);
+        });
     }
 
     /**
@@ -51,13 +56,15 @@ final class AddressService
             abort(403);
         }
 
-        if (! empty($data['is_default'])) {
-            $this->clearDefault($userId);
-        }
+        return DB::transaction(function () use ($address, $userId, $data): Address {
+            if (! empty($data['is_default'])) {
+                $this->clearDefault($userId);
+            }
 
-        $address->update($data);
+            $address->update($data);
 
-        return $address->fresh();
+            return $address->fresh();
+        });
     }
 
     public function delete(Address $address, int $userId): void
@@ -66,7 +73,17 @@ final class AddressService
             abort(403);
         }
 
-        $address->delete();
+        DB::transaction(function () use ($address, $userId): void {
+            $wasDefault = $address->is_default;
+            $address->delete();
+
+            if ($wasDefault) {
+                Address::query()
+                    ->where('user_id', $userId)
+                    ->latest('updated_at')
+                    ->first()?->update(['is_default' => true]);
+            }
+        });
     }
 
     public function setDefault(Address $address, int $userId): void
@@ -75,8 +92,10 @@ final class AddressService
             abort(403);
         }
 
-        $this->clearDefault($userId);
-        $address->update(['is_default' => true]);
+        DB::transaction(function () use ($address, $userId): void {
+            $this->clearDefault($userId);
+            $address->update(['is_default' => true]);
+        });
     }
 
     /** @return array<string, mixed> immutable snapshot for orders */

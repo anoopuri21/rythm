@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationNoticeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterSubscriptionController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
@@ -21,6 +22,9 @@ use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -28,7 +32,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Contact form submission (page itself is dynamic — see catch-all below)
+// Contact page uses the dynamic CMS controller but keeps a stable named route
+// for global navigation, emails and error pages.
+Route::get('/contact', [PageController::class, 'show'])
+    ->defaults('slug', 'contact')
+    ->name('contact');
+
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
@@ -67,13 +76,13 @@ Route::post('/logout', LogoutController::class)->name('logout');
 
 // Email verification (Laravel built-in)
 Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', \App\Http\Controllers\Auth\VerificationNoticeController::class)->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request): \Illuminate\Http\RedirectResponse {
+    Route::get('/email/verify', VerificationNoticeController::class)->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request): RedirectResponse {
         $request->fulfill();
 
         return redirect()->route('account.index')->with('status', 'Email verified!');
     })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse {
+    Route::post('/email/verification-notification', function (Request $request): RedirectResponse {
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('status', 'Verification link sent!');
@@ -89,9 +98,24 @@ Route::middleware('auth')->group(function () {
 
     // Account dashboard — profile, password, addresses, orders
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::get('/account/notifications', [NotificationController::class, 'index'])->name('account.notifications.index');
+    Route::patch('/account/notifications/preferences', [NotificationController::class, 'updatePreferences'])
+        ->middleware('throttle:10,1')
+        ->name('account.notifications.preferences');
+    Route::patch('/account/notifications/read-all', [NotificationController::class, 'markAllRead'])
+        ->middleware('throttle:20,1')
+        ->name('account.notifications.read-all');
+    Route::patch('/account/notifications/{notification}/read', [NotificationController::class, 'markRead'])
+        ->middleware('throttle:30,1')
+        ->name('account.notifications.read');
+    Route::patch('/account/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
+        ->middleware('throttle:30,1')
+        ->name('account.notifications.unread');
     Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
     Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
     Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
+    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
+    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('account.addresses.default');
     Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
 });
 
@@ -109,6 +133,9 @@ Route::post('/newsletter', NewsletterSubscriptionController::class)
 
 // Order detail + tracking — owner, signed link, or guest lookup result
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])
+    ->middleware('throttle:3,1')
+    ->name('orders.retry-payment');
 Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 

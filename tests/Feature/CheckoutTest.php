@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\DTOs\CheckoutData;
+use App\Events\CommerceNotificationRequested;
 use App\Livewire\CheckoutWizard;
-use App\Mail\OrderConfirmationMail;
+use App\Models\InventoryMovement;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\SiteSetting;
 use App\Models\User;
 use App\Payment\FakePaymentGateway;
+use App\Payment\PaymentResult;
+use App\Payment\RazorpayGateway;
+use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -38,7 +49,7 @@ class CheckoutTest extends TestCase
 
     private function addAddress(): int
     {
-        $address = app(\App\Services\AddressService::class)->store($this->user->id, [
+        $address = app(AddressService::class)->store($this->user->id, [
             'name' => 'Anoop Puri',
             'phone' => '9876543210',
             'line1' => '42, Music Lane',
@@ -67,7 +78,7 @@ class CheckoutTest extends TestCase
 
     public function test_full_checkout_flow_with_fake_gateway(): void
     {
-        Mail::fake();
+        Event::fake([CommerceNotificationRequested::class]);
         $this->fillCart(2);
         $addressId = $this->addAddress();
 
@@ -88,8 +99,10 @@ class CheckoutTest extends TestCase
         $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
         $this->assertSame(48, $product->fresh()->stock);
 
-        // Confirmation email queued
-        Mail::assertQueued(OrderConfirmationMail::class, fn ($mail) => $mail->order->is($order));
+        Event::assertDispatched(
+            CommerceNotificationRequested::class,
+            fn ($event) => $event->orderId === $order->id && $event->eventType === 'order.confirmed'
+        );
 
         // Cart cleared
         $this->assertSame(0, app(CartService::class)->count());
@@ -97,6 +110,83 @@ class CheckoutTest extends TestCase
         // Status history audit trail written (pending → confirmed)
         $this->assertSame(1, $order->statusHistory()->count());
         $this->assertSame('confirmed', $order->statusHistory()->first()->to);
+    }
+
+    public function test_server_totals_are_persisted_and_rendered_consistently(): void
+    {
+        SiteSetting::query()->updateOrCreate(['key' => 'shipping_flat_fee'], ['value' => '50']);
+        SiteSetting::query()->updateOrCreate(['key' => 'shipping_free_above'], ['value' => '0']);
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '10']);
+        Cache::forget('site.settings');
+
+        $this->fillCart(2);
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::query()->firstOrFail();
+        $this->assertSame(798.0, (float) $order->subtotal);
+        $this->assertSame(50.0, (float) $order->shipping_fee);
+        $this->assertSame(79.8, (float) $order->tax);
+        $this->assertSame(927.8, (float) $order->total);
+
+        $this->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee('798.00')
+            ->assertSee('50.00')
+            ->assertSee('79.80')
+            ->assertSee('927.80');
+        $this->get(URL::signedRoute('orders.invoice', ['order' => $order]))
+            ->assertOk()
+            ->assertSee('798.00')
+            ->assertSee('50.00')
+            ->assertSee('79.80')
+            ->assertSee('927.80');
+    }
+
+    public function test_checkout_order_creation_is_idempotent_per_attempt(): void
+    {
+        $this->fillCart(2);
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'checkout-attempt-123',
+        );
+        $cart = app(CartService::class)->getOrCreateCart();
+        $orders = app(OrderService::class);
+
+        $first = $orders->createFromCheckout($cart, $data, $this->user->id);
+        $second = $orders->createFromCheckout($cart, $data, $this->user->id);
+
+        $this->assertTrue($first->is($second));
+        $this->assertSame(1, Order::query()->where('idempotency_key', 'checkout-attempt-123')->count());
+        $this->assertSame(1, Order::query()->count());
+    }
+
+    public function test_checkout_idempotency_key_cannot_cross_accounts(): void
+    {
+        $this->fillCart();
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'account-bound-attempt',
+        );
+        $cart = app(CartService::class)->getOrCreateCart();
+        app(OrderService::class)->createFromCheckout($cart, $data, $this->user->id);
+
+        $this->expectException(\RuntimeException::class);
+        app(OrderService::class)->createFromCheckout($cart, $data, User::factory()->create()->id);
     }
 
     public function test_place_order_with_empty_cart_errors(): void
@@ -167,7 +257,7 @@ class CheckoutTest extends TestCase
 
         // Wrong owner → 403
         $other = User::factory()->create();
-        $signed = \Illuminate\Support\Facades\URL::signedRoute('checkout.success', ['order' => $order]);
+        $signed = URL::signedRoute('checkout.success', ['order' => $order]);
         $this->actingAs($other)->get($signed)->assertForbidden();
 
         // Owner + signature → 200
@@ -177,9 +267,139 @@ class CheckoutTest extends TestCase
             ->assertSee($order->order_number);
     }
 
+    public function test_payment_finalization_is_idempotent(): void
+    {
+        Event::fake([CommerceNotificationRequested::class]);
+        $this->fillCart(2);
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::with(['items', 'payments'])->firstOrFail();
+        $payment = $order->payments->firstOrFail();
+        $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
+        $stockAfterFirstCapture = $product->stock;
+
+        $replayed = app(OrderService::class)->markPaid(
+            $order,
+            new PaymentResult(true, 'paid', $payment->gateway_payment_id),
+            $payment->gateway_order_id,
+        );
+
+        $this->assertFalse($replayed);
+        $this->assertSame($stockAfterFirstCapture, $product->fresh()->stock);
+        $this->assertSame(1, $order->payments()->count());
+        $this->assertSame(1, $order->statusHistory()->where('to', Order::STATUS_CONFIRMED)->count());
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'type' => InventoryMovement::TYPE_ORDER_CAPTURE,
+            'quantity_delta' => -2,
+            'balance_after' => $stockAfterFirstCapture,
+        ]);
+        $this->assertSame(1, $order->inventoryMovements()->count());
+        Event::assertDispatchedTimes(CommerceNotificationRequested::class, 1);
+    }
+
+    public function test_variant_checkout_decrements_only_variant_stock_once(): void
+    {
+        $variant = ProductVariant::query()
+            ->where('is_active', true)
+            ->where('stock', '>=', 2)
+            ->with('product')
+            ->firstOrFail();
+        $product = $variant->product;
+        $productStockBefore = $product->stock;
+        $variantStockBefore = $variant->stock;
+
+        app(CartService::class)->addItem($product, $variant, 2);
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::with('payments')->firstOrFail();
+        $payment = $order->payments->firstOrFail();
+
+        $this->assertSame($variantStockBefore - 2, $variant->fresh()->stock);
+        $this->assertSame($productStockBefore, $product->fresh()->stock);
+
+        $replayed = app(OrderService::class)->markPaid(
+            $order,
+            new PaymentResult(true, 'paid', $payment->gateway_payment_id),
+            $payment->gateway_order_id,
+        );
+
+        $this->assertFalse($replayed);
+        $this->assertSame($variantStockBefore - 2, $variant->fresh()->stock);
+        $this->assertSame($productStockBefore, $product->fresh()->stock);
+        $this->assertDatabaseHas('inventory_movements', [
+            'order_id' => $order->id,
+            'product_id' => null,
+            'product_variant_id' => $variant->id,
+            'type' => InventoryMovement::TYPE_ORDER_CAPTURE,
+            'quantity_delta' => -2,
+            'balance_after' => $variantStockBefore - 2,
+        ]);
+        $this->assertSame(1, $order->inventoryMovements()->count());
+    }
+
+    public function test_checkout_rejects_stock_that_changed_after_cart_add(): void
+    {
+        $product = Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->firstOrFail();
+        app(CartService::class)->addItem($product, null, 1);
+        $product->update(['stock' => 0]);
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertSet('paymentError', "Not enough stock for {$product->name}.");
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_customer_cannot_confirm_another_customers_order(): void
+    {
+        $this->fillCart();
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::firstOrFail();
+        $other = User::factory()->create();
+        $this->actingAs($other);
+
+        Livewire::test(CheckoutWizard::class)
+            ->set('orderId', $order->id)
+            ->set('gatewayOrderId', $order->payments()->value('gateway_order_id'))
+            ->call('confirmPayment', ['status' => 'captured'])
+            ->assertSet('paymentError', 'No pending order found.');
+    }
+
+    public function test_payment_initiation_is_idempotent_for_gateway_order(): void
+    {
+        $order = Order::factory()->create(['user_id' => $this->user->id]);
+        $service = app(OrderService::class);
+
+        $first = $service->recordPaymentInitiation($order, 'order_same_gateway_id');
+        $second = $service->recordPaymentInitiation($order, 'order_same_gateway_id');
+
+        $this->assertTrue($first->is($second));
+        $this->assertDatabaseCount('payments', 1);
+    }
+
     public function test_order_number_is_unique_and_formatted(): void
     {
-        $service = app(\App\Services\OrderService::class);
+        $service = app(OrderService::class);
         $numbers = [];
 
         for ($i = 0; $i < 5; $i++) {
@@ -192,9 +412,10 @@ class CheckoutTest extends TestCase
             $this->assertMatchesRegularExpression('/^RYM-\d{4}-[A-F0-9]{6}$/', $number);
         }
     }
+
     public function test_razorpay_webhook_signature_verification(): void
     {
-        $gateway = new \App\Payment\RazorpayGateway('key_id', 'key_secret', 'whsec_test');
+        $gateway = new RazorpayGateway('key_id', 'key_secret', 'whsec_test');
 
         $body = json_encode(['event' => 'payment.captured', 'payload' => []]);
         $valid = hash_hmac('sha256', $body, 'whsec_test');
@@ -204,16 +425,48 @@ class CheckoutTest extends TestCase
         $this->assertFalse($gateway->verifyWebhookSignature($body, ''));
     }
 
+    public function test_invalid_razorpay_callback_cannot_mutate_payment_state(): void
+    {
+        config()->set('rythme.razorpay.key_id', 'rzp_test_key');
+        config()->set('rythme.razorpay.key_secret', 'test_secret');
+
+        $this->fillCart();
+        $addressId = $this->addAddress();
+        $addresses = app(AddressService::class);
+        $address = $addresses->forUser($this->user->id)->firstWhere('id', $addressId);
+        $data = new CheckoutData(
+            addressId: $addressId,
+            shippingAddress: $addresses->snapshot($address),
+            billingAddress: $addresses->snapshot($address),
+            idempotencyKey: 'invalid-callback-attempt',
+        );
+        $order = app(OrderService::class)->createFromCheckout(
+            app(CartService::class)->getOrCreateCart(),
+            $data,
+            $this->user->id,
+        );
+        $payment = app(OrderService::class)->recordPaymentInitiation($order, 'order_gateway_123');
+
+        $this->post(route('payment.razorpay.callback'), [
+            'razorpay_payment_id' => 'pay_untrusted',
+            'razorpay_order_id' => 'order_gateway_123',
+            'razorpay_signature' => 'invalid',
+        ])->assertRedirect(route('checkout.index'));
+
+        $this->assertSame(Payment::STATUS_INITIATED, $payment->fresh()->status);
+        $this->assertSame(Order::PAYMENT_UNPAID, $order->fresh()->payment_status);
+    }
+
     public function test_razorpay_callback_signature_verification(): void
     {
-        $gateway = new \App\Payment\RazorpayGateway('key_id', 'key_secret', 'whsec_test');
+        $gateway = new RazorpayGateway('key_id', 'key_secret', 'whsec_test');
 
         $payload = [
             'razorpay_order_id' => 'order_abc',
             'razorpay_payment_id' => 'pay_xyz',
             'razorpay_signature' => 'forged',
         ];
-        $order = new \App\Models\Order(['order_number' => 'RYM-SEC-1', 'total' => 100]);
+        $order = new Order(['order_number' => 'RYM-SEC-1', 'total' => 100]);
 
         $result = $gateway->verify($order, $payload);
         $this->assertFalse($result->success);

@@ -8,7 +8,6 @@ use App\Livewire\AddToCart;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -33,7 +32,10 @@ class ProductPageTest extends TestCase
             ->assertSee($product->name)
             ->assertSee('Add to Cart')
             ->assertSee($product->sku)
-            ->assertSee('1-Year Warranty')
+            ->assertSee('Shipping at checkout')
+            ->assertSee('Questions &amp; answers', escape: false)
+            ->assertDontSee('1-Year Warranty')
+            ->assertDontSee('4.8')
             ->assertSee('You may also like');
     }
 

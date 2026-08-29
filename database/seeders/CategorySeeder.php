@@ -47,7 +47,7 @@ class CategorySeeder extends Seeder
                 ],
             ],
             'Pro Audio' => [
-                'desc' => 'Interfaces, monitors, mics and headphones trusted by studios across India.',
+                'desc' => 'Interfaces, monitors, microphones and headphones for recording and monitoring workflows.',
                 'children' => [
                     'Studio Monitors' => 'Reference speakers for honest, detailed mixes.',
                     'Microphones' => 'Vocal and instrument mics for stage and studio.',

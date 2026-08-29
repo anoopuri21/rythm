@@ -9,7 +9,7 @@
         // On-page SEO (admin-managed via seo_entries) with Blade @yield fallbacks.
         $seo = $seo ?? [];
         $seoTitle = $seo['meta_title'] ?? ($__env->yieldContent('title') ?: 'Rhythm Exports - Feel The Music, Own The Sound');
-        $seoDescription = $seo['meta_description'] ?? ($__env->yieldContent('meta_description') ?: 'Rhythm Exports - Premium musical instruments, guitars, keyboards, drums, pro audio and more. Shop authentic instruments from top brands with free shipping all over India.');
+        $seoDescription = $seo['meta_description'] ?? ($__env->yieldContent('meta_description') ?: 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories at Rhythm Exports.');
         $ogTitle = $seo['og_title'] ?? ($__env->yieldContent('title') ?: 'Rhythm Exports');
         $ogDescription = $seo['og_description'] ?? $seoDescription;
         $ogImage = $seo['og_image'] ?? ($__env->yieldContent('og_image') ?: asset('images/hero-guitar.jpg'));
@@ -37,7 +37,7 @@
     @if(!empty($seo['head_scripts']))
         {!! $seo['head_scripts'] !!}
     @endif
-    <meta name="theme-color" content="#0A0A0A">
+    <meta name="theme-color" content="#B20202">
     <script>document.documentElement.classList.add('js');</script>
     <script>
         // Shared UI stores (available to all Alpine components)
@@ -48,8 +48,6 @@
 
     <link rel="icon" type="image/png" sizes="128x128" href="{{ asset('favicon.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">

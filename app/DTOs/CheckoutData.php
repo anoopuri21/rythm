@@ -17,12 +17,9 @@ final readonly class CheckoutData
         public int $addressId,
         public array $shippingAddress,
         public array $billingAddress,
-        public float $subtotal,
-        public float $discount = 0.0,
-        public float $shippingFee = 0.0,
-        public float $tax = 0.0,
         public string $currency = 'INR',
         public ?string $notes = null,
         public ?string $couponCode = null,
+        public ?string $idempotencyKey = null,
     ) {}
 }

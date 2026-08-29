@@ -1,7 +1,10 @@
 {
     "project": "SOUNDSCAPE \u2014 Rhythm Exports",
     "repo": "anoopuri21/rythm",
-    "branch": "feature/dev",
+    "canonical": false,
+    "legacy_status": "ARCHIVED_NON_AUTHORITATIVE_DO_NOT_AUTOMATE",
+    "canonical_tracker": "tasks/MASTER_PROJECT_TRACKER.md",
+    "branch": "rhythm-uat",
     "task_mode": false,
     "locked_features": [
         "Header",

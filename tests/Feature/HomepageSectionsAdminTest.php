@@ -65,7 +65,7 @@ class HomepageSectionsAdminTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Deals Of The Day');
+            ->assertSee('Best Deals');
     }
 
     public function test_cache_flushes_when_section_updated(): void

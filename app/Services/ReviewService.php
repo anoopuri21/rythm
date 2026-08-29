@@ -8,17 +8,14 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
+use Illuminate\Database\QueryException;
 use RuntimeException;
 
 /**
- * Reviews: verified-purchase submission, moderation, product summaries.
+ * Verified reviews: paid/delivered eligibility, moderation and summaries.
  */
 final class ReviewService
 {
-    /**
-     * @throws RuntimeException when the user has not purchased the product
-     */
     public function submit(int $userId, Product $product, int $rating, ?string $comment): Review
     {
         if ($rating < 1 || $rating > 5) {
@@ -27,40 +24,45 @@ final class ReviewService
 
         $purchased = Order::query()
             ->where('user_id', $userId)
-            ->where('status', '!=', Order::STATUS_CANCELLED)
-            ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
+            ->where('status', Order::STATUS_DELIVERED)
+            ->where('payment_status', Order::PAYMENT_PAID)
+            ->whereHas('items', fn ($query) => $query->where('product_id', $product->id))
             ->exists();
 
         if (! $purchased) {
-            throw new RuntimeException('You can only review products you have purchased.');
+            throw new RuntimeException('You can only review products from paid, delivered orders.');
         }
 
-        $existing = Review::query()
-            ->where('user_id', $userId)
-            ->where('product_id', $product->id)
-            ->exists();
-
-        if ($existing) {
+        if (Review::query()->where('user_id', $userId)->where('product_id', $product->id)->exists()) {
             throw new RuntimeException('You have already reviewed this product.');
         }
 
-        return Review::create([
-            'product_id' => $product->id,
-            'user_id' => $userId,
-            'rating' => $rating,
-            'comment' => $comment,
-            'is_approved' => false,
-        ]);
+        try {
+            return Review::create([
+                'product_id' => $product->id,
+                'user_id' => $userId,
+                'rating' => $rating,
+                'comment' => trim((string) $comment) ?: null,
+                'status' => Review::STATUS_PENDING,
+            ]);
+        } catch (QueryException $exception) {
+            if (Review::query()->where('user_id', $userId)->where('product_id', $product->id)->exists()) {
+                throw new RuntimeException('You have already reviewed this product.', previous: $exception);
+            }
+
+            throw $exception;
+        }
     }
 
     public function approvedFor(Product $product): LengthAwarePaginator
     {
         return Review::query()
             ->where('product_id', $product->id)
+            ->where('status', Review::STATUS_APPROVED)
             ->where('is_approved', true)
             ->with('user:id,name')
             ->orderByDesc('created_at')
-            ->paginate(6);
+            ->paginate(6, pageName: 'reviewsPage');
     }
 
     /** @return array{avg: float, count: int, stars: array<int,int>} */
@@ -68,13 +70,14 @@ final class ReviewService
     {
         $reviews = Review::query()
             ->where('product_id', $product->id)
+            ->where('status', Review::STATUS_APPROVED)
             ->where('is_approved', true)
             ->get(['rating']);
 
         $count = $reviews->count();
 
         return [
-            'avg' => $count > 0 ? round($reviews->avg('rating'), 1) : 0.0,
+            'avg' => $count > 0 ? round((float) $reviews->avg('rating'), 1) : 0.0,
             'count' => $count,
             'stars' => collect(range(1, 5))
                 ->mapWithKeys(fn (int $star): array => [$star => $reviews->where('rating', $star)->count()])

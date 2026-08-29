@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Payment;
 
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Refund;
 
 /**
  * Gateway contract — Razorpay (production/test) or Fake (dev/tests).
@@ -29,4 +31,9 @@ interface PaymentGateway
      * @param  array<string, mixed>  $payload
      */
     public function handleWebhook(array $payload): PaymentResult;
+
+    /**
+     * Submit one previously reserved refund operation.
+     */
+    public function refund(Payment $payment, Refund $refund): RefundResult;
 }

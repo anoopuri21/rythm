@@ -20,7 +20,11 @@ final class SitemapController extends Controller
         $urls[] = ['loc' => route('shop.index'), 'priority' => '0.9', 'changefreq' => 'daily'];
 
         // Dynamic pages (about, contact, support…)
-        foreach (Page::query()->whereNotNull('slug')->where('is_active', true)->get() as $page) {
+        foreach (Page::query()
+            ->whereNotNull('slug')
+            ->where('is_active', true)
+            ->whereNotIn('slug', config('rythme.withheld_public_pages', []))
+            ->get() as $page) {
             $urls[] = ['loc' => url('/'.$page->slug), 'priority' => '0.8', 'changefreq' => 'monthly'];
         }
 

@@ -7,12 +7,22 @@ namespace App\Filament\Widgets;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\AdminAccess;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
+
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User
+            && $user->hasAdminPermission(AdminAccess::FINANCE_VIEW)
+            && $user->hasAdminPermission(AdminAccess::CATALOGUE_VIEW);
+    }
 
     protected function getStats(): array
     {

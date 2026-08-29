@@ -9,14 +9,14 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Table('product_variants')]
 #[Fillable(['product_id', 'name', 'options', 'sku', 'price_override', 'stock', 'is_active'])]
 class ProductVariant extends Model
 {
     use HasFactory;
-
-    
 
     protected $casts = [
         'options' => 'array',
@@ -28,6 +28,19 @@ class ProductVariant extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function attributeValues(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductAttributeValue::class,
+            'product_attribute_value_product_variant',
+        );
+    }
+
+    public function inventoryMovements(): HasMany
+    {
+        return $this->hasMany(InventoryMovement::class);
     }
 
     /**

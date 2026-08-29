@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Shop All Instruments — Guitars, Keyboards, Drums, Pro Audio | Rythme Music Store')
-@section('meta_description', 'Browse the full Rythme catalogue — acoustic and electric guitars, digital pianos, electronic drums, pro audio and accessories from Fender, Yamaha, Roland, Shure and more. Free shipping all over India.')
+@section('meta_description', 'Browse guitars, digital pianos, drums, pro audio and musical-instrument accessories from leading brands at Rhythm Exports.')
 
 @section('content')
     <div class="bg-paper">
@@ -17,9 +17,8 @@
                 <p class="section-kicker mb-4">The Rythme Collection</p>
                 <h1 class="section-title">Shop instruments,<br><em>built to inspire.</em></h1>
                 <p class="mt-6 max-w-2xl text-base leading-7 text-muted sm:text-lg">
-                    Every guitar, keyboard, drum kit and microphone is hand-picked, expertly set up
-                    and shipped with care across India. Filter by category, brand and budget to find
-                    your next sound.
+                    Explore guitars, keyboards, drums, microphones and studio gear. Filter the catalogue
+                    by category, brand, availability and budget to find the right instrument for your sound.
                 </p>
             </div>
         </header>
