@@ -12,8 +12,8 @@
      Image tile (zoom on hover) · sale badge · wishlist overlay ·
      hover "view product" bar · category · name · stars · price
      ============================================================ --}}
-<article class="pcard">
-    <div class="pcard__media">
+<article class="pcard ui-card ui-card--interactive">
+    <div class="pcard__media ui-media ui-media--product ui-media--contain">
         @if($onSale)
             <span class="pcard__badge">Sale!</span>
         @endif

@@ -10,8 +10,8 @@
     $href = '/product/' . $product->slug;
 @endphp
 
-<article {{ $attributes->class(['group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:shadow-[0_24px_50px_rgba(10,10,10,0.12)] sm:p-4']) }}>
-    <div class="relative aspect-square overflow-hidden rounded-xl bg-paper-dark">
+<article {{ $attributes->class(['ui-card ui-card--interactive group flex h-full flex-col p-3.5 sm:p-4']) }}>
+    <div class="ui-media ui-media--product ui-media--contain relative">
         @if($image)
             <img src="{{ $image }}" alt="{{ $product->name }}" width="800" height="800"
                  class="h-full w-full object-contain transition duration-700 group-hover:scale-105"
@@ -27,9 +27,9 @@
         @endif
 
         @if($discount > 0)
-            <span class="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+            <x-ui.badge variant="brand" class="absolute left-3 top-3">
                 {{ $discount }}% off
-            </span>
+            </x-ui.badge>
         @endif
 
         <livewire:wishlist-button :product-id="$product->id" :variant="'card'"
