@@ -12,6 +12,7 @@
     @include('home._usp-strip')
     @include('home._categories', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._new-arrivals', ['homeSections' => $homeSections, 'homepage' => $homepage])
+    @include('home._trending', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._category-product-rows', ['homepage' => $homepage])
     @include('home._promo-banners')
     @include('home._advantages', ['homeSections' => $homeSections])

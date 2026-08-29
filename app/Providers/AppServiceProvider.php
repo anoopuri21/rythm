@@ -29,6 +29,7 @@ use App\Models\Review;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
+use App\Observers\ProductHomepageObserver;
 use App\Policies\AuditPolicy;
 use App\Policies\CataloguePolicy;
 use App\Policies\ContentPolicy;
@@ -86,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
         ] as $model => $policy) {
             Gate::policy($model, $policy);
         }
+
+        Product::observe(ProductHomepageObserver::class);
 
         foreach ([
             Product::class,

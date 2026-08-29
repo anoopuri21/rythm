@@ -1,19 +1,19 @@
 @php
-    $sec = $homeSections['deals'] ?? null;
-    $deals = $homepage['dealsOfDay'] ?? collect();
+    $sec = $homeSections['best-deals'] ?? ($homeSections['deals'] ?? null);
+    $deals = $homepage['bestDeals'] ?? collect();
 @endphp
 
 @if($deals->isNotEmpty())
 {{-- ============================================================
-     DEALS OF THE DAY — sale cards with real current stock.
+     BEST DEALS — active products with a truthful compare-at discount.
      Unsupported sales counters and countdowns are intentionally omitted;
      expiry UI may return only with a persisted timestamp.
      ============================================================ --}}
-<section class="deal-mm" aria-label="Deals of the day">
+<section id="best-deals" class="deal-mm" aria-label="Best deals">
     <div class="deal-mm__inner">
         <h2 class="deal-mm__title">
             @if($sec?->title){{ $sec->title }}@if($sec?->title_accent) {{ $sec->title_accent }}@endif
-            @else Deals Of The Day @endif
+            @else Best Deals @endif
         </h2>
 
         <div class="deal-mm__grid">

@@ -13,16 +13,22 @@ final class CategoryObserver
 
     public function saved(Category $category): void
     {
-        $this->categories->flush();
+        $this->flush();
     }
 
     public function deleted(Category $category): void
     {
-        $this->categories->flush();
+        $this->flush();
     }
 
     public function restored(Category $category): void
     {
+        $this->flush();
+    }
+
+    private function flush(): void
+    {
         $this->categories->flush();
+        HomepageDataObserver::flush();
     }
 }

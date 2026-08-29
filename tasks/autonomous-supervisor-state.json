@@ -11,21 +11,21 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "f57cdc95fb331e8c09e395394aac6e3040be065c",
-    "remote_head": "f57cdc95fb331e8c09e395394aac6e3040be065c",
+    "local_head": "0c5a9b8248aebc8a5a45e5eed647d618b1e651e7",
+    "remote_head": "0c5a9b8248aebc8a5a45e5eed647d618b1e651e7",
     "working_tree_clean": false
   },
   "delivery": {
     "phase": "10",
-    "chunk": "2-manual-fulfillment",
-    "task": "Least-privilege manual fulfillment operations",
-    "status": "in_progress"
+    "chunk": "homepage-discovery-db-recovery",
+    "task": "Dynamic homepage discovery and correct database recovery",
+    "status": "qa"
   },
   "execution": {
-    "action_class": "read_only",
-    "attempt": 1,
-    "max_attempts": 1,
-    "last_verified_action": "Owner confirmed all focused and full regression tests passed for the paid-cancellation refund admin remediation; Agent 0 accepted it."
+    "action_class": "credential",
+    "attempt": 0,
+    "max_attempts": 0,
+    "last_verified_action": "Implemented bounded homepage discovery and error-page resilience; owner must correct the environment-only database name from maverick_academy to rhythm_db."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -41,8 +41,8 @@
     ]
   },
   "checkpoint": {
-    "id": "43834f4c534332418a060ecd735e3f21fc9259aa88894497900a815449564223",
-    "created_at": "2026-08-29T15:30:00.000Z"
+    "id": "6a8ac19e95ca8fe690ecb8c2bf98ec02fe3d1197dc18eab3f37ba75d71f7458c",
+    "created_at": "2026-08-29T16:00:00.000Z"
   },
   "decisions": [
     {
@@ -96,6 +96,11 @@
       "id": "AS-H006",
       "status": "closed",
       "summary": "Owner runtime must run focused refund and full regression tests before the paid-cancellation admin fix is accepted; no additional real/test refund should be submitted for qualification."
+    },
+    {
+      "id": "AS-H007",
+      "status": "open",
+      "summary": "Owner must restore rythm.test DB_DATABASE to rhythm_db, clear cached configuration, then run focused/full and rendered homepage QA without sharing credentials."
     }
   ],
   "gate_results": [
@@ -263,8 +268,8 @@
     }
   ],
   "next_action": {
-    "id": "PHASE-10-CHUNK-2-MANUAL-FULFILLMENT",
-    "description": "Add least-privilege admin shipment creation/transitions and customer-safe shipment evidence on the accepted fulfillment domain.",
-    "requires_human": false
+    "id": "HOMEPAGE-DISCOVERY-DB-RECOVERY-QA",
+    "description": "Owner corrects the environment-only database selection, clears cache, and runs focused/full plus desktop/mobile homepage checks.",
+    "requires_human": true
   }
 }

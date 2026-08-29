@@ -38,8 +38,9 @@ final class HomepageDataService
      *   bestsellers: Collection<int, Product>,
      *   newArrivals: Collection<int, Product>,
      *   trending: Collection<int, Product>,
+     *   bestDeals: Collection<int, Product>,
      *   categoryRows: Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>,
-     *   popularCategories: Collection<int, array{name:string, slug:string, count:int}>,
+     *   popularCategories: Collection<int, array{name:string, slug:string, count:int, image:?string}>,
      * }
      */
     public function all(): array
@@ -60,29 +61,20 @@ final class HomepageDataService
                 'bestsellers' => Product::query()->active()->featured()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
-                // Curated (not pure created_at): deterministic set, every product
-                // has a hero image, and order never drifts when new rows are seeded.
-                'newArrivals' => $this->curatedProducts([
-                    'yamaha-f310-acoustic-guitar',
-                    'squier-affinity-stratocaster-hss',
-                    'yamaha-trbx174-bass-guitar',
-                    'yamaha-p-145-digital-piano',
-                    'yamaha-psr-e373-portable-keyboard',
-                    'alesis-nitro-mesh-kit',
-                    'shure-sm58-vocal-microphone',
-                    'pioneer-dj-ddj-flx4-controller',
-                    'boss-katana-50-mkii',
-                    'focusrite-scarlett-solo-3rd-gen',
-                ]),
+                'newArrivals' => Product::query()->active()
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->latest('created_at')->latest('id')->limit(10)->get(),
                 'trending' => Product::query()->active()->trending()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->orderByDesc('updated_at')->limit(8)->get(),
-                'dealsOfDay' => $this->curatedProducts([
-                    'boss-katana-50-mkii',
-                    'shure-sm58-vocal-microphone',
-                    'focusrite-scarlett-solo-3rd-gen',
-                    'alesis-nitro-mesh-kit',
-                ]),
+                    ->orderByDesc('updated_at')->orderByDesc('id')->limit(10)->get(),
+                'bestDeals' => Product::query()->active()
+                    ->whereNotNull('compare_at_price')
+                    ->whereColumn('compare_at_price', '>', 'price')
+                    ->with(['brand', 'category.parent', 'media'])
+                    ->orderByRaw('(compare_at_price - price) / NULLIF(compare_at_price, 0) DESC')
+                    ->orderByDesc('updated_at')
+                    ->limit(8)
+                    ->get(),
                 // Distinct set from New Arrivals (reference uses a separate pool) —
                 // fresh gear that has just landed in the store.
                 'recentlyLaunched' => $this->curatedProducts([
@@ -158,27 +150,23 @@ final class HomepageDataService
      * Root counts include direct products and immediate child categories.
      *
      * @param  Collection<int, Category>  $configured
-     * @return Collection<int, array{name:string, slug:string, count:int}>
+     * @return Collection<int, array{name:string, slug:string, count:int, image:?string}>
      */
     private function popularCategories(Collection $configured): Collection
     {
-        $fallback = [
-            'guitars', 'electric-guitars', 'acoustic-guitars',
-            'keyboards-pianos', 'digital-pianos',
-            'drums-percussion', 'pro-audio',
-            'dj-stage', 'dj-controllers', 'accessories',
-        ];
-        $order = $configured->pluck('slug')
-            ->merge($fallback)
-            ->unique()
-            ->take(self::MAX_DISCOVERY_CATEGORIES)
-            ->values();
-
+        $configuredOrder = $configured->pluck('slug')->values();
         $categories = Category::query()
-            ->whereIn('slug', $order)
             ->where('is_active', true)
+            ->where(function ($query): void {
+                $query->whereHas('products', fn ($products) => $products->active())
+                    ->orWhereHas('children.products', fn ($products) => $products->active());
+            })
             ->with('children:id,parent_id')
-            ->get(['id', 'parent_id', 'name', 'slug']);
+            ->orderByRaw('parent_id IS NOT NULL')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->limit(self::MAX_DISCOVERY_CATEGORIES * 2)
+            ->get(['id', 'parent_id', 'name', 'slug', 'sort_order']);
         $categoryIds = $categories
             ->flatMap(fn (Category $category) => $category->children->pluck('id')->push($category->id))
             ->unique();
@@ -189,22 +177,34 @@ final class HomepageDataService
             ->groupBy('category_id')
             ->pluck('aggregate', 'category_id');
 
-        return $order
-            ->map(function (string $slug) use ($categories, $counts): ?array {
-                $category = $categories->firstWhere('slug', $slug);
-                if ($category === null) {
-                    return null;
-                }
+        return $categories
+            ->map(function (Category $category) use ($counts, $configuredOrder): array {
                 $ids = $category->children->pluck('id')->push($category->id);
                 $count = $ids->sum(fn (int $id): int => (int) ($counts[$id] ?? 0));
+                $asset = 'images/categories/'.$category->slug.'.jpg';
+                $image = is_file(public_path($asset)) ? '/'.$asset : Product::query()
+                    ->active()
+                    ->whereIn('category_id', $ids)
+                    ->with('media')
+                    ->latest('updated_at')
+                    ->first()?->heroImage();
+                $configuredRank = $configuredOrder->search($category->slug);
 
-                return $count === 0 ? null : [
+                return [
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'count' => $count,
+                    'image' => $image,
+                    '_configured_rank' => $configuredRank === false ? PHP_INT_MAX : $configuredRank,
                 ];
             })
-            ->filter()
+            ->sortBy(fn (array $category): array => [$category['_configured_rank'], -$category['count'], $category['name']])
+            ->take(self::MAX_DISCOVERY_CATEGORIES)
+            ->map(function (array $category): array {
+                unset($category['_configured_rank']);
+
+                return $category;
+            })
             ->values();
     }
 }

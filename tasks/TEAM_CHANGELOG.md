@@ -655,3 +655,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Existing obligation processing added** — Finance now receives a separate action that processes the already-pending cancellation refund through the configured gateway.
 - **Unsafe overlap blocked** — Manual refund creation is hidden while a pending or processing refund exists; provider-pending outcomes remain reconciliation-only and are not blindly retried.
 - **QA accepted** — Owner confirmed focused refund and full regression tests passed; Agent 0 accepted the remediation without an additional provider refund during automated qualification.
+
+## 29 August 2026 — Homepage Discovery and Database Recovery Candidate
+
+- **Dynamic discovery implemented** — Popular Categories now discovers active catalogue groups with truthful counts and local/fallback product imagery; New Arrivals uses the latest ten active products instead of legacy slugs.
+- **Trending restored** — Product trending/rank fields persist, product/category changes invalidate homepage cache, and an explicitly marked Trending Products section now renders.
+- **Best Deals added** — The homepage displays only active products whose compare-at price is genuinely above the current price; no fabricated countdown or sale claim was added.
+- **Error rendering hardened** — Navbar category composition returns an empty list when the configured database has no categories table, preventing error pages from recursively failing.
+- **Configuration blocker identified** — `rythm.test` is pointed at unrelated database `maverick_academy`; owner must restore `DB_DATABASE=rhythm_db` and clear cached configuration. No tables will be created in the wrong database.
+- **QA pending** — Focused homepage/admin tests, full regression and rendered desktop/mobile checks remain required.

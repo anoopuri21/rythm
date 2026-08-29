@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Cached 2-level category tree shared by the navbar drawer, the shop
@@ -20,6 +21,12 @@ final class CategoryService
      */
     public function tree(): array
     {
+        // Error and installer pages must still render when the configured
+        // database is unavailable or has not been migrated.
+        if (! Schema::hasTable('categories')) {
+            return [];
+        }
+
         return Cache::rememberForever(self::CACHE_KEY, function (): array {
             return Category::query()
                 ->with(['children' => fn ($query) => $query->orderBy('sort_order')->orderBy('name')])
