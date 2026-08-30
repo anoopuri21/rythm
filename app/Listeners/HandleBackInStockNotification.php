@@ -95,6 +95,10 @@ final class HandleBackInStockNotification
             return false;
         }
 
+        if (! $subscription->user->hasVerifiedEmail()) {
+            return false;
+        }
+
         if (! $subscription->product->is_active || $subscription->cancelled_at !== null || (! $allowNotified && $subscription->notified_at !== null)) {
             return false;
         }

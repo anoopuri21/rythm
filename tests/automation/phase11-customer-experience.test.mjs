@@ -42,6 +42,7 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   const component = read('app/Livewire/AddToCart.php');
   const command = read('app/Console/Commands/NotifyBackInStock.php');
   const accountController = read('app/Http/Controllers/AccountController.php');
+  const feature = read('tests/Feature/PhaseElevenCustomerExperienceTest.php');
 
   assert.match(migration, /back_in_stock_user_target_unique/);
   assert.match(migration, /consent_at/);
@@ -57,6 +58,8 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(command, /limit > 500/);
   assert.match(command, /! \$variant->is_active/);
   assert.match(component, /Please choose a valid option/);
+  assert.match(feature, /test_notification_command_rejects_limits_outside_the_worker_bound/);
+  assert.match(feature, /test_delivery_skips_a_customer_whose_email_is_no_longer_verified/);
 });
 
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
@@ -66,6 +69,7 @@ test('Phase 11 stock notifications use the central delivery ledger and mail only
   const retry = read('app/Services/NotificationRetryService.php');
 
   assert.match(listener, /recordEvent/);
+  assert.match(listener, /hasVerifiedEmail/);
   assert.match(listener, /reserveDelivery/);
   assert.match(listener, /BackInStockNotification::class/);
   assert.match(notification, /return \['mail'\]/);

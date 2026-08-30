@@ -158,6 +158,41 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertNull($subscription->fresh()->notified_at);
     }
 
+    public function test_notification_command_rejects_limits_outside_the_worker_bound(): void
+    {
+        $this->artisan('back-in-stock:notify', ['--limit' => 0])
+            ->expectsOutput('The limit must be an integer between 1 and 500.')
+            ->assertExitCode(2);
+
+        $this->artisan('back-in-stock:notify', ['--limit' => 501])
+            ->expectsOutput('The limit must be an integer between 1 and 500.')
+            ->assertExitCode(2);
+    }
+
+    public function test_delivery_skips_a_customer_whose_email_is_no_longer_verified(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-unverified-after-request',
+            'sku' => 'RYM-P11-UNVERIFIED',
+            'stock' => 0,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+        $product->update(['stock' => 2]);
+        $user->forceFill(['email_verified_at' => null])->save();
+
+        app(HandleBackInStockNotification::class)->handle(
+            new BackInStockNotificationRequested($subscription->id),
+        );
+
+        Notification::assertNothingSent();
+        $this->assertDatabaseCount('notification_deliveries', 0);
+        $this->assertNull($subscription->fresh()->notified_at);
+    }
+
     public function test_out_of_stock_storefront_can_record_an_authenticated_stock_request(): void
     {
         $user = User::factory()->create();
