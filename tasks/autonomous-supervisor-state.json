@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "8fb0f12cf358ad23cdfcc40fb729d599b2ca873d",
-    "remote_head": "8fb0f12cf358ad23cdfcc40fb729d599b2ca873d",
+    "local_head": "16b74db805a3495531a2276a193715bd3c255589",
+    "remote_head": "16b74db805a3495531a2276a193715bd3c255589",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner-side run.sh now performs the isolated rhythm_phase11_qa MySQL engine query, migration and status, then safe in-memory SQLite PHP tests and remaining scripted checks. Auto Mode remains paused and Phase 11 remains the current manual gate."
+    "last_verified_action": "Owner reported all isolated migration statuses as Ran, but Phase 11 focused PHP qualification failed 3 tests (30 passed) and full PHP regression failed 43 tests (351 passed). The runner was retired by owner request; manual execution and failure-log capture are now authoritative. Two deterministic fixture issues were aligned and pushed; owner PHP rerun remains required."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "d4e5ee5f277eeb4baa4ecdbbb92dd6708a9a8347d64959d91ee8d94c9d1581a5",
-    "created_at": "2026-08-30T09:41:07.644Z"
+    "id": "55e9da14b92d4e11a6dbc5a7b4c653cc4ebae54ad4bbda74e1a24a33c1579d10",
+    "created_at": "2026-08-30T10:02:34.865Z"
   },
   "decisions": [
     {
@@ -111,7 +111,7 @@
     {
       "id": "AS-H009",
       "status": "open",
-      "summary": "Owner-side Phase 11 responsive/conversion UAT and isolated MySQL qualification remain required before Phase 11 completion."
+      "summary": "Owner-side Phase 11 responsive/conversion UAT and isolated MySQL qualification remain required; latest focused/full PHP evidence failed and needs rerun after fixture alignment."
     },
     {
       "id": "AS-H010",
@@ -527,6 +527,18 @@
       "outcome": "passed",
       "evidence": "run.sh SELECT VERSION(), @@version_comment; fixed rhythm_phase11_qa guard; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
       "verified_at": "2026-08-30T09:41:07.644Z"
+    },
+    {
+      "name": "Phase 11 owner PHP qualification review",
+      "outcome": "failed",
+      "evidence": "Owner-reported isolated migration status showed all listed migrations Ran; focused tests 30 passed, 3 failed (93 assertions); full suite 351 passed, 43 failed (1531 assertions). Failures included one seeded Fender slug mismatch and two unverified seeded test-user stock-alert cases.",
+      "verified_at": "2026-08-30T10:02:34.865Z"
+    },
+    {
+      "name": "Phase 11 fixture alignment and manual QA workflow",
+      "outcome": "passed",
+      "evidence": "Canonical Fender seed slug aligned; seeded test customer is verified for local/test fixture; run.sh removed; manual --filter and tee log instructions added; npm run test:automation 110/110; PHP runtime unavailable in Arena.",
+      "verified_at": "2026-08-30T10:02:34.865Z"
     }
   ],
   "next_action": {
