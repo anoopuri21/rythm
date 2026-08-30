@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "baa2aec205f791f6b676def36073727f9864aaf2",
-    "remote_head": "baa2aec205f791f6b676def36073727f9864aaf2",
+    "local_head": "00c08f8fdb3a7f9dfb146e53245fa95eddbe8a44",
+    "remote_head": "00c08f8fdb3a7f9dfb146e53245fa95eddbe8a44",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 product recommendation, shop-card and wishlist price displays now suppress non-discount compare-at values; Arena-local automation 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 storefront fallback cards now show truthful stock states and suppress false compare-at prices; Arena-local automation 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "69c7eccee988b5b1d72dd344aa667346aba0aa3e0cb04ae3f84cece2b293947a",
-    "created_at": "2026-08-30T08:24:54.572Z"
+    "id": "b973783c33462a84408d9486673c43d5d780715e056ad924a14d30e61a50be39",
+    "created_at": "2026-08-30T08:27:14.837Z"
   },
   "decisions": [
     {
@@ -402,6 +402,12 @@
       "outcome": "passed",
       "evidence": "shop-card.blade.php; minimal-product-card.blade.php; wishlist-page.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:24:54.572Z"
+    },
+    {
+      "name": "Phase 11 shared-card stock and sale truthfulness candidate checks",
+      "outcome": "passed",
+      "evidence": "minimal-product-card.blade.php; shop-card.blade.php; wishlist-page.blade.php; add-to-cart.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:27:14.837Z"
     }
   ],
   "next_action": {
