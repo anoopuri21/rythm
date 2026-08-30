@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "ab8fb95466958e95b32d9aaf614a495e494a05b8",
-    "remote_head": "ab8fb95466958e95b32d9aaf614a495e494a05b8",
+    "local_head": "633e4ba3d4b5e2b80a588f3e8f246499fb616c17",
+    "remote_head": "633e4ba3d4b5e2b80a588f3e8f246499fb616c17",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner reported the focused Phase 11 suite at 33 passed and uploaded php-regression.txt. The full log showed 41 failed, 353 passed and 1,550 assertions, with one seeded-auth fixture conflict and a shared _deals Blade parse error. Those causes were corrected and pushed; owner must rerun focused and full PHP suites. Auto Mode remains paused."
+    "last_verified_action": "Owner reported focused Phase 11 PHP suite 33 passed/112 assertions and uploaded php-regression.txt showing the full suite 394 passed/1,698 assertions with no failures. PHP regression is accepted. Isolated MySQL engine output/database binding and remaining worker/catalogue/browser gates are still pending; Auto Mode remains paused."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "f7a1dc1541b44a54ff1e2a37aebc6cd28a24c73e389b58c7e0298e4d8fceb45e",
-    "created_at": "2026-08-30T10:40:23.932Z"
+    "id": "594a9f274c5e5cb2ff9dec437b5a56bf0550f2cf94bacaca2d776dbe7835013b",
+    "created_at": "2026-08-30T10:49:43.890Z"
   },
   "decisions": [
     {
@@ -111,7 +111,7 @@
     {
       "id": "AS-H009",
       "status": "open",
-      "summary": "Owner-side Phase 11 responsive/conversion UAT and isolated MySQL qualification remain required; focused suite previously passed, full regression failed from corrected fixture/Blade issues and needs rerun."
+      "summary": "Focused/full PHP regression is accepted; isolated MySQL engine/binding evidence, bounded worker, realistic catalogue and responsive/accessibility/SEO/conversion UAT remain required."
     },
     {
       "id": "AS-H010",
@@ -563,6 +563,12 @@
       "outcome": "passed",
       "evidence": "Owner-uploaded php-regression.txt reviewed: 41 failed, 353 passed, 1,550 assertions. Shared _deals.blade.php parse error and seeded-auth fixture expectation were isolated; corrected availability conditional and kept generic seed user unverified while AccountTest verifies its own fixture. npm run test:automation 110/110.",
       "verified_at": "2026-08-30T10:40:23.932Z"
+    },
+    {
+      "name": "Owner Phase 11 focused and full PHP regression",
+      "outcome": "passed",
+      "evidence": "Owner-reported focused suite: 33 passed, 112 assertions. Uploaded php-regression.txt: 394 passed, 1,698 assertions, 0 failures.",
+      "verified_at": "2026-08-30T10:49:43.890Z"
     }
   ],
   "next_action": {
