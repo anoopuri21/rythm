@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "67fc5766efb90a3152ba9441e0b6ba230bbdebbd",
-    "remote_head": "67fc5766efb90a3152ba9441e0b6ba230bbdebbd",
+    "local_head": "8fb0f12cf358ad23cdfcc40fb729d599b2ca873d",
+    "remote_head": "8fb0f12cf358ad23cdfcc40fb729d599b2ca873d",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner-side runner now points migrations and status only at the fixed disposable rhythm_phase11_qa MySQL database, while PHP tests remain forced to in-memory SQLite. Auto Mode remains paused and Phase 11 remains the current manual gate."
+    "last_verified_action": "Owner-side run.sh now performs the isolated rhythm_phase11_qa MySQL engine query, migration and status, then safe in-memory SQLite PHP tests and remaining scripted checks. Auto Mode remains paused and Phase 11 remains the current manual gate."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "0d9310a15e92b400a9c3e2c77d49d45f9084a0a1c383980a8a7326622f67cb21",
-    "created_at": "2026-08-30T09:40:35.716Z"
+    "id": "d4e5ee5f277eeb4baa4ecdbbb92dd6708a9a8347d64959d91ee8d94c9d1581a5",
+    "created_at": "2026-08-30T09:41:07.644Z"
   },
   "decisions": [
     {
@@ -521,6 +521,12 @@
       "outcome": "passed",
       "evidence": "run.sh fixed database guard rhythm_phase11_qa; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
       "verified_at": "2026-08-30T09:40:35.716Z"
+    },
+    {
+      "name": "Owner runner MySQL engine evidence check",
+      "outcome": "passed",
+      "evidence": "run.sh SELECT VERSION(), @@version_comment; fixed rhythm_phase11_qa guard; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
+      "verified_at": "2026-08-30T09:41:07.644Z"
     }
   ],
   "next_action": {
