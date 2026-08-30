@@ -73,7 +73,7 @@ final class HandleBackInStockNotification
             throw new \RuntimeException('Back-in-stock delivery retry requires an existing subscription and customer.');
         }
 
-        if (! $this->isReady($subscription)) {
+        if (! $this->isReady($subscription, allowNotified: true)) {
             throw new \RuntimeException('The subscribed item is no longer available for notification retry.');
         }
 
@@ -85,7 +85,7 @@ final class HandleBackInStockNotification
         ));
     }
 
-    private function isReady(?BackInStockSubscription $subscription): bool
+    private function isReady(?BackInStockSubscription $subscription, bool $allowNotified = false): bool
     {
         if ($subscription === null || ! $subscription->relationLoaded('user') || ! $subscription->relationLoaded('product')) {
             return false;
@@ -95,7 +95,7 @@ final class HandleBackInStockNotification
             return false;
         }
 
-        if (! $subscription->product->is_active || $subscription->cancelled_at !== null || $subscription->notified_at !== null) {
+        if (! $subscription->product->is_active || $subscription->cancelled_at !== null || (! $allowNotified && $subscription->notified_at !== null)) {
             return false;
         }
 
