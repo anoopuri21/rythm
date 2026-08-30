@@ -53,7 +53,8 @@ commercial claim not supported by an approved source.
 ## Current verification record
 
 - `npm ci --no-audit --no-fund`: passed in the disposable workspace dependency directory.
-- `npm run test:automation`: **109 passed, 0 failed** (including five Phase 11 static safety contracts).
+- Arena-local `npm run test:automation`: **109 passed, 0 failed** (including five Phase 11 static safety contracts).
+- Owner-reported `npm run test:automation`: **109 passed, 0 failed**; this confirms the same automation result in the owner runtime and is recorded separately from Arena-local execution.
 - `npm run build`: passed; Vite emitted a valid production manifest.
 - `git diff --check`: passed.
 - PHP/Composer/MySQL execution is not available in Arena, so the new migration and focused PHP feature test remain owner-runtime gates and are not claimed as locally passed.
