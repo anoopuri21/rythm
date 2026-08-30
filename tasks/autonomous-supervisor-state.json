@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "e33d9befe9368da9b27539017cbde1699227af14",
-    "remote_head": "e33d9befe9368da9b27539017cbde1699227af14",
+    "local_head": "eab63d7d05f1c085682a430154e0a48875980568",
+    "remote_head": "eab63d7d05f1c085682a430154e0a48875980568",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 stock-alert account-management implementation, qualification gate documentation and strengthened static safety contracts are pushed; Arena-local automation remains 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 stock-alert variant handling is hardened: inactive variants are skipped by the bounded notifier and stale Livewire selections are rejected; static automation remains 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "c31e69fc91733773498e27e396e6f5f2ca597aba2db7ad42d8d9ef8f321c05a7",
-    "created_at": "2026-08-30T08:05:44.108Z"
+    "id": "d8ba3e1407596cd466fccf5b4a2d83b417b6a6131f04d4b451abe69d156d95af",
+    "created_at": "2026-08-30T08:12:52.072Z"
   },
   "decisions": [
     {
@@ -372,6 +372,12 @@
       "outcome": "passed",
       "evidence": "AccountController.php; BackInStockSubscriptionService.php; account/index.blade.php; AccountTest.php (owner-runtime gate); tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:04:11.656Z"
+    },
+    {
+      "name": "Phase 11 stock-alert variant safety hardening candidate checks",
+      "outcome": "passed",
+      "evidence": "NotifyBackInStock.php; AddToCart.php; PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:12:52.072Z"
     }
   ],
   "next_action": {
