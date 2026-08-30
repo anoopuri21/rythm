@@ -802,3 +802,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **PHP gate passed** — Focused Phase 11/account suite passed **33 tests / 112 assertions**; full regression passed **394 tests / 1,698 assertions** with zero failures.
 - **Worker/search automated coverage passed** — The full suite passed bounded limit rejection, inactive-target skip, notification idempotency, account ownership/pagination and the >500-product catalogue qualification test using non-sending test fakes.
 - **Remaining owner gate** — Four-viewport rendered responsive, keyboard/accessibility, SEO, console/overflow/link and conversion UAT evidence is still required before Phase 11 completion.
+
+
+## 30 August 2026 — Auto Mode activated for Phase 12
+
+- **Explicit owner activation received** — The owner issued `ACTIVATE AUTO MODE`; the supervisor configuration is enabled and canonical Phase 12 is now `IN PROGRESS`.
+- **Plan generated** — `tasks/AUTO_MODE_PHASE_12_PLAN.md` sequences baseline security/privacy/accessibility inventory, safe remediation, privacy/accessibility decisions and independent qualification.
+- **Authority and safety retained** — Auto Mode may not activate Agent 10, deployment, production actions, credentials, live payments, destructive persistent-UAT operations or invented legal/customer-rights rules.
+- **Current next action** — Begin the read-only Phase 12 Chunk 0 baseline threat model and gate inventory on `rhythm-uat`.

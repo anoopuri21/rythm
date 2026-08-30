@@ -1,9 +1,9 @@
 # Owner-side Phasewise Execution Runbook
 
 **Language:** Hinglish / simple English  
-**Purpose:** Owner manually performs one phase at a time. Agent 0 reviews the evidence, records the gate, and only then gives the next phase.  
-**Auto Mode:** PAUSED by explicit owner command on 30 August 2026.  
-**Current open work:** Phase 11 — owner-runtime and rendered qualification.  
+**Purpose:** Record owner gates and safe manual actions while Agent 0 runs approved work.
+**Auto Mode:** ACTIVE by explicit owner command on 30 August 2026.
+**Current open work:** Phase 12 — security, privacy, compliance and accessibility hardening.
 **Deployment:** Phase 18 and Agent 10 remain inactive.
 
 ---
@@ -640,7 +640,7 @@ Use `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` as the contr
 
 # Phase 12 — Security, privacy, compliance and accessibility hardening
 
-**Status:** PENDING.  
+**Status:** IN PROGRESS — Auto Mode activated 30 August 2026.
 **Goal:** Production-focused OWASP/Laravel security, privacy and legal-readiness review.
 
 ## Tasks
@@ -857,4 +857,4 @@ Phase 18 may not start from this runbook. It requires a separate explicit owner 
 
 ## Current owner action
 
-**Phase 11 is accepted.** Do not start Phase 12 automatically. Auto Mode is paused; wait for the owner’s explicit instruction before beginning the next phase. Phase 18, deployment and Agent 10 remain inactive.
+**Phase 11 is accepted.** The owner issued `ACTIVATE AUTO MODE` on 30 August 2026, so Phase 12 is now active under the autonomous supervisor. Phase 18, deployment and Agent 10 remain inactive.

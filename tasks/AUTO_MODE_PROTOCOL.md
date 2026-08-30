@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** PAUSED BY OWNER — Phase 11 is accepted; manual phase-by-phase owner qualification is required for Phase 12 onward
-**Autonomous Supervisor:** PAUSED after owner command `PAUSE AUTO MODE`; authorization through Phase 17 remains recorded, Phase 18 excluded
+**Status:** ACTIVE — owner issued `ACTIVATE AUTO MODE` on 30 August 2026; Phase 12 execution is authorized through the Phase 17 horizon
+**Autonomous Supervisor:** ACTIVE for canonical Phases 12–17; Phase 18/deployment remains excluded and separately gated
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,10 +150,10 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — owner explicitly paused Auto Mode; manual execution is authoritative.
-- **Autonomous Supervisor:** PAUSED after owner command `PAUSE AUTO MODE`; Phase 18 remains excluded.
+- **Active:** Yes — owner explicitly issued `ACTIVATE AUTO MODE` on 30 August 2026; autonomous execution is active within the authorized Phase 12–17 horizon.
+- **Autonomous Supervisor:** ACTIVE after owner command `ACTIVATE AUTO MODE`; Phase 18 remains excluded.
 - **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
-- **Current priority:** Phase 12 security, privacy, compliance and accessibility hardening (`PENDING OWNER INSTRUCTION`).
+- **Current priority:** Phase 12 security, privacy, compliance and accessibility hardening (`IN PROGRESS`).
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
 - **Phase 7 acceptance:** Owner confirmed TOTP, roles and protected staff-user creation; Agent 0 marked Phase 7 `COMPLETE` on 26 August 2026.
 - **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.
