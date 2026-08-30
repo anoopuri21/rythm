@@ -717,3 +717,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Regression coverage added** — Shop feature coverage verifies an attribute attached only to an inactive variant is absent from the public facet UI.
 - **Qualification evidence aligned** — Search and facet exclusion is now covered in both the service query and Livewire facet path.
 - **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.
+
+## 30 August 2026 — Phase 11 facet query active-variant correction
+
+- **Facet query hardened** — The Livewire category facet loader now requires the linked variant itself to be active before exposing its attribute values.
+- **Regression coverage added** — Shop feature coverage verifies that values attached only to inactive variants remain absent from public facets.
+- **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.
