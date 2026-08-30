@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "4a8e25ccfbbe11efced5d1dd745d184feda54491",
-    "remote_head": "4a8e25ccfbbe11efced5d1dd745d184feda54491",
+    "local_head": "72334c679d464fc765c563a6a4f8da4a7d509b8d",
+    "remote_head": "72334c679d464fc765c563a6a4f8da4a7d509b8d",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 now has focused exact-versus-contains search ranking coverage, confirming exact name matches retain the highest relevance score; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 recommendation, homepage deal and compatibility-card availability now consume Product::hasAvailableStock(), including active variant stock when parent stock is zero; automation 109/109, Vite build and diff checks passed; owner PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "e7b31914d163358fa6ffb5625c89a691267e8f1d658f7ae6a3851ca69758c4f9",
-    "created_at": "2026-08-30T08:59:07.474Z"
+    "id": "09704b1df752982fd7998c7c5cadea8686c8bbae9fea66cff38881021662b963",
+    "created_at": "2026-08-30T09:03:03.645Z"
   },
   "decisions": [
     {
@@ -486,6 +486,12 @@
       "outcome": "passed",
       "evidence": "tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:59:07.474Z"
+    },
+    {
+      "name": "Phase 11 recommendation-card availability truthfulness candidate checks",
+      "outcome": "passed",
+      "evidence": "resources/views/components/mega-product-card.blade.php; resources/views/components/minimal-product-card.blade.php; resources/views/home/_deals.blade.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T09:03:03.645Z"
     }
   ],
   "next_action": {
