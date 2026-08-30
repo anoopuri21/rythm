@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "74ef5b51f868d1a27a6096786abb09385983223d",
-    "remote_head": "74ef5b51f868d1a27a6096786abb09385983223d",
+    "local_head": "bcc3495b0a244a624fc817803e107b10eacead4f",
+    "remote_head": "bcc3495b0a244a624fc817803e107b10eacead4f",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner explicitly reactivated Auto Mode. Read-only audit passed on rhythm-uat with matching local/remote HEAD, no workspace vendor entry and no critical findings; Phase 11 Chunk 2 remains active, while PHP/MySQL/rendered/UAT gates remain human-gated and deployment stays disabled."
+    "last_verified_action": "Phase 11 catalogue, homepage, related and wishlist availability is now variant-aware through bounded active-variant existence metadata; Shop in-stock filtering includes active variants and shared cards remain truthful without per-card queries. Automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "e7a6b767439914fa14b7647c556f1d180f0ae4572d404c6c7824f578cfb3c25c",
-    "created_at": "2026-08-30T08:36:55.944Z"
+    "id": "da15c9f66f7927fbc52053615750cac43c19ea6e231eaf6c90029260ec913fd5",
+    "created_at": "2026-08-30T08:40:40.578Z"
   },
   "decisions": [
     {
@@ -432,6 +432,12 @@
       "outcome": "passed",
       "evidence": "tasks/AUTO_MODE_PROTOCOL.md; tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md; tasks/TEAM_CHANGELOG.md; node automation/supervisor.mjs audit; node automation/supervisor.mjs status; node automation/supervisor-state.mjs validate",
       "verified_at": "2026-08-30T08:36:55.944Z"
+    },
+    {
+      "name": "Phase 11 active-variant catalogue availability candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Models/Product.php; app/Services/ProductQueryService.php; app/Services/HomepageDataService.php; app/Services/WishlistService.php; resources/views/components/shop-card.blade.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:40:40.578Z"
     }
   ],
   "next_action": {
