@@ -838,3 +838,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Route abuse controls expanded** — Profile, password, address, order-cancellation and logout writes now have explicit throttles; logout also requires the authenticated route boundary.
 - **Regression contract expanded** — Automation checks cover the new route middleware and existing owner-scoped action behavior; `npm run test:automation` passed **111/111**.
 - **Scope boundary retained** — Rate limits do not change approved customer-rights or order-state rules; owner PHP/runtime verification is still required.
+
+## 30 August 2026 — Phase 12 authorization and action-surface audit
+
+- **Read-only audit continued** — Reviewed the public/customer route mutations, Livewire write actions, 23 Filament resource classes, strict authorization/MFA configuration and explicit model-policy registration.
+- **Evidence recorded** — The authorization matrix now records the 23-resource inventory and the intentional `AdminAuditLog` explicit-policy exception.
+- **Findings retained conservatively** — CSP strictness, HSTS/trusted-proxy behavior, provider callback runtime cases, upload malware/retention policy and privacy/legal decisions remain open review/runtime gates; no unsupported security-complete claim was made.

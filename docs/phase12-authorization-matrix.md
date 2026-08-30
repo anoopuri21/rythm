@@ -32,7 +32,8 @@
 - Sensitive order actions visibly and server-side check order/finance permissions, then call domain services that authorize the actor and record audit events.
 - Staff creation/editing is separately protected by `STAFF_MANAGE`; the final privileged user cannot be demoted by the model guard.
 - Product activation requires catalogue permission and the imported-product activation service authorizes the actor.
-- Remaining work: enumerate each discovered resource/page and verify that hidden UI actions also have server-side authorization; verify bulk actions and relation managers, not only top-level resource methods.
+- Static inventory reviewed 23 discovered Filament resource classes. Their model permissions are represented in `AdminAccess` or an explicitly registered policy; `AdminAuditLog` is the intentional explicit-policy exception rather than a customer/admin domain write model.
+- Remaining work: verify hidden UI actions, bulk actions and relation managers in owner PHP/runtime tests, not only top-level resource methods.
 
 ## Livewire action review list
 
