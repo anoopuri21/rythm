@@ -17,8 +17,8 @@
   },
   "delivery": {
     "phase": "11",
-    "chunk": "customer-experience-search-merchandising-chunk-1",
-    "task": "Phase 11 weighted search, bounded merchandising and consent-safe stock requests",
+    "chunk": "customer-experience-search-merchandising-chunk-2",
+    "task": "Phase 11 stock delivery and customer-experience qualification",
     "status": "in_progress"
   },
   "execution": {
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "d8ba3e1407596cd466fccf5b4a2d83b417b6a6131f04d4b451abe69d156d95af",
-    "created_at": "2026-08-30T08:12:52.072Z"
+    "id": "496ab87172453518c94e03b3da05411c44e175cc09b79085cceeb0f5174f810b",
+    "created_at": "2026-08-30T08:13:12.070Z"
   },
   "decisions": [
     {

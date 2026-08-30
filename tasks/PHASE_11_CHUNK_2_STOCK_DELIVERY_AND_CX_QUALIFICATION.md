@@ -33,7 +33,8 @@ unapproved legal/tax/shipping/warranty promises remain outside this gate.
 - `tests/Feature/AccountTest.php`
 - `tests/automation/phase11-customer-experience.test.mjs`
 
-Candidate code is pushed at `29bbad1`; the supervisor checkpoint is `a4fa52f`.
+The customer-management slice was introduced at `29bbad1`; the current hardened
+candidate is pushed at `eab63d7` with supervisor checkpoint `d9e3707`.
 
 ## Arena-local evidence
 
