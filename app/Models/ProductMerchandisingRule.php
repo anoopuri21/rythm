@@ -43,6 +43,19 @@ final class ProductMerchandisingRule extends Model
         'ends_at' => 'datetime',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (ProductMerchandisingRule $rule): void {
+            if ($rule->source_product_id === $rule->target_product_id) {
+                throw new \DomainException('A product cannot recommend itself.');
+            }
+
+            if (! in_array($rule->rule_type, self::TYPES, true)) {
+                throw new \DomainException('Unsupported merchandising rule type.');
+            }
+        });
+    }
+
     public function sourceProduct(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'source_product_id');

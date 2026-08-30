@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Faq;
 use App\Models\Product;
+use App\Models\ProductMerchandisingRule;
 use App\Services\ProductQueryService;
 use App\Services\ReviewService;
 use App\Services\SeoService;
@@ -51,6 +52,8 @@ final class ProductController extends Controller
         return view('product.show', [
             'product' => $product,
             'related' => $this->products->related($product),
+            'complementary' => $this->products->related($product, 4, ProductMerchandisingRule::TYPE_COMPLEMENTARY),
+            'frequentlyBought' => $this->products->related($product, 4, ProductMerchandisingRule::TYPE_FREQUENTLY_BOUGHT_TOGETHER),
             'recentlyViewed' => $recentlyViewed,
             'productFaqs' => Faq::query()->where('is_active', true)->orderBy('sort_order')->limit(5)->get(),
             'reviewSummary' => $this->reviews->summary($product),

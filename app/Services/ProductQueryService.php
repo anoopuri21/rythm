@@ -88,7 +88,7 @@ final class ProductQueryService
             $curatedIds,
         ))));
 
-        if ($curatedInRuleOrder->count() >= $take) {
+        if ($curatedInRuleOrder->count() >= $take || $ruleType !== ProductMerchandisingRule::TYPE_RELATED) {
             return $curatedInRuleOrder->take($take)->values();
         }
 

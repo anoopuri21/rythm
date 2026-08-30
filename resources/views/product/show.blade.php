@@ -254,6 +254,35 @@
                     </div>
                 </section>
             @endif
+
+            @if($complementary->isNotEmpty())
+                <section aria-labelledby="complementary-products-title" class="mt-20">
+                    <div class="mb-8">
+                        <p class="section-kicker mb-3">Build your rig</p>
+                        <h2 id="complementary-products-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Complete your setup</h2>
+                        <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Curated additions selected for this product. Prices, stock and availability are shown from each product’s current record.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($complementary as $complementaryProduct)
+                            <x-shop-card :product="$complementaryProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($frequentlyBought->isNotEmpty())
+                <section aria-labelledby="frequently-bought-title" class="mt-20">
+                    <div class="mb-8">
+                        <p class="section-kicker mb-3">Curated pairing</p>
+                        <h2 id="frequently-bought-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Often paired with this item</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($frequentlyBought as $pairedProduct)
+                            <x-shop-card :product="$pairedProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </div>
     </div>
 @endsection
