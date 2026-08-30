@@ -832,3 +832,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Wishlist input boundary hardened** — Authenticated wishlist writes now accept only active products; inactive or unknown product IDs cannot be newly persisted.
 - **Regression contract added** — Cart feature coverage and automation checks cover the mismatched-variant boundary; `npm run test:automation` passed **112/112**.
 - **Scope boundary retained** — No catalogue, customer, order or persistent-UAT records were changed; owner PHP runtime verification remains required.
+
+## 30 August 2026 — Phase 12 customer mutation route boundaries
+
+- **Route abuse controls expanded** — Profile, password, address, order-cancellation and logout writes now have explicit throttles; logout also requires the authenticated route boundary.
+- **Regression contract expanded** — Automation checks cover the new route middleware and existing owner-scoped action behavior; `npm run test:automation` passed **111/111**.
+- **Scope boundary retained** — Rate limits do not change approved customer-rights or order-state rules; owner PHP/runtime verification is still required.
