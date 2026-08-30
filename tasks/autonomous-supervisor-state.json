@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "5d473fe20e73ef0199b4d5fb9746801b07f3d06d",
-    "remote_head": "5d473fe20e73ef0199b4d5fb9746801b07f3d06d",
+    "local_head": "28b064ad3165d43f31b9ee3c00b297252bffcb74",
+    "remote_head": "28b064ad3165d43f31b9ee3c00b297252bffcb74",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 12 Chunk 1 safe remediation: authenticated review and product-question Livewire submissions now have per-user/per-product five-attempt, 60-second abuse limits with static regression coverage; npm run test:automation passed 111/111 and commits were pushed."
+    "last_verified_action": "Phase 12 Chunk 1 continued: added route throttles/auth boundary for customer mutations and logout; hardened cart/order variant-product binding and active-product wishlist writes; npm run test:automation passed 112/112; commits pushed."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "af4b90cdf78f7b0cad891c2d1a0b79e2c5d6f270d2d80939dea6febc2e54b661",
-    "created_at": "2026-08-30T11:13:18.913Z"
+    "id": "7e284c4ddb4d85b18f91b466d7be0ecc3bbd0ff1bcecff72c10409ec8728092d",
+    "created_at": "2026-08-30T11:41:24.038Z"
   },
   "decisions": [
     {
@@ -67,6 +67,12 @@
     {
       "id": "AS-D004",
       "summary": "Add per-user/per-product five-attempt 60-second limits to authenticated review and product-question writes to reduce abuse without changing approved moderation or purchase rules.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D005",
+      "summary": "Harden customer input boundaries by requiring product-owned active variants for cart/order operations and active products for new wishlist writes.",
       "confidence": "high",
       "reversible": true
     }
@@ -617,6 +623,12 @@
       "outcome": "passed",
       "evidence": "app/Livewire/ReviewSection.php; app/Livewire/ProductQuestionSection.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation 111/111; commits 0e24046 and 5d473fe pushed to rhythm-uat.",
       "verified_at": "2026-08-30T11:13:18.913Z"
+    },
+    {
+      "name": "Phase 12 route throttling and commerce input-boundary remediation",
+      "outcome": "passed",
+      "evidence": "routes/web.php; CartService.php; OrderService.php; WishlistService.php; CartTest.php; phase11-customer-experience.test.mjs; npm run test:automation 112/112; commit 28b064a pushed to rhythm-uat.",
+      "verified_at": "2026-08-30T11:41:24.038Z"
     }
   ],
   "next_action": {
