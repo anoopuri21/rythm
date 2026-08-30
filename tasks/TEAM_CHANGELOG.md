@@ -789,3 +789,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Full-suite root causes isolated** — The uploaded full log reported **41 failed / 353 passed / 1,550 assertions**. One seeded authentication expectation failed because the generic seeded customer had been made verified; the remaining homepage-related failures shared a Blade parse error in `_deals.blade.php` caused by an inline nested conditional.
 - **Corrections applied** — The generic seeded customer remains unverified so AuthTest preserves its contract; AccountTest verifies its own authenticated fixture; the canonical Fender seed slug and deterministic stock-alert pagination remain aligned; the deals availability conditional is now expanded into valid block directives.
 - **Qualification remains open** — Arena verified the static/automation contract at **110/110**, but owner must rerun focused and full PHP suites after pulling the correction. No browser or next-phase task is authorized yet.
+
+## 30 August 2026 — Phase 11 PHP regression accepted
+
+- **Focused suite passed** — Owner reported **33 tests / 112 assertions** with zero failures after the fixture, Blade and pagination corrections.
+- **Full PHP regression passed** — Owner uploaded the redacted `php-regression.txt`; the suite completed with **394 tests / 1,698 assertions** and zero failures.
+- **Remaining gate** — Isolated MySQL engine/database-binding evidence, worker checks, realistic catalogue qualification and browser responsive/accessibility/SEO/conversion UAT remain open. Phase 11 is not yet complete.
