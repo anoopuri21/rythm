@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "82f470680978bd86d49b00a7533b12dd130e50e2",
-    "remote_head": "82f470680978bd86d49b00a7533b12dd130e50e2",
+    "local_head": "cb722aaee4d7b198ec20917c97bdb3d278115754",
+    "remote_head": "cb722aaee4d7b198ec20917c97bdb3d278115754",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 product stock-request rendering now treats all non-positive stock as unavailable, aligning alert visibility with the add-to-cart guard; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 product JSON-LD now receives the controller-computed active parent/variant availability state, fixing the unbound Blade variable; non-positive stock request rendering remains covered. Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "396036e21ec3418e2e81a28c66aa4044d80516018d5a8e2215150c043c61224b",
-    "created_at": "2026-08-30T08:50:15.989Z"
+    "id": "2a7f83a782e0c7564e6b4f465f186bf21580b57921c6dc755993103ead9155ce",
+    "created_at": "2026-08-30T08:52:08.153Z"
   },
   "decisions": [
     {
@@ -468,6 +468,12 @@
       "outcome": "passed",
       "evidence": "resources/views/livewire/add-to-cart.blade.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:50:15.989Z"
+    },
+    {
+      "name": "Phase 11 product availability metadata binding candidate check",
+      "outcome": "passed",
+      "evidence": "app/Http/Controllers/ProductController.php; resources/views/product/show.blade.php; tests/Feature/ProductPageTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:52:08.153Z"
     }
   ],
   "next_action": {
