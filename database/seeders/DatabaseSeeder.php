@@ -30,9 +30,16 @@ class DatabaseSeeder extends Seeder
 
         $customer = User::firstOrCreate(
             ['email' => 'test@example.com'],
-            ['name' => 'Test User', 'password' => bcrypt('password')],
+            [
+                'name' => 'Test User',
+                'password' => bcrypt('password'),
+                'email_verified_at' => now(),
+            ],
         );
-        $customer->forceFill(['role' => User::ROLE_CUSTOMER])->save();
+        $customer->forceFill([
+            'role' => User::ROLE_CUSTOMER,
+            'email_verified_at' => $customer->email_verified_at ?? now(),
+        ])->save();
 
         $this->call([
             CategorySeeder::class,

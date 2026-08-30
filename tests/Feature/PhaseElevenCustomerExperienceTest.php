@@ -168,7 +168,7 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
     public function test_admin_managed_related_rule_precedes_category_fallback_without_affecting_price(): void
     {
         $source = Product::where('slug', 'yamaha-f310-acoustic-guitar')->firstOrFail();
-        $target = Product::where('slug', 'fender-cd-60s-acoustic-guitar')->firstOrFail();
+        $target = Product::where('slug', 'fender-cd-60s-dreadnought-acoustic-guitar')->firstOrFail();
 
         ProductMerchandisingRule::create([
             'source_product_id' => $source->id,

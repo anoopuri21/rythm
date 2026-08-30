@@ -21,21 +21,24 @@
 
 Repository evidence ke hisaab se Phases **0, 0A, 0B, 1–10 and 6A** accepted/complete hain. In phases ko dobara karne ki zaroorat nahi hai unless code, database, business rule ya environment change hua ho. Current manual gate Phase 11 hai. Neeche complete historical-to-future sequence diya hai so that every owner-side step traceable rahe.
 
-### One-command owner runner
+### Manual owner execution
 
-Phase 11 ke scripted checks ke liye latest branch pull karne ke baad project root mein sirf ek command chalayein:
+Owner manual execution hi authoritative rahega. Har command alag se chalayein, output check karein, aur fail hone par next command par jump na karein. Phase 11 ke liye `tests/Feature/PhaseElevenCustomerExperienceTest.php` aur `tests/Feature/AccountTest.php` focused files hain.
 
-```bash
-./run.sh
-```
-
-Windows PowerShell/Git Bash setup mein agar direct execution blocked ho, to:
+Focused failed tests ko dobara dekhne ke liye PHPUnit ka `--filter` use karein:
 
 ```bash
-bash run.sh
+php artisan test tests/Feature/PhaseElevenCustomerExperienceTest.php tests/Feature/AccountTest.php --filter="admin_managed_related_rule|account_lists_and_cancels|account_paginates"
 ```
 
-`run.sh` automatically branch/clean-tree check, Composer/npm setup, **sirf `rhythm_phase11_qa` isolated MySQL database par engine query, migration + status**, route checks, isolated in-memory SQLite focused/full PHP tests, automation, build and dependency audits run karta hai. Browser responsive/accessibility/conversion review hi manual rahega. Script persistent UAT database par destructive migration/test nahi chalata. MySQL host/user/password local `.env` se liye jaate hain; koi credential Git mein nahi rakha jaata.
+Failure log save karne ke liye:
+
+```bash
+php artisan test tests/Feature/PhaseElevenCustomerExperienceTest.php tests/Feature/AccountTest.php 2>&1 | tee storage/logs/phase11-focused.log
+php artisan test 2>&1 | tee storage/logs/php-regression.log
+```
+
+`storage/logs/*.log` Git mein commit nahi karna. Share karne se pehle log se credentials, `.env`, PII aur secrets remove karein.
 
 ### Common safety rules
 
@@ -518,12 +521,17 @@ Pass criteria:
 
 ## Task 11.3 — MySQL migration/status and route evidence
 
-Against isolated MySQL 8, run the approved migration/test setup and capture:
+Against the disposable MySQL 8 database, use inline environment values so `.env` is not modified and the QA database setting does not leak into the PHP test commands:
 
-```text
-php artisan migrate:status
-php artisan route:list --path=account/stock-alerts
+```bash
+DB_CONNECTION=mysql DB_DATABASE=rhythm_phase11_qa php artisan config:clear
+DB_CONNECTION=mysql DB_DATABASE=rhythm_phase11_qa php artisan tinker --execute='$row = DB::selectOne("SELECT VERSION() AS server_version, @@version_comment AS version_comment"); echo json_encode((array) $row), PHP_EOL;'
+DB_CONNECTION=mysql DB_DATABASE=rhythm_phase11_qa php artisan migrate --force
+DB_CONNECTION=mysql DB_DATABASE=rhythm_phase11_qa php artisan migrate:status
+DB_CONNECTION=mysql DB_DATABASE=rhythm_phase11_qa php artisan route:list --path=account/stock-alerts
 ```
+
+MySQL host/user/password `.env` se liye jaate hain. `DB_DATABASE` ko `export` na karein; inline form use karne se baad ke PHP tests isolated in-memory SQLite par hi rahenge.
 
 Against persistent UAT only after backup and SQL review:
 

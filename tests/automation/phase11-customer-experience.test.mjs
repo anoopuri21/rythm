@@ -54,6 +54,7 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   const command = read('app/Console/Commands/NotifyBackInStock.php');
   const accountController = read('app/Http/Controllers/AccountController.php');
   const feature = read('tests/Feature/PhaseElevenCustomerExperienceTest.php');
+  const seeder = read('database/seeders/DatabaseSeeder.php');
 
   assert.match(migration, /back_in_stock_user_target_unique/);
   assert.match(migration, /consent_at/);
@@ -77,6 +78,9 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(feature, /test_search_ignores_inactive_variant_attributes/);
   assert.match(feature, /test_exact_name_match_ranks_ahead_of_contains_match/);
   assert.match(feature, /test_non_positive_stock_keeps_the_stock_request_path_visible/);
+  assert.match(feature, /fender-cd-60s-dreadnought-acoustic-guitar/);
+  assert.doesNotMatch(feature, /fender-cd-60s-acoustic-guitar/);
+  assert.match(seeder, /email_verified_at/);
 });
 
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
@@ -93,29 +97,6 @@ test('Phase 11 stock notifications use the central delivery ledger and mail only
   assert.match(provider, /BackInStockNotificationRequested::class/);
   assert.match(retry, /HandleBackInStockNotification/);
   assert.doesNotMatch(notification, /database/);
-});
-
-test('Owner-side run.sh keeps qualification bounded and avoids persistent destructive writes', () => {
-  const runner = read('run.sh');
-
-  assert.match(runner, /git branch --show-current/);
-  assert.match(runner, /composer validate --strict/);
-  assert.match(runner, /npm ci --no-audit --no-fund/);
-  assert.match(runner, /QA_DB_DATABASE="\$\{PHASE11_QA_DB_DATABASE:-rhythm_phase11_qa\}"/);
-  assert.match(runner, /QA database must be exactly rhythm_phase11_qa/);
-  assert.match(runner, /SELECT VERSION\(\) AS server_version, @@version_comment AS version_comment/);
-  assert.match(runner, /migrate --force --no-ansi/);
-  assert.match(runner, /migrate:status/);
-  assert.match(runner, /route:list --path=account\/stock-alerts/);
-  assert.match(runner, /PhaseElevenCustomerExperienceTest\.php tests\/Feature\/AccountTest\.php/);
-  assert.match(runner, /php artisan test --no-ansi/);
-  assert.match(runner, /npm run test:automation/);
-  assert.match(runner, /npm run build/);
-  assert.match(runner, /composer audit --locked/);
-  assert.match(runner, /npm audit --omit=dev/);
-  assert.match(runner, /DB_CONNECTION=sqlite/);
-  assert.match(runner, /DB_DATABASE=:memory:/);
-  assert.doesNotMatch(runner, /migrate:fresh|db:wipe|RefreshDatabase/);
 });
 
 test('Phase 11 product recommendations keep truthful empty states and current product pricing', () => {

@@ -776,9 +776,8 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Current gate retained** — Phase 11 remains `IN PROGRESS`; Phases 1–10 and 6A remain recorded as accepted, while Phase 18 and Agent 10 remain inactive.
 - **Safety boundary retained** — Manual phase execution must still use isolated destructive tests, protect persistent UAT, avoid secrets in evidence and avoid invented legal/tax/shipping/warranty promises.
 
-## 30 August 2026 — One-command owner qualification runner
+## 30 August 2026 — Owner runner retired by request
 
-- **Manual command minimized** — Added repository-root `run.sh`; after pulling `rhythm-uat`, the owner can run `./run.sh` (or `bash run.sh`) instead of typing the qualification commands individually.
-- **Safe execution boundary** — The runner checks the branch and clean tree, verifies MySQL engine metadata, runs migration and status only against the fixed disposable database `rhythm_phase11_qa`, forces destructive PHP tests onto in-memory SQLite, then runs automation, build and dependency audits sequentially.
-- **Manual gate retained** — Real browser responsive/accessibility/conversion review and any owner approval remain outside the script; no persistent destructive migration, reset or deployment is performed.
-- **Static guard added** — Phase 11 automation now verifies the runner includes the required checks and excludes `migrate:fresh`, `db:wipe` and `RefreshDatabase`.
+- **One-command runner → Manual execution restored** — The owner requested removal of `run.sh`; it is no longer part of the repository or owner workflow.
+- **Manual evidence retained** — Focused failed tests can be rerun with PHPUnit `--filter`, and complete output can be captured with `2>&1 | tee storage/logs/<name>.log`.
+- **Safety boundary retained** — Isolated MySQL migration/status, in-memory SQLite PHP tests, redacted evidence and Agent 0 review remain mandatory; no persistent destructive test or deployment is authorized.
