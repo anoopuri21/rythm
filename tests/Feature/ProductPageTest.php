@@ -8,6 +8,7 @@ use App\Livewire\AddToCart;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -47,6 +48,25 @@ class ProductPageTest extends TestCase
             ->assertOk()
             ->assertSee('<h1', escape: false)
             ->assertSee('application/ld+json', escape: false);
+    }
+
+    public function test_product_page_uses_self_canonical_and_variant_aware_availability(): void
+    {
+        $product = Product::factory()->withStock(0)->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'variant-aware-availability',
+            'sku' => 'RYM-VARIANT-SEO',
+        ]);
+        ProductVariant::factory()->for($product)->create([
+            'stock' => 2,
+            'is_active' => true,
+        ]);
+
+        $this->get(route('product.show', $product))
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.route('product.show', $product).'">', escape: false)
+            ->assertSee('https://schema.org/InStock', escape: false);
     }
 
     public function test_inactive_product_returns_404(): void
