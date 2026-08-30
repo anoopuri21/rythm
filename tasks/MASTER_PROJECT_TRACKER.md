@@ -6,7 +6,7 @@
 **Current operational priority:** Phase 11 — customer experience, search and merchandising
 **Overall status:** PHASES 0–10 AND 6A COMPLETE / PHASE 11 IN PROGRESS / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
+**Auto Mode:** PAUSED BY OWNER — manual phase-by-phase owner qualification; Phase 18/deployment excluded
 
 ---
 

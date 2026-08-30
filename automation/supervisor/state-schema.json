@@ -7,7 +7,7 @@
   "properties": {
     "schema_version": { "const": 1 },
     "project": { "type": "object" },
-    "lifecycle": { "enum": ["inactive", "planning", "building", "executing", "recovering", "blocked", "complete"] },
+    "lifecycle": { "enum": ["inactive", "planning", "building", "executing", "recovering", "paused", "blocked", "complete"] },
     "authorization": { "type": "object" },
     "git": { "type": "object" },
     "delivery": { "type": "object" },

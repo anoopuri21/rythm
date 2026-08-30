@@ -89,6 +89,7 @@ test('readState rejects malformed JSON and CLI reports compact status', () => {
 
 test('published JSON schema is parseable and identifies state version one', () => {
     const schema = JSON.parse(readFileSync(path.join(root, 'automation', 'supervisor', 'state-schema.json'), 'utf8'));
+    assert.ok(schema.properties.lifecycle.enum.includes('paused'));
     assert.equal(schema.properties.schema_version.const, 1);
     assert.equal(schema.additionalProperties, false);
 });

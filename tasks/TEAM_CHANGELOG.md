@@ -768,3 +768,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Verification boundary covered** — Feature coverage now explicitly rejects unverified customers, inactive or foreign variants and stale Livewire variant selections before any subscription row can be created.
 - **Static contract strengthened** — The Phase 11 automation suite requires those runtime regression tests alongside consent, worker-limit, inactive-variant and delivery re-verification coverage.
 - **Scope boundary retained** — The tests validate existing service and component guards; they do not collect guest email addresses or add marketing behavior.
+
+## 30 August 2026 — Owner requested manual phase-by-phase execution
+
+- **Auto Mode paused** — The owner issued `PAUSE AUTO MODE`; the supervisor configuration is disabled and the project has returned to ask-first/manual owner qualification mode.
+- **Owner runbook added** — `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` lists every owner-side task, achievement condition and redacted evidence pack from Phase 1 through the Phase 17 readiness boundary.
+- **Current gate retained** — Phase 11 remains `IN PROGRESS`; Phases 1–10 and 6A remain recorded as accepted, while Phase 18 and Agent 10 remain inactive.
+- **Safety boundary retained** — Manual phase execution must still use isolated destructive tests, protect persistent UAT, avoid secrets in evidence and avoid invented legal/tax/shipping/warranty promises.

@@ -25,6 +25,7 @@ export function parseExpansionNext(markdown) {
 
 export function chooseNextTask({ state, audit, trackerMarkdown, expansionMarkdown }) {
     if (!audit.safe_for_planning) return { status: 'blocked', reason: 'Critical audit finding must be reconciled before planning.', findings: audit.findings.filter((item) => item.severity === 'critical') };
+    if (state.lifecycle === 'paused') return { status: 'paused', reason: 'Owner paused Auto Mode; manual phase-by-phase execution is required.' };
     if (state.lifecycle === 'building') {
         const task = BUILD_TASKS.get(state.next_action.id);
         return task ? { status: 'ready', source: 'supervisor-build-state', task } : { status: 'blocked', reason: `Unknown build action ${state.next_action.id}` };

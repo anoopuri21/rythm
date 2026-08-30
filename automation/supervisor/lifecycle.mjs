@@ -29,6 +29,7 @@ export function bootstrapDecision({ state, audit, plan, config }) {
     if (!audit.safe_for_planning) return { allowed: false, status: 'blocked', reason: 'Critical audit findings must be resolved.' };
     const reconciliation = reconcileCheckpoint(state, audit);
     if (['blocked', 'inspect'].includes(reconciliation.status)) return { allowed: false, status: reconciliation.status, reason: reconciliation.reason, action: reconciliation.action };
+    if (state.lifecycle === 'paused') return { allowed: false, status: 'paused', reason: 'Owner paused Auto Mode; manual phase-by-phase execution is required.', next: plan };
     if (config.enabled !== true) return { allowed: false, status: 'building', reason: 'Supervisor activation QA has not passed; write execution remains disabled.', next: plan };
     if (state.lifecycle === 'inactive' || state.lifecycle === 'building') return { allowed: false, status: state.lifecycle, reason: 'Supervisor lifecycle is not executable.', next: plan };
     if (plan.status !== 'ready') return { allowed: false, status: plan.status, reason: plan.reason ?? 'No ready task.' };

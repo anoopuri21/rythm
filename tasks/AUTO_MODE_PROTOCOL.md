@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** ACTIVE — Phase 11 in progress; current Agent 0 authority through Phase 17
-**Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 acceptance; Phase 18 excluded
+**Status:** PAUSED BY OWNER — Phase 11 remains in progress; manual phase-by-phase owner qualification is required
+**Autonomous Supervisor:** PAUSED after owner command `PAUSE AUTO MODE`; authorization through Phase 17 remains recorded, Phase 18 excluded
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
