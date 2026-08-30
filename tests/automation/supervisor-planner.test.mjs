@@ -13,7 +13,7 @@ test('read-only auditor verifies branch, authorities and disabled deployment', (
     const audit = auditProject(root);
     assert.equal(audit.mode, 'read-only');
     assert.equal(audit.git.branch, 'rhythm-uat');
-    assert.equal(audit.state.lifecycle, 'paused');
+    assert.equal(audit.state.lifecycle, 'executing');
     assert.equal(audit.authority_sources.every((source) => source.exists && /^[a-f0-9]{64}$/.test(source.sha256)), true);
     assert.equal(audit.findings.some((finding) => finding.code === 'PREMATURE_AUTOMATION_ENABLE'), false);
     assert.equal(audit.findings.some((finding) => finding.code === 'DEPLOYMENT_ENABLED'), false);

@@ -4,20 +4,21 @@ import { readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('canonical planning files record accepted Phase 11 and pending Phase 12', () => {
+test('canonical planning files record accepted Phase 11 and active Phase 12', () => {
   const master = read('tasks/MASTER_PROJECT_TRACKER.md');
   const sequence = read('tasks/CANONICAL_PHASE_SEQUENCE.md');
   const state = JSON.parse(read('tasks/autonomous-supervisor-state.json'));
 
-  assert.match(master, /PHASES 0–11 AND 6A COMPLETE \/ PHASE 12 PENDING/);
+  assert.match(master, /PHASES 0–11 AND 6A COMPLETE \/ PHASE 12 IN PROGRESS/);
   assert.match(sequence, /\| 7 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence, /\| 8 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence, /\| 9 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence, /\| 10 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence, /\| 11 \|[^\n]+\| COMPLETE \|/);
-  assert.equal(state.delivery.phase, '11');
-  assert.equal(state.delivery.status, 'complete');
-  assert.equal(state.next_action.requires_human, true);
+  assert.equal(state.delivery.phase, '12');
+  assert.equal(state.delivery.status, 'in_progress');
+  assert.equal(state.next_action.requires_human, false);
+  assert.equal(state.lifecycle, 'executing');
   assert.equal(state.authorization.deployment_enabled, false);
 });
 
