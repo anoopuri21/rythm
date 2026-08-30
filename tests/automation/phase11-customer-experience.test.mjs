@@ -70,6 +70,9 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(command, /! \$variant->is_active/);
   assert.match(component, /Please choose a valid option/);
   assert.match(feature, /test_notification_command_rejects_limits_outside_the_worker_bound/);
+  assert.match(feature, /test_stock_request_requires_a_verified_email/);
+  assert.match(feature, /test_stock_request_rejects_an_inactive_or_foreign_variant/);
+  assert.match(feature, /test_stale_livewire_variant_selection_cannot_create_a_product_level_request/);
   assert.match(feature, /test_delivery_skips_a_customer_whose_email_is_no_longer_verified/);
   assert.match(feature, /test_search_ignores_inactive_variant_attributes/);
   assert.match(feature, /test_exact_name_match_ranks_ahead_of_contains_match/);

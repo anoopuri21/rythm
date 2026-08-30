@@ -208,6 +208,93 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertDatabaseCount('back_in_stock_subscriptions', 1);
     }
 
+    public function test_stock_request_requires_a_verified_email(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-unverified-request',
+            'sku' => 'RYM-P11-UNVERIFIED-REQUEST',
+            'stock' => 0,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+            $this->fail('An unverified customer should not be able to create a stock request.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please verify your email before requesting a stock-availability email.', $exception->getMessage());
+        }
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
+    public function test_stock_request_rejects_an_inactive_or_foreign_variant(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-invalid-variant',
+            'sku' => 'RYM-P11-INVALID-VARIANT',
+            'stock' => 0,
+        ]);
+        $inactiveVariant = ProductVariant::factory()->for($product)->create([
+            'stock' => 0,
+            'is_active' => false,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, $inactiveVariant, true);
+            $this->fail('An inactive variant should not be accepted as a stock-request target.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please choose a valid option.', $exception->getMessage());
+        }
+
+        $foreignProduct = Product::factory()->create([
+            'category_id' => $product->category_id,
+            'brand_id' => $product->brand_id,
+            'slug' => 'phase-eleven-foreign-variant-product',
+            'sku' => 'RYM-P11-FOREIGN-VARIANT',
+            'stock' => 0,
+        ]);
+        $foreignVariant = ProductVariant::factory()->for($foreignProduct)->create([
+            'stock' => 0,
+            'is_active' => true,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, $foreignVariant, true);
+            $this->fail('A foreign variant should not be accepted as a stock-request target.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please choose a valid option.', $exception->getMessage());
+        }
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
+    public function test_stale_livewire_variant_selection_cannot_create_a_product_level_request(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-stale-variant',
+            'sku' => 'RYM-P11-STALE-VARIANT',
+            'stock' => 0,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(AddToCart::class, ['product' => $product])
+            ->set('variantId', 999999)
+            ->set('notifyConsent', true)
+            ->call('requestStockNotification')
+            ->assertSet('notifySuccess', false)
+            ->assertSet('notifyError', 'Please choose a valid option.');
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
     public function test_back_in_stock_delivery_is_bounded_and_idempotent(): void
     {
         Notification::fake();

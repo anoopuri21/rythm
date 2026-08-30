@@ -762,3 +762,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Deal copy corrected** — A deal with only an active in-stock variant now says it is available without inventing a parent-level quantity; parent quantity remains shown only when it is the available source.
 - **Regression contract strengthened** — The Phase 11 automation contract requires recommendation and deal card availability to call `Product::hasAvailableStock()`.
 - **Scope boundary retained** — No product or inventory values were changed; cards only render current availability metadata already selected by bounded homepage queries.
+
+## 30 August 2026 — Phase 11 stock-request rejection coverage
+
+- **Verification boundary covered** — Feature coverage now explicitly rejects unverified customers, inactive or foreign variants and stale Livewire variant selections before any subscription row can be created.
+- **Static contract strengthened** — The Phase 11 automation suite requires those runtime regression tests alongside consent, worker-limit, inactive-variant and delivery re-verification coverage.
+- **Scope boundary retained** — The tests validate existing service and component guards; they do not collect guest email addresses or add marketing behavior.
