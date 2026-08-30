@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "72334c679d464fc765c563a6a4f8da4a7d509b8d",
-    "remote_head": "72334c679d464fc765c563a6a4f8da4a7d509b8d",
+    "local_head": "6da9969710e08ffaae9e0b444d4694175c3d62b5",
+    "remote_head": "6da9969710e08ffaae9e0b444d4694175c3d62b5",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 recommendation, homepage deal and compatibility-card availability now consume Product::hasAvailableStock(), including active variant stock when parent stock is zero; automation 109/109, Vite build and diff checks passed; owner PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 stock-request qualification coverage now explicitly rejects unverified customers, inactive or foreign variants and stale Livewire variant selections before persistence; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "09704b1df752982fd7998c7c5cadea8686c8bbae9fea66cff38881021662b963",
-    "created_at": "2026-08-30T09:03:03.645Z"
+    "id": "b0ff8809d34c27b82792a22619ecd6c3e097d57be25659f972818e3c109eb7a3",
+    "created_at": "2026-08-30T09:03:52.323Z"
   },
   "decisions": [
     {
@@ -492,6 +492,12 @@
       "outcome": "passed",
       "evidence": "resources/views/components/mega-product-card.blade.php; resources/views/components/minimal-product-card.blade.php; resources/views/home/_deals.blade.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T09:03:03.645Z"
+    },
+    {
+      "name": "Phase 11 stock-request rejection-boundary candidate checks",
+      "outcome": "passed",
+      "evidence": "tests/Feature/PhaseElevenCustomerExperienceTest.php; app/Services/BackInStockSubscriptionService.php; app/Livewire/AddToCart.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T09:03:52.323Z"
     }
   ],
   "next_action": {
