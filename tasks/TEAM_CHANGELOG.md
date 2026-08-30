@@ -781,3 +781,4 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **One-command runner → Manual execution restored** — The owner requested removal of `run.sh`; it is no longer part of the repository or owner workflow.
 - **Manual evidence retained** — Focused failed tests can be rerun with PHPUnit `--filter`, and complete output can be captured with `2>&1 | tee storage/logs/<name>.log`.
 - **Safety boundary retained** — Isolated MySQL migration/status, in-memory SQLite PHP tests, redacted evidence and Agent 0 review remain mandatory; no persistent destructive test or deployment is authorized.
+- **Windows shell support clarified** — The owner runbook now provides CMD/Cmder equivalents for environment overrides, Tinker quoting, directory creation and log redirection; Bash-only `tee`/`mkdir -p` syntax is not required.

@@ -40,6 +40,32 @@ php artisan test 2>&1 | tee storage/logs/php-regression.log
 
 `storage/logs/*.log` Git mein commit nahi karna. Share karne se pehle log se credentials, `.env`, PII aur secrets remove karein.
 
+### Windows CMD / Cmder variant
+
+Agar prompt `C:\...>` ya `λ` dikhata hai aur Bash quoting/`tee`/`mkdir -p` kaam nahi karta, to current CMD window mein ye syntax use karein. Pehle ek fresh terminal kholna behtar hai:
+
+```bat
+set "DB_CONNECTION=mysql"
+set "DB_DATABASE=rhythm_phase11_qa"
+php artisan config:clear
+php artisan tinker --execute="echo json_encode((array) DB::selectOne('SELECT VERSION() AS server_version, @@version_comment AS version_comment')).PHP_EOL;"
+php artisan migrate --force
+php artisan migrate:status
+php artisan route:list --path=account/stock-alerts
+set "DB_CONNECTION="
+set "DB_DATABASE="
+```
+
+`set` values sirf current CMD window ke liye hain; `.env` modify nahi hoti. PHP tests chalane se pehle variables clear karna zaroori hai, warna tests QA MySQL par ja sakte hain. Log ke liye CMD mein `tee` ki jagah `> file 2>&1` use karein:
+
+```bat
+if not exist storage\logs mkdir storage\logs
+php artisan test tests\Feature\PhaseElevenCustomerExperienceTest.php --filter=admin_managed_related_rule > storage\logs\phase11-failed-tests.log 2>&1
+php artisan test tests\Feature\AccountTest.php --filter=account_lists_and_cancels >> storage\logs\phase11-failed-tests.log 2>&1
+php artisan test tests\Feature\AccountTest.php --filter=account_paginates >> storage\logs\phase11-failed-tests.log 2>&1
+findstr /N /C:"FAIL" /C:"FAILED" /C:"Tests:" /C:"Failures:" storage\logs\phase11-failed-tests.log
+```
+
 ### Common safety rules
 
 - Correct branch: `rhythm-uat`.
