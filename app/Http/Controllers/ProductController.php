@@ -36,7 +36,12 @@ final class ProductController extends Controller
             'meta_title' => $product->meta_title ?: $product->name.' — Buy Online in India | Rythme Music Store',
             'meta_description' => $product->meta_description ?: (string) $product->short_description,
             'og_image' => $product->getFirstMediaUrl('og') ?: $product->heroImage(),
+            'canonical_url' => route('product.show', ['product' => $product]),
+            'robots' => 'index, follow',
         ]));
+
+        $hasAvailableStock = $product->stock > 0
+            || $product->variants->contains(fn ($variant): bool => $variant->stock > 0);
 
         $session = request()->session();
         $recentIds = array_values(array_filter(

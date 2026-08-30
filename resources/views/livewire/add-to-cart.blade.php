@@ -100,7 +100,7 @@
     {{-- CTAs --}}
     <div class="mt-6 grid gap-3 sm:grid-cols-2">
         <button type="button" wire:click="add" wire:loading.attr="disabled" wire:target="add"
-                @if($stock === 0) disabled @endif
+                @if($stock <= 0) disabled @endif
                 class="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Add {{ $product->name }} to cart">
             <span wire:loading.remove wire:target="add" class="inline-flex items-center gap-2">
