@@ -255,6 +255,33 @@ class AccountTest extends TestCase
         ]);
     }
 
+    public function test_account_paginates_stock_alerts_without_changing_the_total(): void
+    {
+        $categoryId = Category::firstOrFail()->id;
+        $brandId = Brand::firstOrFail()->id;
+
+        foreach (range(1, 13) as $number) {
+            $product = Product::factory()->create([
+                'category_id' => $categoryId,
+                'brand_id' => $brandId,
+                'name' => "Account stock alert {$number}",
+                'slug' => "account-stock-alert-{$number}",
+                'sku' => sprintf('RYM-ACCOUNT-%02d', $number),
+                'stock' => 0,
+            ]);
+
+            app(BackInStockSubscriptionService::class)->subscribe($this->user, $product, null, true);
+        }
+
+        $this->get('/account?stock_alert_page=2')
+            ->assertOk()
+            ->assertSee('Stock alerts')
+            ->assertSee('13')
+            ->assertSee('Account stock alert 1')
+            ->assertDontSee('Account stock alert 13')
+            ->assertSee('stock_alert_page=1', escape: false);
+    }
+
     public function test_orders_listed_for_owner(): void
     {
         $order = Order::factory()->create(['user_id' => $this->user->id, 'total' => 8499]);

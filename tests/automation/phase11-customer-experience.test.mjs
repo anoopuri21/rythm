@@ -77,6 +77,7 @@ test('Phase 11 stock notifications use the central delivery ledger and mail only
 test('Phase 11 product recommendations keep truthful empty states and current product pricing', () => {
   const controller = read('app/Http/Controllers/ProductController.php');
   const accountController = read('app/Http/Controllers/AccountController.php');
+  const accountFeature = read('tests/Feature/AccountTest.php');
   const view = read('resources/views/product/show.blade.php');
   const addToCartView = read('resources/views/livewire/add-to-cart.blade.php');
   const shopCard = read('resources/views/components/shop-card.blade.php');
@@ -101,6 +102,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(accountController, /cancelBackInStockAlert/);
   assert.match(accountController, /stockAlertCount/);
   assert.match(accountController, /paginate\(12, \['\*'\], 'stock_alert_page'\)/);
+  assert.match(accountFeature, /test_account_paginates_stock_alerts_without_changing_the_total/);
   assert.match(accountView, /hasPages\(\)/);
   assert.match(accountView, /account\.stock-alerts\.destroy/);
   assert.match(accountView, /not a marketing subscription/i);
