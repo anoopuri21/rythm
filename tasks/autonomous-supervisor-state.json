@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "841269ab98b5fbfb48b132f5d56205aba03b4609",
-    "remote_head": "841269ab98b5fbfb48b132f5d56205aba03b4609",
+    "local_head": "aa264062a7c3c0cc8021a8cf0461e918cbf092f9",
+    "remote_head": "aa264062a7c3c0cc8021a8cf0461e918cbf092f9",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 public search and facets now exclude inactive variants and inactive attribute definitions while retaining active normalized-attribute matching; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 category-aware Shop facets now exclude values reachable only through inactive variants while preserving active product/variant values; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "de8709cfa75c6b4a57dd7a28850418fa2bc32bb9c34e6d6ffb27c6dd5f3fba0e",
-    "created_at": "2026-08-30T08:43:20.148Z"
+    "id": "93309d1924f0f73988dfbd6b82801dc31e921813acd3371e0ba010ade852a1cd",
+    "created_at": "2026-08-30T08:45:00.544Z"
   },
   "decisions": [
     {
@@ -444,6 +444,12 @@
       "outcome": "passed",
       "evidence": "app/Services/ProductQueryService.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:43:20.148Z"
+    },
+    {
+      "name": "Phase 11 public facet active-record visibility candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Livewire/ShopIndex.php; tests/Feature/ShopPageTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:45:00.544Z"
     }
   ],
   "next_action": {
