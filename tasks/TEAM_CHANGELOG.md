@@ -794,4 +794,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 
 - **Focused suite passed** — Owner reported **33 tests / 112 assertions** with zero failures after the fixture, Blade and pagination corrections.
 - **Full PHP regression passed** — Owner uploaded the redacted `php-regression.txt`; the suite completed with **394 tests / 1,698 assertions** and zero failures.
-- **Remaining gate** — Isolated MySQL engine/database-binding evidence, worker checks, realistic catalogue qualification and browser responsive/accessibility/SEO/conversion UAT remain open. Phase 11 is not yet complete.
+- **Remaining gate** — Rendered responsive/accessibility/SEO/conversion UAT remains open. Phase 11 is not yet complete.
+
+## 30 August 2026 — Phase 11 owner runtime qualification accepted
+
+- **Isolated MySQL gate passed** — Owner reported `rhythm_phase11_qa`, MySQL `8.4.3`, `MySQL Community Server - GPL`, `Nothing to migrate`, all listed migrations `Ran`, and one stock-alert cancellation route.
+- **PHP gate passed** — Focused Phase 11/account suite passed **33 tests / 112 assertions**; full regression passed **394 tests / 1,698 assertions** with zero failures.
+- **Worker/search automated coverage passed** — The full suite passed bounded limit rejection, inactive-target skip, notification idempotency, account ownership/pagination and the >500-product catalogue qualification test using non-sending test fakes.
+- **Remaining owner gate** — Four-viewport rendered responsive, keyboard/accessibility, SEO, console/overflow/link and conversion UAT evidence is still required before Phase 11 completion.
