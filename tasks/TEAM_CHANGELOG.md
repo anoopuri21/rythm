@@ -689,3 +689,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Truthful boundaries retained** — Stock alerts are visibly separate from marketing preferences; the product flow remains authenticated, consent-based and mail-only, with no guest email collection, price-drop alert or abandoned-cart behavior.
 - **Candidate checks passed** — Arena-local `git diff --check`, `npm run test:automation` (**109/109**) and `npm run build` passed. The implementation and checkpoint were pushed to `rhythm-uat` at `29bbad1` and `a4fa52f`.
 - **Qualification gate opened** — `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` now defines the isolated MySQL/PHP, bounded worker, realistic-catalog, responsive/accessibility, SEO and owner conversion-UAT evidence required before Phase 11 completion.
+
+## 30 August 2026 — Auto Mode reactivated for Phase 11
+
+- **Explicit activation received** — The owner issued the registered command `ACTIVATE AUTO MODE`; Agent 0 resumes continuous execution within the approved Phase 11–17 horizon.
+- **Activation boundary retained** — Phase 11 Chunk 2 is the active task. The mandatory owner-runtime PHP/MySQL and rendered/UAT gates remain human-gated; Phase 18, Agent 10 and deployment remain inactive.
+- **Authority reconciliation completed** — The current branch is `rhythm-uat`, local and remote HEAD are `74ef5b5`, the working tree is clean, all authoritative sources are present, and no workspace `vendor` entry exists.
+- **Protocol state reconciled** — The Auto Mode header and current-priority section now reflect Phase 11 rather than the completed Phase 6A/Phase 8–10 work.

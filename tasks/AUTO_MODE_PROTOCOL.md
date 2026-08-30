@@ -1,7 +1,7 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** ACTIVE — Phase 6A in progress; current Agent 0 authority through Phase 11
+**Status:** ACTIVE — Phase 11 in progress; current Agent 0 authority through Phase 17
 **Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 acceptance; Phase 18 excluded
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
@@ -152,8 +152,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 - **Registered:** Yes
 - **Active:** Yes — existing Agent 0 Auto Mode is owner-authorized through Phase 11.
 - **Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 accepted build and simulation evidence; Phase 18 remains excluded.
-- **Completed phases:** Canonical Phases 0–7 (`COMPLETE`).
-- **Current priority:** Phase 6A multi-category catalogue and Homepage/Shop expansion (`IN PROGRESS`) before Phase 8.
+- **Completed phases:** Canonical delivery Phases 0–10 and Phase 6A (`COMPLETE`).
+- **Current priority:** Phase 11 Chunk 2 stock delivery and customer-experience qualification (`IN PROGRESS`).
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
 - **Phase 7 acceptance:** Owner confirmed TOTP, roles and protected staff-user creation; Agent 0 marked Phase 7 `COMPLETE` on 26 August 2026.
 - **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.
