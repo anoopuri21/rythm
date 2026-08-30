@@ -2,8 +2,8 @@
 
 **Language:** Hinglish / simple English  
 **Purpose:** Record owner gates and safe manual actions while Agent 0 runs approved work.
-**Auto Mode:** ACTIVE by explicit owner command on 30 August 2026.
-**Current open work:** Phase 12 — security, privacy, compliance and accessibility hardening.
+**Auto Mode:** PAUSED by owner hold for manual homepage UI/UX planning.
+**Current open work:** Homepage UI/UX refinement plan and owner content/privacy decisions.
 **Deployment:** Phase 18 and Agent 10 remain inactive.
 
 ---
@@ -640,7 +640,7 @@ Use `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` as the contr
 
 # Phase 12 — Security, privacy, compliance and accessibility hardening
 
-**Status:** IN PROGRESS — Auto Mode activated 30 August 2026.
+**Status:** IN PROGRESS — manual homepage UI/UX task planned while Auto Mode is paused.
 **Goal:** Production-focused OWASP/Laravel security, privacy and legal-readiness review.
 
 ## Tasks
@@ -857,4 +857,4 @@ Phase 18 may not start from this runbook. It requires a separate explicit owner 
 
 ## Current owner action
 
-**Phase 11 is accepted.** The owner issued `ACTIVATE AUTO MODE` on 30 August 2026, so Phase 12 is now active under the autonomous supervisor. Phase 18, deployment and Agent 10 remain inactive.
+**Phase 11 is accepted.** Auto Mode is currently held by the owner while the homepage UI/UX task is planned and implemented manually. Phase 18, deployment and Agent 10 remain inactive.

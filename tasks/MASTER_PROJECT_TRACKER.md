@@ -3,10 +3,10 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current operational priority:** Phase 12 — security, privacy, compliance and accessibility (Auto Mode active)
-**Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 IN PROGRESS / AUTO MODE ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Current operational priority:** Manual homepage UI/UX refinement — plan first, then implement
+**Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 IN PROGRESS / AUTO MODE PAUSED BY OWNER / HOMEPAGE UI/UX PLAN PENDING / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** ACTIVE — owner issued `ACTIVATE AUTO MODE` on 30 August 2026; Phase 18/deployment excluded
+**Auto Mode:** PAUSED BY OWNER — held for manual homepage UI/UX planning; Phase 18/deployment excluded
 
 ---
 
