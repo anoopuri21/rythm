@@ -50,7 +50,11 @@
 
                         <p class="dealcard__stock" aria-label="Availability">
                             @if($hasAvailableStock)
-                                <span>Available now@if($available > 0): <b>{{ $available }}</b>@endif</span>
+                                @if($available > 0)
+                                    <span>Available now: <b>{{ $available }}</b></span>
+                                @else
+                                    <span>Available now</span>
+                                @endif
                             @else
                                 <span><b>Currently out of stock</b></span>
                             @endif

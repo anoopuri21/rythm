@@ -26,6 +26,7 @@ class AccountTest extends TestCase
         $this->seed();
 
         $this->user = User::where('email', 'test@example.com')->firstOrFail();
+        $this->user->forceFill(['email_verified_at' => now()])->save();
         $this->actingAs($this->user);
     }
 

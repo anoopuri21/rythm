@@ -54,7 +54,7 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   const command = read('app/Console/Commands/NotifyBackInStock.php');
   const accountController = read('app/Http/Controllers/AccountController.php');
   const feature = read('tests/Feature/PhaseElevenCustomerExperienceTest.php');
-  const seeder = read('database/seeders/DatabaseSeeder.php');
+  const accountTest = read('tests/Feature/AccountTest.php');
 
   assert.match(migration, /back_in_stock_user_target_unique/);
   assert.match(migration, /consent_at/);
@@ -80,7 +80,7 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(feature, /test_non_positive_stock_keeps_the_stock_request_path_visible/);
   assert.match(feature, /fender-cd-60s-dreadnought-acoustic-guitar/);
   assert.doesNotMatch(feature, /fender-cd-60s-acoustic-guitar/);
-  assert.match(seeder, /email_verified_at/);
+  assert.match(accountTest, /forceFill\(\['email_verified_at' => now\(\)\]\)/);
 });
 
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
@@ -131,6 +131,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(minimalCard, /\$hasAvailableStock \? 'In stock' : 'Out of stock'/);
   assert.match(dealsView, /\$hasAvailableStock = \$product->hasAvailableStock\(\)/);
   assert.match(dealsView, /@if\(\$hasAvailableStock\)/);
+  assert.doesNotMatch(dealsView, /Available now@if/);
   assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
   assert.match(accountController, /cancelBackInStockAlert/);
   assert.match(accountController, /stockAlertCount/);
