@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "eab63d7d05f1c085682a430154e0a48875980568",
-    "remote_head": "eab63d7d05f1c085682a430154e0a48875980568",
+    "local_head": "2e838858a149a7a8dfe4df536d0f6aebbad91ae1",
+    "remote_head": "2e838858a149a7a8dfe4df536d0f6aebbad91ae1",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 stock-alert variant handling is hardened: inactive variants are skipped by the bounded notifier and stale Livewire selections are rejected; static automation remains 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 storefront filter inputs are now bounded for brands and attributes; Arena-local automation 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "496ab87172453518c94e03b3da05411c44e175cc09b79085cceeb0f5174f810b",
-    "created_at": "2026-08-30T08:13:12.070Z"
+    "id": "778f43613e37562433b1667dc4b0b4b86babb29e9dc27d3f29239b37a3a434c0",
+    "created_at": "2026-08-30T08:17:41.012Z"
   },
   "decisions": [
     {
@@ -378,6 +378,12 @@
       "outcome": "passed",
       "evidence": "NotifyBackInStock.php; AddToCart.php; PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:12:52.072Z"
+    },
+    {
+      "name": "Phase 11 bounded storefront filter-input candidate checks",
+      "outcome": "passed",
+      "evidence": "ProductQueryService.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:17:41.012Z"
     }
   ],
   "next_action": {
