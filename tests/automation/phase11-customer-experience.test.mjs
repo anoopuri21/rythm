@@ -11,6 +11,9 @@ test('Phase 11 search stays bounded, weighted and MySQL/shared-host safe', () =>
   assert.match(service, /search_relevance/);
   assert.match(service, /mb_substr\(\$term, 0, 80\)/);
   assert.match(service, /array_slice\(\$tokens, 0, 5\)/);
+  assert.match(service, /MAX_BRAND_FILTERS/);
+  assert.match(service, /MAX_ATTRIBUTE_FILTERS/);
+  assert.match(service, /MAX_ATTRIBUTE_VALUES/);
   for (const field of ['products.name', 'products.sku', "orWhereHas('brand'", "orWhereHas('category'", "orWhereHas('attributeValues'"]) {
     assert.ok(service.includes(field), `missing search field: ${field}`);
   }

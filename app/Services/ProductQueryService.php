@@ -21,6 +21,12 @@ final class ProductQueryService
 {
     private const PER_PAGE = 12;
 
+    private const MAX_BRAND_FILTERS = 50;
+
+    private const MAX_ATTRIBUTE_FILTERS = 20;
+
+    private const MAX_ATTRIBUTE_VALUES = 50;
+
     public function shopQuery(ShopFilters $filters): Builder
     {
         $query = Product::query()
@@ -156,7 +162,11 @@ final class ProductQueryService
     /** @param string[] $brandSlugs */
     private function applyBrandFilter(Builder $query, array $brandSlugs): void
     {
-        $brandSlugs = array_values(array_filter($brandSlugs));
+        $brandSlugs = array_slice(
+            array_values(array_filter(array_map('strval', $brandSlugs))),
+            0,
+            self::MAX_BRAND_FILTERS,
+        );
 
         if ($brandSlugs === []) {
             return;
@@ -281,8 +291,12 @@ final class ProductQueryService
     /** @param array<string, string[]> $attributes */
     private function applyAttributeFilters(Builder $query, array $attributes): void
     {
-        foreach ($attributes as $attributeSlug => $valueSlugs) {
-            $values = array_values(array_filter(array_map('strval', (array) $valueSlugs)));
+        foreach (array_slice($attributes, 0, self::MAX_ATTRIBUTE_FILTERS, true) as $attributeSlug => $valueSlugs) {
+            $values = array_slice(
+                array_values(array_filter(array_map('strval', (array) $valueSlugs))),
+                0,
+                self::MAX_ATTRIBUTE_VALUES,
+            );
 
             if ($values === []) {
                 continue;
