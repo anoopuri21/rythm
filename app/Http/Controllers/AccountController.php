@@ -50,6 +50,7 @@ final class AccountController extends Controller
             'backInStockSubscriptions' => $stockAlertQuery
                 ->with(['product', 'variant'])
                 ->orderByDesc('created_at')
+                ->orderByDesc('id')
                 ->paginate(12, ['*'], 'stock_alert_page'),
         ]);
     }

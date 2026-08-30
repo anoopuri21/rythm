@@ -134,6 +134,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
   assert.match(accountController, /cancelBackInStockAlert/);
   assert.match(accountController, /stockAlertCount/);
+  assert.match(accountController, /orderByDesc\('created_at'\).*orderByDesc\('id'\)/s);
   assert.match(accountController, /paginate\(12, \['\*'\], 'stock_alert_page'\)/);
   assert.match(accountFeature, /test_account_paginates_stock_alerts_without_changing_the_total/);
   assert.match(accountView, /\$stockAlertCount > 0/);
