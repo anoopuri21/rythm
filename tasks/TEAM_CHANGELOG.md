@@ -825,3 +825,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Safe throttling correction** — Authenticated Livewire review and product-question submissions now use a per-user/per-product five-attempt, 60-second limiter before the domain write.
 - **Regression contract added** — The automation suite requires the limiter, bounded key scope and user-facing failure boundary in both components; `npm run test:automation` passed **111/111**.
 - **Scope boundary retained** — No review/Q&A business rules, customer data or production records changed; broader authorization, upload, CSP, privacy and owner-runtime gates remain open.
+
+## 30 August 2026 — Phase 12 cart/order/wishlist integrity boundaries
+
+- **Variant ownership hardened** — Cart add/update and order creation now reject missing, inactive or product-mismatched variants instead of falling back to parent-product stock.
+- **Wishlist input boundary hardened** — Authenticated wishlist writes now accept only active products; inactive or unknown product IDs cannot be newly persisted.
+- **Regression contract added** — Cart feature coverage and automation checks cover the mismatched-variant boundary; `npm run test:automation` passed **112/112**.
+- **Scope boundary retained** — No catalogue, customer, order or persistent-UAT records were changed; owner PHP runtime verification remains required.

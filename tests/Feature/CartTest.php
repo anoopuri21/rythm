@@ -71,6 +71,20 @@ class CartTest extends TestCase
         $service->addItem($product, null, $product->stock + 1);
     }
 
+    public function test_cart_rejects_a_variant_belonging_to_another_product(): void
+    {
+        $service = app(CartService::class);
+        $product = Product::factory()->withStock(10)->create();
+        $otherProduct = Product::factory()->withStock(10)->create();
+        $foreignVariant = ProductVariant::factory()->create([
+            'product_id' => $otherProduct->id,
+            'stock' => 5,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $service->addItem($product, $foreignVariant, 1);
+    }
+
     public function test_update_qty_and_remove(): void
     {
         $service = app(CartService::class);

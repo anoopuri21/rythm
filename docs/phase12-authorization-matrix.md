@@ -12,8 +12,8 @@
 | Contact and newsletter writes | Public | Form request validation, honeypot, explicit route throttles | Abuse/spam and data-retention review |
 | Login, registration and password reset | Guest | Form requests and explicit throttles | Credential-enumeration, session and reset-token review |
 | Email verification | Authenticated | Signed verification URL and throttled send/verify routes | Verify notification abuse and default-unverified behavior |
-| Cart | Guest or authenticated | Cart service resolves guest/user cart | Check session/cart merge and authorization transitions |
-| Wishlist | Authenticated | Auth route group and user-scoped service queries | Verify no cross-user IDs are accepted |
+| Cart | Guest or authenticated | Cart service resolves guest/user cart; item mutations verify cart ownership in Livewire and variant/product binding in services | Verify session/cart merge, malformed item IDs and authorization transitions |
+| Wishlist | Authenticated | Auth route group and user-scoped service queries; writes accept only active products | Verify no cross-user IDs or inactive product IDs are accepted |
 | Account/profile/password/address/stock alerts | Authenticated | Auth route group; address and subscription services check user ownership | Feature tests for every `{address}`/`{subscription}` action |
 | Notifications | Authenticated | User relation is constrained; notification ID fetched through user relation | Verify mutation IDs cannot cross users |
 | Checkout and signed success page | Authenticated | Auth route group; signed success URL; order ownership check | Verify signature expiry, user binding and sensitive output |

@@ -72,11 +72,11 @@ final class OrderService
                         throw new RuntimeException('A product in your cart is no longer available.');
                     }
 
-                    if ($item->variant !== null && ! $item->variant->is_active) {
+                    if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active || (int) $item->variant->product_id !== (int) $item->product_id)) {
                         throw new RuntimeException("{$item->product->name} option is no longer available.");
                     }
 
-                    $availableStock = $item->variant?->stock ?? $item->product->stock;
+                    $availableStock = $item->product_variant_id !== null ? $item->variant->stock : $item->product->stock;
                     if ($availableStock < $item->qty) {
                         throw new RuntimeException("Not enough stock for {$item->product->name}.");
                     }

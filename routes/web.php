@@ -73,7 +73,9 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
-Route::post('/logout', LogoutController::class)->name('logout');
+Route::post('/logout', LogoutController::class)
+    ->middleware(['auth', 'throttle:10,1'])
+    ->name('logout');
 
 // Email verification (Laravel built-in)
 Route::middleware('auth')->group(function () {
@@ -112,15 +114,27 @@ Route::middleware('auth')->group(function () {
     Route::patch('/account/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
         ->middleware('throttle:30,1')
         ->name('account.notifications.unread');
-    Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
-    Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
+    Route::patch('/account/profile', [AccountController::class, 'updateProfile'])
+        ->middleware('throttle:10,1')
+        ->name('account.profile.update');
+    Route::patch('/account/password', [AccountController::class, 'updatePassword'])
+        ->middleware('throttle:5,1')
+        ->name('account.password.update');
     Route::delete('/account/stock-alerts/{subscription}', [AccountController::class, 'cancelBackInStockAlert'])
         ->middleware('throttle:10,1')
         ->name('account.stock-alerts.destroy');
-    Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
-    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
-    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('account.addresses.default');
-    Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
+    Route::post('/account/addresses', [AccountController::class, 'storeAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.store');
+    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.update');
+    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.default');
+    Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.destroy');
     Route::get('/orders/{order}/returns/create', [ReturnRequestController::class, 'create'])->name('returns.create');
     Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])
         ->middleware('throttle:5,1')
@@ -147,7 +161,9 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.sh
 Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])
     ->middleware('throttle:3,1')
     ->name('orders.retry-payment');
-Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
+    ->middleware('throttle:5,1')
+    ->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 
 // Guest order lookup (no login needed)

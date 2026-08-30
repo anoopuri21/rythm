@@ -77,6 +77,10 @@ final class CartService
             throw new RuntimeException('This product is no longer available.');
         }
 
+        if ($variant !== null && ((int) $variant->product_id !== (int) $product->id || ! $variant->is_active)) {
+            throw new RuntimeException('This product option is no longer available.');
+        }
+
         $stock = $variant !== null ? $variant->stock : $product->stock;
         $unitPrice = $variant !== null
             ? $variant->effectivePrice($product)
@@ -125,7 +129,7 @@ final class CartService
             throw new RuntimeException('This product is no longer available.');
         }
 
-        if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active)) {
+        if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active || (int) $item->variant->product_id !== (int) $item->product_id)) {
             throw new RuntimeException('This product option is no longer available.');
         }
 

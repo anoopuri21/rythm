@@ -35,9 +35,10 @@
 | SEC12-001 | CSP currently includes `unsafe-inline` and `unsafe-eval` and multiple external origins | `app/Http/Middleware/SecurityHeaders.php` | Review/tighten where compatible; test Razorpay and actual asset origins before changing |
 | SEC12-002 | HSTS is emitted only when the request is detected as secure | `SecurityHeaders.php` | Verify trusted proxy/HTTPS production configuration in owner runtime; do not infer production behavior from Arena |
 | SEC12-003 | Razorpay callback/webhook bypass CSRF by design | `bootstrap/app.php`, `RazorpayController.php` | Keep exception narrow; independently test signature, unknown order, malformed JSON, replay and conflict paths |
-| SEC12-004 | Some public/customer mutations rely on global CSRF and ownership but do not have route-specific throttles | `routes/web.php` | Review abuse budget for profile/address/order-cancel and add only evidence-backed limits |
+| SEC12-004 | Customer profile/password/address/order-cancel mutations and logout now have route-specific limits; Livewire/cart actions remain under review | `routes/web.php`, Livewire components | Verify limits in owner runtime and continue reviewing Livewire/cart boundaries |
 | SEC12-005 | Filament uploads have MIME/type/size limits, but malware scanning and retention are not established by this baseline | Filament resources and media configuration | Require an explicit hosting/business decision before introducing a scanner or retention policy |
 | SEC12-006 | Account export/deletion and retention rules are not yet implemented | Phase 12 runbook and current models | Human/legal gate; do not implement from inference |
+| SEC12-007 | Cart/order services needed an explicit product-variant ownership boundary; wishlist writes needed an active-product boundary | `CartService.php`, `OrderService.php`, `WishlistService.php` | Corrected with focused static/feature regression coverage; owner PHP runtime verification remains required |
 
 ## Required next checks
 

@@ -26,6 +26,10 @@ final class WishlistService
             return false;
         }
 
+        if (! Product::query()->active()->whereKey($productId)->exists()) {
+            return false;
+        }
+
         Wishlist::create([
             'user_id' => $userId,
             'product_id' => $productId,
