@@ -235,9 +235,11 @@ final class ShopIndex extends Component
                     $value->whereHas('products', fn ($product) => $product
                         ->active()
                         ->whereIn('category_id', $categoryIds))
-                        ->orWhereHas('variants.product', fn ($product) => $product
-                            ->active()
-                            ->whereIn('category_id', $categoryIds));
+                        ->orWhereHas('variants', fn ($variant) => $variant
+                            ->where('is_active', true)
+                            ->whereHas('product', fn ($product) => $product
+                                ->active()
+                                ->whereIn('category_id', $categoryIds)));
                 })
                 ->orderBy('sort_order')
                 ->orderBy('value')])

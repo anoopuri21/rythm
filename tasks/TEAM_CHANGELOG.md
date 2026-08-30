@@ -710,3 +710,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Regression coverage added** — Phase 11 tests prove an active variant attribute remains searchable while an inactive variant attribute does not leak into public results.
 - **Qualification contract tightened** — The Chunk 2 catalogue evidence now requires active-record search coverage and explicit inactive-record exclusion.
 - **Scope boundary retained** — No catalogue data is deleted or rewritten; this is a read-boundary correction only.
+
+## 30 August 2026 — Phase 11 inactive facet visibility correction
+
+- **Facet read boundary fixed** — Category-aware Shop facets now include values from active products and active variants only; inactive variants cannot expose hidden option values.
+- **Regression coverage added** — Shop feature coverage verifies an attribute attached only to an inactive variant is absent from the public facet UI.
+- **Qualification evidence aligned** — Search and facet exclusion is now covered in both the service query and Livewire facet path.
+- **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.

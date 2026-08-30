@@ -7,12 +7,16 @@ const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), '
 test('Phase 11 search stays bounded, weighted and MySQL/shared-host safe', () => {
   const service = read('app/Services/ProductQueryService.php');
   const product = read('app/Models/Product.php');
+  const shopIndex = read('app/Livewire/ShopIndex.php');
+  const shopFeature = read('tests/Feature/ShopPageTest.php');
   const migration = read('database/migrations/2026_08_30_000001_create_product_merchandising_rules_table.php');
 
   assert.match(service, /search_relevance/);
   assert.match(service, /orWhereHas\('variants'/);
   assert.match(product, /scopeWithAvailableVariantStock/);
   assert.match(product, /hasAvailableStock/);
+  assert.match(shopIndex, /->where\('is_active', true\)/);
+  assert.match(shopFeature, /test_category_facets_ignore_inactive_variant_attributes/);
   assert.match(service, /mb_substr\(\$term, 0, 80\)/);
   assert.match(service, /array_slice\(\$tokens, 0, 5\)/);
   assert.match(service, /MAX_BRAND_FILTERS/);
