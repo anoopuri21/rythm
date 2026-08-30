@@ -29,7 +29,7 @@
                             class="rounded-full border px-4 py-2 text-sm font-semibold transition
                             {{ $variantId === $v->id ? 'border-brand bg-brand text-white shadow-sm' : 'border-ink/15 bg-white text-ink hover:border-brand/50' }}">
                         {{ $v->name }}
-                        @if($v->stock === 0)
+                        @if($v->stock <= 0)
                             <span class="ml-1 text-[10px] font-bold uppercase opacity-70">· Out</span>
                         @endif
                     </button>

@@ -9,6 +9,7 @@
     $name = $isModel ? $product->name : $product['name'];
     $brand = $isModel ? ($product->brand?->name ?? '') : ($product['brand'] ?? '');
     $price = $isModel ? (float) $product->price : (float) ($product['price'] ?? 0);
+    $stock = $isModel ? (int) $product->stock : (int) ($product['stock'] ?? 0);
     $oldCandidate = $isModel
         ? ($product->compare_at_price ? (float) $product->compare_at_price : null)
         : (isset($product['compare_at']) ? (float) $product['compare_at'] : (isset($product['old_price']) ? (float) $product['old_price'] : null));
@@ -50,7 +51,7 @@
                 @if($old)
                     <span class="mcard__price-old">₹{{ number_format($old) }}</span>
                 @endif
-                <span class="mcard__stock">In stock</span>
+                <span class="mcard__stock">{{ $stock > 0 ? 'In stock' : 'Out of stock' }}</span>
             </div>
         </div>
     </a>
