@@ -25,7 +25,7 @@
 
             <a href="{{ route('home') }}" class="nav__logo" aria-label="{{ $brand }} home">
                 <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434"
-                     class="nav__logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                     class="nav__logo-img" onerror="this.onerror=null;this.src='{{ asset('images/logo-rythme.svg') }}';">
                 <span class="nav__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>
 

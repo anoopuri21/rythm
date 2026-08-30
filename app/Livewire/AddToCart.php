@@ -25,7 +25,9 @@ final class AddToCart extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load(['variants' => fn ($q) => $q->where('is_active', true), 'brand', 'media']);
+        $this->product = $product->load(['variants' => fn ($q) => $q
+            ->where('is_active', true)
+            ->orderBy('id'), 'brand', 'media']);
 
         if ($product->variants->isNotEmpty()) {
             $this->variantId = $product->variants->first()->id;

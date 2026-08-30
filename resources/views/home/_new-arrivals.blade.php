@@ -13,8 +13,7 @@
 <section id="new-arrivals" class="prod-mm" aria-label="New arrival products">
     <div class="prod-mm__inner">
         <h2 class="prod-mm__title">
-            @if($sec?->title){{ $sec->title }}@if($sec?->title_accent) {{ $sec->title_accent }}@endif
-            @else New Arrival Products @endif
+            {{ trim(($sec?->title ?? 'New Arrival') . ' ' . ($sec?->title_accent ?? 'Products')) }}
         </h2>
 
         <div class="prod-mm__grid">

@@ -13,6 +13,7 @@ use App\Models\ReturnRequest;
 use App\Models\ReturnRequestItem;
 use App\Models\User;
 use App\Support\AdminAccess;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -258,9 +259,22 @@ final class ReturnRequestService
             throw new RuntimeException('A return can be requested only after delivery is recorded.');
         }
 
-        $deliveredAt = $order->shipments()->whereNotNull('delivered_at')->max('delivered_at')
-            ?? $order->statusHistory()->where('to', Order::STATUS_DELIVERED)->max('created_at');
-        if ($deliveredAt === null || now()->greaterThan(\Illuminate\Support\Carbon::parse($deliveredAt)->addDays($windowDays))) {
+        $deliveryTimestamps = array_filter([
+            $order->shipments()
+                ->whereNotNull('delivered_at')
+                ->orderByDesc('delivered_at')
+                ->value('delivered_at'),
+            $order->statusHistory()
+                ->where('to', Order::STATUS_DELIVERED)
+                ->orderByDesc('created_at')
+                ->value('created_at'),
+        ]);
+        $deliveredAt = collect($deliveryTimestamps)
+            ->map(fn (mixed $value): Carbon => Carbon::parse($value))
+            ->sortBy(fn (Carbon $value): int => $value->getTimestamp())
+            ->last();
+
+        if ($deliveredAt === null || now()->greaterThan($deliveredAt->copy()->addDays($windowDays))) {
             throw new RuntimeException('This order is outside the configured return eligibility window.');
         }
     }

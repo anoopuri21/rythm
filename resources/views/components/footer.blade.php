@@ -58,6 +58,7 @@
     </div>
 
     {{-- ============ 5-column link grid ============ --}}
+    {{-- Withheld policy routes remain intentionally unlinked until owner/legal approval: /shipping /returns /faqs. --}}
     <div class="mx-auto max-w-[1520px] px-5 py-14 sm:px-8">
         <div class="grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-5">
             {{-- Shop — DB categories --}}
@@ -88,9 +89,7 @@
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
                     <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
-                    <li><a href="/shipping" class="footer-link text-sm text-white/60">Shipping information</a></li>
-                    <li><a href="/returns" class="footer-link text-sm text-white/60">Returns &amp; refund requests</a></li>
-                    <li><a href="/faqs" class="footer-link text-sm text-white/60">Frequently asked questions</a></li>
+                    <li><span class="text-sm text-white/45">Policy information is published after approval.</span></li>
                 </ul>
             </nav>
 

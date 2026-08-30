@@ -32,7 +32,7 @@
             <p class="section-kicker mb-3">Before you order</p>
             <h2 id="home-faq-title" class="text-3xl font-bold text-ink sm:text-4xl">Questions, answered clearly</h2>
             <p class="mt-4 text-sm leading-7 text-muted">Review practical information, then contact the team if your instrument or order needs individual guidance.</p>
-            <a href="/faqs" class="text-link mt-6 inline-flex text-sm">View all FAQs <span aria-hidden="true">→</span></a>
+            <a href="/contact" class="text-link mt-6 inline-flex text-sm">Ask the team <span aria-hidden="true">→</span></a>
         </div>
         <div class="divide-y divide-ink/10">
             @foreach($faqs as $faq)

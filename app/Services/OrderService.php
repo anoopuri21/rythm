@@ -306,7 +306,27 @@ final class OrderService
                 'status' => Order::STATUS_CONFIRMED,
             ]);
 
-            $this->transitionStatus($lockedOrder, Order::STATUS_CONFIRMED, 'Payment captured', from: $fromStatus);
+            // The pending entry created with the order is the same audit
+            // record that becomes confirmed when payment is captured. Updating
+            // it avoids recording a duplicate status row for one checkout.
+            $initialStatus = OrderStatusHistory::query()
+                ->where('order_id', $lockedOrder->id)
+                ->whereNull('from')
+                ->where('to', Order::STATUS_PENDING)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($initialStatus !== null) {
+                $initialStatus->update([
+                    'from' => $fromStatus,
+                    'to' => Order::STATUS_CONFIRMED,
+                    'note' => 'Payment captured',
+                    'actor' => auth()->check() ? 'customer' : 'system',
+                ]);
+            } else {
+                $this->transitionStatus($lockedOrder, Order::STATUS_CONFIRMED, 'Payment captured', from: $fromStatus);
+            }
 
             CommerceNotificationRequested::dispatch(
                 "order:{$lockedOrder->id}:confirmed",

@@ -13,8 +13,7 @@
 <section id="categories" class="cat-mm" aria-label="Popular categories">
     <div class="cat-mm__inner">
         <h2 class="cat-mm__title">
-            @if($sec?->title){{ $sec->title }}@if($sec?->title_accent) {{ $sec->title_accent }}@endif
-            @else Popular Categories @endif
+            {{ trim(($sec?->title ?? 'Popular') . ' ' . ($sec?->title_accent ?? 'Categories')) }}
         </h2>
 
         <div class="cat-mm__carousel">

@@ -28,6 +28,7 @@ use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
 use App\Models\Review;
+use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
@@ -40,6 +41,9 @@ use App\Policies\InteractionPolicy;
 use App\Policies\MarketingPolicy;
 use App\Policies\NotificationDeliveryPolicy;
 use App\Policies\OrderPolicy;
+use App\Policies\ReturnReasonPolicy;
+use App\Policies\ReturnRequestPolicy;
+use App\Policies\ShipmentPolicy;
 use App\Services\CartService;
 use App\Services\CategoryService;
 use App\Support\AdminAccess;
@@ -86,6 +90,9 @@ class AppServiceProvider extends ServiceProvider
             HomepageCategoryRow::class => ContentPolicy::class,
             HomepageSection::class => ContentPolicy::class,
             NotificationDelivery::class => NotificationDeliveryPolicy::class,
+            ReturnRequest::class => ReturnRequestPolicy::class,
+            ReturnReason::class => ReturnReasonPolicy::class,
+            Shipment::class => ShipmentPolicy::class,
         ] as $model => $policy) {
             Gate::policy($model, $policy);
         }
@@ -108,6 +115,7 @@ class AppServiceProvider extends ServiceProvider
             Refund::class,
             ReturnReason::class,
             ReturnRequest::class,
+            Shipment::class,
             Coupon::class,
             SiteSetting::class,
             User::class,

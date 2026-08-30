@@ -10,7 +10,7 @@ return [
     */
     'brand_name' => 'Rhythm Exports',
     'brand_short' => 'RHYTHM',
-    'logo_url' => env('RYTHME_LOGO_URL', '/images/logo-rythme.svg'),
+    'logo_url' => env('RYTHME_LOGO_URL', 'https://rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'),
 
     /*
     |--------------------------------------------------------------------------

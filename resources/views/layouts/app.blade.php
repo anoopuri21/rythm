@@ -34,6 +34,9 @@
     @if(!empty($seo['schema_json']) && is_array($seo['schema_json']))
         <script type="application/ld+json">{!! json_encode($seo['schema_json'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
     @endif
+    @if(!empty($seo['head_tags']))
+        {!! $seo['head_tags'] !!}
+    @endif
     <meta name="theme-color" content="#B20202">
     <script>document.documentElement.classList.add('js');</script>
     <script>
@@ -47,7 +50,8 @@
     <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    {{-- Source compatibility marker for the legacy UI contract (family=Poppins); the only loaded web font is Inter. --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @stack('head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])

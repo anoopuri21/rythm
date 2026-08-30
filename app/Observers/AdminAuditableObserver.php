@@ -22,6 +22,7 @@ use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
 use App\Models\Review;
+use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Services\AdminAuditService;
@@ -51,6 +52,7 @@ final class AdminAuditableObserver
         Refund::class => ['amount', 'currency', 'status', 'gateway_refund_id'],
         ReturnReason::class => ['name', 'customer_guidance', 'is_active', 'sort_order'],
         ReturnRequest::class => ['status', 'refund_id', 'approved_at', 'received_at', 'closed_at'],
+        Shipment::class => ['order_id', 'idempotency_key', 'status', 'carrier', 'awb', 'tracking_url', 'note', 'created_by', 'dispatched_at', 'delivered_at'],
         Coupon::class => ['type', 'value', 'min_order', 'max_discount', 'starts_at', 'expires_at', 'max_uses', 'is_active'],
         SiteSetting::class => ['value'],
         User::class => ['role'],
