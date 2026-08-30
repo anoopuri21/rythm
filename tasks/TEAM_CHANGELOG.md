@@ -682,3 +682,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Consent-safe stock requests added** — Authenticated customers can store an explicit one-item stock-availability request without guest email collection or marketing opt-in. The bounded `back-in-stock:notify` command reserves central notification deliveries idempotently; scheduling it remains an operations/release gate.
 - **Phase 11 static contract added** — Five Node checks now cover bounded search, price-safe merchandising, verified-consent stock requests, central mail delivery and truthful recommendation empty states.
 - **Owner automation evidence recorded** — The owner reported `npm run test:automation` at **109 passed, 0 failed**. This is explicitly owner-reported evidence; PHP/MySQL/rendered Phase 11 gates remain separate.
+
+## 30 August 2026 — Phase 11 Chunk 2 qualification gate opened
+
+- **Customer self-service delivered** — Authenticated customers can view active verified-email stock-availability requests in Account and cancel only their own pending request; cross-customer cancellation returns HTTP 403.
+- **Truthful boundaries retained** — Stock alerts are visibly separate from marketing preferences; the product flow remains authenticated, consent-based and mail-only, with no guest email collection, price-drop alert or abandoned-cart behavior.
+- **Candidate checks passed** — Arena-local `git diff --check`, `npm run test:automation` (**109/109**) and `npm run build` passed. The implementation and checkpoint were pushed to `rhythm-uat` at `29bbad1` and `a4fa52f`.
+- **Qualification gate opened** — `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` now defines the isolated MySQL/PHP, bounded worker, realistic-catalog, responsive/accessibility, SEO and owner conversion-UAT evidence required before Phase 11 completion.

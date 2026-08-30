@@ -58,15 +58,18 @@ commercial claim not supported by an approved source.
 - Owner-reported `npm run test:automation`: **109 passed, 0 failed**; this confirms the same automation result in the owner runtime and is recorded separately from Arena-local execution.
 - `npm run build`: passed; Vite emitted a valid production manifest.
 - `git diff --check`: passed.
-- PHP/Composer/MySQL execution is not available in Arena, so the new migration and focused PHP feature test remain owner-runtime gates and are not claimed as locally passed.
+- PHP/Composer/MySQL execution is not available in Arena, so the migration and focused
+  PHP feature tests remain owner-runtime gates and are not claimed as locally passed.
+- `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` records the exact
+  isolated-MySQL, notification, responsive/accessibility, SEO and owner-UAT gates.
 
-## Remaining Phase 11 chunks
+## Remaining Phase 11 chunk
 
-- Add complementary/frequently-bought-together storefront placements with truthful
-  empty states and product-level visibility checks.
-- Add responsive/SEO qualification evidence for search and recommendation states.
-- Add temporary realistic-catalog query/performance evidence and authorization review.
-- Reconcile owner-reported external evidence without presenting it as local execution.
+- **Chunk 2 — stock delivery and customer-experience qualification:** run the focused
+  and full PHP suites against isolated MySQL, verify the bounded notification worker
+  and ownership controls, record temporary realistic-catalogue query evidence, and
+  complete responsive/keyboard/SEO/conversion UAT. Phase 11 stays `IN PROGRESS` until
+  those results are reconciled by Agent 0.
 
 ## Exit gate
 
