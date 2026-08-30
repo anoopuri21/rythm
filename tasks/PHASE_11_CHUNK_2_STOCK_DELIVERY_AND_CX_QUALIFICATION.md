@@ -34,14 +34,13 @@ unapproved legal/tax/shipping/warranty promises remain outside this gate.
 - `tests/automation/phase11-customer-experience.test.mjs`
 
 The customer-management slice was introduced at `29bbad1`; the current hardened
-candidate is pushed at `00c08f8` with supervisor checkpoint `b716b01`. Product pages
-now provide a self-canonical URL and variant-aware availability metadata, with focused
-PHP coverage added for the rendered canonical and variant-availability output. Account
-stock-alert results use a separate bounded paginator. Catalogue, homepage, related and
-wishlist product queries now expose bounded active-variant availability metadata, and
-shared cards use that metadata so a zero parent stock value cannot hide an in-stock
-active variant or claim availability for an inactive variant. Shared cards also
-suppress false sale prices.
+candidate is pushed at `7e33903` on `rhythm-uat`. Product pages now provide a
+self-canonical URL and variant-aware availability metadata, with focused PHP coverage
+added for the rendered canonical and variant-availability output. Account stock-alert
+results use a separate bounded paginator. Catalogue, homepage, related, wishlist and
+deal-card product paths now expose or consume bounded active-variant availability
+metadata, so a zero parent stock value cannot hide an in-stock active variant or claim
+availability for an inactive variant. Shared cards also suppress false sale prices.
 
 ## Arena-local evidence
 
