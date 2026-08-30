@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "cb722aaee4d7b198ec20917c97bdb3d278115754",
-    "remote_head": "cb722aaee4d7b198ec20917c97bdb3d278115754",
+    "local_head": "9f9ae83c39344bd8b2720342d0e1a187f73dd808",
+    "remote_head": "9f9ae83c39344bd8b2720342d0e1a187f73dd808",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 product JSON-LD now receives the controller-computed active parent/variant availability state, fixing the unbound Blade variable; non-positive stock request rendering remains covered. Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 merchandising selectors now use searchable active-product relationship queries without preloading the complete catalogue; automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "2a7f83a782e0c7564e6b4f465f186bf21580b57921c6dc755993103ead9155ce",
-    "created_at": "2026-08-30T08:52:08.153Z"
+    "id": "e621f490ad47dc5e3c01c0948bd51db890d8cc90b4a251d722a05a89372549d0",
+    "created_at": "2026-08-30T08:55:54.166Z"
   },
   "decisions": [
     {
@@ -474,6 +474,12 @@
       "outcome": "passed",
       "evidence": "app/Http/Controllers/ProductController.php; resources/views/product/show.blade.php; tests/Feature/ProductPageTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:52:08.153Z"
+    },
+    {
+      "name": "Phase 11 bounded merchandising selector candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Filament/Resources/ProductMerchandisingRuleResource.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:55:54.166Z"
     }
   ],
   "next_action": {
