@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "aa264062a7c3c0cc8021a8cf0461e918cbf092f9",
-    "remote_head": "aa264062a7c3c0cc8021a8cf0461e918cbf092f9",
+    "local_head": "3e904df5270b6f65cc204acfb018a69e5bda988b",
+    "remote_head": "3e904df5270b6f65cc204acfb018a69e5bda988b",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 category-aware Shop facets now exclude values reachable only through inactive variants while preserving active product/variant values; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 Livewire category facets now require linked variants to be active before exposing variant attribute values; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "93309d1924f0f73988dfbd6b82801dc31e921813acd3371e0ba010ade852a1cd",
-    "created_at": "2026-08-30T08:45:00.544Z"
+    "id": "dfb1ef17dc55aabaa1511c5afa22796640d0a099b1c236e84fbc437cfc9e1e45",
+    "created_at": "2026-08-30T08:46:30.164Z"
   },
   "decisions": [
     {
@@ -450,6 +450,12 @@
       "outcome": "passed",
       "evidence": "app/Livewire/ShopIndex.php; tests/Feature/ShopPageTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:45:00.544Z"
+    },
+    {
+      "name": "Phase 11 Livewire facet active-variant candidate check",
+      "outcome": "passed",
+      "evidence": "app/Livewire/ShopIndex.php; tests/Feature/ShopPageTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:46:30.164Z"
     }
   ],
   "next_action": {
