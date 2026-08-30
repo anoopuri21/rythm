@@ -52,6 +52,8 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(component, /requestStockNotification/);
   assert.match(command, /--limit=100/);
   assert.match(command, /limit > 500/);
+  assert.match(command, /! \$variant->is_active/);
+  assert.match(component, /Please choose a valid option/);
 });
 
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
