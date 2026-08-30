@@ -18,6 +18,7 @@ use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\ProductMerchandisingRule;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
 use App\Models\ReturnReason;
@@ -70,6 +71,7 @@ final class AdminAccess
     /** @var array<class-string, array{view:string,manage:string}> */
     private const MODEL_PERMISSIONS = [
         Product::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
+        ProductMerchandisingRule::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Category::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Brand::class => ['view' => self::CATALOGUE_VIEW, 'manage' => self::CATALOGUE_MANAGE],
         Order::class => ['view' => self::ORDERS_VIEW, 'manage' => self::ORDERS_MANAGE],

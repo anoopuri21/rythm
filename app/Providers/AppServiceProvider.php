@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\BackInStockNotificationRequested;
 use App\Events\CommerceNotificationRequested;
+use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Listeners\MarkNotificationDeliveryFailed;
 use App\Listeners\MarkNotificationDeliverySent;
@@ -23,6 +25,7 @@ use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\ProductMerchandisingRule;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
 use App\Models\ReturnReason;
@@ -39,6 +42,7 @@ use App\Policies\ContentPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\InteractionPolicy;
 use App\Policies\MarketingPolicy;
+use App\Policies\MerchandisingRulePolicy;
 use App\Policies\NotificationDeliveryPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ReturnReasonPolicy;
@@ -74,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
         foreach ([
             AdminAuditLog::class => AuditPolicy::class,
             Product::class => CataloguePolicy::class,
+            ProductMerchandisingRule::class => MerchandisingRulePolicy::class,
             Category::class => CataloguePolicy::class,
             Brand::class => CataloguePolicy::class,
             Order::class => OrderPolicy::class,
@@ -121,6 +126,7 @@ class AppServiceProvider extends ServiceProvider
             User::class,
             Review::class,
             ProductQuestion::class,
+            ProductMerchandisingRule::class,
             ContactMessage::class,
         ] as $auditedModel) {
             $auditedModel::observe(AdminAuditableObserver::class);
@@ -160,6 +166,7 @@ class AppServiceProvider extends ServiceProvider
             },
         );
 
+        Event::listen(BackInStockNotificationRequested::class, HandleBackInStockNotification::class);
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
         Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
         Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);

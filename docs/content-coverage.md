@@ -17,16 +17,16 @@
 | Product trust links | shipping, returns, privacy/payment, tracking | CMS pages and named routes | Covered |
 | Reviews | approved verified-purchase reviews | ReviewService | Covered; empty state allowed |
 | Product questions | moderated customer questions/answers | ProductQuestionSection | Covered |
-| Related products | same-category active products | ProductQueryService | Covered |
+| Related products | admin-curated active products with same-category fallback | ProductMerchandisingRule/ProductQueryService | Phase 11 chunk 1 covered |
 | Recently viewed | bounded active IDs from current browser session | session + ProductQueryService | Covered |
-| Search/facets | product, SKU, brand, category, price, rating, attributes, stock, sale | ProductQueryService/Livewire | Covered |
+| Search/facets | weighted product, SKU, brand, category, attribute, price, rating, stock and sale matching | ProductQueryService/Livewire | Phase 11 chunk 1 covered; performance/relevance evidence pending |
 | Cart totals | line totals and subtotal | Cart/checkout services | Covered |
 | Promotion | validated coupon and discount | CouponService at checkout | Covered |
 | Shipping preview | configured fee/tax shown before payment | CheckoutWizard | Covered |
 | Account | orders, addresses, profile, notifications, support paths | account controllers/views | Covered |
 | Order tracking | recorded status and authorized detail | OrderController | Covered |
 | Returns/refunds | cancellation and pending-refund truth; post-delivery guidance | OrderService/CMS/contact | Partial; dedicated return cases need approved policy |
-| Back-in-stock | availability enquiry | contact route | Partial; no persistent alert claim |
+| Back-in-stock | authenticated, explicit-consent stock-availability request | BackInStockSubscription/AddToCart | Phase 11 chunk 1 stores a bounded request; central email delivery qualification remains open |
 | Authenticity | only evidence-backed product/brand statements | product/admin content | Owner-content gate; no global certification claim |
 
 ## Content rules
@@ -43,5 +43,5 @@
 - Approved shipping regions, service levels and escalation owner.
 - Approved post-delivery return windows, eligible conditions and evidence requirements.
 - Manufacturer/distributor authenticity evidence and per-product warranty terms.
-- Whether back-in-stock interest may collect email/phone and which consent/retention rules apply.
+- Owner confirmation of notification delivery/retention rules before the Phase 11 stock-request worker is enabled.
 - Moderated testimonials linked to qualifying customer evidence.

@@ -29,8 +29,8 @@
 | 7 | Admin governance, staff RBAC and auditability | E7 | COMPLETE |
 | 8 | Payment, refund and financial reconciliation operations | E2 | COMPLETE |
 | 9 | Central notifications and external-integration event architecture | E4 | COMPLETE |
-| 10 | Shipping, fulfillment, returns and India tax workflow | E5 | IN PROGRESS |
-| 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | PENDING |
+| 10 | Shipping, fulfillment, returns and India tax workflow | E5 | COMPLETE |
+| 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | IN PROGRESS |
 | 12 | Security, privacy, compliance and accessibility hardening | E8 plus cross-cutting accessibility/legal gates | PENDING |
 | 13 | Performance, scalability and resilience | E9 | PENDING |
 | 14 | Observability, backups and production operations | E10 | PENDING |
@@ -73,4 +73,4 @@
 2. The pipeline may be developed against bounded public reference data while commercial rights to competitor text/images remain unresolved.
 3. Source-access constraints: public pages only, no authentication bypass, no CAPTCHA bypass and respectful rate limiting.
 
-Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures. The owner additionally authorized continuous sequential Agent 0 execution through Phase 11 under `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; this does not waive gates or activate Agent 10.
+Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures. The owner additionally authorized continuous sequential Agent 0 execution through Phase 17; this does not waive gates, professional approvals or activate Agent 10.

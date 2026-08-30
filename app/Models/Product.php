@@ -92,6 +92,16 @@ class Product extends Model implements HasMedia
         return $this->hasMany(InventoryMovement::class);
     }
 
+    public function merchandisingRules(): HasMany
+    {
+        return $this->hasMany(ProductMerchandisingRule::class, 'source_product_id');
+    }
+
+    public function backInStockSubscriptions(): HasMany
+    {
+        return $this->hasMany(BackInStockSubscription::class);
+    }
+
     public function importSource(): HasOne
     {
         return $this->hasOne(ProductImportSource::class);

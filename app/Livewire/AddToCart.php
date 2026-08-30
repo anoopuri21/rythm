@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Models\User;
+use App\Services\BackInStockSubscriptionService;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -22,6 +23,12 @@ final class AddToCart extends Component
     public ?string $error = null;
 
     public bool $added = false;
+
+    public bool $notifyConsent = false;
+
+    public bool $notifySuccess = false;
+
+    public ?string $notifyError = null;
 
     public function mount(Product $product): void
     {
@@ -40,6 +47,9 @@ final class AddToCart extends Component
         $this->qty = 1;
         $this->error = null;
         $this->added = false;
+        $this->notifyConsent = false;
+        $this->notifySuccess = false;
+        $this->notifyError = null;
     }
 
     public function setQty(int $qty): void
@@ -70,6 +80,36 @@ final class AddToCart extends Component
             $this->dispatch('cart-updated');
         } catch (RuntimeException $e) {
             $this->error = $e->getMessage();
+        }
+    }
+
+    public function requestStockNotification(): void
+    {
+        $this->notifyError = null;
+        $this->notifySuccess = false;
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            $this->notifyError = 'Please log in to request a stock-availability email.';
+
+            return;
+        }
+
+        $variant = $this->variantId !== null
+            ? $this->product->variants->firstWhere('id', $this->variantId)
+            : null;
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe(
+                $user,
+                $this->product,
+                $variant,
+                $this->notifyConsent,
+            );
+            $this->notifySuccess = true;
+            $this->notifyConsent = false;
+        } catch (RuntimeException $exception) {
+            $this->notifyError = $exception->getMessage();
         }
     }
 

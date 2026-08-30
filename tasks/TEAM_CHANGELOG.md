@@ -671,3 +671,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Commerce flows documented** — Browse/search, cart/login merge, checkout, callback/webhook, order, cancellation/refund, notifications, catalogue activation and fulfillment paths are traced end to end.
 - **Risks prioritized** — Wrong-database selection remains the immediate critical owner blocker; tax/legal, fulfillment/RMA, security, backups, observability and release packaging remain explicit later gates.
 - **Backlog reconciled** — Work stays in the canonical Phase 10–17 sequence; this re-audit does not reset completed delivery phases or activate Phase 18.
+
+## 30 August 2026 — Phase 10 acceptance and Phase 11 activation
+
+- **Phase 10 qualification reconciled** — The owner reported passing focused/full PHP, isolated MySQL migration/status, rendered fulfillment/RMA/tax workflow, dependency/build, authorization, independent review and disabled-default checks at candidate `4a6c498` on `rhythm-uat`. This evidence is explicitly owner-reported; Arena independently verified Node automation at 104/104.
+- **Safety boundary retained** — Returns/tax values remain disabled; no invoice/credit-note identity, legal promise or deployment authorization was introduced.
+- **Phase 11 activated** — Canonical tracker and supervisor checkpoint now identify Phase 11 as `IN PROGRESS`.
+- **Weighted search baseline added** — MySQL/SQLite-portable name, SKU, brand, category and normalized attribute matching now includes exact ranking and bounded typo-stem tolerance without a persistent search daemon.
+- **Merchandising controls added** — Catalogue-authorized staff can manage time-bounded related, complementary and frequently-bought-together product links; recommendation rules never alter product price or stock.
+- **Consent-safe stock requests added** — Authenticated customers can store an explicit one-item stock-availability request without guest email collection or marketing opt-in. Central delivery scheduling remains a separate qualification chunk.

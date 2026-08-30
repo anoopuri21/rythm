@@ -1,7 +1,7 @@
 # Phase 10 Qualification — Fulfillment, Returns and Tax Snapshots
 
-**Candidate baseline:** `862275310007e426086efc3cb899438f63cd1ad1` or its later qualification-only descendant on `rhythm-uat`
-**Status:** external PHP/MySQL, rendered workflow and professional review required
+**Candidate baseline:** `4a6c498` on `rhythm-uat`
+**Status:** TECHNICALLY QUALIFIED — owner-reported external evidence accepted; returns/tax values remain disabled
 **Safety:** never run destructive tests or migrations against persistent UAT
 
 ## 1. Entry gate

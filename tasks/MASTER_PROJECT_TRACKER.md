@@ -3,8 +3,8 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current operational priority:** Phase 10 — shipping, fulfillment, returns and India tax workflow
-**Overall status:** PHASES 0–9 AND 6A COMPLETE / PHASE 10 IN PROGRESS / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Current operational priority:** Phase 11 — customer experience, search and merchandising
+**Overall status:** PHASES 0–10 AND 6A COMPLETE / PHASE 11 IN PROGRESS / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
 
@@ -70,8 +70,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | COMPLETE | Accepted 29 Aug 2026: 80 imported / 80 active / 0 held owner-reported MySQL UAT, Filament/local-media controls verified, Chunk 4 full regression 302 tests / 1,178 assertions |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | COMPLETE | Accepted 29 Aug 2026: 321 tests / 1,282 assertions plus owner-reported Razorpay test-mode payment, replay, failure/retry, partial/full refund and clean reconciliation |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | COMPLETE | Accepted 29 Aug 2026: 340 tests / 1,376 assertions plus owner-attested exact-once staging delivery, SPF/DKIM/DMARC, HTML/plain-text, signed-link and clean reconciliation gate |
-| 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | IN PROGRESS | Chunk 0 audit complete; professionally approved rules plus fulfillment/tax/RMA tests required |
-| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | PENDING | Realistic-catalog search, merchandising, SEO and responsive conversion gates pass |
+| 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | COMPLETE | Owner-reported focused/full PHP, MySQL, rendered workflow, dependency/build, authorization, review and disabled-default gates accepted; no values enabled |
+| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | IN PROGRESS | Phase 11 implementation chunk 1 is in place; realistic-catalog, delivery, SEO, accessibility, responsive and UAT gates remain |
 | 12 | Agent 8, 3, 4, 9, 11, 13, 15 | Security, privacy, compliance and accessibility hardening | PENDING | No unresolved critical/high finding; privacy/legal/accessibility gates pass |
 | 13 | Agent 8, 3, 4, 9, 11 | Performance, scalability and resilience | PENDING | Approved service-level, load, cache and failure-recovery targets pass |
 | 14 | Agent 8, 9, 11, 14 | Observability, backups and production operations | PENDING | Monitoring, backup/restore, incident and runbook drills pass |
@@ -93,9 +93,9 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | Product listing | COMPLETE | YES — phase-scoped | Query/UI/pagination tests plus four-/two-column populated renders |
 | Category/brand/price/rating filters | COMPLETE | YES — phase-scoped | Query correctness, normalized facets and populated desktop/mobile UI evidence |
 | Sorting | COMPLETE | YES — phase-scoped | Featured/newest/price tests and rendered controls |
-| Search/autocomplete | UNVERIFIED | UNVERIFIED | Relevance, performance and UX tests |
-| Product detail | UNVERIFIED | UNVERIFIED | Gallery, variants, specs and related products |
-| Recently viewed | UNVERIFIED | UNVERIFIED | Persistence/privacy behavior |
+| Search/autocomplete | IN PROGRESS | PARTIAL | Weighted MySQL-safe search and bounded typo fallback implemented; responsive/relevance/performance evidence remains |
+| Product detail | QA | PARTIAL | Gallery, variants, curated related rules and empty/error states |
+| Recently viewed | QA | PARTIAL | Bounded session persistence implemented; privacy and responsive evidence remains |
 | Stock/availability | QA | PARTIAL | Phase 3 truthful stock-aware surfaces pass; later commerce/concurrency gates remain |
 | Footer | COMPLETE | YES — phase-scoped | Truthful-link remediation and 1440/768/390/320 responsive evidence |
 
@@ -331,8 +331,6 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 ## 14. Current Next Action
 
-Phase 10 Chunks 1–4 are implemented. Chunk 1 has prior accepted domain evidence; Chunks 2–4 require the external-runtime and professional qualification defined in `docs/phase10-qualification.md`.
+Phase 10 qualification is accepted from owner-reported evidence at candidate commit `4a6c498` on `rhythm-uat`. The owner reported passing focused/full PHP, isolated MySQL migration/status, rendered workflow, dependency/build, authorization, independent review and disabled-default checks. Arena-local automation independently records `npm run test:automation` at **104/104 passed**. Returns/tax values remain disabled; no invoice/credit-note identity or legal enablement is implied.
 
-The next authorized action is a non-destructive run against an isolated restored MySQL 8 QA database: apply forward migrations through `2026_08_29_000008_add_optional_tax_classification_snapshots`, run focused and full PHP suites, capture rendered fulfillment/RMA/tax workflow evidence, and obtain professional approval before enabling any return or tax rule. Invoice/credit-note identity remains unimplemented until numbering and correction rules are professionally approved.
-
-Phase 10 remains `IN PROGRESS`. Phase 11 must not be marked active until Agent 0 accepts Phase 10 qualification evidence. Agent 10 and Phase 18 remain inactive.
+Phase 11 is now `IN PROGRESS` under `tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md`. Chunk 1 covers weighted MySQL-safe search, bounded typo tolerance, admin-managed merchandising rules and consent-safe authenticated stock requests. Delivery scheduling, responsive/SEO qualification, temporary realistic-catalog evidence and owner conversion UAT remain open. Agent 10 and Phase 18 remain inactive.
