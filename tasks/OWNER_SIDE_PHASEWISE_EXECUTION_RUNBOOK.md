@@ -857,4 +857,4 @@ Phase 18 may not start from this runbook. It requires a separate explicit owner 
 
 ## Current owner action
 
-Start only with **Phase 11** because Phases 1–10 and 6A are already accepted in the repository record. Execute the Phase 11 checklist above and send the redacted evidence pack. Agent 0 will review it, update the tracker, and tell you whether Phase 11 is accepted or exactly what remains.
+**Phase 11 is accepted.** Do not start Phase 12 automatically. Auto Mode is paused; wait for the owner’s explicit instruction before beginning the next phase. Phase 18, deployment and Agent 10 remain inactive.

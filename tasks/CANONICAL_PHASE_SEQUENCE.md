@@ -30,7 +30,7 @@
 | 8 | Payment, refund and financial reconciliation operations | E2 | COMPLETE |
 | 9 | Central notifications and external-integration event architecture | E4 | COMPLETE |
 | 10 | Shipping, fulfillment, returns and India tax workflow | E5 | COMPLETE |
-| 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | IN PROGRESS |
+| 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | COMPLETE |
 | 12 | Security, privacy, compliance and accessibility hardening | E8 plus cross-cutting accessibility/legal gates | PENDING |
 | 13 | Performance, scalability and resilience | E9 | PENDING |
 | 14 | Observability, backups and production operations | E10 | PENDING |

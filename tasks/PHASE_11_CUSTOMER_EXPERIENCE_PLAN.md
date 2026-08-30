@@ -63,17 +63,11 @@ commercial claim not supported by an approved source.
 - `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` records the exact
   isolated-MySQL, notification, responsive/accessibility, SEO and owner-UAT gates.
 
-## Remaining Phase 11 chunk
+## Phase 11 completion record
 
-- **Chunk 2 — stock delivery and customer-experience qualification:** run the focused
-  and full PHP suites against isolated MySQL, verify the bounded notification worker
-  and ownership controls, record temporary realistic-catalogue query evidence, and
-  complete responsive/keyboard/SEO/conversion UAT. Phase 11 stays `IN PROGRESS` until
-  those results are reconciled by Agent 0.
+- **Chunk 2 accepted:** Owner reported isolated MySQL 8.4.3 engine/runtime evidence, all listed migrations `Ran`, one stock-alert route, 33 focused tests / 112 assertions, 394 full tests / 1,698 assertions, worker/catalogue coverage and four-viewport responsive/accessibility/SEO/stock-alert UAT.
+- **Phase 11 status:** `COMPLETE` as accepted by Agent 0 on 30 August 2026.
 
 ## Exit gate
 
-Phase 11 may be marked `COMPLETE` only after the implementation, focused/full PHP
-suite, automation/build checks, isolated MySQL migration/status checks, rendered
-responsive/accessibility review and owner-side conversion UAT are recorded. Until
-then it remains `IN PROGRESS`/`QA` as appropriate.
+The Phase 11 implementation, focused/full PHP suite, automation/build checks, isolated MySQL migration/status checks, worker/catalogue coverage, rendered responsive/accessibility/SEO review and owner-side stock-alert UAT are recorded. Phase 12 remains pending owner instruction; Phase 18/deployment remains inactive.

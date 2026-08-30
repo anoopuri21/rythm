@@ -1,6 +1,6 @@
 # Phase 11 Chunk 2 — Stock delivery and customer-experience qualification
 
-**Status:** QA GATE OPEN — implementation is pushed; owner-runtime and rendered evidence remain
+**Status:** COMPLETE — owner-runtime, automated and rendered qualification accepted 30 August 2026
 **Branch:** `rhythm-uat`
 **Deployment:** inactive; Phase 18 and Agent 10 remain inactive
 
@@ -139,9 +139,7 @@ production latency SLO before Phase 13 profiling.
 
 ## Acceptance boundary
 
-Chunk 2 can be accepted only after the owner supplies the focused/full PHP result,
-isolated MySQL migration/status result, notification idempotency result and rendered
-responsive/accessibility/UAT summary. Until then Phase 11 remains **IN PROGRESS**.
+Chunk 2 was accepted on 30 August 2026 after the owner supplied the focused/full PHP result, isolated MySQL migration/status result, notification/worker and catalogue coverage through the full suite, and the rendered responsive/accessibility/SEO/stock-alert UAT summary. Phase 11 is now **COMPLETE**; Phase 12 remains pending owner instruction.
 
 Passing local Node/build checks or an implementation diff does not close the owner
 runtime gates. Phase 12 cannot begin as a completed phase, and Phase 18/deployment

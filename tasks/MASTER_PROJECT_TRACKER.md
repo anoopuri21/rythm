@@ -3,8 +3,8 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current operational priority:** Phase 11 — customer experience, search and merchandising
-**Overall status:** PHASES 0–10 AND 6A COMPLETE / PHASE 11 IN PROGRESS / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Current operational priority:** Phase 12 — security, privacy, compliance and accessibility (pending owner instruction)
+**Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 PENDING / AUTO MODE PAUSED BY OWNER / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **Auto Mode:** PAUSED BY OWNER — manual phase-by-phase owner qualification; Phase 18/deployment excluded
 
@@ -71,7 +71,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | COMPLETE | Accepted 29 Aug 2026: 321 tests / 1,282 assertions plus owner-reported Razorpay test-mode payment, replay, failure/retry, partial/full refund and clean reconciliation |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | COMPLETE | Accepted 29 Aug 2026: 340 tests / 1,376 assertions plus owner-attested exact-once staging delivery, SPF/DKIM/DMARC, HTML/plain-text, signed-link and clean reconciliation gate |
 | 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | COMPLETE | Owner-reported focused/full PHP, MySQL, rendered workflow, dependency/build, authorization, review and disabled-default gates accepted; no values enabled |
-| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | IN PROGRESS | Chunk 1 implementation and account stock-alert management are pushed; Chunk 2 isolated-MySQL, realistic-catalog, delivery, SEO, accessibility, responsive and UAT gates remain |
+| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | COMPLETE | Accepted 30 Aug 2026: owner-reported MySQL 8.4.3 isolated runtime, 33 focused / 112 assertions, 394 full / 1,698 assertions, route, worker/catalogue coverage and four-viewport responsive/accessibility/SEO/stock-alert UAT all passed |
 | 12 | Agent 8, 3, 4, 9, 11, 13, 15 | Security, privacy, compliance and accessibility hardening | PENDING | No unresolved critical/high finding; privacy/legal/accessibility gates pass |
 | 13 | Agent 8, 3, 4, 9, 11 | Performance, scalability and resilience | PENDING | Approved service-level, load, cache and failure-recovery targets pass |
 | 14 | Agent 8, 9, 11, 14 | Observability, backups and production operations | PENDING | Monitoring, backup/restore, incident and runbook drills pass |
@@ -333,4 +333,4 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 Phase 10 qualification is accepted from owner-reported evidence at candidate commit `4a6c498` on `rhythm-uat`. The owner reported passing focused/full PHP, isolated MySQL migration/status, rendered workflow, dependency/build, authorization, independent review and disabled-default checks. Arena-local automation independently records `npm run test:automation` at **104/104 passed**. Returns/tax values remain disabled; no invoice/credit-note identity or legal enablement is implied.
 
-Phase 11 is now `IN PROGRESS` under `tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md`. Chunk 1 covers weighted MySQL-safe search, bounded typo tolerance, admin-managed merchandising rules and consent-safe authenticated stock requests. Delivery scheduling, responsive/SEO qualification, temporary realistic-catalog evidence and owner conversion UAT remain open. Agent 10 and Phase 18 remain inactive.
+Phase 11 is `COMPLETE` under `tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md`. Agent 0 accepted the owner-reported isolated MySQL 8.4.3 runtime, 33 focused tests / 112 assertions, 394 full tests / 1,698 assertions, route and worker/catalogue coverage, and four-viewport responsive/accessibility/SEO/stock-alert UAT on 30 August 2026. Phase 12 is next in canonical order but remains pending owner instruction; Auto Mode, Agent 10 and Phase 18 remain inactive.
