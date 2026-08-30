@@ -57,7 +57,7 @@
                         </h3>
                         <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 pt-3.5">
                             <span class="text-lg font-bold text-ink">₹{{ number_format((float) $product->price) }}</span>
-                            @if($product->compare_at_price)
+                            @if($product->compare_at_price !== null && (float) $product->compare_at_price > (float) $product->price)
                                 <span class="text-xs text-muted line-through">₹{{ number_format((float) $product->compare_at_price) }}</span>
                             @endif
                         </div>

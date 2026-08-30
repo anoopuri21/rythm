@@ -4,7 +4,9 @@
     $image = $product->thumbnailImage();
     $discount = $product->discountPercent();
     $price = number_format((float) $product->price);
-    $old = $product->compare_at_price !== null ? number_format((float) $product->compare_at_price) : null;
+    $old = $product->compare_at_price !== null && (float) $product->compare_at_price > (float) $product->price
+        ? number_format((float) $product->compare_at_price)
+        : null;
     $rating = $product->reviews_avg_rating !== null ? (float) $product->reviews_avg_rating : null;
     $reviewCount = (int) ($product->reviews_count ?? 0);
     $href = '/product/' . $product->slug;

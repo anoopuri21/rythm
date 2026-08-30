@@ -9,9 +9,10 @@
     $name = $isModel ? $product->name : $product['name'];
     $brand = $isModel ? ($product->brand?->name ?? '') : ($product['brand'] ?? '');
     $price = $isModel ? (float) $product->price : (float) ($product['price'] ?? 0);
-    $old = $isModel
+    $oldCandidate = $isModel
         ? ($product->compare_at_price ? (float) $product->compare_at_price : null)
         : (isset($product['compare_at']) ? (float) $product['compare_at'] : (isset($product['old_price']) ? (float) $product['old_price'] : null));
+    $old = $oldCandidate !== null && $oldCandidate > $price ? $oldCandidate : null;
     $badge = $isModel
         ? ($product->is_featured ? 'Best Seller' : null)
         : ($product['badge'] ?? null);

@@ -79,6 +79,8 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   const accountController = read('app/Http/Controllers/AccountController.php');
   const view = read('resources/views/product/show.blade.php');
   const addToCartView = read('resources/views/livewire/add-to-cart.blade.php');
+  const shopCard = read('resources/views/components/shop-card.blade.php');
+  const wishlistView = read('resources/views/livewire/wishlist-page.blade.php');
   const accountView = read('resources/views/account/index.blade.php');
   const plan = read('tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md');
 
@@ -92,6 +94,8 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(controller, /robots.*index, follow/s);
   assert.match(controller, /hasAvailableStock/);
   assert.match(addToCartView, /\$stock <= 0/);
+  assert.match(shopCard, /compare_at_price > \(float\) \$product->price/);
+  assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
   assert.match(accountController, /cancelBackInStockAlert/);
   assert.match(accountView, /account\.stock-alerts\.destroy/);
   assert.match(accountView, /not a marketing subscription/i);
