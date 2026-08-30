@@ -48,6 +48,7 @@ QA_DB_DATABASE="${PHASE11_QA_DB_DATABASE:-rhythm_phase11_qa}"
     [[ -z "${PHASE11_QA_DB_USERNAME:-}" ]] || export DB_USERNAME="$PHASE11_QA_DB_USERNAME"
     [[ -z "${PHASE11_QA_DB_PASSWORD:-}" ]] || export DB_PASSWORD="$PHASE11_QA_DB_PASSWORD"
     php artisan config:clear --no-ansi
+    php artisan tinker --execute='$row = DB::selectOne("SELECT VERSION() AS server_version, @@version_comment AS version_comment"); echo json_encode((array) $row), PHP_EOL;'
     php artisan migrate --force --no-ansi
     php artisan migrate:status --no-ansi
     php artisan route:list --path=account/stock-alerts --no-ansi

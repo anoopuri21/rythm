@@ -103,6 +103,7 @@ test('Owner-side run.sh keeps qualification bounded and avoids persistent destru
   assert.match(runner, /npm ci --no-audit --no-fund/);
   assert.match(runner, /QA_DB_DATABASE="\$\{PHASE11_QA_DB_DATABASE:-rhythm_phase11_qa\}"/);
   assert.match(runner, /QA database must be exactly rhythm_phase11_qa/);
+  assert.match(runner, /SELECT VERSION\(\) AS server_version, @@version_comment AS version_comment/);
   assert.match(runner, /migrate --force --no-ansi/);
   assert.match(runner, /migrate:status/);
   assert.match(runner, /route:list --path=account\/stock-alerts/);
