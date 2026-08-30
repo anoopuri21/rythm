@@ -15,7 +15,7 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 
 ### Chunk 0 — baseline threat model and gate inventory
 
-**Status:** NEXT
+**Status:** COMPLETE — baseline recorded 30 August 2026
 
 - Inventory web routes, controllers, policies, middleware, Filament resources, Livewire actions, validation and ownership checks.
 - Review CSRF, throttling/rate limits, file uploads, storage visibility, headers, CSP/Razorpay origins, HTTPS/HSTS, secure cookies, trusted proxies and production debug settings.
@@ -28,6 +28,8 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 **Gates:** clean diff checks; no critical audit finding; no secret values retained; no persistent destructive operation.
 
 ### Chunk 1 — safe authorization and input-boundary remediation
+
+**Status:** NEXT
 
 - Correct only evidence-backed IDOR, authorization, validation, CSRF, throttling and upload-boundary defects.
 - Add focused regression coverage for every corrected boundary.
