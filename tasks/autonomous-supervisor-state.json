@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "9f9ae83c39344bd8b2720342d0e1a187f73dd808",
-    "remote_head": "9f9ae83c39344bd8b2720342d0e1a187f73dd808",
+    "local_head": "4a8e25ccfbbe11efced5d1dd745d184feda54491",
+    "remote_head": "4a8e25ccfbbe11efced5d1dd745d184feda54491",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 merchandising selectors now use searchable active-product relationship queries without preloading the complete catalogue; automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 now has focused exact-versus-contains search ranking coverage, confirming exact name matches retain the highest relevance score; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "e621f490ad47dc5e3c01c0948bd51db890d8cc90b4a251d722a05a89372549d0",
-    "created_at": "2026-08-30T08:55:54.166Z"
+    "id": "e7b31914d163358fa6ffb5625c89a691267e8f1d658f7ae6a3851ca69758c4f9",
+    "created_at": "2026-08-30T08:59:07.474Z"
   },
   "decisions": [
     {
@@ -480,6 +480,12 @@
       "outcome": "passed",
       "evidence": "app/Filament/Resources/ProductMerchandisingRuleResource.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:55:54.166Z"
+    },
+    {
+      "name": "Phase 11 weighted search ranking candidate checks",
+      "outcome": "passed",
+      "evidence": "tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:59:07.474Z"
     }
   ],
   "next_action": {
