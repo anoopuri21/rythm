@@ -755,3 +755,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Ranking contract covered** — Phase 11 feature coverage now creates exact-name and contains-name candidates and verifies the exact result ranks first with the expected relevance score.
 - **Qualification evidence strengthened** — Weighted ranking is now an explicit automated candidate check alongside the existing SKU, brand, category, attribute and bounded typo coverage.
 - **Scope boundary retained** — No production search index or persistent search service was introduced; the test uses the existing bounded MySQL/SQLite-portable query path.
+
+## 30 August 2026 — Phase 11 recommendation-card availability truthfulness
+
+- **Variant-aware card state** — Homepage mega cards, deal cards and the compatibility minimal card now use the bounded active-variant availability flag instead of trusting a zero parent stock value.
+- **Deal copy corrected** — A deal with only an active in-stock variant now says it is available without inventing a parent-level quantity; parent quantity remains shown only when it is the available source.
+- **Regression contract strengthened** — The Phase 11 automation contract requires recommendation and deal card availability to call `Product::hasAvailableStock()`.
+- **Scope boundary retained** — No product or inventory values were changed; cards only render current availability metadata already selected by bounded homepage queries.

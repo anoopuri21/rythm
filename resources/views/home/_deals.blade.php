@@ -21,6 +21,7 @@
                 @php
                     $image = $product->thumbnailImage();
                     $available = max((int) $product->stock, 0);
+                    $hasAvailableStock = $product->hasAvailableStock();
                     $href = route('product.show', $product->slug);
                 @endphp
                 <article class="pcard dealcard">
@@ -48,8 +49,8 @@
                         </p>
 
                         <p class="dealcard__stock" aria-label="Availability">
-                            @if($available > 0)
-                                <span>Available now: <b>{{ $available }}</b></span>
+                            @if($hasAvailableStock)
+                                <span>Available now@if($available > 0): <b>{{ $available }}</b>@endif</span>
                             @else
                                 <span><b>Currently out of stock</b></span>
                             @endif

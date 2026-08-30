@@ -4,6 +4,7 @@
     $image = $product->thumbnailImage();
     $onSale = $product->compare_at_price !== null && (float) $product->compare_at_price > (float) $product->price;
     $rating = $product->reviews_avg_rating ?? null;
+    $hasAvailableStock = $product->hasAvailableStock();
     $href = route('product.show', $product->slug);
 @endphp
 
@@ -56,6 +57,9 @@
                 <del>₹{{ number_format((float) $product->compare_at_price) }}</del>
             @endif
             <ins>₹{{ number_format((float) $product->price) }}</ins>
+        </p>
+        <p class="pcard__stock {{ $hasAvailableStock ? 'text-emerald-700' : 'text-muted' }}" aria-label="Availability">
+            {{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}
         </p>
     </div>
 </article>
