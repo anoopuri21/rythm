@@ -242,7 +242,7 @@
                     <p class="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('stock_alert_success') }}</p>
                 @endif
 
-                @if($backInStockSubscriptions->isNotEmpty())
+                @if($stockAlertCount > 0 && $backInStockSubscriptions->isNotEmpty())
                     <div class="mt-6 grid gap-4 sm:grid-cols-2">
                         @foreach($backInStockSubscriptions as $subscription)
                             <div class="flex items-start justify-between gap-5 rounded-3xl border border-ink/10 bg-white p-6">
@@ -265,6 +265,13 @@
                     @if($backInStockSubscriptions->hasPages())
                         <div class="mt-6">{{ $backInStockSubscriptions->onEachSide(1)->links() }}</div>
                     @endif
+                @elseif($stockAlertCount > 0)
+                    <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
+                        <p class="text-4xl" aria-hidden="true">↔</p>
+                        <h3 class="mt-4 font-playfair text-xl font-bold text-ink">No requests on this page</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">Your active stock alerts are on another page.</p>
+                        <a href="{{ request()->fullUrlWithQuery(['stock_alert_page' => 1]) }}" class="mt-4 inline-flex text-sm font-bold text-brand underline underline-offset-4">View first page</a>
+                    </div>
                 @else
                     <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
                         <p class="text-4xl" aria-hidden="true">🔔</p>

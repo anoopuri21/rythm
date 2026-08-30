@@ -718,8 +718,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Qualification evidence aligned** — Search and facet exclusion is now covered in both the service query and Livewire facet path.
 - **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.
 
-## 30 August 2026 — Phase 11 facet query active-variant correction
+## 30 August 2026 — Phase 11 account paginator empty-state correction
 
-- **Facet query hardened** — The Livewire category facet loader now requires the linked variant itself to be active before exposing its attribute values.
-- **Regression coverage added** — Shop feature coverage verifies that values attached only to inactive variants remain absent from public facets.
-- **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.
+- **Truthful pagination state** — Account no longer displays “No active stock alerts” when a customer opens an out-of-range stock-alert page while active requests still exist.
+- **Recovery path added** — The empty page now explains that requests are on another page and links back to the first page while preserving the separate bounded paginator.
+- **Regression coverage added** — Account feature coverage verifies the out-of-range page state and the existing truthful total.
+- **Scope boundary retained** — No request rows or pagination behavior were changed; only misleading empty-state rendering was corrected.

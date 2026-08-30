@@ -117,6 +117,8 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(accountController, /stockAlertCount/);
   assert.match(accountController, /paginate\(12, \['\*'\], 'stock_alert_page'\)/);
   assert.match(accountFeature, /test_account_paginates_stock_alerts_without_changing_the_total/);
+  assert.match(accountView, /\$stockAlertCount > 0/);
+  assert.match(accountView, /No requests on this page/);
   assert.match(accountView, /hasPages\(\)/);
   assert.match(accountView, /account\.stock-alerts\.destroy/);
   assert.match(accountView, /not a marketing subscription/i);

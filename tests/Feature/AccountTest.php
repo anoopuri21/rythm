@@ -280,6 +280,12 @@ class AccountTest extends TestCase
             ->assertSee('Account stock alert 1')
             ->assertDontSee('Account stock alert 13')
             ->assertSee('stock_alert_page=1', escape: false);
+
+        $this->get('/account?stock_alert_page=99')
+            ->assertOk()
+            ->assertSee('No requests on this page')
+            ->assertDontSee('No active stock alerts')
+            ->assertSee('View first page');
     }
 
     public function test_orders_listed_for_owner(): void
