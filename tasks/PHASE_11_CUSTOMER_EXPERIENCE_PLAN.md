@@ -50,6 +50,14 @@ commercial claim not supported by an approved source.
 5. Qualify responsive/keyboard states for search, empty results, out-of-stock and
    consent feedback before Phase 11 can become `QA` or `COMPLETE`.
 
+## Current verification record
+
+- `npm ci --no-audit --no-fund`: passed in the disposable workspace dependency directory.
+- `npm run test:automation`: **104 passed, 0 failed**.
+- `npm run build`: passed; Vite emitted a valid production manifest.
+- `git diff --check`: passed.
+- PHP/Composer/MySQL execution is not available in Arena, so the new migration and focused PHP feature test remain owner-runtime gates and are not claimed as locally passed.
+
 ## Remaining Phase 11 chunks
 
 - Add complementary/frequently-bought-together storefront placements with truthful
