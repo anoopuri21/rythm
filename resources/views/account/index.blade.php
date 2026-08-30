@@ -37,6 +37,7 @@
                     'overview' => ['Overview', 'heroicon-o-home'],
                     'orders' => ['Orders', 'heroicon-o-shopping-bag'],
                     'addresses' => ['Addresses', 'heroicon-o-map-pin'],
+                    'stock-alerts' => ['Stock alerts', 'heroicon-o-bell-alert'],
                     'support' => ['Support', 'heroicon-o-chat-bubble-left-right'],
                     'settings' => ['Settings', 'heroicon-o-cog-6-tooth'],
                 ] as $key => [$label, $icon])
@@ -52,11 +53,12 @@
 
             {{-- ===== OVERVIEW ===== --}}
             <section x-show="tab === 'overview'" id="account-panel-overview" role="tabpanel" aria-labelledby="account-tab-overview" class="py-10">
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
                     @foreach([
                         ['Orders', $orders->count(), '/'],
                         ['Wishlist', $wishlistCount, '/wishlist'],
                         ['Addresses', $addresses->count(), '#addresses'],
+                        ['Stock alerts', $backInStockSubscriptions->count(), '#stock-alerts'],
                         ['Member since', auth()->user()->created_at?->format('Y'), '/'],
                     ] as [$label, $value, $href])
                         <div class="rounded-3xl border border-ink/10 bg-white p-6 text-center">
@@ -224,6 +226,49 @@
                         </div>
                     </form>
                 </div>
+            </section>
+
+            {{-- ===== STOCK ALERTS ===== --}}
+            <section x-show="tab === 'stock-alerts'" x-cloak id="account-panel-stock-alerts" role="tabpanel" aria-labelledby="account-tab-stock-alerts" class="py-10">
+                <div class="flex items-end justify-between gap-4">
+                    <div>
+                        <p class="section-kicker mb-3">Your requests</p>
+                        <h2 class="font-playfair text-2xl font-bold text-ink">Stock alerts</h2>
+                    </div>
+                    <a href="{{ route('shop.index') }}" class="text-link text-sm">Keep browsing <span aria-hidden="true">→</span></a>
+                </div>
+
+                @if(session('stock_alert_success'))
+                    <p class="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('stock_alert_success') }}</p>
+                @endif
+
+                @if($backInStockSubscriptions->isNotEmpty())
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        @foreach($backInStockSubscriptions as $subscription)
+                            <div class="flex items-start justify-between gap-5 rounded-3xl border border-ink/10 bg-white p-6">
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-brand">Waiting for stock</p>
+                                    <h3 class="mt-2 truncate font-semibold text-ink">{{ $subscription->product->name }}</h3>
+                                    @if($subscription->variant)
+                                        <p class="mt-1 text-sm text-muted">Option: {{ $subscription->variant->name }}</p>
+                                    @endif
+                                    <p class="mt-2 text-xs leading-5 text-muted">We will send one availability email if this item is restocked. This is not a marketing subscription.</p>
+                                </div>
+                                <form method="POST" action="{{ route('account.stock-alerts.destroy', $subscription) }}" class="shrink-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-semibold text-muted underline underline-offset-4 transition hover:text-brand">Cancel</button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
+                        <p class="text-4xl" aria-hidden="true">🔔</p>
+                        <h3 class="mt-4 font-playfair text-xl font-bold text-ink">No active stock alerts</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">When an item is unavailable, you can request a single stock-availability email from its product page.</p>
+                    </div>
+                @endif
             </section>
 
             {{-- ===== SUPPORT ===== --}}

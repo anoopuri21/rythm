@@ -8,8 +8,10 @@ use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Address;
+use App\Models\BackInStockSubscription;
 use App\Models\Order;
 use App\Services\AddressService;
+use App\Services\BackInStockSubscriptionService;
 use App\Services\SeoService;
 use App\Services\WishlistService;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +29,7 @@ final class AccountController extends Controller
 
         $this->seo->apply([
             'meta_title' => 'My Account — Rhythm Exports',
-            'meta_description' => 'Manage your profile, addresses, orders and wishlist at Rhythm Exports.',
+            'meta_description' => 'Manage your profile, addresses, orders, wishlist and stock alerts at Rhythm Exports.',
             'robots' => 'noindex, follow',
         ]);
 
@@ -40,7 +42,22 @@ final class AccountController extends Controller
                 ->paginate(10),
             'wishlistCount' => $wishlists->countFor($user->id),
             'addresses' => $addresses->forUser($user->id),
+            'backInStockSubscriptions' => BackInStockSubscription::query()
+                ->where('user_id', $user->id)
+                ->pending()
+                ->with(['product', 'variant'])
+                ->orderByDesc('created_at')
+                ->get(),
         ]);
+    }
+
+    public function cancelBackInStockAlert(
+        BackInStockSubscription $subscription,
+        BackInStockSubscriptionService $stockAlerts,
+    ): RedirectResponse {
+        $stockAlerts->cancel(auth()->user(), $subscription);
+
+        return back()->with('stock_alert_success', 'Stock-availability request cancelled.');
     }
 
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse

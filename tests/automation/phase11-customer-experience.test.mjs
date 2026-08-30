@@ -67,7 +67,9 @@ test('Phase 11 stock notifications use the central delivery ledger and mail only
 
 test('Phase 11 product recommendations keep truthful empty states and current product pricing', () => {
   const controller = read('app/Http/Controllers/ProductController.php');
+  const accountController = read('app/Http/Controllers/AccountController.php');
   const view = read('resources/views/product/show.blade.php');
+  const accountView = read('resources/views/account/index.blade.php');
   const plan = read('tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md');
 
   assert.match(controller, /TYPE_COMPLEMENTARY/);
@@ -75,5 +77,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(view, /\$complementary->isNotEmpty\(\)/);
   assert.match(view, /\$frequentlyBought->isNotEmpty\(\)/);
   assert.match(view, /Prices, stock and availability/);
+  assert.match(accountController, /cancelBackInStockAlert/);
+  assert.match(accountView, /account\.stock-alerts\.destroy/);
   assert.match(plan, /Gift cards.*abandoned-cart marketing.*price-drop alerts/is);
 });

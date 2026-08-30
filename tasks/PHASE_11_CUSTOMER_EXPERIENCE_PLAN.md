@@ -36,8 +36,9 @@ commercial claim not supported by an approved source.
   stock-availability email request. Only the user/product/variant target and consent
   timestamp are stored; no guest email collection or marketing subscription is added.
   A bounded `back-in-stock:notify --limit=...` command uses the central notification
-  ledger and idempotent delivery reservation. Enabling its cPanel schedule remains
-  an operations/release qualification gate.
+  ledger and idempotent delivery reservation. Customers can review and cancel active
+  requests from Account. Enabling its cPanel schedule remains an operations/release
+  qualification gate.
 
 ## Verification plan
 

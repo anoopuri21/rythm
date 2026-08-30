@@ -76,7 +76,7 @@ final class BackInStockSubscriptionService
     public function cancel(User $user, BackInStockSubscription $subscription): void
     {
         if ($subscription->user_id !== $user->id) {
-            throw new RuntimeException('You cannot cancel another customer’s request.');
+            abort(403);
         }
 
         $subscription->forceFill(['cancelled_at' => now()])->save();

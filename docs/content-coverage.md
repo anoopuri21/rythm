@@ -26,7 +26,7 @@
 | Account | orders, addresses, profile, notifications, support paths | account controllers/views | Covered |
 | Order tracking | recorded status and authorized detail | OrderController | Covered |
 | Returns/refunds | cancellation and pending-refund truth; post-delivery guidance | OrderService/CMS/contact | Partial; dedicated return cases need approved policy |
-| Back-in-stock | authenticated, explicit-consent stock-availability request | BackInStockSubscription/AddToCart | Phase 11 chunk 1 stores a bounded request; central email delivery qualification remains open |
+| Back-in-stock | authenticated, explicit-consent stock-availability request with customer cancellation | BackInStockSubscription/AddToCart/AccountController | Phase 11 chunk 1 stores and manages a bounded request; cPanel scheduling remains an operations gate |
 | Authenticity | only evidence-backed product/brand statements | product/admin content | Owner-content gate; no global certification claim |
 
 ## Content rules
