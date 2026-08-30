@@ -69,7 +69,7 @@
         </p>
     @endif
 
-    @if($stock === 0)
+    @if($stock <= 0)
         <div class="mt-5 rounded-2xl border border-brand/20 bg-brand/5 p-4" aria-labelledby="stock-alert-title">
             <h3 id="stock-alert-title" class="text-sm font-bold text-ink">Want a stock update?</h3>
             @auth

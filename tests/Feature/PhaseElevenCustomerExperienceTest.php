@@ -278,6 +278,23 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertNull($subscription->fresh()->notified_at);
     }
 
+    public function test_non_positive_stock_keeps_the_stock_request_path_visible(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-negative-stock',
+            'sku' => 'RYM-P11-NEGATIVE-STOCK',
+            'stock' => -1,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(AddToCart::class, ['product' => $product])
+            ->assertSee('Want a stock update?')
+            ->assertSee('Out of stock');
+    }
+
     public function test_out_of_stock_storefront_can_record_an_authenticated_stock_request(): void
     {
         $user = User::factory()->create();

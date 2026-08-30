@@ -724,3 +724,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Recovery path added** — The empty page now explains that requests are on another page and links back to the first page while preserving the separate bounded paginator.
 - **Regression coverage added** — Account feature coverage verifies the out-of-range page state and the existing truthful total.
 - **Scope boundary retained** — No request rows or pagination behavior were changed; only misleading empty-state rendering was corrected.
+
+## 30 August 2026 — Phase 11 non-positive stock request-state correction
+
+- **Availability boundary fixed** — The product stock-request surface now treats every non-positive stock value as unavailable, including defensive handling for an unexpected negative inventory value.
+- **Regression coverage added** — Livewire feature coverage verifies that the request path and out-of-stock state remain visible for non-positive stock.
+- **Scope boundary retained** — No inventory values were changed; the correction only aligns rendering with the existing non-positive-stock add-to-cart guard.
