@@ -38,11 +38,15 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   const service = read('app/Services/BackInStockSubscriptionService.php');
   const component = read('app/Livewire/AddToCart.php');
   const command = read('app/Console/Commands/NotifyBackInStock.php');
+  const accountController = read('app/Http/Controllers/AccountController.php');
 
   assert.match(migration, /back_in_stock_user_target_unique/);
   assert.match(migration, /consent_at/);
   assert.match(service, /Please confirm stock-availability email consent/);
   assert.match(service, /hasVerifiedEmail/);
+  assert.match(service, /abort\(403\)/);
+  assert.match(accountController, /->pending\(\)/);
+  assert.match(accountController, /with\(\['product', 'variant'\]\)/);
   assert.match(service, /targetKey/);
   assert.match(component, /notifyConsent/);
   assert.match(component, /requestStockNotification/);
@@ -79,5 +83,6 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(view, /Prices, stock and availability/);
   assert.match(accountController, /cancelBackInStockAlert/);
   assert.match(accountView, /account\.stock-alerts\.destroy/);
+  assert.match(accountView, /not a marketing subscription/i);
   assert.match(plan, /Gift cards.*abandoned-cart marketing.*price-drop alerts/is);
 });
