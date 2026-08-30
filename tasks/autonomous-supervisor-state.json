@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "b9092f79661ed7b0e6b6a1a78bf1edab64c5d221",
-    "remote_head": "b9092f79661ed7b0e6b6a1a78bf1edab64c5d221",
+    "local_head": "baa2aec205f791f6b676def36073727f9864aaf2",
+    "remote_head": "baa2aec205f791f6b676def36073727f9864aaf2",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 product SEO and variant-aware availability output is covered by focused PHP tests; Arena-local automation 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 product recommendation, shop-card and wishlist price displays now suppress non-discount compare-at values; Arena-local automation 109/109 and Vite build passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "b3ec6253b0e5f2468593c69a9ba6750a511f3a268ba3ed57c0c7accf49d622f1",
-    "created_at": "2026-08-30T08:20:41.570Z"
+    "id": "69c7eccee988b5b1d72dd344aa667346aba0aa3e0cb04ae3f84cece2b293947a",
+    "created_at": "2026-08-30T08:24:54.572Z"
   },
   "decisions": [
     {
@@ -396,6 +396,12 @@
       "outcome": "passed",
       "evidence": "ProductController.php; product/show.blade.php; tests/Feature/ProductPageTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:20:41.570Z"
+    },
+    {
+      "name": "Phase 11 truthful compare-price candidate checks",
+      "outcome": "passed",
+      "evidence": "shop-card.blade.php; minimal-product-card.blade.php; wishlist-page.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:24:54.572Z"
     }
   ],
   "next_action": {
