@@ -782,3 +782,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Manual evidence retained** — Focused failed tests can be rerun with PHPUnit `--filter`, and complete output can be captured with `2>&1 | tee storage/logs/<name>.log`.
 - **Safety boundary retained** — Isolated MySQL migration/status, in-memory SQLite PHP tests, redacted evidence and Agent 0 review remain mandatory; no persistent destructive test or deployment is authorized.
 - **Windows shell support clarified** — The owner runbook now provides CMD/Cmder equivalents for environment overrides, Tinker quoting, directory creation and log redirection; Bash-only `tee`/`mkdir -p` syntax is not required.
+
+## 30 August 2026 — Phase 11 owner PHP regression review
+
+- **Focused suite improved** — After fixture alignment, the owner reported **33 focused tests passed / 112 assertions**.
+- **Full-suite root causes isolated** — The uploaded full log reported **41 failed / 353 passed / 1,550 assertions**. One seeded authentication expectation failed because the generic seeded customer had been made verified; the remaining homepage-related failures shared a Blade parse error in `_deals.blade.php` caused by an inline nested conditional.
+- **Corrections applied** — The generic seeded customer remains unverified so AuthTest preserves its contract; AccountTest verifies its own authenticated fixture; the canonical Fender seed slug and deterministic stock-alert pagination remain aligned; the deals availability conditional is now expanded into valid block directives.
+- **Qualification remains open** — Arena verified the static/automation contract at **110/110**, but owner must rerun focused and full PHP suites after pulling the correction. No browser or next-phase task is authorized yet.
