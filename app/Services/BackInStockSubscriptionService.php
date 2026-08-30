@@ -23,6 +23,10 @@ final class BackInStockSubscriptionService
             throw new RuntimeException('Please confirm stock-availability email consent.');
         }
 
+        if (! $user->hasVerifiedEmail()) {
+            throw new RuntimeException('Please verify your email before requesting a stock-availability email.');
+        }
+
         if (! $product->is_active) {
             throw new RuntimeException('This product is no longer available.');
         }
