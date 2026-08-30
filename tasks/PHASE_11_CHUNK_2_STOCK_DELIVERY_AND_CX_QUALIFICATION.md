@@ -34,7 +34,7 @@ unapproved legal/tax/shipping/warranty promises remain outside this gate.
 - `tests/automation/phase11-customer-experience.test.mjs`
 
 The customer-management slice was introduced at `29bbad1`; the current hardened
-candidate is pushed at `7e33903` on `rhythm-uat`. Product pages now provide a
+candidate is pushed at `feb6536` on `rhythm-uat`. Product pages now provide a
 self-canonical URL and variant-aware availability metadata, with focused PHP coverage
 added for the rendered canonical and variant-availability output. Account stock-alert
 results use a separate bounded paginator. Catalogue, homepage, related, wishlist and
