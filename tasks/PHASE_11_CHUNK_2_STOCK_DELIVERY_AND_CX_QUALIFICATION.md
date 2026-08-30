@@ -108,6 +108,8 @@ sizes; do not attach customer PII.
   states have no horizontal overflow, clipping or overlapping controls.
 - Complementary and frequently-bought sections render only when their collections
   are non-empty; each card uses its current product price and stock state.
+- The merchandising admin selectors search active products instead of preloading the
+  full catalogue into the form.
 - Account Stock alerts is a distinct tab from notification/marketing preferences;
   active requests show the product/variant target and a usable cancellation form.
 - Guest product visitors see a login path rather than an email field; consent copy

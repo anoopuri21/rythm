@@ -40,13 +40,11 @@ final class ProductMerchandisingRuleResource extends Resource
                 ->label('Product')
                 ->relationship('sourceProduct', 'name', fn (Builder $query): Builder => $query->where('is_active', true)->orderBy('name'))
                 ->searchable()
-                ->preload()
                 ->required(),
             Select::make('target_product_id')
                 ->label('Recommended product')
                 ->relationship('targetProduct', 'name', fn (Builder $query): Builder => $query->where('is_active', true)->orderBy('name'))
                 ->searchable()
-                ->preload()
                 ->different('source_product_id')
                 ->required(),
             Select::make('rule_type')

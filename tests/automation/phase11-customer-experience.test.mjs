@@ -41,6 +41,9 @@ test('Phase 11 merchandising rules are admin-managed and price-safe', () => {
   assert.match(model, /A product cannot recommend itself/);
   assert.match(resource, /Only curated product links are shown/);
   assert.match(resource, /different\('source_product_id'\)/);
+  assert.match(resource, /relationship\('sourceProduct', 'name'/);
+  assert.match(resource, /relationship\('targetProduct', 'name'/);
+  assert.doesNotMatch(resource, /preload\(\)/);
   assert.match(policy, /CATALOGUE_MANAGE/);
 });
 

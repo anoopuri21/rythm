@@ -743,3 +743,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Rendered SEO contract verified** — ProductPageTest now has the controller-to-view availability binding in place, so active variant stock can produce `schema.org/InStock` rather than an undefined Blade variable.
 - **Regression guard strengthened** — The static Phase 11 contract requires the explicit `hasAvailableStock` view payload.
 - **Scope boundary retained** — No catalogue or inventory data changed; this was a view-data binding correction.
+
+## 30 August 2026 — Phase 11 merchandising selector bound
+
+- **Admin catalogue load bounded** — Related and target product selectors remain searchable and active-product scoped without preloading the entire catalogue into the merchandising form.
+- **Qualification contract aligned** — Chunk 2 evidence now includes the bounded admin selector behavior for the realistic-catalogue review.
+- **Scope boundary retained** — No merchandising rules or product records were changed; only form query behavior was narrowed.
