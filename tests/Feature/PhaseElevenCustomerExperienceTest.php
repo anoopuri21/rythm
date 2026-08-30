@@ -13,6 +13,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
+use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\BackInStockSubscriptionService;
 use App\Services\ProductQueryService;
@@ -124,6 +125,37 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertNotNull($subscription->fresh()->notified_at);
         $this->assertDatabaseHas('back_in_stock_subscriptions', ['id' => $subscription->id]);
         $this->assertDatabaseCount('notification_deliveries', 1);
+    }
+
+    public function test_notification_command_skips_inactive_variants_even_if_they_have_stock(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email_verified_at' => now()]);
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-inactive-variant',
+            'sku' => 'RYM-P11-INACTIVE',
+            'stock' => 0,
+        ]);
+        $variant = ProductVariant::factory()->for($product)->create([
+            'stock' => 0,
+            'is_active' => true,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe(
+            $user,
+            $product,
+            $variant,
+            true,
+        );
+        $variant->update(['stock' => 3, 'is_active' => false]);
+
+        $this->artisan('back-in-stock:notify', ['--limit' => 100])
+            ->expectsOutput('Queued 0 back-in-stock notification request(s) from a 100-record bound.')
+            ->assertExitCode(0);
+
+        Notification::assertNothingSent();
+        $this->assertNull($subscription->fresh()->notified_at);
     }
 
     public function test_out_of_stock_storefront_can_record_an_authenticated_stock_request(): void

@@ -78,11 +78,13 @@ production data. Do not share credentials or customer data in the evidence.
    ```
 
 6. Exercise the bounded worker with a non-sending mail configuration or notification
-   fake. Confirm invalid limits below 1 and above 500 are rejected, inactive and
-   out-of-stock targets are skipped, and repeated handling creates only one commerce
-   event, one delivery reservation and one `notified_at` transition per request.
+   fake. Confirm invalid limits below 1 and above 500 are rejected, inactive products
+   and inactive variants are skipped even when a variant still has stock, and repeated
+   handling creates only one commerce event, one delivery reservation and one
+   `notified_at` transition per request.
 7. Confirm a request without consent, an unverified customer and an invalid/inactive
-   variant are rejected. Confirm a verified customer can request one active target,
+   variant are rejected. A tampered or stale Livewire variant selection must not be
+   silently converted into a product-level request. Confirm a verified customer can request one active target,
    view it in Account, cancel it, and request it again only through the explicit
    consent flow.
 8. Confirm a customer cannot cancel another customer's subscription: the request must

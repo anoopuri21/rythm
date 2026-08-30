@@ -34,7 +34,9 @@ final class NotifyBackInStock extends Command
         foreach ($subscriptions as $subscription) {
             $variant = $subscription->variant;
             $stock = $variant?->stock ?? $subscription->product?->stock ?? 0;
-            if (! $subscription->product?->is_active || $stock < 1) {
+            if (! $subscription->product?->is_active
+                || ($variant !== null && ! $variant->is_active)
+                || $stock < 1) {
                 continue;
             }
 

@@ -99,6 +99,12 @@ final class AddToCart extends Component
             ? $this->product->variants->firstWhere('id', $this->variantId)
             : null;
 
+        if ($this->variantId !== null && $variant === null) {
+            $this->notifyError = 'Please choose a valid option.';
+
+            return;
+        }
+
         try {
             app(BackInStockSubscriptionService::class)->subscribe(
                 $user,
