@@ -730,3 +730,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Availability boundary fixed** — The product stock-request surface now treats every non-positive stock value as unavailable, including defensive handling for an unexpected negative inventory value.
 - **Regression coverage added** — Livewire feature coverage verifies that the request path and out-of-stock state remain visible for non-positive stock.
 - **Scope boundary retained** — No inventory values were changed; the correction only aligns rendering with the existing non-positive-stock add-to-cart guard.
+
+## 30 August 2026 — Phase 11 product SEO availability binding correction
+
+- **SEO availability fixed** — ProductController now passes its computed availability state into the product view, so Product JSON-LD reports active parent or variant stock instead of relying on an unbound Blade variable.
+- **Availability logic centralized** — The controller reuses the Product availability helper shared by catalogue cards and variant-aware stock checks.
+- **Regression contract strengthened** — Automation now verifies the controller-to-view availability binding; the existing variant-aware product test covers the rendered `InStock` JSON-LD path.
+- **Scope boundary retained** — No catalogue or inventory data changed; this corrects only rendered metadata truthfulness.

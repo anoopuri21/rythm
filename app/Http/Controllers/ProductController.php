@@ -40,8 +40,7 @@ final class ProductController extends Controller
             'robots' => 'index, follow',
         ]));
 
-        $hasAvailableStock = $product->stock > 0
-            || $product->variants->contains(fn ($variant): bool => $variant->stock > 0);
+        $hasAvailableStock = $product->hasAvailableStock();
 
         $session = request()->session();
         $recentIds = array_values(array_filter(
@@ -56,6 +55,7 @@ final class ProductController extends Controller
 
         return view('product.show', [
             'product' => $product,
+            'hasAvailableStock' => $hasAvailableStock,
             'related' => $this->products->related($product),
             'complementary' => $this->products->related($product, 4, ProductMerchandisingRule::TYPE_COMPLEMENTARY),
             'frequentlyBought' => $this->products->related($product, 4, ProductMerchandisingRule::TYPE_FREQUENTLY_BOUGHT_TOGETHER),

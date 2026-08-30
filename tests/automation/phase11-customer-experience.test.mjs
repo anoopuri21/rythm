@@ -108,6 +108,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(view, /\$hasAvailableStock/);
   assert.match(controller, /canonical_url/);
   assert.match(controller, /robots.*index, follow/s);
+  assert.match(controller, /\'hasAvailableStock\' => \$hasAvailableStock/);
   assert.match(controller, /hasAvailableStock/);
   assert.match(addToCartView, /\$stock <= 0/);
   assert.match(shopCard, /compare_at_price > \(float\) \$product->price/);
