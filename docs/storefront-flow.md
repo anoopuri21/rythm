@@ -45,4 +45,4 @@ Trust statements must describe implemented behavior, not promises the business h
 1. Point `rythm.test` to `rhythm_db` and clear cached configuration.
 2. Run focused/full PHP tests in an external disposable dependency runtime.
 3. Verify responsive homepage, shop, product, cart, checkout, account and tracking views with real UAT data.
-4. Owner must approve operational rules before a persistent back-in-stock subscription or post-delivery returns workflow is activated.
+4. Post-delivery returns remain disabled until approved rules exist. Authenticated customers may record an explicit-consent back-in-stock request, but its bounded notification command must be scheduled and operationally approved before delivery is enabled.
