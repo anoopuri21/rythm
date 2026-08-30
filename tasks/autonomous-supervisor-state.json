@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "bcc3495b0a244a624fc817803e107b10eacead4f",
-    "remote_head": "bcc3495b0a244a624fc817803e107b10eacead4f",
+    "local_head": "841269ab98b5fbfb48b132f5d56205aba03b4609",
+    "remote_head": "841269ab98b5fbfb48b132f5d56205aba03b4609",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 11 catalogue, homepage, related and wishlist availability is now variant-aware through bounded active-variant existence metadata; Shop in-stock filtering includes active variants and shared cards remain truthful without per-card queries. Automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
+    "last_verified_action": "Phase 11 public search and facets now exclude inactive variants and inactive attribute definitions while retaining active normalized-attribute matching; Arena-local automation 109/109, Vite build and diff checks passed; PHP/MySQL/rendered/UAT gates remain open."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "da15c9f66f7927fbc52053615750cac43c19ea6e231eaf6c90029260ec913fd5",
-    "created_at": "2026-08-30T08:40:40.578Z"
+    "id": "de8709cfa75c6b4a57dd7a28850418fa2bc32bb9c34e6d6ffb27c6dd5f3fba0e",
+    "created_at": "2026-08-30T08:43:20.148Z"
   },
   "decisions": [
     {
@@ -438,6 +438,12 @@
       "outcome": "passed",
       "evidence": "app/Models/Product.php; app/Services/ProductQueryService.php; app/Services/HomepageDataService.php; app/Services/WishlistService.php; resources/views/components/shop-card.blade.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
       "verified_at": "2026-08-30T08:40:40.578Z"
+    },
+    {
+      "name": "Phase 11 active-record search visibility candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Services/ProductQueryService.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:43:20.148Z"
     }
   ],
   "next_action": {
