@@ -56,6 +56,32 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertGreaterThanOrEqual(0, (int) ($results->first()->search_relevance ?? 0));
     }
 
+    public function test_exact_name_match_ranks_ahead_of_contains_match(): void
+    {
+        $term = 'Weighted ranking QA phrase';
+        $exact = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'name' => $term,
+            'slug' => 'weighted-ranking-exact',
+            'sku' => 'RYM-WEIGHTED-EXACT',
+        ]);
+        Product::factory()->create([
+            'category_id' => $exact->category_id,
+            'brand_id' => $exact->brand_id,
+            'name' => $term.' Studio Edition',
+            'slug' => 'weighted-ranking-contains',
+            'sku' => 'RYM-WEIGHTED-CONTAINS',
+        ]);
+
+        $results = app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(search: $term))
+            ->get();
+
+        $this->assertSame($exact->id, $results->first()?->id);
+        $this->assertSame(120, (int) ($results->first()?->search_relevance ?? 0));
+    }
+
     public function test_active_variant_stock_makes_catalogue_availability_truthful(): void
     {
         $product = Product::factory()->create([

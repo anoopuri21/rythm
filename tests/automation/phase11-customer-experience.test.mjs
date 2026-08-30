@@ -72,6 +72,7 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(feature, /test_notification_command_rejects_limits_outside_the_worker_bound/);
   assert.match(feature, /test_delivery_skips_a_customer_whose_email_is_no_longer_verified/);
   assert.match(feature, /test_search_ignores_inactive_variant_attributes/);
+  assert.match(feature, /test_exact_name_match_ranks_ahead_of_contains_match/);
   assert.match(feature, /test_non_positive_stock_keeps_the_stock_request_path_visible/);
 });
 
