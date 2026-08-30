@@ -818,3 +818,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Evidence recorded** — `docs/phase12-security-threat-model.md`, `docs/phase12-authorization-matrix.md`, `docs/phase12-privacy-data-map.md` and `docs/phase12-accessibility-baseline.md` record observed controls and open review items without customer records or secrets.
 - **Scan result** — `npm audit --omit=dev --audit-level=high` reported zero high/critical vulnerabilities; PHP/Composer checks remain an external disposable-runtime gate.
 - **Open review items retained** — CSP strictness, proxy/HSTS behavior, provider callback exception testing, mutation abuse budgets, upload malware/retention policy and privacy/legal decisions remain open; no unsupported completion claim was made.
+
+
+## 30 August 2026 — Phase 12 review and Q&A abuse limits
+
+- **Safe throttling correction** — Authenticated Livewire review and product-question submissions now use a per-user/per-product five-attempt, 60-second limiter before the domain write.
+- **Regression contract added** — The automation suite requires the limiter, bounded key scope and user-facing failure boundary in both components; `npm run test:automation` passed **111/111**.
+- **Scope boundary retained** — No review/Q&A business rules, customer data or production records changed; broader authorization, upload, CSP, privacy and owner-runtime gates remain open.

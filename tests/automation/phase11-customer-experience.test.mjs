@@ -83,6 +83,20 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
   assert.match(accountTest, /forceFill\(\['email_verified_at' => now\(\)\]\)/);
 });
 
+test('Phase 12 review and product Q&A submissions have per-user per-product abuse limits', () => {
+  const review = read('app/Livewire/ReviewSection.php');
+  const question = read('app/Livewire/ProductQuestionSection.php');
+
+  for (const component of [review, question]) {
+    assert.match(component, /use Illuminate\\Support\\Facades\\RateLimiter/);
+    assert.match(component, /RateLimiter::tooManyAttempts/);
+    assert.match(component, /RateLimiter::hit\(\$key, 60\)/);
+    assert.match(component, /Too many (review|question) attempts/);
+    assert.match(component, /user:\'\.auth\(\)->id\(\)/);
+    assert.match(component, /product:\'\.\$this->product->getKey\(\)/);
+  }
+});
+
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
   const listener = read('app/Listeners/HandleBackInStockNotification.php');
   const notification = read('app/Notifications/BackInStockNotification.php');

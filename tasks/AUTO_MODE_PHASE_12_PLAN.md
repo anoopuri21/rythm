@@ -29,7 +29,7 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 
 ### Chunk 1 — safe authorization and input-boundary remediation
 
-**Status:** NEXT
+**Status:** IN PROGRESS — review and Q&A write limits added; remaining action-boundary review continues
 
 - Correct only evidence-backed IDOR, authorization, validation, CSRF, throttling and upload-boundary defects.
 - Add focused regression coverage for every corrected boundary.
