@@ -21,6 +21,22 @@
 
 Repository evidence ke hisaab se Phases **0, 0A, 0B, 1–10 and 6A** accepted/complete hain. In phases ko dobara karne ki zaroorat nahi hai unless code, database, business rule ya environment change hua ho. Current manual gate Phase 11 hai. Neeche complete historical-to-future sequence diya hai so that every owner-side step traceable rahe.
 
+### One-command owner runner
+
+Phase 11 ke scripted checks ke liye latest branch pull karne ke baad project root mein sirf ek command chalayein:
+
+```bash
+./run.sh
+```
+
+Windows PowerShell/Git Bash setup mein agar direct execution blocked ho, to:
+
+```bash
+bash run.sh
+```
+
+`run.sh` automatically branch/clean-tree check, Composer/npm setup, read-only migration/route checks, isolated in-memory SQLite focused/full PHP tests, automation, build and dependency audits run karta hai. Browser responsive/accessibility/conversion review hi manual rahega. Script persistent database par destructive migration/test nahi chalata.
+
 ### Common safety rules
 
 - Correct branch: `rhythm-uat`.

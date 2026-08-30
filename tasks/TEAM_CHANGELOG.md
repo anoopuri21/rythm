@@ -775,3 +775,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Owner runbook added** — `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` lists every owner-side task, achievement condition and redacted evidence pack from Phase 1 through the Phase 17 readiness boundary.
 - **Current gate retained** — Phase 11 remains `IN PROGRESS`; Phases 1–10 and 6A remain recorded as accepted, while Phase 18 and Agent 10 remain inactive.
 - **Safety boundary retained** — Manual phase execution must still use isolated destructive tests, protect persistent UAT, avoid secrets in evidence and avoid invented legal/tax/shipping/warranty promises.
+
+## 30 August 2026 — One-command owner qualification runner
+
+- **Manual command minimized** — Added repository-root `run.sh`; after pulling `rhythm-uat`, the owner can run `./run.sh` (or `bash run.sh`) instead of typing the qualification commands individually.
+- **Safe execution boundary** — The runner checks the branch and clean tree, installs locked dependencies, performs read-only migration/route checks, forces destructive PHP tests onto in-memory SQLite, then runs automation, build and dependency audits sequentially.
+- **Manual gate retained** — Real browser responsive/accessibility/conversion review and any owner approval remain outside the script; no persistent destructive migration, reset or deployment is performed.
+- **Static guard added** — Phase 11 automation now verifies the runner includes the required checks and excludes `migrate:fresh`, `db:wipe` and `RefreshDatabase`.

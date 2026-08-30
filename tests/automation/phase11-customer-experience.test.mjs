@@ -95,6 +95,25 @@ test('Phase 11 stock notifications use the central delivery ledger and mail only
   assert.doesNotMatch(notification, /database/);
 });
 
+test('Owner-side run.sh keeps qualification bounded and avoids persistent destructive writes', () => {
+  const runner = read('run.sh');
+
+  assert.match(runner, /git branch --show-current/);
+  assert.match(runner, /composer validate --strict/);
+  assert.match(runner, /npm ci --no-audit --no-fund/);
+  assert.match(runner, /migrate:status/);
+  assert.match(runner, /route:list --path=account\/stock-alerts/);
+  assert.match(runner, /PhaseElevenCustomerExperienceTest\.php tests\/Feature\/AccountTest\.php/);
+  assert.match(runner, /php artisan test --no-ansi/);
+  assert.match(runner, /npm run test:automation/);
+  assert.match(runner, /npm run build/);
+  assert.match(runner, /composer audit --locked/);
+  assert.match(runner, /npm audit --omit=dev/);
+  assert.match(runner, /DB_CONNECTION=sqlite/);
+  assert.match(runner, /DB_DATABASE=:memory:/);
+  assert.doesNotMatch(runner, /migrate:fresh|db:wipe|RefreshDatabase/);
+});
+
 test('Phase 11 product recommendations keep truthful empty states and current product pricing', () => {
   const controller = read('app/Http/Controllers/ProductController.php');
   const accountController = read('app/Http/Controllers/AccountController.php');
