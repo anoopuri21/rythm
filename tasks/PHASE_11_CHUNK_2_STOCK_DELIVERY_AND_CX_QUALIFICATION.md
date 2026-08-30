@@ -126,7 +126,8 @@ The evidence must include:
 
 - a catalogue above 500 products;
 - bounded pagination and no unbounded export/query loop;
-- search coverage for name, SKU, brand, category and normalized attributes;
+- search coverage for name, SKU, brand, category and normalized attributes from active records;
+- inactive variants and inactive attribute definitions do not leak into public search or facets;
 - exact matches ranked ahead of contains/typo-stem matches;
 - recorded query count and elapsed time for a shop request, with the environment and
   dataset size stated;

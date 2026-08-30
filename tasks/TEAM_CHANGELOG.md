@@ -703,3 +703,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Shared-card truthfulness preserved** — Shop, homepage, related and wishlist queries expose a bounded active-variant stock-existence flag, and the shared Shop card uses it without introducing per-card queries.
 - **Regression coverage added** — Phase 11 feature coverage verifies active-variant inclusion and inactive-variant exclusion; automation and production build remain green.
 - **Scope boundary retained** — No product stock is inferred or rewritten; the change only reads current parent/active-variant state.
+
+## 30 August 2026 — Phase 11 public search visibility hardening
+
+- **Inactive variant data excluded** — Public search and normalized attribute facets now inspect only active variants; inactive attribute definitions are excluded from direct attribute search matches.
+- **Regression coverage added** — Phase 11 tests prove an active variant attribute remains searchable while an inactive variant attribute does not leak into public results.
+- **Qualification contract tightened** — The Chunk 2 catalogue evidence now requires active-record search coverage and explicit inactive-record exclusion.
+- **Scope boundary retained** — No catalogue data is deleted or rewritten; this is a read-boundary correction only.

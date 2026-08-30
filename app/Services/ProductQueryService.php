@@ -254,11 +254,19 @@ final class ProductQueryService
                         ->where('name', 'like', "%{$value}%")
                         ->orWhere('slug', 'like', "%{$value}%"))
                     ->orWhereHas('attributeValues', fn (Builder $attribute): Builder => $attribute
-                        ->where('value', 'like', "%{$value}%")
-                        ->orWhere('slug', 'like', "%{$value}%"))
-                    ->orWhereHas('variants.attributeValues', fn (Builder $attribute): Builder => $attribute
-                        ->where('value', 'like', "%{$value}%")
-                        ->orWhere('slug', 'like', "%{$value}%"));
+                        ->where(function (Builder $matched) use ($value): void {
+                            $matched->where('value', 'like', "%{$value}%")
+                                ->orWhere('slug', 'like', "%{$value}%");
+                        })
+                        ->whereHas('attribute', fn (Builder $definition): Builder => $definition->where('is_active', true)))
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->whereHas('attributeValues', fn (Builder $attribute): Builder => $attribute
+                            ->where(function (Builder $matched) use ($value): void {
+                                $matched->where('value', 'like', "%{$value}%")
+                                    ->orWhere('slug', 'like', "%{$value}%");
+                            })
+                            ->whereHas('attribute', fn (Builder $definition): Builder => $definition->where('is_active', true))));
             };
 
             $matches($q, $likeTerm);
@@ -320,7 +328,9 @@ final class ProductQueryService
                         ->where('is_filterable', true));
 
                 $product->whereHas('attributeValues', $matchesValue)
-                    ->orWhereHas('variants.attributeValues', $matchesValue);
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->whereHas('attributeValues', $matchesValue));
             });
         }
     }

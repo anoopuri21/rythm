@@ -12,6 +12,8 @@ use App\Models\BackInStockSubscription;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAttributeValue;
 use App\Models\ProductMerchandisingRule;
 use App\Models\ProductVariant;
 use App\Models\User;
@@ -82,6 +84,59 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
             ->shopQuery(new ShopFilters(inStockOnly: true))
             ->get()
             ->contains('id', $product->id));
+    }
+
+    public function test_search_ignores_inactive_variant_attributes(): void
+    {
+        $categoryId = Category::firstOrFail()->id;
+        $brandId = Brand::firstOrFail()->id;
+        $attribute = ProductAttribute::create([
+            'name' => 'Finish QA',
+            'slug' => 'finish-qa',
+            'type' => 'select',
+            'is_filterable' => true,
+            'is_variant' => true,
+            'is_active' => true,
+        ]);
+        $visibleValue = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Walnut Live QA',
+            'slug' => 'walnut-live-qa',
+        ]);
+        $archivedValue = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Archived Tone QA',
+            'slug' => 'archived-tone-qa',
+        ]);
+        $visibleProduct = Product::factory()->create([
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'slug' => 'phase-eleven-visible-attribute',
+            'sku' => 'RYM-P11-VISIBLE-ATTRIBUTE',
+            'stock' => 0,
+        ]);
+        $visibleVariant = ProductVariant::factory()->for($visibleProduct)->create([
+            'stock' => 1,
+            'is_active' => true,
+        ]);
+        $visibleVariant->attributeValues()->attach($visibleValue);
+
+        $archivedProduct = Product::factory()->create([
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'slug' => 'phase-eleven-archived-attribute',
+            'sku' => 'RYM-P11-ARCHIVED-ATTRIBUTE',
+            'stock' => 0,
+        ]);
+        $archivedVariant = ProductVariant::factory()->for($archivedProduct)->create([
+            'stock' => 2,
+            'is_active' => false,
+        ]);
+        $archivedVariant->attributeValues()->attach($archivedValue);
+
+        $service = app(ProductQueryService::class);
+        $this->assertTrue($service->shopQuery(new ShopFilters(search: 'walnut-live-qa'))->get()->contains('id', $visibleProduct->id));
+        $this->assertFalse($service->shopQuery(new ShopFilters(search: 'archived-tone-qa'))->get()->contains('id', $archivedProduct->id));
     }
 
     public function test_admin_managed_related_rule_precedes_category_fallback_without_affecting_price(): void
