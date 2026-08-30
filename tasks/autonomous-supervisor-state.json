@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "16b74db805a3495531a2276a193715bd3c255589",
-    "remote_head": "16b74db805a3495531a2276a193715bd3c255589",
+    "local_head": "816ab846e5c6faeed861fd9e699e3dab14c9a444",
+    "remote_head": "816ab846e5c6faeed861fd9e699e3dab14c9a444",
     "working_tree_clean": true
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner reported all isolated migration statuses as Ran, but Phase 11 focused PHP qualification failed 3 tests (30 passed) and full PHP regression failed 43 tests (351 passed). The runner was retired by owner request; manual execution and failure-log capture are now authoritative. Two deterministic fixture issues were aligned and pushed; owner PHP rerun remains required."
+    "last_verified_action": "Owner requested run.sh removal and manual execution. Windows CMD/Cmder-safe isolated MySQL and focused failure-log commands are documented. Phase 11 focused/full PHP evidence remains failed pending owner rerun after fixture alignment; Auto Mode remains paused."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "55e9da14b92d4e11a6dbc5a7b4c653cc4ebae54ad4bbda74e1a24a33c1579d10",
-    "created_at": "2026-08-30T10:02:34.865Z"
+    "id": "b52d0b9aac8dac974a3443d4d8c2ff149c52619b1a0ccc764e8b99e4b5364430",
+    "created_at": "2026-08-30T10:10:31.512Z"
   },
   "decisions": [
     {
@@ -539,6 +539,12 @@
       "outcome": "passed",
       "evidence": "Canonical Fender seed slug aligned; seeded test customer is verified for local/test fixture; run.sh removed; manual --filter and tee log instructions added; npm run test:automation 110/110; PHP runtime unavailable in Arena.",
       "verified_at": "2026-08-30T10:02:34.865Z"
+    },
+    {
+      "name": "Windows manual QA command compatibility",
+      "outcome": "passed",
+      "evidence": "Runbook includes CMD/Cmder equivalents for isolated rhythm_phase11_qa binding, config clear, engine query, migration/status, route listing, filtered tests and file logs; npm run test:automation (110/110).",
+      "verified_at": "2026-08-30T10:10:31.512Z"
     }
   ],
   "next_action": {
