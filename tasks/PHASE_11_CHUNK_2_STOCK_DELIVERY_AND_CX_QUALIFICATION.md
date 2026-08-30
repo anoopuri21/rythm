@@ -34,8 +34,9 @@ unapproved legal/tax/shipping/warranty promises remain outside this gate.
 - `tests/automation/phase11-customer-experience.test.mjs`
 
 The customer-management slice was introduced at `29bbad1`; the current hardened
-candidate is pushed at `0c1d74b` with supervisor checkpoint `8409a89`. Product pages
-now provide a self-canonical URL and variant-aware availability metadata.
+candidate is pushed at `b9092f7` with supervisor checkpoint `1b79724`. Product pages
+now provide a self-canonical URL and variant-aware availability metadata, with focused
+PHP coverage added for the rendered canonical and variant-availability output.
 
 ## Arena-local evidence
 
