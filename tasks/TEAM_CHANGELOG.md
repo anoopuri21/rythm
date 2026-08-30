@@ -737,3 +737,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Availability logic centralized** — The controller reuses the Product availability helper shared by catalogue cards and variant-aware stock checks.
 - **Regression contract strengthened** — Automation now verifies the controller-to-view availability binding; the existing variant-aware product test covers the rendered `InStock` JSON-LD path.
 - **Scope boundary retained** — No catalogue or inventory data changed; this corrects only rendered metadata truthfulness.
+
+## 30 August 2026 — Phase 11 product availability view binding regression
+
+- **Rendered SEO contract verified** — ProductPageTest now has the controller-to-view availability binding in place, so active variant stock can produce `schema.org/InStock` rather than an undefined Blade variable.
+- **Regression guard strengthened** — The static Phase 11 contract requires the explicit `hasAvailableStock` view payload.
+- **Scope boundary retained** — No catalogue or inventory data changed; this was a view-data binding correction.
