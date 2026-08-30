@@ -10,7 +10,7 @@ test('launch smoke suite covers the core storefront release paths', async () => 
         read('package.json'),
         read('tests/automation/supervisor-state.test.mjs'),
     ]);
-    assert.match(packageJson, /"test:automation": "node --test tests\/automation"/);
+    assert.match(packageJson, /"test:automation": "node --test tests\/automation\/\*\.test\.mjs"/);
     assert.match(supervisorStateTest, /process\.platform === 'win32'/);
     for (const contract of ["route('home')", "route('shop.index'", "route('cart.index')", "route('checkout.index')", "signedRoute('checkout.success'"]) {
         assert.ok(smoke.includes(contract), `missing smoke contract: ${contract}`);
