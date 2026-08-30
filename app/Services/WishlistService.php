@@ -49,6 +49,7 @@ final class WishlistService
     {
         return Product::query()
             ->active()
+            ->withAvailableVariantStock()
             ->whereIn('id', Wishlist::query()->where('user_id', $userId)->pluck('product_id'))
             ->with(['brand', 'media'])
             ->orderByDesc(

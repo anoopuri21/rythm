@@ -9,6 +9,7 @@
         : null;
     $rating = $product->reviews_avg_rating !== null ? (float) $product->reviews_avg_rating : null;
     $reviewCount = (int) ($product->reviews_count ?? 0);
+    $hasAvailableStock = $product->hasAvailableStock();
     $href = '/product/' . $product->slug;
 @endphp
 
@@ -60,8 +61,8 @@
             </p>
         @endif
 
-        <p class="mt-2 text-[11px] font-semibold {{ $product->stock > 0 ? 'text-ink' : 'text-muted' }}">
-            {{ $product->stock > 0 ? 'In stock' : 'Out of stock' }}
+        <p class="mt-2 text-[11px] font-semibold {{ $hasAvailableStock ? 'text-ink' : 'text-muted' }}">
+            {{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}
         </p>
 
         <div class="shop-card__price mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1">

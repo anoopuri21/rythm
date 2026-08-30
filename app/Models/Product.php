@@ -232,7 +232,41 @@ class Product extends Model implements HasMedia
 
     public function scopeInStock(Builder $query): Builder
     {
-        return $query->where('stock', '>', 0);
+        return $query->where(function (Builder $available): void {
+            $available->where('stock', '>', 0)
+                ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                    ->where('is_active', true)
+                    ->where('stock', '>', 0));
+        });
+    }
+
+    public function scopeWithAvailableVariantStock(Builder $query): Builder
+    {
+        return $query->withExists([
+            'variants as has_available_variant_stock' => fn (Builder $variant): Builder => $variant
+                ->where('is_active', true)
+                ->where('stock', '>', 0),
+        ]);
+    }
+
+    public function hasAvailableStock(): bool
+    {
+        if ($this->stock > 0) {
+            return true;
+        }
+
+        if (array_key_exists('has_available_variant_stock', $this->attributes)) {
+            return (int) $this->attributes['has_available_variant_stock'] > 0;
+        }
+
+        if ($this->relationLoaded('variants')) {
+            return $this->variants->contains(fn (ProductVariant $variant): bool => $variant->is_active && $variant->stock > 0);
+        }
+
+        return $this->variants()
+            ->where('is_active', true)
+            ->where('stock', '>', 0)
+            ->exists();
     }
 
     public function scopeFeatured(Builder $query): Builder

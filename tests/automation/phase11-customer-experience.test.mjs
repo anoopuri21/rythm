@@ -6,9 +6,13 @@ const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), '
 
 test('Phase 11 search stays bounded, weighted and MySQL/shared-host safe', () => {
   const service = read('app/Services/ProductQueryService.php');
+  const product = read('app/Models/Product.php');
   const migration = read('database/migrations/2026_08_30_000001_create_product_merchandising_rules_table.php');
 
   assert.match(service, /search_relevance/);
+  assert.match(service, /orWhereHas\('variants'/);
+  assert.match(product, /scopeWithAvailableVariantStock/);
+  assert.match(product, /hasAvailableStock/);
   assert.match(service, /mb_substr\(\$term, 0, 80\)/);
   assert.match(service, /array_slice\(\$tokens, 0, 5\)/);
   assert.match(service, /MAX_BRAND_FILTERS/);
@@ -101,6 +105,7 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(controller, /hasAvailableStock/);
   assert.match(addToCartView, /\$stock <= 0/);
   assert.match(shopCard, /compare_at_price > \(float\) \$product->price/);
+  assert.match(shopCard, /hasAvailableStock\(\)/);
   assert.match(minimalCard, /\$stock > 0 \? 'In stock' : 'Out of stock'/);
   assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
   assert.match(accountController, /cancelBackInStockAlert/);

@@ -54,6 +54,36 @@ final class PhaseElevenCustomerExperienceTest extends TestCase
         $this->assertGreaterThanOrEqual(0, (int) ($results->first()->search_relevance ?? 0));
     }
 
+    public function test_active_variant_stock_makes_catalogue_availability_truthful(): void
+    {
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-variant-stock',
+            'sku' => 'RYM-P11-VARIANT-STOCK',
+            'stock' => 0,
+        ]);
+        $variant = ProductVariant::factory()->for($product)->create([
+            'stock' => 3,
+            'is_active' => true,
+        ]);
+
+        $available = app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(inStockOnly: true))
+            ->get()
+            ->firstWhere('id', $product->id);
+
+        $this->assertNotNull($available);
+        $this->assertTrue($available->hasAvailableStock());
+
+        $variant->update(['is_active' => false]);
+
+        $this->assertFalse(app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(inStockOnly: true))
+            ->get()
+            ->contains('id', $product->id));
+    }
+
     public function test_admin_managed_related_rule_precedes_category_fallback_without_affecting_price(): void
     {
         $source = Product::where('slug', 'yamaha-f310-acoustic-guitar')->firstOrFail();

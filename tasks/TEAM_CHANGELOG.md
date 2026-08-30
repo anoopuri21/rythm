@@ -696,3 +696,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Activation boundary retained** — Phase 11 Chunk 2 is the active task. The mandatory owner-runtime PHP/MySQL and rendered/UAT gates remain human-gated; Phase 18, Agent 10 and deployment remain inactive.
 - **Authority reconciliation completed** — The current branch is `rhythm-uat`, local and remote HEAD are `74ef5b5`, the working tree is clean, all authoritative sources are present, and no workspace `vendor` entry exists.
 - **Protocol state reconciled** — The Auto Mode header and current-priority section now reflect Phase 11 rather than the completed Phase 6A/Phase 8–10 work.
+
+## 30 August 2026 — Phase 11 variant-aware availability hardening
+
+- **Catalogue availability made variant-aware** — Active in-stock variants now qualify a product for the Shop in-stock filter even when parent stock is zero; inactive variants never qualify.
+- **Shared-card truthfulness preserved** — Shop, homepage, related and wishlist queries expose a bounded active-variant stock-existence flag, and the shared Shop card uses it without introducing per-card queries.
+- **Regression coverage added** — Phase 11 feature coverage verifies active-variant inclusion and inactive-variant exclusion; automation and production build remain green.
+- **Scope boundary retained** — No product stock is inferred or rewritten; the change only reads current parent/active-variant state.

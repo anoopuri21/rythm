@@ -58,16 +58,16 @@ final class HomepageDataService
                 'ugc' => HomepageBlock::query()->section('ugc')->get(),
                 'comparison' => HomepageBlock::query()->section('comparison')->get(),
                 'faqs' => Faq::query()->where('is_active', true)->orderBy('sort_order')->get(),
-                'bestsellers' => Product::query()->active()->featured()
+                'bestsellers' => Product::query()->active()->featured()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
-                'newArrivals' => Product::query()->active()
+                'newArrivals' => Product::query()->active()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
                     ->latest('created_at')->latest('id')->limit(10)->get(),
-                'trending' => Product::query()->active()->trending()
+                'trending' => Product::query()->active()->trending()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByDesc('updated_at')->orderByDesc('id')->limit(10)->get(),
-                'bestDeals' => Product::query()->active()
+                'bestDeals' => Product::query()->active()->withAvailableVariantStock()
                     ->whereNotNull('compare_at_price')
                     ->whereColumn('compare_at_price', '>', 'price')
                     ->with(['brand', 'category.parent', 'media'])
@@ -100,7 +100,7 @@ final class HomepageDataService
      */
     private function curatedProducts(array $slugs): Collection
     {
-        $products = Product::query()->active()
+        $products = Product::query()->active()->withAvailableVariantStock()
             ->whereIn('slug', $slugs)
             ->with(['brand', 'category.parent', 'media'])
             ->get();
@@ -129,6 +129,7 @@ final class HomepageDataService
             ->map(function (HomepageCategoryRow $row): array {
                 $products = Product::query()
                     ->active()
+                    ->withAvailableVariantStock()
                     ->where('category_id', $row->category_id)
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('featured_rank IS NULL')

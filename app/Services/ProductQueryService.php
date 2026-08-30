@@ -47,6 +47,7 @@ final class ProductQueryService
         $this->applySearchFilter($query, $filters->search);
         $this->applyRatingFilter($query, $filters->minRating);
         $this->applyAttributeFilters($query, $filters->attributes);
+        $query->withAvailableVariantStock();
         $this->applySort($query, $filters->sort, trim((string) $filters->search) !== '');
 
         return $query;
@@ -84,6 +85,7 @@ final class ProductQueryService
 
         $curated = Product::query()
             ->active()
+            ->withAvailableVariantStock()
             ->whereKey($curatedIds)
             ->whereKeyNot($product->id)
             ->with(['brand', 'media'])
@@ -100,6 +102,7 @@ final class ProductQueryService
 
         $fallback = Product::query()
             ->active()
+            ->withAvailableVariantStock()
             ->whereKeyNot($product->id)
             ->whereNotIn('id', $curatedInRuleOrder->pluck('id')->all())
             ->where(function (Builder $q) use ($product): void {
@@ -135,6 +138,7 @@ final class ProductQueryService
 
         $products = Product::query()
             ->active()
+            ->withAvailableVariantStock()
             ->whereKey($ids)
             ->with(['brand', 'category', 'media'])
             ->get()
@@ -200,7 +204,12 @@ final class ProductQueryService
     private function applyAvailabilityFilter(Builder $query, bool $inStockOnly): void
     {
         if ($inStockOnly) {
-            $query->where('stock', '>', 0);
+            $query->where(function (Builder $available): void {
+                $available->where('stock', '>', 0)
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->where('stock', '>', 0));
+            });
         }
     }
 
