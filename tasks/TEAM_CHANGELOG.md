@@ -779,6 +779,6 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 ## 30 August 2026 — One-command owner qualification runner
 
 - **Manual command minimized** — Added repository-root `run.sh`; after pulling `rhythm-uat`, the owner can run `./run.sh` (or `bash run.sh`) instead of typing the qualification commands individually.
-- **Safe execution boundary** — The runner checks the branch and clean tree, installs locked dependencies, performs read-only migration/route checks, forces destructive PHP tests onto in-memory SQLite, then runs automation, build and dependency audits sequentially.
+- **Safe execution boundary** — The runner checks the branch and clean tree, installs locked dependencies, runs migration and status only against the fixed disposable database `rhythm_phase11_qa`, forces destructive PHP tests onto in-memory SQLite, then runs automation, build and dependency audits sequentially.
 - **Manual gate retained** — Real browser responsive/accessibility/conversion review and any owner approval remain outside the script; no persistent destructive migration, reset or deployment is performed.
 - **Static guard added** — Phase 11 automation now verifies the runner includes the required checks and excludes `migrate:fresh`, `db:wipe` and `RefreshDatabase`.

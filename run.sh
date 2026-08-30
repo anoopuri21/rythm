@@ -34,12 +34,24 @@ if [[ ! -f vendor/autoload.php ]]; then
 fi
 npm ci --no-audit --no-fund
 
-step 'Safe application configuration and read-only route/migration checks'
-php artisan config:clear --no-ansi
-# This is read-only. It reports the currently configured database migrations;
-# the destructive PHP suite below is forced to isolated in-memory SQLite.
-php artisan migrate:status --no-ansi
-php artisan route:list --path=account/stock-alerts --no-ansi
+step 'Isolated Phase 11 MySQL migration and route checks'
+# The database name is deliberately fixed so this script cannot migrate the
+# persistent UAT database by accident. DB host/user/password continue to come
+# from the owner's local .env (or may be supplied as PHASE11_QA_DB_* variables).
+QA_DB_DATABASE="${PHASE11_QA_DB_DATABASE:-rhythm_phase11_qa}"
+[[ "$QA_DB_DATABASE" == "rhythm_phase11_qa" ]] || fail 'QA database must be exactly rhythm_phase11_qa.'
+(
+    export DB_CONNECTION="${PHASE11_QA_DB_CONNECTION:-mysql}"
+    export DB_DATABASE="$QA_DB_DATABASE"
+    [[ -z "${PHASE11_QA_DB_HOST:-}" ]] || export DB_HOST="$PHASE11_QA_DB_HOST"
+    [[ -z "${PHASE11_QA_DB_PORT:-}" ]] || export DB_PORT="$PHASE11_QA_DB_PORT"
+    [[ -z "${PHASE11_QA_DB_USERNAME:-}" ]] || export DB_USERNAME="$PHASE11_QA_DB_USERNAME"
+    [[ -z "${PHASE11_QA_DB_PASSWORD:-}" ]] || export DB_PASSWORD="$PHASE11_QA_DB_PASSWORD"
+    php artisan config:clear --no-ansi
+    php artisan migrate --force --no-ansi
+    php artisan migrate:status --no-ansi
+    php artisan route:list --path=account/stock-alerts --no-ansi
+)
 
 step 'Focused Phase 11 and account tests in isolated in-memory SQLite'
 env \

@@ -101,6 +101,9 @@ test('Owner-side run.sh keeps qualification bounded and avoids persistent destru
   assert.match(runner, /git branch --show-current/);
   assert.match(runner, /composer validate --strict/);
   assert.match(runner, /npm ci --no-audit --no-fund/);
+  assert.match(runner, /QA_DB_DATABASE="\$\{PHASE11_QA_DB_DATABASE:-rhythm_phase11_qa\}"/);
+  assert.match(runner, /QA database must be exactly rhythm_phase11_qa/);
+  assert.match(runner, /migrate --force --no-ansi/);
   assert.match(runner, /migrate:status/);
   assert.match(runner, /route:list --path=account\/stock-alerts/);
   assert.match(runner, /PhaseElevenCustomerExperienceTest\.php tests\/Feature\/AccountTest\.php/);

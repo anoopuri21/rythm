@@ -35,7 +35,7 @@ Windows PowerShell/Git Bash setup mein agar direct execution blocked ho, to:
 bash run.sh
 ```
 
-`run.sh` automatically branch/clean-tree check, Composer/npm setup, read-only migration/route checks, isolated in-memory SQLite focused/full PHP tests, automation, build and dependency audits run karta hai. Browser responsive/accessibility/conversion review hi manual rahega. Script persistent database par destructive migration/test nahi chalata.
+`run.sh` automatically branch/clean-tree check, Composer/npm setup, **sirf `rhythm_phase11_qa` isolated MySQL database par migration + status**, route checks, isolated in-memory SQLite focused/full PHP tests, automation, build and dependency audits run karta hai. Browser responsive/accessibility/conversion review hi manual rahega. Script persistent UAT database par destructive migration/test nahi chalata. MySQL host/user/password local `.env` se liye jaate hain; koi credential Git mein nahi rakha jaata.
 
 ### Common safety rules
 
