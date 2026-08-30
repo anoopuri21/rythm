@@ -36,8 +36,9 @@ unapproved legal/tax/shipping/warranty promises remain outside this gate.
 The customer-management slice was introduced at `29bbad1`; the current hardened
 candidate is pushed at `00c08f8` with supervisor checkpoint `b716b01`. Product pages
 now provide a self-canonical URL and variant-aware availability metadata, with focused
-PHP coverage added for the rendered canonical and variant-availability output. Shared
-cards also suppress false sale prices and expose non-positive stock as unavailable.
+PHP coverage added for the rendered canonical and variant-availability output. Account
+stock-alert results use a separate bounded paginator, while shared cards suppress false
+sale prices and expose non-positive stock as unavailable.
 
 ## Arena-local evidence
 

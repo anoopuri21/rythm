@@ -58,7 +58,7 @@
                         ['Orders', $orders->count(), '/'],
                         ['Wishlist', $wishlistCount, '/wishlist'],
                         ['Addresses', $addresses->count(), '#addresses'],
-                        ['Stock alerts', $backInStockSubscriptions->count(), '#stock-alerts'],
+                        ['Stock alerts', $stockAlertCount, '#stock-alerts'],
                         ['Member since', auth()->user()->created_at?->format('Y'), '/'],
                     ] as [$label, $value, $href])
                         <div class="rounded-3xl border border-ink/10 bg-white p-6 text-center">
@@ -262,6 +262,9 @@
                             </div>
                         @endforeach
                     </div>
+                    @if($backInStockSubscriptions->hasPages())
+                        <div class="mt-6">{{ $backInStockSubscriptions->onEachSide(1)->links() }}</div>
+                    @endif
                 @else
                     <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
                         <p class="text-4xl" aria-hidden="true">🔔</p>

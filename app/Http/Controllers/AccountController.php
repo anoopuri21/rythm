@@ -33,6 +33,10 @@ final class AccountController extends Controller
             'robots' => 'noindex, follow',
         ]);
 
+        $stockAlertQuery = BackInStockSubscription::query()
+            ->where('user_id', $user->id)
+            ->pending();
+
         return view('account.index', [
             'orders' => Order::query()
                 ->where('user_id', $user->id)
@@ -42,12 +46,11 @@ final class AccountController extends Controller
                 ->paginate(10),
             'wishlistCount' => $wishlists->countFor($user->id),
             'addresses' => $addresses->forUser($user->id),
-            'backInStockSubscriptions' => BackInStockSubscription::query()
-                ->where('user_id', $user->id)
-                ->pending()
+            'stockAlertCount' => (clone $stockAlertQuery)->count(),
+            'backInStockSubscriptions' => $stockAlertQuery
                 ->with(['product', 'variant'])
                 ->orderByDesc('created_at')
-                ->get(),
+                ->paginate(12, ['*'], 'stock_alert_page'),
         ]);
     }
 

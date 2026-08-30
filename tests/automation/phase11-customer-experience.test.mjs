@@ -99,6 +99,9 @@ test('Phase 11 product recommendations keep truthful empty states and current pr
   assert.match(minimalCard, /\$stock > 0 \? 'In stock' : 'Out of stock'/);
   assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
   assert.match(accountController, /cancelBackInStockAlert/);
+  assert.match(accountController, /stockAlertCount/);
+  assert.match(accountController, /paginate\(12, \['\*'\], 'stock_alert_page'\)/);
+  assert.match(accountView, /hasPages\(\)/);
   assert.match(accountView, /account\.stock-alerts\.destroy/);
   assert.match(accountView, /not a marketing subscription/i);
   assert.match(plan, /Gift cards.*abandoned-cart marketing.*price-drop alerts/is);
