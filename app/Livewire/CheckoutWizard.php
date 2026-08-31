@@ -88,8 +88,18 @@ final class CheckoutWizard extends Component
         ];
     }
 
-    public function selectAddress(int $addressId): void
+    public function selectAddress(int $addressId, AddressService $addresses): void
     {
+        abort_unless(auth()->check(), 403);
+
+        if (! $addresses->forUser((int) auth()->id())->contains('id', $addressId)) {
+            $this->addressId = null;
+            $this->error = 'Please choose a valid delivery address.';
+            $this->step = 1;
+
+            return;
+        }
+
         $this->addressId = $addressId;
         $this->error = null;
         $this->step = 2;
@@ -121,6 +131,7 @@ final class CheckoutWizard extends Component
 
     public function applyCoupon(CouponService $coupons): void
     {
+        abort_unless(auth()->check(), 403);
         $this->couponError = null;
 
         try {

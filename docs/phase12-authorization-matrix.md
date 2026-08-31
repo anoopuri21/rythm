@@ -16,7 +16,7 @@
 | Wishlist | Authenticated | Auth route group and user-scoped service queries; writes accept only active products | Verify no cross-user IDs or inactive product IDs are accepted |
 | Account/profile/password/address/stock alerts | Authenticated | Auth route group; address and subscription services check user ownership | Feature tests for every `{address}`/`{subscription}` action |
 | Notifications | Authenticated | User relation is constrained; notification ID fetched through user relation | Verify mutation IDs cannot cross users |
-| Checkout and signed success page | Authenticated | Auth route group; signed success URL; order ownership check | Verify signature expiry, user binding and sensitive output |
+| Checkout and signed success page | Authenticated | Auth route group; `CheckoutWizard` verifies selected address ownership before advancing; signed success URL; order ownership check | Verify signature expiry, user binding and sensitive output |
 | Orders, invoice, cancel, retry payment | Temporary signed link for read-only guest detail/invoice; cancel/retry mutations require `auth` plus route throttles | `OrderController::authorizeView`, owner checks for mutations, temporary signed lookup | Verify every action separately and confirm owner/runtime behavior |
 | Guest order lookup | Public write/read journey | Order number plus email match, temporary signed redirect, throttle | Check enumeration resistance and response uniformity |
 | Returns | Authenticated order owner | Owner checks in controller and service; disabled-by-default settings remain | Verify order/item/reason ownership and state transitions |
@@ -37,7 +37,7 @@
 
 ## Livewire action review list
 
-`AddToCart`, `CartBadge`, `CartDrawer`, `CartPage`, `CheckoutWizard`, `ProductQuestionSection`, `ReviewSection`, `ShopIndex`, `WishlistBadge`, `WishlistButton` and `WishlistPage` require action-by-action review. The baseline found authenticated user resolution and product/ownership service boundaries in the main commerce components; this is not a substitute for independent runtime tests.
+`AddToCart`, `CartBadge`, `CartDrawer`, `CartPage`, `CheckoutWizard`, `ProductQuestionSection`, `ReviewSection`, `ShopIndex`, `WishlistBadge`, `WishlistButton` and `WishlistPage` require action-by-action review. The baseline found authenticated user resolution and product/ownership service boundaries in the main commerce components. `CheckoutWizard::selectAddress` now verifies that the selected address belongs to the authenticated user before changing checkout state, and coupon application has an explicit authentication guard. This is not a substitute for independent runtime tests.
 
 ## Acceptance rule
 

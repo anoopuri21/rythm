@@ -39,6 +39,7 @@
 | SEC12-005 | Filament uploads have MIME/type/size limits, but malware scanning and retention are not established by this baseline | Filament resources and media configuration | Require an explicit hosting/business decision before introducing a scanner or retention policy |
 | SEC12-006 | Account export/deletion and retention rules are not yet implemented | Phase 12 runbook and current models | Human/legal gate; do not implement from inference |
 | SEC12-007 | Cart/order services needed an explicit product-variant ownership boundary; wishlist writes needed an active-product boundary | `CartService.php`, `OrderService.php`, `WishlistService.php` | Corrected with focused static/feature regression coverage; owner PHP runtime verification remains required |
+| SEC12-008 | Checkout address selection must not advance state for another customer’s address; coupon application is an authenticated checkout action | `app/Livewire/CheckoutWizard.php` | Corrected with owner-scoped address lookup, explicit auth guard and focused feature/static coverage; owner PHP runtime verification remains required |
 
 ## Required next checks
 

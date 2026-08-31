@@ -264,6 +264,26 @@ class CheckoutTest extends TestCase
             ->assertHasErrors(['name' => 'required', 'pincode' => 'regex']);
     }
 
+    public function test_checkout_rejects_another_customers_address_before_place_order(): void
+    {
+        $other = User::factory()->create();
+        $address = app(AddressService::class)->store($other->id, [
+            'name' => 'Other Customer',
+            'phone' => '9876543210',
+            'line1' => '99, Private Lane',
+            'city' => 'New Delhi',
+            'state' => 'Delhi',
+            'pincode' => '110001',
+            'is_default' => true,
+        ]);
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $address->id)
+            ->assertSet('addressId', null)
+            ->assertSet('step', 1)
+            ->assertSet('error', 'Please choose a valid delivery address.');
+    }
+
     public function test_failed_payment_marks_order_failed_and_keeps_cart(): void
     {
         $this->fillCart();

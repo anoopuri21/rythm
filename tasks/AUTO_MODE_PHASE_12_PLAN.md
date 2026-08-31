@@ -30,7 +30,7 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 
 ### Chunk 1 — safe authorization and input-boundary remediation
 
-**Status:** IN PROGRESS — review/Q&A write limits, explicit order-mutation auth boundaries and CSP origin/framing tightening added; remaining action-boundary/runtime review continues
+**Status:** IN PROGRESS — review/Q&A write limits, explicit order-mutation auth boundaries, checkout address ownership and CSP origin/framing tightening added; remaining action-boundary/runtime review continues
 
 - Correct only evidence-backed IDOR, authorization, validation, CSRF, throttling and upload-boundary defects.
 - Add focused regression coverage for every corrected boundary.

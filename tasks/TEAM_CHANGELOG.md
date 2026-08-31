@@ -900,3 +900,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Future backlog created** — Advanced scalability/resilience, full observability, broad CI/CD, full penetration testing, extended compatibility/accessibility work, analytics/marketing and unapproved legal/privacy workflows are deferred unless a real launch blocker appears.
 - **Mandatory gates preserved** — Payment/order/inventory correctness, authorization, owner-approved legal/tax/privacy behavior, backup/restore, rollback, owner runtime/UAT and go/no-go evidence cannot be deferred or bypassed.
 - **Documents updated** — `tasks/MVP_LAUNCH_PLAN.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/CANONICAL_PHASE_SEQUENCE.md`, `docs/task-priority.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the current Phase 12 plan now reflect the shortened track. No production-readiness claim is made.
+
+## 31 August 2026 — Manual Phase 12 checkout ownership continuation
+
+- **Checkout state boundary tightened** — `CheckoutWizard::selectAddress` now verifies the address belongs to the authenticated customer before advancing to payment; invalid selection resets to the address step with a safe message.
+- **Authenticated coupon action enforced** — `CheckoutWizard::applyCoupon` now has an explicit authentication guard in addition to the protected checkout route.
+- **Regression/documentation added** — A focused PHP test and static Phase 12 contract cover cross-customer address rejection; the authorization matrix and threat model record the new boundary.
+- **Arena checks passed** — Phase 11 customer-experience automation **7/7** and security automation **10/10** passed; PHP runtime tests remain owner-side because PHP/Composer are unavailable in Arena.
+- **Scope retained** — No order, payment, address, customer or persistent UAT data was changed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
