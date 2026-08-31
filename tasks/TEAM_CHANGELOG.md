@@ -891,3 +891,12 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Read-only order links bounded** — Customer-facing order invoices and Filament-generated invoice links now use temporary 15-minute signed URLs; authenticated owners retain their direct access path.
 - **Regression contract added** — Static security automation now rejects permanent invoice links and requires the bounded signed route in both customer and admin views.
 - **Scope retained** — No customer/order records, payment state, credentials or persistent UAT data were changed; owner PHP/runtime verification remains required.
+
+## 31 August 2026 — MVP launch-track simplification
+
+- **Enterprise roadmap → short practical MVP path** — The owner requested that remaining work be reduced to the minimum needed for a functional client-facing e-commerce demo and a safe eventual launch.
+- **Canonical phases 12–17 streamlined** — Phase 12 now covers only core security, authorization, privacy and payment/order blockers; Phase 13 practical performance smoke; Phase 14 minimum operations; Phase 15 cPanel/shared-host release packaging; Phase 16 focused client UAT; Phase 17 evidence review and go/no-go.
+- **Phase 18 remains separately inactive** — Deployment still requires an explicit owner activation after Phase 17 acceptance; Auto Mode and Agent 10 remain paused/inactive.
+- **Future backlog created** — Advanced scalability/resilience, full observability, broad CI/CD, full penetration testing, extended compatibility/accessibility work, analytics/marketing and unapproved legal/privacy workflows are deferred unless a real launch blocker appears.
+- **Mandatory gates preserved** — Payment/order/inventory correctness, authorization, owner-approved legal/tax/privacy behavior, backup/restore, rollback, owner runtime/UAT and go/no-go evidence cannot be deferred or bypassed.
+- **Documents updated** — `tasks/MVP_LAUNCH_PLAN.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/CANONICAL_PHASE_SEQUENCE.md`, `docs/task-priority.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the current Phase 12 plan now reflect the shortened track. No production-readiness claim is made.

@@ -3,13 +3,15 @@
 **Established:** 26 August 2026
 **Authority:** Agent 0
 **Status:** CANONICAL — supersedes conflicting phase numbering in older planning documents
+**MVP launch track:** `tasks/MVP_LAUNCH_PLAN.md`
+**Delivery posture:** short, manual and launch-blocker-focused; enterprise enhancements are deferred unless they become a real safety or release blocker
 
 ## Source-of-truth rule
 
 1. `tasks/MASTER_PROJECT_TRACKER.md` is authoritative for delivery phase number, current status and acceptance.
 2. This document is authoritative for the ordered phase sequence and crosswalk.
 3. `tasks/ENTERPRISE_ECOMMERCE_ROADMAP.md` is a capability inventory. Its former phase numbers are now **E-series workstream IDs** and must not be used as delivery phase numbers.
-4. Completed delivery phases 0 through 5 retain their accepted numbers. They will not be retroactively renumbered.
+4. Completed delivery phases retain their accepted numbers (currently 0 through 11, plus 6A). They will not be retroactively renumbered.
 5. A later phase may close inherited tasks from several E-series workstreams, but every deferred task must remain traceable in the crosswalk.
 6. Agent 10 remains inactive until explicit deployment activation. Canonical sequencing does not activate deployment.
 
@@ -31,12 +33,12 @@
 | 9 | Central notifications and external-integration event architecture | E4 | COMPLETE |
 | 10 | Shipping, fulfillment, returns and India tax workflow | E5 | COMPLETE |
 | 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | COMPLETE |
-| 12 | Security, privacy, compliance and accessibility hardening | E8 plus cross-cutting accessibility/legal gates | PENDING |
-| 13 | Performance, scalability and resilience | E9 | PENDING |
-| 14 | Observability, backups and production operations | E10 | PENDING |
-| 15 | CI/CD and shared-hosting release packaging | E11 | PENDING |
-| 16 | Full QA, compatibility, UAT and release candidate | E12 | PENDING |
-| 17 | Production-readiness review and Agent 0 sign-off decision | All workstreams and release gates | PENDING |
+| 12 | MVP core safety: authorization, privacy/payment/order blockers, basic security and approved content boundaries | Launch-blocking subset of E8 plus cross-cutting gates | IN PROGRESS |
+| 13 | Practical storefront, cart and checkout performance smoke checks | Launch-blocking subset of E9 | PENDING |
+| 14 | Minimum operations: environment, SSL, backup/restore, logs, queue/cron and rollback | Launch-blocking subset of E10 | PENDING |
+| 15 | cPanel/shared-host release package and migration checklist | Launch-blocking subset of E11 | PENDING |
+| 16 | Focused client UAT: browse, search, cart, checkout, payment, order, invoice and admin essentials | Launch-blocking subset of E12 | PENDING |
+| 17 | Final evidence review and explicit go/no-go decision | Required release gates across all workstreams | PENDING |
 | 18 | Shared-hosting deployment, launch and stabilization | E13; Agent 10 by explicit activation only | INACTIVE |
 
 ## Legacy workstream crosswalk
@@ -51,21 +53,23 @@
 | E5 | Shipping, fulfillment, returns and tax | 10 |
 | E6 | Customer experience, search and merchandising | 11 |
 | E7 | Admin governance, RBAC and auditability | 7 |
-| E8 | Security, privacy and compliance | 12 |
-| E9 | Performance, scalability and resilience | 13 |
-| E10 | Observability and production operations | 14 |
-| E11 | CI/CD, infrastructure and deployment preparation | 0B shared-host constraints; remaining packaging/automation in 15 |
-| E12 | QA, accessibility, compatibility and release candidate | Accessibility hardening in 12; per-phase QA plus final phase 16 |
+| E8 | Security, privacy and compliance | Launch blockers only in 12; advanced hardening and unapproved legal/privacy workflows are future backlog |
+| E9 | Performance, scalability and resilience | Practical storefront/cart/checkout smoke in 13; advanced scale/resilience is future backlog |
+| E10 | Observability and production operations | Minimum backup/restore, logs, queue/cron and rollback in 14; full observability is future backlog |
+| E11 | CI/CD, infrastructure and deployment preparation | Shared-host release package/checklist in 15; broad CI/CD and automation are future backlog |
+| E12 | QA, accessibility, compatibility and release candidate | Focused client UAT in 16; extended matrices and non-blocking polish are future backlog |
 | E13 | Production launch and stabilization | 18 after phase 17 sign-off and explicit deployment activation |
 
-## Dependency rationale for the next phases
+## Practical dependency rationale for the next phases
 
-- **Phase 6 precedes search/performance qualification:** realistic catalogue volume, normalized source data and media reports are needed before meaningful search, merchandising and load evidence.
-- **Phase 7 precedes expanded financial/operational admin workflows:** least-privilege staff roles and auditability must exist before adding finance, support and fulfillment powers.
-- **Phase 8 precedes refund notifications and return orchestration:** gateway refund and reconciliation truth must exist before downstream systems report financial outcomes.
-- **Phase 9 precedes later workflow messaging:** fulfillment, review and payment events should use one idempotent notification architecture rather than adding more fragmented mail triggers.
-- **Phase 10 requires professional business approval:** GST, HSN, shipping, return, replacement and warranty rules cannot be invented by implementation agents.
-- **Phases 12–17 are mandatory release gates:** they cannot be collapsed into deployment.
+- **Phase 12 first:** payment/order correctness, authorization, customer-data boundaries and approved legal/content behavior are release blockers.
+- **Phase 13 depends on the real storefront flow:** smoke the homepage, catalogue/search, cart and checkout rather than starting a broad load-testing programme.
+- **Phase 14 depends on the candidate build:** verify the minimum shared-host runtime, backup/restore, queue/cron, logs and rollback before packaging.
+- **Phase 15 packages the verified candidate:** include the commit/version, environment checklist, migrations, storage/media steps and rollback notes for cPanel/shared hosting.
+- **Phase 16 is owner-facing UAT:** test only the critical client journeys and admin essentials needed for a credible demo/release candidate.
+- **Phase 17 is a review, not deployment:** Agent 0 records the evidence-based decision; Phase 18 stays inactive until the owner explicitly activates deployment.
+- **Phases 12–17 are mandatory safety/release gates:** they may be short, but they cannot be bypassed or collapsed into deployment.
+- Existing E-series capabilities not needed for these gates remain traceable as future backlog; no enterprise completeness claim is made for the MVP track.
 
 ## Phase 6 activation decisions — RESOLVED 26 August 2026
 
@@ -73,4 +77,4 @@
 2. The pipeline may be developed against bounded public reference data while commercial rights to competitor text/images remain unresolved.
 3. Source-access constraints: public pages only, no authentication bypass, no CAPTCHA bypass and respectful rate limiting.
 
-Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures. The owner additionally authorized continuous sequential Agent 0 execution through Phase 17; this does not waive gates, professional approvals or activate Agent 10.
+Commercial content and image rights remain a production-data gate even if the technical pipeline is built and tested with bounded fixtures. The owner has since required manual, short and practical execution; no continuous/autonomous execution is implied, and this does not waive gates, professional approvals or activate Agent 10.

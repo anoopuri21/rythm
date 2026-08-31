@@ -1,4 +1,4 @@
-# Auto Mode Execution Plan — Phase 12 Security, Privacy, Compliance and Accessibility
+# Manual Execution Plan — Phase 12 MVP Safety, Authorization, Payment/Order and Privacy Blockers
 
 **Status:** IN PROGRESS — manual owner-authorized continuation; Auto Mode remains paused
 **Canonical phase:** 12
@@ -10,7 +10,7 @@
 
 ## Authority and scope
 
-This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the Phase 12 security/privacy/compliance requirements. Auto Mode may make safe, reversible technical corrections, but it may not invent legal text, change financial/customer-rights rules, expose or rotate credentials, perform destructive persistent-UAT work, or activate deployment.
+This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the MVP launch track. It covers only launch-blocking safety, authorization, payment/order integrity, privacy boundaries and evidence-backed accessibility defects. Manual execution may make safe, reversible technical corrections, but it may not invent legal text, change financial/customer-rights rules, expose or rotate credentials, perform destructive persistent-UAT work, or activate deployment. Advanced hardening and enterprise completeness remain future backlog.
 
 ## Chunk sequence
 
@@ -42,17 +42,18 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 - Add or repair CI checks for dependencies, secrets and security without embedding credentials.
 - Keep live gateway, credential rotation and production actions human-gated.
 
-### Chunk 3 — privacy and accessibility decisions
+### Chunk 3 — MVP privacy, legal and accessibility blockers
 
-- Document PII classification, retention, deletion/anonymization and export behavior.
-- Do not implement account deletion/export or a consent banner until exact retention/legal behavior and actual tracking use are approved.
-- Remediate evidence-backed accessibility issues and add regression coverage.
+- Record the minimum PII/data-flow and customer-data ownership boundaries needed for the enabled demo flows.
+- Obtain owner/professional decisions for any legal, tax, return, warranty or privacy text required by enabled behavior; keep unknown behavior disabled.
+- Do not implement account deletion/export, detailed retention tooling or a consent banner until exact retention/legal behavior and actual tracking use are approved.
+- Remediate only evidence-backed critical accessibility blockers and add regression coverage; defer non-blocking polish.
 
 ### Chunk 4 — independent Phase 12 qualification
 
 - Run applicable static/automation suites, PHP/Composer checks in the disposable external QA copy and owner-side runtime/UAT gates.
 - Require independent review and a redacted evidence pack.
-- Mark Phase 12 `COMPLETE` only after no unresolved critical/high finding, approved privacy/legal traceability, accessibility evidence and all mandatory gates pass.
+- Mark Phase 12 `COMPLETE` only after no unresolved critical/high blocker, required privacy/legal traceability, critical accessibility evidence and payment/order/authorization gates pass. Full penetration testing and advanced hardening are not MVP prerequisites.
 
 ## Stop conditions
 
