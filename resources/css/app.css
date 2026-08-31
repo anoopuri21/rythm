@@ -1827,7 +1827,8 @@ input:focus-visible { outline: none; }
 .recent-purchase__detail { margin: .5rem 0 0; color: var(--color-muted); font-size: .72rem; line-height: 1.55; }
 
 @media (max-width: 640px) {
-    .top-bar__inner { min-height: 32px; padding: 0 16px; }
+    .top-bar__inner { min-height: 32px; padding: 0 16px; flex-wrap: wrap; justify-content: center; row-gap: 0; }
+    .top-bar__contact { min-width: 0; flex: 1 1 auto; justify-content: center; flex-wrap: wrap; }
     .top-bar__contact, .top-bar__socials { gap: .75rem; }
     .top-bar__link { font-size: .62rem; }
     .top-bar__link span { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
