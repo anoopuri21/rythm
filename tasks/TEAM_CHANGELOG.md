@@ -873,3 +873,21 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Popup loading polished** — The offer image now uses lazy loading with low fetch priority so it does not compete with the hero for initial rendering; fixed dimensions remain declared to avoid layout shift.
 - **Interaction polish added** — Popup close is idempotent, restores prior focus when possible, and the recent-purchase rotation stops while the tab is hidden to avoid unnecessary background work.
 - **Reduced-motion polish retained** — Marquee compositor hints are released when motion is reduced, while the popup and recent-card transitions remain disabled as appropriate.
+
+## 31 August 2026 — Manual Phase 12 action-boundary continuation
+
+- **Owner resume scope recorded** — Manual Phase 12 application development resumed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
+- **Order mutation routes hardened** — Customer payment-retry and cancellation POST routes now require the explicit `auth` middleware in addition to their existing throttles; controller ownership checks remain defense in depth.
+- **Regression/documentation contract updated** — Static automation and the Phase 12 authorization/threat-model records now require the explicit route boundary. PHP/runtime qualification remains owner-side.
+
+## 31 August 2026 — Manual Phase 12 security-configuration continuation
+
+- **Order mutation boundary retained** — The manually resumed hardening pass keeps cancel/retry-payment routes explicitly authenticated and throttled.
+- **CSP surface reduced conservatively** — Unused Google/CDN script origins were removed and `frame-ancestors 'self'` was added; existing inline Alpine/Livewire allowances remain because runtime compatibility evidence for nonce migration is not available in Arena.
+- **Scope boundary retained** — No Auto Mode activation, deployment, Phase 18/Agent 10 work, credential change, production operation or destructive UAT operation was performed.
+
+## 31 August 2026 — Manual Phase 12 order-link privacy hardening
+
+- **Read-only order links bounded** — Customer-facing order invoices and Filament-generated invoice links now use temporary 15-minute signed URLs; authenticated owners retain their direct access path.
+- **Regression contract added** — Static security automation now rejects permanent invoice links and requires the bounded signed route in both customer and admin views.
+- **Scope retained** — No customer/order records, payment state, credentials or persistent UAT data were changed; owner PHP/runtime verification remains required.

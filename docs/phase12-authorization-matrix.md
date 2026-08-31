@@ -17,7 +17,7 @@
 | Account/profile/password/address/stock alerts | Authenticated | Auth route group; address and subscription services check user ownership | Feature tests for every `{address}`/`{subscription}` action |
 | Notifications | Authenticated | User relation is constrained; notification ID fetched through user relation | Verify mutation IDs cannot cross users |
 | Checkout and signed success page | Authenticated | Auth route group; signed success URL; order ownership check | Verify signature expiry, user binding and sensitive output |
-| Orders, invoice, cancel, retry payment | Owner, signed guest link for read-only detail | `OrderController::authorizeView`, owner checks for mutations, temporary signed lookup | Verify every action separately; add missing abuse limits only if justified |
+| Orders, invoice, cancel, retry payment | Temporary signed link for read-only guest detail/invoice; cancel/retry mutations require `auth` plus route throttles | `OrderController::authorizeView`, owner checks for mutations, temporary signed lookup | Verify every action separately and confirm owner/runtime behavior |
 | Guest order lookup | Public write/read journey | Order number plus email match, temporary signed redirect, throttle | Check enumeration resistance and response uniformity |
 | Returns | Authenticated order owner | Owner checks in controller and service; disabled-by-default settings remain | Verify order/item/reason ownership and state transitions |
 | Reviews and product Q&A | Authenticated | Livewire components require auth; services bind user/product | Verify verified-purchase/moderation and cross-product IDs |

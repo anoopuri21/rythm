@@ -27,13 +27,14 @@ final class SecurityHeaders
 
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com data:",
             "img-src 'self' data: blob: https:",
             "connect-src 'self' https://api.razorpay.com https://fonts.googleapis.com https://videos.pexels.com",
             "media-src 'self' https://videos.pexels.com blob:",
             'frame-src https://checkout.razorpay.com',
+            "frame-ancestors 'self'",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

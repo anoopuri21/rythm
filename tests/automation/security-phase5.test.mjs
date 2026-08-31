@@ -9,6 +9,8 @@ const paymentEvents = read('app/Services/PaymentEventService.php');
 const orderService = read('app/Services/OrderService.php');
 const gateway = read('app/Payment/RazorpayGateway.php');
 const layout = read('resources/views/layouts/app.blade.php');
+const orderView = read('resources/views/orders/show.blade.php');
+const adminOrderView = read('app/Filament/Resources/OrderResource/Pages/ViewOrder.php');
 const config = read('config/services.php');
 
 await test('Razorpay webhook authenticates the exact raw body before decoding JSON', () => {
@@ -49,6 +51,21 @@ await test('Razorpay config has one environment-backed namespace', () => {
     assert.match(config, /env\('RAZORPAY_KEY_SECRET'\)/);
     assert.match(config, /env\('RAZORPAY_WEBHOOK_SECRET'\)/);
     assert.doesNotMatch(read('config/rythme.php'), /RAZORPAY|razorpay/);
+});
+
+await test('CSP framing and script origins stay bounded', () => {
+    const headers = read('app/Http/Middleware/SecurityHeaders.php');
+
+    assert.match(headers, /frame-ancestors 'self'/);
+    assert.match(headers, /script-src[^\n]*https:\/\/checkout\.razorpay\.com/);
+    assert.doesNotMatch(headers, /cdn\.jsdelivr\.net|www\.google\.com|www\.gstatic\.com/);
+});
+
+await test('customer-facing invoice links are time-bounded', () => {
+    assert.match(orderView, /temporarySignedRoute\('orders\.invoice', now\(\)->addMinutes\(15\)/);
+    assert.match(adminOrderView, /temporarySignedRoute\('orders\.invoice', now\(\)->addMinutes\(15\)/);
+    assert.doesNotMatch(orderView, /signedRoute\('orders\.invoice'/);
+    assert.doesNotMatch(adminOrderView, /signedRoute\('orders\.invoice'/);
 });
 
 await test('rich HTML uses a read/write sanitizer and raw head scripts are disabled', () => {

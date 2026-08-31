@@ -159,10 +159,10 @@ Route::post('/newsletter', NewsletterSubscriptionController::class)
 // Order detail + tracking — owner, signed link, or guest lookup result
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])
-    ->middleware('throttle:3,1')
+    ->middleware(['auth', 'throttle:3,1'])
     ->name('orders.retry-payment');
 Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
-    ->middleware('throttle:5,1')
+    ->middleware(['auth', 'throttle:5,1'])
     ->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 

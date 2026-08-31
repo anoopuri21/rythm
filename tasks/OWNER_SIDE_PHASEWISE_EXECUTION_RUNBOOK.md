@@ -640,7 +640,7 @@ Use `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` as the contr
 
 # Phase 12 — Security, privacy, compliance and accessibility hardening
 
-**Status:** IN PROGRESS — manual homepage UI/UX task planned while Auto Mode is paused.
+**Status:** IN PROGRESS — manual homepage UI/UX implementation completed; owner-side runtime/browser gates remain while Auto Mode is paused.
 **Goal:** Production-focused OWASP/Laravel security, privacy and legal-readiness review.
 
 ## Tasks

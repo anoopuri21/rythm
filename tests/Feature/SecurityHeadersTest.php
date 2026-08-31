@@ -34,7 +34,9 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString("default-src 'self'", $csp);
         $this->assertStringContainsString("object-src 'none'", $csp);
         $this->assertStringContainsString("frame-src https://checkout.razorpay.com", $csp);
+        $this->assertStringContainsString("frame-ancestors 'self'", $csp);
         $this->assertStringContainsString("form-action 'self'", $csp);
+        $this->assertStringNotContainsString('cdn.jsdelivr.net', $csp);
     }
 
     public function test_csrf_token_present_on_all_forms(): void

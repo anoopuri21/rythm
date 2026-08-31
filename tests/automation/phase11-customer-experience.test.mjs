@@ -101,7 +101,8 @@ test('Phase 12 customer writes have scoped abuse limits', () => {
     /account\/profile[\s\S]{0,140}throttle:10,1/,
     /account\/password[\s\S]{0,140}throttle:5,1/,
     /account\/addresses[\s\S]{0,160}throttle:10,1/,
-    /orders\/\{order\}\/cancel[\s\S]{0,140}throttle:5,1/,
+    /orders\/\{order\}\/retry-payment[\s\S]{0,140}auth[\s\S]{0,80}throttle:3,1/,
+    /orders\/\{order\}\/cancel[\s\S]{0,140}auth[\s\S]{0,80}throttle:5,1/,
     /Route::post\('\/logout'[\s\S]{0,100}auth[\s\S]{0,100}throttle:10,1/,
   ]) assert.match(routes, route);
 });
