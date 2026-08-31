@@ -100,6 +100,71 @@ function initNewsletter() {
     });
 }
 
+function initOfferPopup() {
+    const popup = document.querySelector('[data-offer-popup]');
+    if (!popup || popup.dataset.initialized === 'true') return;
+
+    popup.dataset.initialized = 'true';
+    const closeButton = popup.querySelector('[data-offer-popup-close]');
+    const dialog = popup.querySelector('.offer-popup__dialog');
+    const storageKey = popup.dataset.offerPopupStorageKey || 'rythme-offer-popup-closed-at-v1';
+    const dayInMilliseconds = 24 * 60 * 60 * 1000;
+
+    if (!closeButton || !dialog) return;
+
+    try {
+        const closedAt = Number(window.localStorage.getItem(storageKey));
+        if (Number.isFinite(closedAt) && closedAt > 0 && Date.now() - closedAt < dayInMilliseconds) {
+            popup.remove();
+            return;
+        }
+    } catch {
+        // Show the offer when browser storage is unavailable; close remains page-local.
+    }
+
+    popup.classList.remove('is-pending');
+    popup.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('offer-popup-open');
+
+    const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusables = [...dialog.querySelectorAll(focusableSelector)];
+    const close = () => {
+        try {
+            window.localStorage.setItem(storageKey, String(Date.now()));
+        } catch {
+            // The popup still closes for the current page when storage is blocked.
+        }
+
+        popup.classList.add('is-closing');
+        popup.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('offer-popup-open');
+        window.setTimeout(() => popup.remove(), 220);
+    };
+
+    closeButton.addEventListener('click', close);
+    popup.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            close();
+            return;
+        }
+
+        if (event.key !== 'Tab' || focusables.length < 2) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+
+    closeButton.focus({ preventScroll: true });
+}
+
 function initRecentPurchasePreview() {
     const preview = document.querySelector('[data-recent-purchase-demo]');
     if (!preview || preview.dataset.initialized === 'true') return;
@@ -186,6 +251,7 @@ export function initUi() {
     initNavbar();
     initCountdowns();
     initNewsletter();
+    initOfferPopup();
     initRecentPurchasePreview();
     initScrollTop();
 }

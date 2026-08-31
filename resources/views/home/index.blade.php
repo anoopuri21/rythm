@@ -22,4 +22,5 @@
     @include('home._recently-launched', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._brands', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._confidence', ['homepage' => $homepage])
+    @include('home._offer-popup', ['homepage' => $homepage])
 @endsection

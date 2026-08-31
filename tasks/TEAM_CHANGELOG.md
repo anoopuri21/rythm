@@ -860,3 +860,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Demo preview boundary retained** — The site-wide recent-purchase component contains five synthetic front-end-only cards, shows unit price, rotates every 10 seconds with fade transitions, labels itself `Demo preview`, and persists browser dismissal without Admin/customer/order data.
 - **Scope retained** — No real contact values, customer names, purchases, order totals, production social proof or autonomous/deployment work were introduced. Runtime/browser/PHP/MySQL qualification remains open.
 - **Arena verification** — The targeted homepage contract passed **4/4** and the Vite production build passed. Full Node automation passed **114/116**; two existing supervisor assertions still expect an executing lifecycle even though the owner-approved Auto Mode state is paused, so they remain outside this homepage scope.
+
+## 31 August 2026 — Homepage offer pop-up clarification and implementation
+
+- **Owner clarification received** — Use an existing homepage `bestDeals` product and its actual stored 10–50% discount for the pop-up.
+- **Display rule recorded** — The pop-up is included only in the homepage view, stays visible until its close button is used, and is suppressed for 24 hours after close using a versioned browser timestamp.
+- **Truthfulness boundary retained** — If no eligible existing offer is available, the pop-up does not render; no discount, scarcity, countdown or customer data is fabricated.
+- **Popup verification** — The targeted homepage contract passed **5/5** and the Vite production build passed after adding the popup; full Node automation is **115/117** with the same two pre-existing paused-versus-executing supervisor expectation failures.

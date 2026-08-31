@@ -66,6 +66,33 @@ test('recent purchase card is a front-end-only five-card demo with permanent bro
   assert.match(css, /recent-purchase__close/);
 });
 
+test('homepage offer popup is homepage-only, offer-backed, close-persistent and 24-hour limited', async () => {
+  const [home, popup, layout, js, css] = await Promise.all([
+    read('resources/views/home/index.blade.php'),
+    read('resources/views/home/_offer-popup.blade.php'),
+    read('resources/views/layouts/app.blade.php'),
+    read('resources/js/modules/ui.js'),
+    read('resources/css/app.css'),
+  ]);
+
+  assert.match(home, /home\._offer-popup/);
+  assert.doesNotMatch(layout, /offer-popup/);
+  assert.match(popup, /bestDeals/);
+  assert.match(popup, /discount >= 10/);
+  assert.match(popup, /discount <= 50/);
+  assert.match(popup, /data-offer-popup/);
+  assert.match(popup, /data-offer-popup-close/);
+  assert.match(popup, /role="dialog"/);
+  assert.match(popup, /route\('product\.show'/);
+  assert.match(js, /initOfferPopup/);
+  assert.match(js, /rythme-offer-popup-closed-at-v1/);
+  assert.match(js, /24 \* 60 \* 60 \* 1000/);
+  assert.match(js, /Date\.now\(\)/);
+  assert.match(js, /data-offer-popup-close/);
+  assert.match(css, /offer-popup__dialog/);
+  assert.match(css, /offer-popup\.is-pending/);
+});
+
 test('homepage UI plan records the clarified synthetic demo scope', async () => {
   const plan = await read('tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md');
   assert.match(plan, /five synthetic front-end demo cards/i);

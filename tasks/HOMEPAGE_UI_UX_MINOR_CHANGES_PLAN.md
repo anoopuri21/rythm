@@ -10,11 +10,13 @@
 1. Add a slim top bar containing a phone number, email address and social-media icons.
 2. Add a continuously looping offer/deal strip directly after the hero with truthful selective-product discounts from 10% through 50%.
 3. Add a bottom-left fixed last-purchase card containing product name, price, user name and short product detail; close it permanently for that browser/user after dismissal and otherwise show it across pages.
+4. Add a homepage-only offer ad pop-up with a close button; after close, suppress it for 24 hours, and keep it visible until the user closes it.
 
 ## Safety and content rules
 
 - Phone number, email address and social URLs must come from owner-provided values or approved environment/configuration; no contact details or social profiles will be invented.
 - Offer percentages must be calculated from existing product `compare_at_price` and `price` data. No fake discount, scarcity or unsupported offer copy will be added. Products outside the 10–50% range will be excluded from the ticker.
+- The offer pop-up will reuse one eligible existing `bestDeals` product and its stored pricing; if no 10–50% eligible offer exists, the pop-up will not render. It is homepage-only, remains open until closed, and a versioned browser timestamp suppresses it for 24 hours after close.
 - The bottom-left cards are explicitly synthetic front-end demo data, not real customer social proof. Each card will carry a visible `Demo preview` label so fabricated names/purchases cannot be mistaken for production evidence.
 - The demo carousel will contain five cards, fade between cards every 10 seconds, run on every page and have no Admin/database control.
 - The card will use the purchased product unit price in the design payload; no addresses, phone numbers, email addresses, order numbers or payment details will appear.
@@ -45,6 +47,13 @@
 - Calculate the discount from the stored prices; show product name and offer percentage without inventing an end date.
 - Render a duplicated track for seamless looping, pause on hover/focus, and provide a reduced-motion static presentation.
 
+### Step 3A — Homepage offer pop-up
+
+- Add `resources/views/home/_offer-popup.blade.php` only to the homepage view, not the global layout.
+- Select one existing eligible `bestDeals` product using the same truthful 10–50% discount calculation and show its current/compare-at prices.
+- Keep the dialog open until the close button is used; Escape is an accessible equivalent close action and backdrop clicks do not dismiss it.
+- Store only a close timestamp in a versioned browser key and suppress the pop-up for 24 hours after that timestamp.
+
 ### Step 4 — Front-end demo recent-purchase card
 
 - Add a dedicated `resources/views/components/recent-purchase-card.blade.php` with five synthetic cards containing product name, unit price, demo user name and short detail.
@@ -69,9 +78,9 @@
 
 ### Arena verification snapshot — 31 August 2026
 
-- Targeted homepage contract: **4/4 passed** (`node --test tests/automation/homepage-minor-ui.test.mjs`).
+- Targeted homepage contract: **5/5 passed** (`node --test tests/automation/homepage-minor-ui.test.mjs`).
 - Front-end production build: **passed** (`npm run build`) after installing the locked npm dependencies; no package files changed.
-- Full Node automation: **114/116 passed**. The two failures are existing supervisor assertions that still expect an executing lifecycle while the owner-approved committed state is paused; they are outside this homepage scope and were not changed.
+- Full Node automation: **115/117 passed**. The two failures are existing supervisor assertions that still expect an executing lifecycle while the owner-approved committed state is paused; they are outside this homepage scope and were not changed.
 - PHP/Composer, MySQL and rendered browser/accessibility checks are unavailable in Arena and remain owner-side gates; no production-readiness claim is made.
 
 ## Explicit non-goals
