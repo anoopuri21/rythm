@@ -1838,7 +1838,7 @@ input:focus-visible { outline: none; }
     .recent-purchase { left: 1rem; bottom: 1rem; width: calc(100vw - 2rem); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .offer-marquee__track { animation: none; }
+    .offer-marquee__track { animation: none; will-change: auto; }
     .recent-purchase__card { transition: none; }
 }
 

@@ -61,6 +61,7 @@ test('recent purchase card is a front-end-only five-card demo with permanent bro
   assert.match(js, /data-recent-purchase-demo/);
   assert.match(js, /10000/);
   assert.match(js, /localStorage/);
+  assert.match(js, /document\.hidden/);
   assert.match(js, /prefers-reduced-motion/);
   assert.match(css, /recent-purchase__card\.is-active/);
   assert.match(css, /recent-purchase__close/);
@@ -83,6 +84,8 @@ test('homepage offer popup is homepage-only, offer-backed, close-persistent and 
   assert.match(popup, /data-offer-popup/);
   assert.match(popup, /data-offer-popup-close/);
   assert.match(popup, /role="dialog"/);
+  assert.match(popup, /loading="lazy"/);
+  assert.match(popup, /fetchpriority="low"/);
   assert.match(popup, /route\('product\.show'/);
   assert.match(js, /initOfferPopup/);
   assert.match(js, /rythme-offer-popup-closed-at-v1/);

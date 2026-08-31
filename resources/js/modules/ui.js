@@ -125,10 +125,17 @@ function initOfferPopup() {
     popup.classList.remove('is-pending');
     popup.setAttribute('aria-hidden', 'false');
     document.body.classList.add('offer-popup-open');
+    const previouslyFocused = document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+        ? document.activeElement
+        : null;
 
     const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
     const focusables = [...dialog.querySelectorAll(focusableSelector)];
+    let closing = false;
     const close = () => {
+        if (closing) return;
+        closing = true;
+
         try {
             window.localStorage.setItem(storageKey, String(Date.now()));
         } catch {
@@ -138,6 +145,7 @@ function initOfferPopup() {
         popup.classList.add('is-closing');
         popup.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('offer-popup-open');
+        previouslyFocused?.focus({ preventScroll: true });
         window.setTimeout(() => popup.remove(), 220);
     };
 
@@ -208,12 +216,19 @@ function initRecentPurchasePreview() {
 
     const startTimer = () => {
         stopTimer();
-        if (paused || reducedMotion || cards.length < 2) return;
+        if (paused || reducedMotion || document.hidden || cards.length < 2) return;
         timer = window.setInterval(() => showCard(active + 1), 10000);
     };
 
+    const handleVisibilityChange = () => {
+        if (document.hidden) stopTimer();
+        else startTimer();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const dismiss = () => {
         stopTimer();
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
         try {
             window.localStorage.setItem(storageKey, '1');
         } catch {

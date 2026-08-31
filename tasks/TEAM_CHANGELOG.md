@@ -867,3 +867,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Display rule recorded** — The pop-up is included only in the homepage view, stays visible until its close button is used, and is suppressed for 24 hours after close using a versioned browser timestamp.
 - **Truthfulness boundary retained** — If no eligible existing offer is available, the pop-up does not render; no discount, scarcity, countdown or customer data is fabricated.
 - **Popup verification** — The targeted homepage contract passed **5/5** and the Vite production build passed after adding the popup; full Node automation is **115/117** with the same two pre-existing paused-versus-executing supervisor expectation failures.
+
+## 31 August 2026 — Homepage UI verification and performance polish
+
+- **Popup loading polished** — The offer image now uses lazy loading with low fetch priority so it does not compete with the hero for initial rendering; fixed dimensions remain declared to avoid layout shift.
+- **Interaction polish added** — Popup close is idempotent, restores prior focus when possible, and the recent-purchase rotation stops while the tab is hidden to avoid unnecessary background work.
+- **Reduced-motion polish retained** — Marquee compositor hints are released when motion is reduced, while the popup and recent-card transitions remain disabled as appropriate.
