@@ -100,10 +100,93 @@ function initNewsletter() {
     });
 }
 
+function initRecentPurchasePreview() {
+    const preview = document.querySelector('[data-recent-purchase-demo]');
+    if (!preview || preview.dataset.initialized === 'true') return;
+
+    preview.dataset.initialized = 'true';
+    const storageKey = 'rythme-recent-purchase-preview-dismissed-v1';
+    const closeButton = preview.querySelector('[data-recent-purchase-close]');
+    const cards = [...preview.querySelectorAll('[data-recent-purchase-card]')];
+
+    if (!closeButton || cards.length === 0) return;
+
+    try {
+        if (window.localStorage.getItem(storageKey) === '1') {
+            preview.remove();
+            return;
+        }
+    } catch {
+        // Continue with an in-page dismissal if browser storage is unavailable.
+    }
+
+    let active = 0;
+    let timer = null;
+    let paused = false;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+    const showCard = (index) => {
+        active = (index + cards.length) % cards.length;
+        cards.forEach((card, cardIndex) => {
+            const isActive = cardIndex === active;
+            card.classList.toggle('is-active', isActive);
+            card.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
+    };
+
+    const stopTimer = () => {
+        if (timer !== null) {
+            window.clearInterval(timer);
+            timer = null;
+        }
+    };
+
+    const startTimer = () => {
+        stopTimer();
+        if (paused || reducedMotion || cards.length < 2) return;
+        timer = window.setInterval(() => showCard(active + 1), 10000);
+    };
+
+    const dismiss = () => {
+        stopTimer();
+        try {
+            window.localStorage.setItem(storageKey, '1');
+        } catch {
+            // The current page is still hidden when persistent storage is blocked.
+        }
+        preview.classList.add('is-dismissed');
+        window.setTimeout(() => preview.remove(), 260);
+    };
+
+    closeButton.addEventListener('click', dismiss);
+    preview.addEventListener('mouseenter', () => {
+        paused = true;
+        stopTimer();
+    });
+    preview.addEventListener('mouseleave', () => {
+        paused = false;
+        startTimer();
+    });
+    preview.addEventListener('focusin', () => {
+        paused = true;
+        stopTimer();
+    });
+    preview.addEventListener('focusout', (event) => {
+        if (!preview.contains(event.relatedTarget)) {
+            paused = false;
+            startTimer();
+        }
+    });
+
+    showCard(0);
+    startTimer();
+}
+
 export function initUi() {
     initNavbar();
     initCountdowns();
     initNewsletter();
+    initRecentPurchasePreview();
     initScrollTop();
 }
 

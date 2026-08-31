@@ -1,6 +1,6 @@
 # Homepage Minor UI/UX Changes — Plan First
 
-**Status:** PLAN READY — implementation intentionally held until owner content/privacy choices are confirmed
+**Status:** IMPLEMENTED — static/build gates complete; owner runtime/browser qualification and two existing hold-state automation expectations remain open
 **Auto Mode:** PAUSED by owner hold
 **Branch:** `rhythm-uat`
 **Scope:** Homepage/site-shell UI only; no Phase 12 autonomous continuation during this task
@@ -15,18 +15,20 @@
 
 - Phone number, email address and social URLs must come from owner-provided values or approved environment/configuration; no contact details or social profiles will be invented.
 - Offer percentages must be calculated from existing product `compare_at_price` and `price` data. No fake discount, scarcity or unsupported offer copy will be added. Products outside the 10–50% range will be excluded from the ticker.
-- A real customer’s name and purchase details must not be shown as public social proof without explicit consent and an approved privacy basis. The recommended safe implementation is an authenticated customer’s own most recent eligible purchase, shown only to that customer; guests see no personal purchase card.
-- The card will exclude cancelled/refunded/failed orders and will not expose order numbers, addresses, phone numbers, email addresses or payment details.
-- Account/order data will be loaded only for the authenticated user, preferably through a cached view composer/service. Dismissal will use a versioned browser key scoped to the authenticated user/order context; no sensitive data will be stored in localStorage.
-- The close button will be keyboard-accessible, labelled and announceable. The offer ticker will pause on hover/focus and respect `prefers-reduced-motion`.
+- The bottom-left cards are explicitly synthetic front-end demo data, not real customer social proof. Each card will carry a visible `Demo preview` label so fabricated names/purchases cannot be mistaken for production evidence.
+- The demo carousel will contain five cards, fade between cards every 10 seconds, run on every page and have no Admin/database control.
+- The card will use the purchased product unit price in the design payload; no addresses, phone numbers, email addresses, order numbers or payment details will appear.
+- Dismissal will use a versioned browser key with no sensitive data stored in localStorage; after close it will remain hidden until the user clears site storage or the component version changes.
+- The close button will be keyboard-accessible, labelled and announceable. The offer ticker will pause on hover/focus and respect `prefers-reduced-motion`. They both remain clearly front-end presentation features.
 
 ## Implementation sequence
 
 ### Step 1 — Confirm content and privacy inputs
 
-- Confirm exact phone number, support email and social profile URLs/handles.
-- Confirm whether “last buy” means the signed-in customer’s own latest eligible order (recommended) or a consented public purchase/social-proof feed.
-- Confirm whether card price means the purchased item unit price or the order total.
+- Owner chose config/environment-driven phone/email/social values; missing values must be hidden rather than replaced with placeholders.
+- Owner chose five synthetic front-end demo cards, no Admin control, fade transitions every 10 seconds and display on every page.
+- Owner chose the purchased product unit price for the card.
+- No further content input is needed for this design pass; the demo label remains mandatory for truthful presentation.
 
 ### Step 2 — Site-shell top bar
 
@@ -43,13 +45,13 @@
 - Calculate the discount from the stored prices; show product name and offer percentage without inventing an end date.
 - Render a duplicated track for seamless looping, pause on hover/focus, and provide a reduced-motion static presentation.
 
-### Step 4 — Authenticated recent-purchase card
+### Step 4 — Front-end demo recent-purchase card
 
-- Add a small view composer/service for the global layout and a dedicated `resources/views/components/recent-purchase-card.blade.php`.
-- Query only the authenticated user’s latest eligible purchase with the minimum required product/order fields.
-- Include product name, approved price field, user display name and product short description.
-- Add accessible close control and per-user/order dismissal persistence.
-- Do not render the card for guests or when there is no eligible purchase.
+- Add a dedicated `resources/views/components/recent-purchase-card.blade.php` with five synthetic cards containing product name, unit price, demo user name and short detail.
+- Include a visible `Demo preview` label; do not query the database, create Admin controls or imply real customer activity.
+- Render the component globally from `resources/views/layouts/app.blade.php`.
+- Add accessible close control and versioned localStorage dismissal persistence.
+- Fade to the next card every 10 seconds; pause the timer on hover/focus and reduce motion for users who request it.
 
 ### Step 5 — Styling, behavior and responsive QA
 
@@ -64,6 +66,13 @@
 - Run `npm run test:automation` and `npm run build`.
 - Owner PHP/runtime/browser checks remain required where applicable.
 - Commit and push only after the applicable gates pass; keep Auto Mode paused until this manual task is complete.
+
+### Arena verification snapshot — 31 August 2026
+
+- Targeted homepage contract: **4/4 passed** (`node --test tests/automation/homepage-minor-ui.test.mjs`).
+- Front-end production build: **passed** (`npm run build`) after installing the locked npm dependencies; no package files changed.
+- Full Node automation: **114/116 passed**. The two failures are existing supervisor assertions that still expect an executing lifecycle while the owner-approved committed state is paused; they are outside this homepage scope and were not changed.
+- PHP/Composer, MySQL and rendered browser/accessibility checks are unavailable in Arena and remain owner-side gates; no production-readiness claim is made.
 
 ## Explicit non-goals
 

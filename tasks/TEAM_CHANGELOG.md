@@ -852,3 +852,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Plan-first requirement recorded** — `tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md` defines top bar, truthful offer loop, authenticated recent-purchase card, responsive behavior, privacy rules and test gates before code changes.
 - **Open owner inputs** — Exact phone/email/social URLs, the privacy-safe “last buy” data scope and whether card price means item price or order total must be confirmed before implementation.
 - **Safety boundary retained** — No customer social proof, unsupported offers, invented contact details, production action or destructive UAT operation will be inferred.
+
+## 31 August 2026 — Homepage minor UI/UX implementation and Arena verification
+
+- **Configuration-driven shell added** — The optional top bar now reads phone, email and social URLs from `config/rythme.php` / environment values and hides missing values; non-HTTPS social URLs are not rendered.
+- **Truthful offer presentation added** — A post-hero looping strip uses the existing bounded `bestDeals` product data and renders only discounts from 10% through 50%; hover/focus pauses it and reduced-motion disables animation.
+- **Demo preview boundary retained** — The site-wide recent-purchase component contains five synthetic front-end-only cards, shows unit price, rotates every 10 seconds with fade transitions, labels itself `Demo preview`, and persists browser dismissal without Admin/customer/order data.
+- **Scope retained** — No real contact values, customer names, purchases, order totals, production social proof or autonomous/deployment work were introduced. Runtime/browser/PHP/MySQL qualification remains open.
+- **Arena verification** — The targeted homepage contract passed **4/4** and the Vite production build passed. Full Node automation passed **114/116**; two existing supervisor assertions still expect an executing lifecycle even though the owner-approved Auto Mode state is paused, so they remain outside this homepage scope.

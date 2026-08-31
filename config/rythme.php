@@ -12,6 +12,15 @@ return [
     'brand_short' => 'RHYTHM',
     'logo_url' => env('RYTHME_LOGO_URL', 'https://rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'),
 
+    // Optional site-shell contact/social values. Empty values stay hidden.
+    'contact_phone' => env('RYTHME_CONTACT_PHONE', ''),
+    'contact_email' => env('RYTHME_CONTACT_EMAIL', ''),
+    'social_links' => [
+        'instagram' => env('RYTHME_SOCIAL_INSTAGRAM', ''),
+        'facebook' => env('RYTHME_SOCIAL_FACEBOOK', ''),
+        'youtube' => env('RYTHME_SOCIAL_YOUTUBE', ''),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Hero — two selectable modes (one at a time)
