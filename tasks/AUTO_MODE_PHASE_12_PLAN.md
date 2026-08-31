@@ -1,6 +1,6 @@
 # Manual Execution Plan — Phase 12 MVP Safety, Authorization, Payment/Order and Privacy Blockers
 
-**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunk 1 closed
+**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunks 1 and 2 closed
 **Canonical phase:** 12
 **Branch:** `rhythm-uat`
 **Execution mode:** Auto Mode autonomous execution; deployment, Phase 18 and Agent 10 remain separately gated
@@ -38,9 +38,20 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 
 ### Chunk 2 — security configuration and dependency/secret scan contract
 
-- Harden safe application defaults and document environment-only production requirements.
-- Add or repair CI checks for dependencies, secrets and security without embedding credentials.
-- Keep live gateway, credential rotation and production actions human-gated.
+**Status:** COMPLETE — closed 31 August 2026 under Auto Mode; headers/CSP/session/app defaults re-reviewed, tracked-tree secret and artifact scans passed, dependency pins verified, and the contract is locked by `tests/automation/security-phase12-config.test.mjs`
+
+- Safe application defaults re-verified: env-driven `APP_DEBUG` defaulting to `false`, secure-by-default session cookie attributes, production-only HSTS and a bounded CSP limited to the approved Razorpay/fonts/media origins.
+- Read-only `git grep` secret scans found no private keys, Razorpay/AWS/Stripe-style keys or hardcoded credential assignments in the tracked tree; `.env.example`/`.env.production.example` ship empty secret values and production-safe flags; no `vendor/`, `node_modules/` or `.env` is tracked. Supervisor test fixtures that deliberately embed a bare key marker to prove rejection remain the recorded allowlist.
+- Locked stack pins re-verified: Laravel `13.24.0` exact, PHP `^8.3`, npm `lockfileVersion` 3.
+- Live gateway use, credential rotation, production configuration and any real secret remain human-gated.
+
+#### Environment-only production requirements
+
+Production values must come exclusively from the environment on the host (cPanel variables or a server-side `.env` that is never committed):
+
+- `APP_ENV=production`, `APP_DEBUG=false`, a host-generated `APP_KEY`, exact MySQL 8 credentials, `SESSION_SECURE_COOKIE=true` behind HTTPS, and the Razorpay key/secret/webhook triple in test mode until launch approval.
+- `composer audit` and `npm audit` remain owner-side pre-release gates because PHP/Composer are unavailable in Arena; Arena records the committed-tree and lockfile contract instead.
+- Any rotation, live-mode payment key or production data change requires an explicit owner step and is never executed by Auto Mode.
 
 ### Chunk 3 — MVP privacy, legal and accessibility blockers
 

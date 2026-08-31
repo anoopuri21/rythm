@@ -916,3 +916,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Regression contract added** — `tests/automation/security-phase12-boundaries.test.mjs` locks the route throttle/auth matrix, CSRF exception scope, Livewire guest/ownership guards, cart session binding, order/return/notification/address ownership checks and the planning-document closure records.
 - **Documentation updated** — `docs/phase12-authorization-matrix.md` gained the Chunk 1 closure record; the Phase 12 plan marks Chunk 1 COMPLETE with Chunk 2 (security configuration/dependency-secret contract) next.
 - **Gates** — `npm run test:automation` 130/131 and `npm run build` passed in Arena. The single failure is the supervisor's canonical-branch assertion: the Arena session checkout is `arena/01a058de-rythm` at the exact `rhythm-uat` head, so the branch literal mismatch is environment-mapped, not a code regression; it passes on the `rhythm-uat` checkout. PHP/Composer/MySQL and rendered browser checks remain owner-side.
+
+## 31 August 2026 — Phase 12 Chunk 2 security-configuration and secret-scan contract
+
+- **Chunk 2 COMPLETE** — Application security defaults re-reviewed: env-driven `APP_DEBUG` defaulting false, production-only HSTS, bounded CSP (self + approved Razorpay/fonts/media origins only), secure-by-default session cookie attributes.
+- **Tracked-tree scans passed** — Read-only `git grep` scans found no private keys, Razorpay/AWS/Stripe-style keys or hardcoded credentials; env templates keep empty secrets with production-safe flags; no `vendor/`, `node_modules/` or `.env` is tracked.
+- **Dependency pins re-verified** — Laravel exact `13.24.0`/`v13.24.0`, PHP `^8.3`, npm `lockfileVersion` 3; `composer audit`/`npm audit` remain owner-side pre-release gates.
+- **Contract added** — `tests/automation/security-phase12-config.test.mjs` (9 tests) locks headers/CSP, env-safe flags, secret-scan cleanliness, artifact exclusions and stack pins; Phase 12 plan now records the environment-only production requirements list.
