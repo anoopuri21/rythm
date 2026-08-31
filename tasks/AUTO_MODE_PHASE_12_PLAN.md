@@ -1,9 +1,9 @@
 # Manual Execution Plan — Phase 12 MVP Safety, Authorization, Payment/Order and Privacy Blockers
 
-**Status:** IN PROGRESS — manual owner-authorized continuation; Auto Mode remains paused
+**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunk 1 closed
 **Canonical phase:** 12
 **Branch:** `rhythm-uat`
-**Execution mode:** Manual application development only; deployment, Phase 18 and Agent 10 remain separately gated
+**Execution mode:** Auto Mode autonomous execution; deployment, Phase 18 and Agent 10 remain separately gated
 **Accountable:** Agent 0
 **Primary specialists:** Agents 8, 3, 4, 9, 11, 13 and 15
 **Deployment:** inactive; Phase 18 and Agent 10 remain separately gated
@@ -30,7 +30,7 @@ This plan follows `tasks/CANONICAL_PHASE_SEQUENCE.md`, `tasks/MASTER_PROJECT_TRA
 
 ### Chunk 1 — safe authorization and input-boundary remediation
 
-**Status:** IN PROGRESS — review/Q&A write limits, explicit order-mutation auth boundaries, checkout address ownership and CSP origin/framing tightening added; remaining action-boundary/runtime review continues
+**Status:** COMPLETE — closed 31 August 2026 under reactivated Auto Mode; review/Q&A write limits, explicit order-mutation auth boundaries, checkout address ownership and CSP origin/framing tightening were already in place, and the remaining customer-facing route/Livewire/controller action-boundary sweep found every boundary enforced with no new defect. The sweep is locked by `tests/automation/security-phase12-boundaries.test.mjs` (see `docs/phase12-authorization-matrix.md` closure record); PHP runtime confirmation stays with Chunk 4 owner-side qualification
 
 - Correct only evidence-backed IDOR, authorization, validation, CSRF, throttling and upload-boundary defects.
 - Add focused regression coverage for every corrected boundary.

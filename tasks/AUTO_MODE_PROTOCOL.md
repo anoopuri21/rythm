@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** PAUSED BY OWNER — owner requested a hold for manual homepage UI/UX planning and implementation
-**Autonomous Supervisor:** PAUSED by owner hold; Phase 18/deployment remains excluded and separately gated
+**Status:** ACTIVE — owner issued `ACTIVATE AUTO MODE` on 31 August 2026; canonical Phase 12 continues autonomously
+**Autonomous Supervisor:** ACTIVE; Phase 18/deployment remains excluded and separately gated
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,8 +150,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No — owner requested a hold for manual homepage UI/UX planning and implementation; ask-first mode is authoritative for this task.
-- **Autonomous Supervisor:** PAUSED by owner hold; Phase 18 remains excluded.
+- **Active:** Yes — owner issued `ACTIVATE AUTO MODE` on 31 August 2026, lifting the 30 August manual homepage UI/UX hold whose content choices were already recorded.
+- **Autonomous Supervisor:** ACTIVE on canonical Phase 12; Phase 18 remains excluded and Agent 10 inactive.
 - **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
 - **Current priority:** Manual homepage UI/UX changes — plan first, then implement after required content/privacy decisions.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.

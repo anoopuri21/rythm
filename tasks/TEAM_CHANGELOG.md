@@ -908,3 +908,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Regression/documentation added** — A focused PHP test and static Phase 12 contract cover cross-customer address rejection; the authorization matrix and threat model record the new boundary.
 - **Arena checks passed** — Phase 11 customer-experience automation **7/7** and security automation **10/10** passed; PHP runtime tests remain owner-side because PHP/Composer are unavailable in Arena.
 - **Scope retained** — No order, payment, address, customer or persistent UAT data was changed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
+
+## 31 August 2026 — Auto Mode reactivation and Phase 12 Chunk 1 closure
+
+- **Auto Mode ACTIVE again** — The owner issued `ACTIVATE AUTO MODE`, lifting the 30 August manual hold; `automation/config.json` is enabled, the supervisor lifecycle is `executing`, and the protocol/tracker state was reconciled. Deployment, Phase 18 and Agent 10 remain human-gated.
+- **Phase 12 Chunk 1 COMPLETE** — The remaining customer-facing action-boundary sweep re-read every mutating web route, Livewire write action and sensitive controller; all auth, throttle, ownership, signed-link and CSRF boundaries were already enforced and no new defect was found.
+- **Regression contract added** — `tests/automation/security-phase12-boundaries.test.mjs` locks the route throttle/auth matrix, CSRF exception scope, Livewire guest/ownership guards, cart session binding, order/return/notification/address ownership checks and the planning-document closure records.
+- **Documentation updated** — `docs/phase12-authorization-matrix.md` gained the Chunk 1 closure record; the Phase 12 plan marks Chunk 1 COMPLETE with Chunk 2 (security configuration/dependency-secret contract) next.
+- **Gates** — `npm run test:automation` 130/131 and `npm run build` passed in Arena. The single failure is the supervisor's canonical-branch assertion: the Arena session checkout is `arena/01a058de-rythm` at the exact `rhythm-uat` head, so the branch literal mismatch is environment-mapped, not a code regression; it passes on the `rhythm-uat` checkout. PHP/Composer/MySQL and rendered browser checks remain owner-side.

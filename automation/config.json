@@ -1,8 +1,8 @@
 {
     "schema_version": 2,
-    "enabled": false,
-    "status": "AUTONOMOUS_SUPERVISOR_PAUSED",
-    "reason": "Owner requested: continuePAUSE AUTO MODE / hold for manual homepage UI/UX planning and implementation.",
+    "enabled": true,
+    "status": "AUTONOMOUS_SUPERVISOR_ACTIVE",
+    "reason": "Owner command on 31 August 2026: ACTIVATE AUTO MODE. Canonical Phase 12 (MVP core safety) continues autonomously; Phase 18/deployment and Agent 10 remain separately gated.",
     "branch": "rhythm-uat",
     "authoritative_sources": [
         "tasks/MASTER_PROJECT_TRACKER.md",

@@ -39,6 +39,16 @@
 
 `AddToCart`, `CartBadge`, `CartDrawer`, `CartPage`, `CheckoutWizard`, `ProductQuestionSection`, `ReviewSection`, `ShopIndex`, `WishlistBadge`, `WishlistButton` and `WishlistPage` require action-by-action review. The baseline found authenticated user resolution and product/ownership service boundaries in the main commerce components. `CheckoutWizard::selectAddress` now verifies that the selected address belongs to the authenticated user before changing checkout state, and coupon application has an explicit authentication guard. This is not a substitute for independent runtime tests.
 
+## Chunk 1 closure record — 31 August 2026
+
+Agent 0 completed the remaining customer-facing action-boundary sweep under reactivated Auto Mode:
+
+- Every POST/PATCH/DELETE route in `routes/web.php` was re-read and carries an explicit throttle; order cancel/retry mutations additionally require `auth`.
+- `bootstrap/app.php` keeps CSRF exceptions limited to the two Razorpay endpoints that cryptographically verify payloads, and `SecurityHeaders` stays prepended to the web group.
+- All customer Livewire write actions re-verified: wishlist/review/Q&A/stock-alert actions resolve the authenticated user (guests redirect or are rejected), `CheckoutWizard` aborts unauthenticated address/coupon actions and re-checks selected-address ownership, and cart item mutations bind to the current session/user cart.
+- Controller ownership re-verified: order reads accept owner-or-valid-signature with 15-minute signed links, order mutations and return create/store/cancel stay owner-only, notification mutations fetch through the user relation, and `AddressService` owner-checks update/default/destroy.
+- The sweep is locked by the static regression contract `tests/automation/security-phase12-boundaries.test.mjs`; PHP runtime confirmation of these boundaries remains an owner-side Phase 12 Chunk 4 gate.
+
 ## Acceptance rule
 
 No matrix row is accepted solely from route visibility or hidden buttons. Every state-changing action needs server-side authorization, validated input, CSRF or cryptographic provider verification, an appropriate abuse limit and a focused regression test. Any exception requiring legal, business or production evidence is a human gate.
