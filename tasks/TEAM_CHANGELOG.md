@@ -1008,3 +1008,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **AS-H012 closed** — all Phase 12 runtime gates are now satisfied: PHP focused 112/384 + full 396/1,704/0-fail, exact MySQL 8.4.3 with all migrations Ran, clean composer/npm audits, and the rendered/keyboard/axe pass.
 - **Agent 0 acceptance** — Phase 12 (MVP core safety) and Phase 13 (performance smoke) are marked **COMPLETE** in the tracker and canonical sequence; MVP readiness gates §7 updated (six gates ticked). AS-H011 stays open as the standing pre-launch rule: no legal/return/warranty content may be enabled until the owner/legal decision arrives; every such value remains disabled.
 - **Frontier** — only owner evidence remains before Phase 17: Evidence 5 (backup/restore + scheduler) and Evidence 6 (Phase 16 UAT script + Phase 15 cPanel package).
+
+## 1 September 2026 — Owner Evidence #5 progress: scheduler PASS, restore-import PASS
+
+- **Scheduler** — owner-reported `php artisan schedule:run`: the bounded `queue:work --stop-when-empty --max-time=50 --tries=3 --timeout=45` invocation completed (DONE) on Laragon PHP 8.3.30; shared-host queue contract works on the owner machine.
+- **Backup + restore import** — owner exported `rhythm_db` to SQL and imported it into `rhythm_restore_test` successfully (`products_count: 20` read back from the restored copy).
+- **Open micro-step** — final source-vs-restore count comparison (products + orders on both databases) requested to formally close Evidence #5.
