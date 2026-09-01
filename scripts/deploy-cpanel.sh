@@ -165,21 +165,62 @@ health() {
   fi
 }
 
+# ---------------------------------------------------------------------
+#  PLAN B support: jab public_html ek asli folder ho (symlink/docroot
+#  change possible na ho), to app/public ke assets wahan copy karne padte
+#  hain aur index.php ki jagah bridge file rakhni padti hai.
+# ---------------------------------------------------------------------
+PUBLIC_HTML="${PUBLIC_HTML:-$HOME/public_html}"
+
+is_plan_b() {
+  [ -d "$PUBLIC_HTML" ] && [ ! -L "$PUBLIC_HTML" ] \
+    && [ "$(cd "$PUBLIC_HTML" 2>/dev/null && pwd -P)" != "$(cd "$APP_DIR/public" && pwd -P)" ]
+}
+
+sync_public() {
+  say "Plan B: public/ assets ko public_html me copy kar rahe hain"
+  [ -d "$PUBLIC_HTML" ] || die "public_html folder nahi mila: $PUBLIC_HTML  (PUBLIC_HTML=<path> se batao)"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete --exclude 'index.php' "$APP_DIR/public/" "$PUBLIC_HTML/"
+  else
+    cp -a "$APP_DIR/public/." "$PUBLIC_HTML/"
+  fi
+  cp "$APP_DIR/deploy/public_html-bridge-index.php" "$PUBLIC_HTML/index.php"
+  # bridge file me app ka sahi path likh do
+  local rel_base
+  rel_base="$APP_DIR"
+  "$PHP_BIN" -r '
+    $f = $argv[1]; $base = $argv[2];
+    $s = file_get_contents($f);
+    $s = str_replace("__DIR__.\x27/../app\x27", var_export($base, true), $s);
+    file_put_contents($f, $s);
+  ' "$PUBLIC_HTML/index.php" "$rel_base"
+  ok "public_html sync ho gaya (bridge index.php -> $APP_DIR)"
+}
+
+maybe_sync_public() {
+  if is_plan_b; then sync_public; else ok "Docroot seedha app/public pe hai — sync ki zarurat nahi"; fi
+}
+
 case "${1:-}" in
   setup)
     php_version_check; require_env; install_deps; check_assets
-    app_key; storage_perms; db_check; migrate; seed; storage_link; optimize; health
+    app_key; storage_perms; db_check; migrate; seed; storage_link; optimize
+    maybe_sync_public; health
     say "SETUP COMPLETE 🎉  Ab browser me apna domain kholo." ;;
   update)
     require_env
-    say "Maintenance mode ON"; "$PHP_BIN" artisan down --render="errors::503" || true
+    say "Maintenance mode ON"; "$PHP_BIN" artisan down --retry=60 || true
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
     install_deps; check_assets; storage_perms; db_check; migrate; optimize
+    maybe_sync_public
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
     php_version_check; check_assets; require_env; db_check; health ;;
+  sync-public)
+    sync_public ;;
   *)
-    echo "Use karo:  bash scripts/deploy-cpanel.sh [setup|update|check]"; exit 1 ;;
+    echo "Use karo:  bash scripts/deploy-cpanel.sh [setup|update|check|sync-public]"; exit 1 ;;
 esac

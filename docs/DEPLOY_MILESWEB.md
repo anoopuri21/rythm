@@ -15,8 +15,23 @@
 | 3 | SSH access | MilesWeb Business plan me **included** hai ✅ (bas ON karna hai) |
 | 4 | Razorpay TEST keys | free — [dashboard.razorpay.com](https://dashboard.razorpay.com) pe signup |
 
-> 💡 **MilesWeb ka panel cPanel hai** (Hostinger ke hPanel se alag dikhta hai). Neeche saare menu names cPanel ke hain.
+> 💡 **MilesWeb ka panel cPanel hai.** Neeche saare menu names cPanel ke hisaab se hain.
 > Login usually: `https://aapkadomain.com/cpanel` ya MilesWeb client area → **Manage** → **cPanel**
+
+---
+
+## ✅ Aapka progress tracker
+
+| Step | Kaam | Status |
+|---|---|---|
+| 1.1 | PHP 8.3 + extensions | ✅ **ho gaya** |
+| 1.2 | MySQL database + user | ✅ **ho gaya** (ALL PRIVILEGES check kar lena) |
+| 1.3 | SSL / HTTPS | ✅ **ho gaya** |
+| 1.4 | SSH access | ✅ **available hai** |
+| **2** | **Terminal kholo** | 👈 **YAHAN SE SHURU KARO** |
+| 3.1–3.6 | Project install | ⬜ baaki |
+| 4.1–4.5 | Cron, robots, password, test payment | ⬜ baaki |
+
 
 ---
 
@@ -74,10 +89,11 @@ DB_PASSWORD = <jo generate hua>
 Host     : aapkadomain.com  (ya server IP — cPanel ke right sidebar me "Shared IP Address")
 Username : aapka cPanel username (jaise milesxyz)
 Password : cPanel password
-Port     : 21098   <- MilesWeb shared servers pe usually ye. 22 bhi try karna.
+Port     : 7822    <- MilesWeb shared servers ka standard SSH port (agar na chale to 22 try karo)
 ```
 
-> Port confirm karne ka aasan tarika: MilesWeb support se live chat pe pucho *"What is the SSH port for my shared hosting account?"*
+> ℹ️ MilesWeb ki apni help doc bhi **7822** batati hai. Agar dono port fail hon (connection timed out), to MilesWeb live chat pe likho:
+> *"Please enable SSH access for my cPanel account and confirm the SSH port. Also whitelist my current IP if the firewall is blocking it."*
 
 ---
 
@@ -92,7 +108,7 @@ cPanel → **Advanced** → **Terminal** → warning aaye to **I understand and 
 1. `Windows key` dabao → `cmd` type karo → Enter
 2. Ye likho (apne values daal ke) → Enter:
 ```
-ssh -p 21098 milesxyz@aapkadomain.com
+ssh -p 7822 milesxyz@aapkadomain.com
 ```
 3. `Are you sure you want to continue connecting?` → `yes` → Enter
 4. Password type karo — **screen pe kuch nahi dikhega, ye normal hai** → Enter
@@ -279,13 +295,23 @@ Ye khud: maintenance ON → naya code pull → libraries update → DB migrate �
 
 # 🅱️ PLAN B — Agar Document Root bhi na badle aur symlink bhi fail ho
 
+Is case me Laravel `~/app` me hi rahegi (safe), lekin `public_html` me uske assets ki copy + ek chhoti "bridge" file rakhni padegi.
+
 ```bash
 cd ~
-rm -f public_html
+rm -rf public_html
 mkdir public_html
-cp app/deploy/public_html-fallback.htaccess public_html/.htaccess
+cd ~/app
+bash scripts/deploy-cpanel.sh sync-public
 ```
-Phir Step 3.4 se aage same. Browser me domain kholo — chal jana chahiye.
+
+Bas. Script khud:
+- `app/public` ke saare assets (CSS, JS, images) `public_html` me copy kar degi
+- `public_html/index.php` me bridge file daal degi jo `~/app` ko boot karti hai
+- `.env` aur baaki code phir bhi web se **chhupe** rahenge ✅
+
+> **Plan B me ek extra baat:** har update ke baad assets dobara copy hone chahiye.
+> `bash scripts/deploy-cpanel.sh update` ye **apne aap** kar deta hai — aapko kuch nahi karna.
 
 ---
 
