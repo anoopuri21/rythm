@@ -995,3 +995,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Owner-reported (4 screenshots)** — the after-hero offer marquee renders as a static wrapped strip and the bottom-left recent-purchase card appears unstyled/non-rotating on rythm.test.
 - **Diagnosis (Agent 0)** — source code verified complete and correct: `_offer-marquee` include sits directly after the hero, `recent-purchase-card` renders from the layout, and a fresh `npm run build` compile contains the `offerMarquee` keyframes, `.recent-purchase` styles and both JS behaviors. `public/build` is gitignored, so the owner's `git checkout` left their compiled CSS/JS from before the 31 August homepage features.
 - **Fix path** — owner-side frontend rebuild (`npm install`, `npm run build`, `php artisan optimize:clear`, hard refresh); no code change required. If defects persist after the rebuild, they re-enter as code findings with fresh screenshots.
+
+## 1 September 2026 — Evidence #4 progress: marquee/card fix confirmed by owner
+
+- Owner ran `npm install`, `npm run build`, `php artisan optimize:clear` and hard-refreshed; the offer marquee now loops correctly and the recent-purchase demo card renders/rotates/closes as designed.
+- Owner reports the view is correct on all four screen sizes (1440×900, 768×1024, 390×844, 360×800).
+- Evidence #4 remains open only for the quick console-error, keyboard-Tab and axe confirmations; AS-H012 stays open until those report.
