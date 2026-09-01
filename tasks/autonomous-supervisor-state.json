@@ -16,16 +16,16 @@
     "working_tree_clean": false
   },
   "delivery": {
-    "phase": "16",
-    "chunk": "owner-uat-and-package",
-    "task": "Owner runs the Phase 16 UAT script and builds the Phase 15 cPanel release package; then Phase 17 go/no-go review",
-    "status": "in_progress"
+    "phase": "17",
+    "chunk": "conditional-go-recorded",
+    "task": "MVP launch-track evidence complete; conditional GO recorded; live launch awaits the explicit deployment command after the 4 pre-live owner items",
+    "status": "complete"
   },
   "execution": {
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner Evidence #6 Part B accepted: rythme-release-candidate.zip (22,025,972 bytes) built via git archive from tracked HEAD on the owner machine. Part A (Phase 16 UAT script results) is awaited."
+    "last_verified_action": "Owner Evidence #6 Part A accepted (1 September 2026): Phase 16 UAT script 23/23 PASS, 0 FAIL; Razorpay test payment successful; paid order visible to customer and admin; cancel/invoice/account journeys pass; 0 console errors on payment/checkout. Phases 15 and 16 marked COMPLETE; Phase 17 review recorded a CONDITIONAL GO with four named pre-live owner items; Phase 18 remains inactive."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "fdf87e3c4d33b01150478f4d0555a01f0444cfefcfc99648c8f3fe5a80c57d3f",
-    "created_at": "2026-09-01T05:06:46.368Z"
+    "id": "1de82a6dd5066e7be09e2491273912982ac229ce09da44dec1cdff28998a0757",
+    "created_at": "2026-09-01T05:13:23.979Z"
   },
   "decisions": [
     {
@@ -121,6 +121,12 @@
     {
       "id": "AS-D013",
       "summary": "Accept Phase 12 and Phase 13 as COMPLETE on 1 September 2026 owner evidence; AS-H011 persists as a standing pre-launch rule that blocks enabling legal/return/warranty content, not the phases themselves, because every such value remains disabled.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D014",
+      "summary": "Phase 17 decision is CONDITIONAL GO: the release candidate passed all MVP evidence gates, but live launch requires four owner actions first (live payment keys, legal wording, content rights, host HTTPS). Deployment needs the owner's explicit Phase 18 command.",
       "confidence": "high",
       "reversible": true
     }
@@ -783,11 +789,23 @@
       "outcome": "passed",
       "evidence": "Owner-reported 1 September 2026: rythme-release-candidate.zip, 22,025,972 bytes, git archive of tracked tree at session HEAD; vendor/build artifacts are intentionally excluded and produced at package/deploy time via release checklist section 4.",
       "verified_at": "2026-09-01T05:06:46.368Z"
+    },
+    {
+      "name": "Phase 16 owner UAT acceptance (Evidence 6A of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: 23/23 steps PASS, 0 FAIL; test payment successful; paid order visible in account and admin; 0 console errors on payment/checkout; four viewports covered.",
+      "verified_at": "2026-09-01T05:13:23.979Z"
+    },
+    {
+      "name": "Phase 17 go/no-go review",
+      "outcome": "passed",
+      "evidence": "Agent 0 recorded CONDITIONAL GO on 1 September 2026: every MVP evidence gate passed; live launch conditioned on Razorpay live keys + production webhook, AS-H011 legal wording for legally-sensitive content, catalogue content/media rights clearance, and host HTTPS/TLS verification. Phase 18 stays inactive until an explicit deployment command.",
+      "verified_at": "2026-09-01T05:13:23.979Z"
     }
   ],
   "next_action": {
-    "id": "OWNER-UAT-AND-PACKAGE-EVIDENCE",
-    "description": "Owner runs tasks/PHASE_16_OWNER_UAT_SCRIPT.md (23 steps) and builds the release package per docs/release-checklist.md section 4 at the bound commit; then Agent 0 conducts the Phase 17 go/no-go review. AS-H011 must be answered before enabling legal/return/warranty content.",
+    "id": "PHASE-18-OWNER-ACTIVATION-DECISION",
+    "description": "Owner decides on deployment: resolve the four pre-live items (Razorpay live keys/webhook, AS-H011 legal wording, catalogue content rights, host HTTPS) and then issue an explicit deployment command to activate Phase 18/Agent 10.",
     "requires_human": true
   }
 }

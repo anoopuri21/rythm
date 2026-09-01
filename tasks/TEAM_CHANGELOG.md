@@ -1026,3 +1026,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 
 - **Owner-reported** — `rythme-release-candidate.zip` (22,025,972 bytes ≈ 22 MB) created via `git archive` from the tracked tree at the session HEAD on the owner machine; the file stays local to the owner machine and is not committed.
 - **Part A pending** — Phase 16 UAT script results (23 numbered journeys) awaited; on their pass plus Agents' review, Phase 15/16 close and Phase 17 go/no-go begins.
+
+## 1 September 2026 — 🏁 MVP LAUNCH TRACK COMPLETE: Phases 15/16 COMPLETE, Phase 17 CONDITIONAL GO
+
+- **Owner Evidence #6 Part A accepted** — Phase 16 UAT script: **23/23 steps PASS, 0 FAIL**; Razorpay test payment successful; paid order visible to customer and in admin; cancel/invoice/account journeys pass; 0 console errors on payment/checkout.
+- **Phases 15 & 16 marked COMPLETE** — release-candidate zip (22,025,972 bytes) built from the tracked HEAD; critical-journey UAT green end to end.
+- **Phase 17 decision: CONDITIONAL GO** — every mandatory MVP evidence gate passed and is bound to the review timeline. Live launch is explicitly conditioned on 4 owner items: (1) Razorpay live keys + production webhook, (2) AS-H011 legal wording for any legally-sensitive content (all unknown values stay disabled), (3) catalogue content/media rights clearance, (4) host HTTPS/TLS verification during deployment.
+- **Phase 18/Agent 10** — remain inactive; deployment requires the owner's explicit command after the pre-live items close.

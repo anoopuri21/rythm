@@ -1,6 +1,6 @@
 # MVP Launch Track — Short Practical Delivery Plan
 
-**Status:** ACTIVE — manual delivery only
+**Status:** EVIDENCE COMPLETE — all MVP gates passed on owner evidence (1 September 2026); Phase 17 recorded a CONDITIONAL GO; Phase 18 deployment awaits the explicit owner command and the 4 pre-live items
 **Branch:** `rhythm-uat`
 **Auto Mode:** PAUSED
 **Deployment:** Not authorized in this plan; Phase 18 remains separately gated.

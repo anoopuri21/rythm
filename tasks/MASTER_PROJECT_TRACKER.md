@@ -4,7 +4,7 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current operational priority:** Short MVP launch track — close launch blockers, owner UAT, release packaging; defer non-essential enterprise work
-**Overall status:** PHASES 0–14 AND 6A COMPLETE / PHASES 15–16 OWNER EVIDENCE PENDING / MVP LAUNCH TRACK ACTIVE / AUTO MODE PAUSED AT OWNER EVIDENCE / NOT PRODUCTION-READY
+**Overall status:** PHASES 0–17 AND 6A COMPLETE / MVP LAUNCH TRACK EVIDENCE COMPLETE / PHASE 17 CONDITIONAL GO RECORDED 1 SEP 2026 / AUTO MODE PAUSED / PHASE 18 DEPLOYMENT INACTIVE — AWAITS EXPLICIT OWNER COMMAND / NOT LIVE YET (4 PRE-LIVE OWNER ITEMS OPEN)
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **MVP launch plan:** `tasks/MVP_LAUNCH_PLAN.md`
 **Auto Mode:** PAUSED — all gate-independent MVP-track work complete (31 Aug 2026); awaiting owner evidence/decisions (AS-H011, AS-H012, Phase 15 package, Phase 16 UAT); Phase 18/deployment excluded
@@ -76,9 +76,9 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 12 | Agent 0 + required specialists | MVP core safety: auth, ownership, checkout, payment, inventory, basic security and approved content boundaries | COMPLETE | Accepted 1 Sep 2026: owner-reported 396 PHP tests / 1,704 assertions / 0 failures, focused 112/384, exact MySQL 8.4.3 all-Ran, clean composer/npm audits, four-viewport rendered pass with 0 console errors, keyboard/focus YES, axe critical/serious 0; no unresolved critical/high blocker. Legal wording (AS-H011) remains a standing pre-launch gate only for enabling such content; all unknown values stay disabled |
 | 13 | Agent 0 + owner | MVP performance smoke: build, bounded queries, critical-page rendering and obvious regression checks | COMPLETE | Accepted 1 Sep 2026: production build green; bounded-query/N+1 contract (`performance-phase13.test.mjs`); re-measured budgets within limits; owner-reported acceptable rendering and zero console errors at 1440/768/390/360 |
 | 14 | Agent 0 + owner | MVP minimum operations: HTTPS, external env, backup/restore, queue/cron, logs and rollback | COMPLETE | Accepted 1 Sep 2026: owner-reported bounded scheduler run DONE, SQL backup export, isolated restore into scratch DB with matching products(20)/orders(1) counts, plus Arena ops contract; host HTTPS/TLS/secrets verify at package/deploy time through release checklist §3 |
-| 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | IN PROGRESS | Arena-side: release-checklist/package-hygiene/migration-gate contract passed 31 Aug 2026; owner builds the actual cPanel package from the checklist. Versioned cPanel-compatible package and safe forward migration pass |
-| 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | IN PROGRESS | Arena-side: copy-safe owner UAT script prepared at `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` 31 Aug 2026; owner execution evidence pending. Browse, cart, checkout, payment, order, account and admin UAT pass |
-| 17 | Agent 0 | Short go/no-go evidence review; no deployment action | PENDING | Mandatory evidence reviewed, blockers resolved, explicit decision recorded |
+| 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | COMPLETE | Accepted 1 Sep 2026: owner built `rythme-release-candidate.zip` (22,025,972 bytes) via git archive at the tracked HEAD; release checklist §4 (vendor/build produced at package/deploy time) and the migration-gate contract stand |
+| 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | COMPLETE | Accepted 1 Sep 2026: owner-reported **23/23 steps PASS, 0 FAIL** via `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` — browse/search/product/cart/checkout, Razorpay test payment successful, paid order visible in account and admin, cancel/invoice/account journeys pass, 0 console errors on payment/checkout, four viewports covered |
+| 17 | Agent 0 | Short go/no-go evidence review; no deployment action | COMPLETE | Decision recorded 1 Sep 2026 — **CONDITIONAL GO**: all MVP evidence gates pass; live launch stays conditioned on 4 owner pre-live items (Razorpay live keys + production webhook, AS-H011 legal wording for any legally-sensitive content, catalogue content/media rights clearance, host HTTPS/TLS verification). Phase 18 stays inactive until the explicit deployment command |
 | 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | INACTIVE | Activated only by explicit deployment command after Phase 17 acceptance |
 
 ---
@@ -228,12 +228,12 @@ Agent 0 will not issue MVP launch readiness or recommend a live launch until the
 - [x] Enabled legal, tax, privacy, return and warranty behavior has owner/professional approval; unknown values remain disabled.
 - [x] Phase 13: practical storefront/cart/checkout performance and rendering smoke passes.
 - [x] Phase 14: HTTPS, production environment/secrets, debug-off, logs, queue/cron, backup/restore and rollback pass. *(Backup/restore + queue/cron proven locally 1 Sep; host HTTPS/TLS verifies at package/deploy via release checklist §3)*
-- [ ] Phase 15: versioned cPanel/shared-host release package and migration checklist pass.
-- [ ] Phase 16: focused owner UAT passes for browse, search, cart, checkout, test payment, order, invoice and admin essentials.
+- [x] Phase 15: versioned cPanel/shared-host release package and migration checklist pass.
+- [x] Phase 16: focused owner UAT passes for browse, search, cart, checkout, test payment, order, invoice and admin essentials.
 - [x] Browser, keyboard/accessibility and responsive checks for the agreed viewports have no release blocker.
 - [ ] Catalogue/content/media rights, approved data and real stock/publication decisions are accepted.
-- [ ] Critical bug count is zero; evidence is bound to the reviewed release commit.
-- [ ] Phase 17: Agent 0 records `GO`, `NO-GO` or `BLOCKED`, and owner approval is explicit.
+- [x] Critical bug count is zero; evidence is bound to the reviewed release commit.
+- [ ] Phase 17: Agent 0 recorded **CONDITIONAL GO** on 1 Sep 2026; owner launch approval is expected with the explicit deployment command after the 4 pre-live items resolve.
 
 This readiness decision does not activate Phase 18. Deployment, live financial actions and production changes remain separately human-gated.
 

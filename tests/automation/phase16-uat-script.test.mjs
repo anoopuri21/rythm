@@ -36,8 +36,9 @@ await test('the script pins the four agreed viewports and the result template', 
     assert.match(script, /git rev-parse HEAD/);
 });
 
-await test('Phase 15 and 16 records stay consistent with pending owner execution', () => {
-    assert.match(tracker, /\| 15 \|[^\n]+\| IN PROGRESS \|/);
-    assert.match(tracker, /\| 16 \|[^\n]+\| IN PROGRESS \|/);
+await test('Phase 15 and 16 records reflect the accepted owner evidence', () => {
+    assert.match(tracker, /\| 15 \|[^\n]+\| COMPLETE \|/);
+    assert.match(tracker, /\| 16 \|[^\n]+\| COMPLETE \|/);
+    assert.match(tracker, /23\/23 steps PASS, 0 FAIL/);
     assert.match(tracker, /PHASE_16_OWNER_UAT_SCRIPT\.md/);
 });
