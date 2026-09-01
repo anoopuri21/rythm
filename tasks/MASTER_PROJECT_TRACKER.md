@@ -7,7 +7,7 @@
 **Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 IN PROGRESS (Chunks 1–3 + Arena-side Chunk 4 done; owner runtime/UAT + legal gates pending) / PHASE 13–14 ARENA-SIDE GATES PASSED / MVP LAUNCH TRACK ACTIVE / AUTO MODE ACTIVE / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **MVP launch plan:** `tasks/MVP_LAUNCH_PLAN.md`
-**Auto Mode:** ACTIVE — owner re-activated 31 August 2026; executing gate-independent Phase 13–15 Arena-side work while Phase 12 owner gates (AS-H011/AS-H012) stay open; Phase 18/deployment excluded
+**Auto Mode:** PAUSED — all gate-independent MVP-track work complete (31 Aug 2026); awaiting owner evidence/decisions (AS-H011, AS-H012, Phase 15 package, Phase 16 UAT); Phase 18/deployment excluded
 
 ---
 
@@ -76,8 +76,8 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 12 | Agent 0 + required specialists | MVP core safety: auth, ownership, checkout, payment, inventory, basic security and approved content boundaries | IN PROGRESS | No unresolved critical/high blocker; focused/runtime checks pass |
 | 13 | Agent 0 + owner | MVP performance smoke: build, bounded queries, critical-page rendering and obvious regression checks | IN PROGRESS | Arena-side: static bounded-query/N+1 contract + re-measured build budgets passed 31 Aug 2026; owner rendered viewports remain. Build and practical page-speed/error checks pass at agreed viewports |
 | 14 | Agent 0 + owner | MVP minimum operations: HTTPS, external env, backup/restore, queue/cron, logs and rollback | IN PROGRESS | Arena-side: scheduler/cron, rollback layers, backup restore-qualification and log/env safety contract passed 31 Aug 2026; owner restore/rollback proof and host HTTPS remain. Owner verifies restore, rollback and shared-host operation |
-| 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | PENDING | Versioned cPanel-compatible package and safe forward migration pass |
-| 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | PENDING | Browse, cart, checkout, payment, order, account and admin UAT pass |
+| 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | IN PROGRESS | Arena-side: release-checklist/package-hygiene/migration-gate contract passed 31 Aug 2026; owner builds the actual cPanel package from the checklist. Versioned cPanel-compatible package and safe forward migration pass |
+| 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | IN PROGRESS | Arena-side: copy-safe owner UAT script prepared at `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` 31 Aug 2026; owner execution evidence pending. Browse, cart, checkout, payment, order, account and admin UAT pass |
 | 17 | Agent 0 | Short go/no-go evidence review; no deployment action | PENDING | Mandatory evidence reviewed, blockers resolved, explicit decision recorded |
 | 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | INACTIVE | Activated only by explicit deployment command after Phase 17 acceptance |
 

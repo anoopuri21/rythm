@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** ACTIVE — owner re-issued `ACTIVATE AUTO MODE` on 31 August 2026; Phase 13–15 Arena-side work continues while the Phase 12 owner gates (AS-H011 legal wording, AS-H012 runtime UAT) stay open
-**Autonomous Supervisor:** ACTIVE; Phase 18/deployment remains excluded and separately gated
+**Status:** PAUSED — all gate-independent MVP-track work finished 31 August 2026; every remaining item needs owner evidence or decisions (AS-H011/AS-H012, Phase 15 package, Phase 16 UAT, Phase 17)
+**Autonomous Supervisor:** PAUSED at protocol blockers 3.6/3.7; a new `ACTIVATE AUTO MODE` or owner evidence resumes work; Phase 18/deployment remains excluded and separately gated
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,8 +150,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** Yes — the owner re-issued `ACTIVATE AUTO MODE` on 31 August 2026 after the Phase 12 owner-gate pause; execution continues on gate-independent Phase 13–15 Arena-side work. Phase 12 completion still awaits AS-H011/AS-H012 owner evidence.
-- **Autonomous Supervisor:** ACTIVE on the MVP launch track; Phase 12 owner gates remain open alongside, Phase 18 remains excluded and Agent 10 inactive.
+- **Active:** No (paused at genuine blockers) — after the 31 August 2026 reactivation, Phases 13–15 Arena-side contracts and the Phase 16 owner UAT script were completed; nothing gate-independent remains, so the supervisor paused per protocol blockers 3.6/3.7.
+- **Autonomous Supervisor:** PAUSED awaiting owner evidence/decisions; Phase 18 remains excluded and Agent 10 inactive.
 - **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
 - **Current priority:** Manual homepage UI/UX changes — plan first, then implement after required content/privacy decisions.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
