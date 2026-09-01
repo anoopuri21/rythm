@@ -1,12 +1,31 @@
 @php
-    $phone = trim((string) config('rythme.contact_phone', ''));
-    $email = trim((string) config('rythme.contact_email', ''));
-    $configuredSocials = config('rythme.social_links', []);
+    /**
+     * Site top bar (sits directly above #navbar).
+     * Every value here is admin-managed: Filament → Settings → "Contact & address"
+     * and "Social links". Blank values are simply not rendered.
+     */
+    $siteSettings = app(\App\Services\SiteSettingsService::class);
+
+    $phone = trim((string) ($siteSettings->get('contact_phone') ?? ''));
+    $email = trim((string) ($siteSettings->get('contact_email') ?? ''));
+
     $socials = collect([
-        'instagram' => ['label' => 'Instagram', 'url' => $configuredSocials['instagram'] ?? null],
-        'facebook' => ['label' => 'Facebook', 'url' => $configuredSocials['facebook'] ?? null],
-        'youtube' => ['label' => 'YouTube', 'url' => $configuredSocials['youtube'] ?? null],
-    ])->filter(fn (array $social): bool => is_string($social['url']) && str_starts_with($social['url'], 'https://'));
+        'instagram' => ['label' => 'Instagram', 'url' => $siteSettings->get('social_instagram')],
+        'facebook' => ['label' => 'Facebook', 'url' => $siteSettings->get('social_facebook')],
+        'youtube' => ['label' => 'YouTube', 'url' => $siteSettings->get('social_youtube')],
+        'x' => ['label' => 'X (Twitter)', 'url' => $siteSettings->get('social_x')],
+        'linkedin' => ['label' => 'LinkedIn', 'url' => $siteSettings->get('social_linkedin')],
+    ])->filter(function (array $social): bool {
+        $url = trim((string) ($social['url'] ?? ''));
+
+        // Only render an icon when the admin has saved a valid absolute URL.
+        return $url !== '' && filter_var($url, FILTER_VALIDATE_URL) !== false
+            && (str_starts_with($url, 'https://') || str_starts_with($url, 'http://'));
+    })->map(function (array $social): array {
+        $social['url'] = trim((string) $social['url']);
+
+        return $social;
+    });
 @endphp
 
 @if($phone !== '' || $email !== '' || $socials->isNotEmpty())
@@ -35,8 +54,12 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>
                             @elseif($network === 'facebook')
                                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.7 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.6 1.7-1.6h1.8V3.8c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V10H8.2v3h2.6v8h2.9Z"/></svg>
-                            @else
+                            @elseif($network === 'youtube')
                                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.8 2.8 0 0 0-2-2C17.8 4.7 12 4.7 12 4.7s-5.8 0-7.6.5a2.8 2.8 0 0 0-2 2C1.9 9 1.9 12 1.9 12s0 3 .5 4.8a2.8 2.8 0 0 0 2 2c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a2.8 2.8 0 0 0 2-2c.5-1.8.5-4.8.5-4.8s0-3-.5-4.8ZM10 15.8V8.2l6.3 3.8-6.3 3.8Z"/></svg>
+                            @elseif($network === 'x')
+                                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.53 3h3.02l-6.6 7.54L21.75 21h-5.9l-4.62-6.04L5.94 21H2.92l7.06-8.07L2.5 3h6.05l4.18 5.52L17.53 3Zm-1.06 16.17h1.67L7.6 4.74H5.81l10.66 14.43Z"/></svg>
+                            @else
+                                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.94 5.5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0ZM3.3 8.98h3.4V21H3.3V8.98Zm5.53 0h3.26v1.64h.05c.45-.86 1.57-1.77 3.23-1.77 3.45 0 4.09 2.27 4.09 5.22V21h-3.4v-5.35c0-1.28-.02-2.92-1.78-2.92-1.78 0-2.05 1.39-2.05 2.83V21h-3.4V8.98Z"/></svg>
                             @endif
                         </a>
                     @endforeach

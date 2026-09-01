@@ -24,11 +24,16 @@ final class SiteSettingsService
         'return_window_days' => '0', // no eligibility window is assumed
         'contact_email' => 'support@rythme.store',
         'contact_phone' => '+91 98765 43210',
+        'whatsapp_number' => '',
+        'whatsapp_message' => 'Hi Rhythm Exports! I have a question about your instruments.',
         'address_line' => '42, Music Lane, Karol Bagh, New Delhi 110005',
-        'social_instagram' => 'https://instagram.com',
-        'social_youtube' => 'https://youtube.com',
-        'social_facebook' => 'https://facebook.com',
-        'social_x' => 'https://x.com',
+        // Social links stay empty until an admin saves a real profile URL,
+        // so no placeholder icon is ever shown in the top bar.
+        'social_instagram' => '',
+        'social_youtube' => '',
+        'social_facebook' => '',
+        'social_x' => '',
+        'social_linkedin' => '',
     ];
 
     /** @return array<string, string> */

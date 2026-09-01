@@ -16,8 +16,10 @@
         ]);
     }
 
+    // Falls back to the global admin setting (Filament → Settings).
+    $globalSettings = app(\App\Services\SiteSettingsService::class);
     $whatsappEnabled = (bool) ($s['whatsapp_enabled'] ?? true);
-    $whatsappNumber = $s['whatsapp_number'] ?? '+91 98765 43210';
+    $whatsappNumber = ($s['whatsapp_number'] ?? null) ?: ($globalSettings->get('whatsapp_number') ?? '');
     $whatsappDigits = preg_replace('/\D+/', '', (string) $whatsappNumber);
     $whatsappTitle = $s['whatsapp_title'] ?? 'Prefer WhatsApp?';
     $whatsappText = $s['whatsapp_text'] ?? 'Message us photos of your gear — we love a good setup question.';
