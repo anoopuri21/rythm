@@ -28,20 +28,20 @@
        ============================================================ */
 
   /* Brand */
-  --color-brand: #b20202;
+  --color-brand: #B20202;
   --color-brand-dark: #930303;
-  --color-brand-light: #b20202;
-  --color-brand-soft: #e7f4f1;
+  --color-brand-light: #B20202;
+  --color-brand-soft: #E7F4F1;
 
   /* Surface / text */
   --color-ink: #222222;
-  --color-ink-soft: #2d2d2d;
-  --color-ink-muted: #3a3a3a;
-  --color-paper: #ffffff;
-  --color-paper-dark: #f7f7f8;
-  --color-muted: #6b6b6b;
-  --color-border: #e5e7eb;
-  --color-white: #ffffff;
+  --color-ink-soft: #2D2D2D;
+  --color-ink-muted: #3A3A3A;
+  --color-paper: #FFFFFF;
+  --color-paper-dark: #F7F7F8;
+  --color-muted: #6B6B6B;
+  --color-border: #E5E7EB;
+  --color-white: #FFFFFF;
 
   /* Legacy aliases keep existing classes working */
   --color-gold: #b20202;
@@ -58,11 +58,11 @@
   --color-rythme-warm-white: #ffffff;
   --color-rythme-warm-gray: #6b6b6b;
 
-  /* Typography — one premium Poppins hierarchy */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-playfair: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-inter: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-bebas: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  /* Typography — Inter font family */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-playfair: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-bebas: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 ::-webkit-scrollbar {
