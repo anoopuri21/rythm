@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Models\Product;
 use App\Services\ReviewService;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -51,6 +52,7 @@ final class ReviewSection extends Component
         ]);
 
         try {
+            $this->guardRateLimit();
             $reviews->submit(auth()->id(), $this->product, $this->rating, $this->comment);
             $this->submitted = true;
             $this->comment = null;
@@ -65,5 +67,16 @@ final class ReviewSection extends Component
             'paginated' => $reviews->approvedFor($this->product),
             'summary' => $reviews->summary($this->product),
         ]);
+    }
+
+    private function guardRateLimit(): void
+    {
+        $key = 'review:submit:user:'.auth()->id().':product:'.$this->product->getKey();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw new RuntimeException('Too many review attempts. Please wait a moment and try again.');
+        }
+
+        RateLimiter::hit($key, 60);
     }
 }

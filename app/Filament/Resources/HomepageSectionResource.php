@@ -64,7 +64,7 @@ class HomepageSectionResource extends Resource
                 ->label('Title accent')
                 ->maxLength(255)
                 ->helperText('The emphasised part of the heading (brand colour).'),
-            RichEditor::make('content')
+            RichEditor::make('content')->maxLength(50000)
                 ->label('Body content')
                 ->profile('default')
                 ->helperText('Long-form body shown in this section (optional).'),

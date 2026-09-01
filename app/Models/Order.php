@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\OrderPaymentStatus;
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,29 +21,31 @@ class Order extends Model
 {
     use HasFactory;
 
-    public const STATUS_PENDING = 'pending';
+    public const STATUS_PENDING = OrderStatus::Pending->value;
 
-    public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_CONFIRMED = OrderStatus::Confirmed->value;
 
-    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_PROCESSING = OrderStatus::Processing->value;
 
-    public const STATUS_SHIPPED = 'shipped';
+    public const STATUS_SHIPPED = OrderStatus::Shipped->value;
 
-    public const STATUS_DELIVERED = 'delivered';
+    public const STATUS_DELIVERED = OrderStatus::Delivered->value;
 
-    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_CANCELLED = OrderStatus::Cancelled->value;
 
-    public const STATUS_REFUNDED = 'refunded';
+    public const STATUS_REFUNDED = OrderStatus::Refunded->value;
 
-    public const PAYMENT_UNPAID = 'unpaid';
+    public const PAYMENT_UNPAID = OrderPaymentStatus::Unpaid->value;
 
-    public const PAYMENT_PAID = 'paid';
+    public const PAYMENT_AUTHORIZED = OrderPaymentStatus::Authorized->value;
 
-    public const PAYMENT_FAILED = 'failed';
+    public const PAYMENT_PAID = OrderPaymentStatus::Paid->value;
 
-    public const PAYMENT_REFUND_PENDING = 'refund_pending';
+    public const PAYMENT_FAILED = OrderPaymentStatus::Failed->value;
 
-    public const PAYMENT_REFUNDED = 'refunded';
+    public const PAYMENT_REFUND_PENDING = OrderPaymentStatus::RefundPending->value;
+
+    public const PAYMENT_REFUNDED = OrderPaymentStatus::Refunded->value;
 
     public const STATUSES = [
         self::STATUS_PENDING,
@@ -55,6 +59,7 @@ class Order extends Model
 
     public const PAYMENT_STATUSES = [
         self::PAYMENT_UNPAID,
+        self::PAYMENT_AUTHORIZED,
         self::PAYMENT_PAID,
         self::PAYMENT_FAILED,
         self::PAYMENT_REFUND_PENDING,
@@ -114,6 +119,11 @@ class Order extends Model
         return $this->hasMany(Shipment::class);
     }
 
+    public function returnRequests(): HasMany
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;
@@ -133,8 +143,9 @@ class Order extends Model
     public function trackingTimeline(): array
     {
         $reached = collect($this->statusHistory)
-            ->keyBy('to')
-            ->map(fn ($entry) => $entry->created_at);
+            ->mapWithKeys(fn ($entry): array => [
+                ($entry->to === self::STATUS_PENDING ? 'placed' : $entry->to) => $entry->created_at,
+            ]);
 
         $steps = [
             'placed' => ['label' => 'Order placed', 'desc' => 'We have received your order.'],
@@ -187,6 +198,13 @@ class Order extends Model
 
     private function currentStepIndex(): int
     {
-        return $this->stepIndex($this->status);
+        return match ($this->status) {
+            self::STATUS_PENDING => 0,
+            self::STATUS_CONFIRMED => 1,
+            self::STATUS_PROCESSING => 2,
+            self::STATUS_SHIPPED => 3,
+            self::STATUS_DELIVERED => 4,
+            default => -1,
+        };
     }
 }

@@ -178,7 +178,7 @@
 
                         {{-- Razorpay script (only when configured) --}}
                         @if($razorpayConfigured)
-                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('rythme.razorpay.key_id') }}" defer></script>
+                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('services.razorpay.key_id') }}" defer></script>
                         @endif
 
                         @if($razorpayConfigured)
@@ -207,6 +207,12 @@
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Payment details are handled by the configured gateway; order totals are verified by the application.
                         </p>
+                        <nav class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted" aria-label="Checkout policies">
+                            <a href="/shipping" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Shipping</a>
+                            <a href="/returns" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Returns &amp; refunds</a>
+                            <a href="/terms" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Terms</a>
+                            <a href="/privacy" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Privacy</a>
+                        </nav>
                     </div>
                 </section>
             @endif
@@ -214,14 +220,14 @@
 
         {{-- ===== ORDER SUMMARY ===== --}}
         <aside class="min-w-0 lg:sticky lg:top-28 lg:self-start">
-            <div class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-7">
+            <div class="ui-summary-panel p-6 sm:p-7">
                 <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-muted">Order summary</h2>
                 <div class="mt-5 max-h-72 space-y-4 overflow-y-auto pr-1">
                     @forelse($cartItems as $item)
                         <div class="flex items-center gap-3">
                             <div class="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-paper p-1.5">
-                                @if($item->product->heroImage())
-                                    <img src="{{ $item->product->heroImage() }}" alt="" class="h-full w-full object-contain">
+                                @if($item->product->thumbnailImage())
+                                    <img src="{{ $item->product->thumbnailImage() }}" alt="" width="480" height="480" class="h-full w-full object-contain" loading="lazy" decoding="async">
                                 @else
                                     <div class="flex h-full w-full items-center justify-center text-[8px] font-bold uppercase text-muted">{{ $item->product->brand?->name ?? 'R' }}</div>
                                 @endif

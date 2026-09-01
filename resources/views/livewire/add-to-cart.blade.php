@@ -11,8 +11,8 @@
             </span>
         @endif
     </div>
-    <p class="mt-1.5 text-xs text-muted">
-        MRP inclusive of all taxes · <span class="font-semibold text-ink">EMI from ₹{{ number_format((int) round($price / 12)) }}/mo</span>
+    <p class="mt-1.5 text-xs leading-5 text-muted">
+        Displayed price is revalidated at checkout. Shipping, tax and available payment methods are shown before payment.
     </p>
 
     {{-- Variant selector --}}
@@ -29,7 +29,7 @@
                             class="rounded-full border px-4 py-2 text-sm font-semibold transition
                             {{ $variantId === $v->id ? 'border-brand bg-brand text-white shadow-sm' : 'border-ink/15 bg-white text-ink hover:border-brand/50' }}">
                         {{ $v->name }}
-                        @if($v->stock === 0)
+                        @if($v->stock <= 0)
                             <span class="ml-1 text-[10px] font-bold uppercase opacity-70">· Out</span>
                         @endif
                     </button>
@@ -69,10 +69,38 @@
         </p>
     @endif
 
+    @if($stock <= 0)
+        <div class="mt-5 rounded-2xl border border-brand/20 bg-brand/5 p-4" aria-labelledby="stock-alert-title">
+            <h3 id="stock-alert-title" class="text-sm font-bold text-ink">Want a stock update?</h3>
+            @auth
+                <label class="mt-3 flex items-start gap-2 text-xs leading-5 text-muted">
+                    <input type="checkbox" wire:model="notifyConsent" class="mt-1 rounded border-ink/20 text-brand focus:ring-brand" />
+                    <span>I agree to receive one stock-availability email for this item. No marketing messages.</span>
+                </label>
+                <button type="button" wire:click="requestStockNotification" wire:loading.attr="disabled" wire:target="requestStockNotification"
+                        class="mt-3 inline-flex items-center rounded-full bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-brand disabled:opacity-50">
+                    Request stock email
+                </button>
+            @else
+                <p class="mt-1 text-xs leading-5 text-muted">Log in to request a stock-availability email without sharing your address on this page.</p>
+                <a href="{{ route('login') }}" class="mt-3 inline-flex text-xs font-bold text-brand underline underline-offset-4">Log in to request an update</a>
+            @endauth
+            @if($notifyError)
+                <p class="mt-3 text-xs font-semibold text-brand" role="alert">{{ $notifyError }}</p>
+            @endif
+            @if($notifySuccess)
+                <p class="mt-3 text-xs font-semibold text-emerald-700" role="status">Your request is recorded. We will email you if this item is restocked.</p>
+            @endif
+            <a href="{{ route('contact', ['product' => $product->slug]) }}" class="mt-3 inline-flex text-xs font-semibold text-brand underline underline-offset-4">
+                Ask about availability
+            </a>
+        </div>
+    @endif
+
     {{-- CTAs --}}
     <div class="mt-6 grid gap-3 sm:grid-cols-2">
         <button type="button" wire:click="add" wire:loading.attr="disabled" wire:target="add"
-                @if($stock === 0) disabled @endif
+                @if($stock <= 0) disabled @endif
                 class="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Add {{ $product->name }} to cart">
             <span wire:loading.remove wire:target="add" class="inline-flex items-center gap-2">

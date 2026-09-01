@@ -30,6 +30,7 @@ final class OrderService
         private readonly SiteSettingsService $settings,
         private readonly RefundService $refunds,
         private readonly InventoryService $inventory,
+        private readonly OrderStateMachine $states,
     ) {}
 
     public function createFromCheckout(Cart $cart, CheckoutData $data, int $userId): Order
@@ -71,11 +72,11 @@ final class OrderService
                         throw new RuntimeException('A product in your cart is no longer available.');
                     }
 
-                    if ($item->variant !== null && ! $item->variant->is_active) {
+                    if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active || (int) $item->variant->product_id !== (int) $item->product_id)) {
                         throw new RuntimeException("{$item->product->name} option is no longer available.");
                     }
 
-                    $availableStock = $item->variant?->stock ?? $item->product->stock;
+                    $availableStock = $item->product_variant_id !== null ? $item->variant->stock : $item->product->stock;
                     if ($availableStock < $item->qty) {
                         throw new RuntimeException("Not enough stock for {$item->product->name}.");
                     }
@@ -94,7 +95,13 @@ final class OrderService
                 }
 
                 $shippingFee = $this->shippingFeeFor($subtotal);
-                $tax = $this->taxFor($subtotal - $discount);
+                $taxSnapshots = $this->taxSnapshotsFor(
+                    $items,
+                    $unitPrices,
+                    $discount,
+                    $data->shippingAddress,
+                );
+                $tax = round((float) collect($taxSnapshots)->sum('tax_amount_snapshot'), 2);
                 $total = max(0.0, round($subtotal - $discount + $shippingFee + $tax, 2));
 
                 $order = Order::create([
@@ -126,6 +133,7 @@ final class OrderService
                         'product_variant_id' => $item->product_variant_id,
                         'name' => $item->product->name,
                         'sku' => $item->variant?->sku ?? $item->product->sku,
+                        ...$taxSnapshots[$item->id],
                         'options' => $item->variant?->options,
                         'unit_price' => $unitPrice,
                         'qty' => $item->qty,
@@ -133,7 +141,7 @@ final class OrderService
                     ]);
                 }
 
-                $this->transitionStatus($order, Order::STATUS_PENDING, 'Order placed');
+                $this->recordInitialStatus($order);
 
                 return $order;
             });
@@ -198,6 +206,54 @@ final class OrderService
     }
 
     /**
+     * Record a provider-confirmed authorization without granting paid state,
+     * confirming the order, or moving inventory.
+     */
+    public function markPaymentAuthorized(
+        Order $order,
+        PaymentResult $result,
+        string $gatewayOrderId,
+    ): bool {
+        return DB::transaction(function () use ($order, $result, $gatewayOrderId): bool {
+            $lockedOrder = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedOrder->isPaid() || $lockedOrder->isCancelled()) {
+                return false;
+            }
+
+            $payment = Payment::query()
+                ->where('order_id', $lockedOrder->id)
+                ->where('gateway', 'razorpay')
+                ->where('gateway_order_id', $gatewayOrderId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($payment === null) {
+                throw new RuntimeException('Payment initiation record not found.');
+            }
+
+            if ($payment->status === Payment::STATUS_AUTHORIZED
+                && $payment->gateway_payment_id === $result->gatewayPaymentId) {
+                return false;
+            }
+
+            if ($payment->status === Payment::STATUS_PAID) {
+                return false;
+            }
+
+            $payment->update([
+                'gateway_payment_id' => $result->gatewayPaymentId,
+                'amount' => $lockedOrder->total,
+                'currency' => $lockedOrder->currency,
+                'status' => Payment::STATUS_AUTHORIZED,
+            ]);
+            $lockedOrder->update(['payment_status' => Order::PAYMENT_AUTHORIZED]);
+
+            return true;
+        });
+    }
+
+    /**
      * Finalize a captured payment exactly once.
      *
      * @return bool true only when this call performed the first transition
@@ -250,7 +306,27 @@ final class OrderService
                 'status' => Order::STATUS_CONFIRMED,
             ]);
 
-            $this->transitionStatus($lockedOrder, Order::STATUS_CONFIRMED, 'Payment captured', from: $fromStatus);
+            // The pending entry created with the order is the same audit
+            // record that becomes confirmed when payment is captured. Updating
+            // it avoids recording a duplicate status row for one checkout.
+            $initialStatus = OrderStatusHistory::query()
+                ->where('order_id', $lockedOrder->id)
+                ->whereNull('from')
+                ->where('to', Order::STATUS_PENDING)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($initialStatus !== null) {
+                $initialStatus->update([
+                    'from' => $fromStatus,
+                    'to' => Order::STATUS_CONFIRMED,
+                    'note' => 'Payment captured',
+                    'actor' => auth()->check() ? 'customer' : 'system',
+                ]);
+            } else {
+                $this->transitionStatus($lockedOrder, Order::STATUS_CONFIRMED, 'Payment captured', from: $fromStatus);
+            }
 
             CommerceNotificationRequested::dispatch(
                 "order:{$lockedOrder->id}:confirmed",
@@ -297,6 +373,17 @@ final class OrderService
         });
     }
 
+    private function recordInitialStatus(Order $order): void
+    {
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'from' => null,
+            'to' => Order::STATUS_PENDING,
+            'note' => 'Order placed',
+            'actor' => auth()->check() ? 'customer' : 'system',
+        ]);
+    }
+
     public function transitionStatus(Order $order, string $to, ?string $note = null, ?string $actor = null, ?string $from = null): void
     {
         // Explicit $from wins — call sites must capture the previous
@@ -329,28 +416,17 @@ final class OrderService
      *
      * @throws RuntimeException on invalid transitions
      */
-    public function changeStatus(Order $order, string $to, ?string $note = null): void
+    public function changeStatus(Order $order, string $to, ?string $note = null, bool $notify = true): void
     {
-        $allowed = match ($order->status) {
-            Order::STATUS_CONFIRMED => [Order::STATUS_PROCESSING, Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
-            Order::STATUS_PROCESSING => [Order::STATUS_SHIPPED, Order::STATUS_CANCELLED],
-            Order::STATUS_SHIPPED => [Order::STATUS_DELIVERED, Order::STATUS_CANCELLED],
-            default => [],
-        };
-
-        if (! in_array($to, $allowed, true)) {
-            throw new RuntimeException(
-                "Cannot move order from '{$order->status}' to '{$to}'."
-            );
-        }
+        $this->states->assertTransition($order->status, $to);
 
         $from = $order->status;
 
-        DB::transaction(function () use ($order, $to, $note, $from): void {
+        DB::transaction(function () use ($order, $to, $note, $from, $notify): void {
             $order->update(['status' => $to]);
             $this->transitionStatus($order, $to, $note, from: $from);
 
-            if (in_array($to, [
+            if ($notify && in_array($to, [
                 Order::STATUS_PROCESSING,
                 Order::STATUS_SHIPPED,
                 Order::STATUS_DELIVERED,
@@ -378,6 +454,9 @@ final class OrderService
 
             if (! in_array($lockedOrder->status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED], true)) {
                 throw new RuntimeException('This order can no longer be cancelled.');
+            }
+            if ($lockedOrder->payment_status === Order::PAYMENT_AUTHORIZED) {
+                throw new RuntimeException('Payment authorization is settling. Please wait before cancelling.');
             }
 
             $wasPaid = $lockedOrder->isPaid();
@@ -430,10 +509,60 @@ final class OrderService
         return $freeAbove > 0 && $subtotal >= $freeAbove ? 0.0 : $flat;
     }
 
-    private function taxFor(float $discountedSubtotal): float
+    /**
+     * Build immutable line-level tax evidence without assuming a jurisdictional rule.
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CartItem>  $items
+     * @param  array<int, float>  $unitPrices
+     * @param  array<string, mixed>  $shippingAddress
+     * @return array<int, array<string, mixed>>
+     */
+    private function taxSnapshotsFor($items, array $unitPrices, float $discount, array $shippingAddress): array
     {
-        $rate = max(0.0, $this->settings->getFloat('tax_rate', 0.0));
+        $enabled = $this->settings->get('tax_rules_enabled', '0') === '1';
+        $globalRate = $this->settings->getFloat('tax_rate', 0.0);
+        if ($enabled && ($globalRate < 0 || $globalRate > 100)) {
+            throw new RuntimeException('Configured default tax rate must be between 0 and 100.');
+        }
+        $subtotalCents = (int) round($items->sum(
+            fn ($item): float => $unitPrices[$item->id] * $item->qty,
+        ) * 100);
+        $discountCentsTotal = min($subtotalCents, max(0, (int) round($discount * 100)));
+        $remainingDiscountCents = $discountCentsTotal;
+        $snapshots = [];
+        $lastIndex = $items->count() - 1;
 
-        return round(max(0.0, $discountedSubtotal) * ($rate / 100), 2);
+        foreach ($items->values() as $index => $item) {
+            $grossCents = (int) round($unitPrices[$item->id] * $item->qty * 100);
+            $discountCents = $index === $lastIndex
+                ? $remainingDiscountCents
+                : min($remainingDiscountCents, (int) round(
+                    $subtotalCents > 0 ? $discountCentsTotal * ($grossCents / $subtotalCents) : 0,
+                ));
+            $remainingDiscountCents -= $discountCents;
+            $taxableCents = max(0, $grossCents - $discountCents);
+            $configuredRate = $item->product->tax_rate === null
+                ? $globalRate
+                : (float) $item->product->tax_rate;
+            if ($enabled && ($configuredRate < 0 || $configuredRate > 100)) {
+                throw new RuntimeException('Configured product tax rate must be between 0 and 100.');
+            }
+            $appliedRate = $enabled ? $configuredRate : null;
+            $taxCents = $appliedRate === null ? 0 : (int) round($taxableCents * ($appliedRate / 100));
+
+            $snapshots[$item->id] = [
+                'hsn_code_snapshot' => $item->product->hsn_code,
+                'tax_classification_snapshot' => $item->product->tax_classification,
+                'tax_rate_snapshot' => $appliedRate,
+                'taxable_amount_snapshot' => $enabled ? $taxableCents / 100 : null,
+                'tax_amount_snapshot' => $taxCents / 100,
+                'tax_calculation_enabled_snapshot' => $enabled,
+                'tax_destination_region_snapshot' => $enabled
+                    ? (isset($shippingAddress['state']) ? trim((string) $shippingAddress['state']) : null)
+                    : null,
+            ];
+        }
+
+        return $snapshots;
     }
 }

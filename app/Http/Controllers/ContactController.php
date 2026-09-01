@@ -20,6 +20,6 @@ final class ContactController extends Controller
     {
         $messages->store($request->validated());
 
-        return back()->with('contact_success', 'Thank you! Your message has been sent — we reply within 24 hours.');
+        return back()->with('contact_success', 'Thank you. Your message has been recorded for the Rhythm Exports team.');
     }
 }

@@ -1,3 +1,9 @@
+import 'swiper/css';
+import 'swiper/css/a11y';
+import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 import Swiper from 'swiper';
 import { A11y, Autoplay, EffectFade, Keyboard, Navigation, Pagination } from 'swiper/modules';
 

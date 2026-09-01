@@ -8,14 +8,19 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Refund;
-use App\Payment\FakePaymentGateway;
+use App\Models\Shipment;
+use App\Models\User;
 use App\Payment\RazorpayGateway;
+use App\Services\FulfillmentService;
 use App\Services\OrderService;
 use App\Services\RefundService;
 use App\Support\AdminAccess;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -31,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class OrderResource extends Resource
 {
@@ -66,7 +72,7 @@ class OrderResource extends Resource
                             'cancelled', 'refunded' => 'danger',
                             default => 'gray',
                         }),
-                        TextEntry::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
+                        TextEntry::make('payment_status')->badge()->color(fn (string $state): string => match ($state) { 'paid' => 'success', 'authorized' => 'warning', default => 'danger' }),
                         TextEntry::make('placed_at')->dateTime('d M Y, h:i A'),
                         TextEntry::make('total')->money('INR')->weight('bold')->size(TextSize::Large),
                     ]),
@@ -80,6 +86,12 @@ class OrderResource extends Resource
                                 TextEntry::make('qty'),
                                 TextEntry::make('unit_price')->money('INR'),
                                 TextEntry::make('total')->money('INR')->weight('bold'),
+                                TextEntry::make('hsn_code_snapshot')->label('HSN snapshot')->placeholder('—'),
+                                TextEntry::make('tax_classification_snapshot')->label('Tax class snapshot')->placeholder('—'),
+                                TextEntry::make('tax_rate_snapshot')->label('Rate snapshot')->suffix('%')->placeholder('Disabled'),
+                                TextEntry::make('taxable_amount_snapshot')->label('Taxable snapshot')->money('INR')->placeholder('Disabled'),
+                                TextEntry::make('tax_amount_snapshot')->label('Tax snapshot')->money('INR'),
+                                TextEntry::make('tax_destination_region_snapshot')->label('Destination snapshot')->placeholder('Disabled'),
                             ])
                             ->columns(6),
                     ]),
@@ -136,6 +148,19 @@ class OrderResource extends Resource
                             ])
                             ->columns(5),
                     ]),
+                Section::make('Shipments')
+                    ->schema([
+                        RepeatableEntry::make('shipments')
+                            ->schema([
+                                TextEntry::make('id')->label('Parcel')->formatStateUsing(fn (int $state): string => '#'.$state),
+                                TextEntry::make('status')->badge(),
+                                TextEntry::make('carrier')->placeholder('—'),
+                                TextEntry::make('awb')->label('AWB / reference')->placeholder('—'),
+                                TextEntry::make('items_count')->label('Allocations')->state(fn (Shipment $record): int => $record->items->count()),
+                                TextEntry::make('dispatched_at')->dateTime()->placeholder('—'),
+                            ])
+                            ->columns(6),
+                    ]),
                 Section::make('Status history')
                     ->schema([
                         RepeatableEntry::make('statusHistory')
@@ -172,7 +197,7 @@ class OrderResource extends Resource
                         default => 'gray',
                     })
                     ->sortable(),
-                TextColumn::make('payment_status')->badge()->color(fn (string $state): string => $state === 'paid' ? 'success' : 'danger'),
+                TextColumn::make('payment_status')->badge()->color(fn (string $state): string => match ($state) { 'paid' => 'success', 'authorized' => 'warning', default => 'danger' }),
                 TextColumn::make('placed_at')->dateTime('d M Y')->sortable(),
             ])
             ->defaultSort('placed_at', 'desc')
@@ -188,6 +213,7 @@ class OrderResource extends Resource
             ])
             ->actions([
                 ViewAction::make(),
+                self::createShipmentAction(),
                 self::processPendingRefundAction(),
                 self::refundAction(),
                 self::statusAction(Order::STATUS_PROCESSING, 'Mark processing', 'heroicon-o-arrow-path', 'info'),
@@ -198,6 +224,57 @@ class OrderResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([]),
             ]);
+    }
+
+    private static function createShipmentAction(): Action
+    {
+        return Action::make('create_shipment')
+            ->label('Create shipment')
+            ->icon('heroicon-o-archive-box-arrow-down')
+            ->color('warning')
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::ORDERS_MANAGE) ?? false)
+                && $record->payment_status === Order::PAYMENT_PAID
+                && ! in_array($record->status, [Order::STATUS_CANCELLED, Order::STATUS_REFUNDED], true))
+            ->schema([
+                Hidden::make('idempotency_key')->default(fn (Order $record): string => 'admin-'.$record->id.'-'.Str::uuid()),
+                Repeater::make('allocations')
+                    ->minItems(1)
+                    ->addActionLabel('Allocate another item')
+                    ->schema([
+                        Select::make('order_item_id')
+                            ->label('Order item')
+                            ->options(fn (Order $record): array => $record->items
+                                ->mapWithKeys(fn ($item): array => [$item->id => $item->name.' (ordered: '.$item->qty.')'])
+                                ->all())
+                            ->distinct()
+                            ->required(),
+                        TextInput::make('quantity')->integer()->minValue(1)->required(),
+                    ])->columns(2),
+                Textarea::make('note')->label('Internal allocation note')->maxLength(1000),
+            ])
+            ->action(function (Order $record, array $data): void {
+                $actor = auth()->user();
+                if (! $actor instanceof User) {
+                    Notification::make()->danger()->title('Order-management authorization is required.')->send();
+                    return;
+                }
+
+                try {
+                    $allocations = collect($data['allocations'])
+                        ->mapWithKeys(fn (array $row): array => [(int) $row['order_item_id'] => (int) $row['quantity']])
+                        ->all();
+                    app(FulfillmentService::class)->create(
+                        $record,
+                        $allocations,
+                        (string) $data['idempotency_key'],
+                        $actor,
+                        ['note' => isset($data['note']) ? (string) $data['note'] : null],
+                    );
+                    Notification::make()->success()->title('Shipment allocation created')->send();
+                } catch (\RuntimeException $exception) {
+                    Notification::make()->danger()->title($exception->getMessage())->send();
+                }
+            });
     }
 
     private static function processPendingRefundAction(): Action
@@ -228,9 +305,7 @@ class OrderResource extends Resource
                 request()->merge(['audit_reason' => $data['reason']]);
 
                 try {
-                    $gateway = RazorpayGateway::isConfigured()
-                        ? RazorpayGateway::fromConfig()
-                        : app(FakePaymentGateway::class);
+                    $gateway = RazorpayGateway::resolve();
                     $refund = app(RefundService::class)->processPendingForOrder($record, $gateway, $user);
 
                     if ($refund->status === Refund::STATUS_REFUNDED) {
@@ -287,9 +362,7 @@ class OrderResource extends Resource
                 try {
                     $service = app(RefundService::class);
                     $refund = $service->request($payment, (float) $data['amount'], $data['reason'], $user);
-                    $gateway = RazorpayGateway::isConfigured()
-                        ? RazorpayGateway::fromConfig()
-                        : app(FakePaymentGateway::class);
+                    $gateway = RazorpayGateway::resolve();
                     $refund = $service->process($refund, $gateway, $user);
                     $notification = Notification::make()->title(
                         $refund->status === Refund::STATUS_REFUNDED
@@ -311,7 +384,8 @@ class OrderResource extends Resource
             ->label($label)
             ->icon($icon)
             ->color($color)
-            ->visible(fn (): bool => auth()->user()?->hasAdminPermission(AdminAccess::ORDERS_MANAGE) ?? false)
+            ->visible(fn (Order $record): bool => (auth()->user()?->hasAdminPermission(AdminAccess::ORDERS_MANAGE) ?? false)
+                && (! in_array($to, [Order::STATUS_SHIPPED, Order::STATUS_DELIVERED], true) || ! $record->shipments()->exists()))
             ->requiresConfirmation()
             ->schema([
                 Textarea::make('reason')->label('Reason / operational note')->required()->minLength(5)->maxLength(500),

@@ -116,8 +116,13 @@ class CheckoutTest extends TestCase
     {
         SiteSetting::query()->updateOrCreate(['key' => 'shipping_flat_fee'], ['value' => '50']);
         SiteSetting::query()->updateOrCreate(['key' => 'shipping_free_above'], ['value' => '0']);
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rules_enabled'], ['value' => '1']);
         SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '10']);
         Cache::forget('site.settings');
+        Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->update([
+            'hsn_code' => 'APPROVED-HSN',
+            'tax_classification' => 'approved-test-class',
+        ]);
 
         $this->fillCart(2);
         $addressId = $this->addAddress();
@@ -132,6 +137,14 @@ class CheckoutTest extends TestCase
         $this->assertSame(50.0, (float) $order->shipping_fee);
         $this->assertSame(79.8, (float) $order->tax);
         $this->assertSame(927.8, (float) $order->total);
+        $line = $order->items()->firstOrFail();
+        $this->assertSame('APPROVED-HSN', $line->hsn_code_snapshot);
+        $this->assertSame('approved-test-class', $line->tax_classification_snapshot);
+        $this->assertSame(10.0, (float) $line->tax_rate_snapshot);
+        $this->assertSame(798.0, (float) $line->taxable_amount_snapshot);
+        $this->assertSame(79.8, (float) $line->tax_amount_snapshot);
+        $this->assertTrue($line->tax_calculation_enabled_snapshot);
+        $this->assertSame('Delhi', $line->tax_destination_region_snapshot);
 
         $this->get(route('orders.show', $order))
             ->assertOk()
@@ -145,6 +158,43 @@ class CheckoutTest extends TestCase
             ->assertSee('50.00')
             ->assertSee('79.80')
             ->assertSee('927.80');
+    }
+
+    public function test_tax_values_remain_disabled_without_explicit_rule_enablement(): void
+    {
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '18']);
+        Cache::forget('site.settings');
+        $this->fillCart();
+        $addressId = $this->addAddress();
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $order = Order::query()->firstOrFail();
+        $line = $order->items()->firstOrFail();
+        $this->assertSame(0.0, (float) $order->tax);
+        $this->assertFalse($line->tax_calculation_enabled_snapshot);
+        $this->assertNull($line->tax_rate_snapshot);
+        $this->assertNull($line->taxable_amount_snapshot);
+        $this->assertSame(0.0, (float) $line->tax_amount_snapshot);
+        $this->assertNull($line->tax_destination_region_snapshot);
+    }
+
+    public function test_order_line_tax_snapshots_reject_later_mutation(): void
+    {
+        $this->fillCart();
+        $addressId = $this->addAddress();
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $addressId)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $line = Order::query()->firstOrFail()->items()->firstOrFail();
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Order-line tax snapshots are immutable after checkout.');
+        $line->update(['tax_amount_snapshot' => 999]);
     }
 
     public function test_checkout_order_creation_is_idempotent_per_attempt(): void
@@ -212,6 +262,26 @@ class CheckoutTest extends TestCase
             ->set('pincode', '12')
             ->call('saveNewAddress')
             ->assertHasErrors(['name' => 'required', 'pincode' => 'regex']);
+    }
+
+    public function test_checkout_rejects_another_customers_address_before_place_order(): void
+    {
+        $other = User::factory()->create();
+        $address = app(AddressService::class)->store($other->id, [
+            'name' => 'Other Customer',
+            'phone' => '9876543210',
+            'line1' => '99, Private Lane',
+            'city' => 'New Delhi',
+            'state' => 'Delhi',
+            'pincode' => '110001',
+            'is_default' => true,
+        ]);
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $address->id)
+            ->assertSet('addressId', null)
+            ->assertSet('step', 1)
+            ->assertSet('error', 'Please choose a valid delivery address.');
     }
 
     public function test_failed_payment_marks_order_failed_and_keeps_cart(): void
@@ -427,8 +497,8 @@ class CheckoutTest extends TestCase
 
     public function test_invalid_razorpay_callback_cannot_mutate_payment_state(): void
     {
-        config()->set('rythme.razorpay.key_id', 'rzp_test_key');
-        config()->set('rythme.razorpay.key_secret', 'test_secret');
+        config()->set('services.razorpay.key_id', 'rzp_test_key');
+        config()->set('services.razorpay.key_secret', 'test_secret');
 
         $this->fillCart();
         $addressId = $this->addAddress();

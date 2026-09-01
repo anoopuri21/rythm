@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\SanitizedHtml;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,9 +18,10 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('products')]
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
 class Product extends Model implements HasMedia
 {
     use HasFactory;
@@ -27,7 +29,9 @@ class Product extends Model implements HasMedia
     use SoftDeletes;
 
     protected $casts = [
+        'description' => SanitizedHtml::class,
         'price' => 'decimal:2',
+        'tax_rate' => 'decimal:4',
         'compare_at_price' => 'decimal:2',
         'stock' => 'integer',
         'low_stock_threshold' => 'integer',
@@ -88,6 +92,16 @@ class Product extends Model implements HasMedia
         return $this->hasMany(InventoryMovement::class);
     }
 
+    public function merchandisingRules(): HasMany
+    {
+        return $this->hasMany(ProductMerchandisingRule::class, 'source_product_id');
+    }
+
+    public function backInStockSubscriptions(): HasMany
+    {
+        return $this->hasMany(BackInStockSubscription::class);
+    }
+
     public function importSource(): HasOne
     {
         return $this->hasOne(ProductImportSource::class);
@@ -140,6 +154,25 @@ class Product extends Model implements HasMedia
             ->singleFile();
     }
 
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        // Conversions run through the bounded, stop-when-empty scheduled
+        // worker; no persistent shared-hosting daemon is required.
+        $this->addMediaConversion('thumb-webp')
+            ->width(480)
+            ->height(480)
+            ->format('webp')
+            ->quality(82)
+            ->queued();
+
+        $this->addMediaConversion('gallery-webp')
+            ->width(1200)
+            ->height(1200)
+            ->format('webp')
+            ->quality(84)
+            ->queued();
+    }
+
     /**
      * Best available product image URL.
      *
@@ -150,8 +183,11 @@ class Product extends Model implements HasMedia
      */
     public function heroImage(): ?string
     {
-        if ($media = $this->getFirstMediaUrl('gallery')) {
-            return $media;
+        $media = $this->getFirstMedia('gallery');
+        if ($media !== null) {
+            return $media->hasGeneratedConversion('gallery-webp')
+                ? $media->getUrl('gallery-webp')
+                : $media->getUrl();
         }
 
         $file = 'images/products/'.$this->slug.'.jpg';
@@ -159,11 +195,26 @@ class Product extends Model implements HasMedia
         return is_file(public_path($file)) ? '/'.$file : null;
     }
 
+    public function thumbnailImage(): ?string
+    {
+        $media = $this->getFirstMedia('gallery');
+
+        if ($media !== null) {
+            return $media->hasGeneratedConversion('thumb-webp')
+                ? $media->getUrl('thumb-webp')
+                : $media->getUrl();
+        }
+
+        return $this->heroImage();
+    }
+
     /** Gallery image URLs (media first, committed fallback, else []). */
     public function galleryImages(): array
     {
         $urls = $this->getMedia('gallery')
-            ->map(fn ($m) => $m->getUrl())
+            ->map(fn (Media $media): string => $media->hasGeneratedConversion('gallery-webp')
+                ? $media->getUrl('gallery-webp')
+                : $media->getUrl())
             ->values()
             ->all();
 
@@ -181,7 +232,41 @@ class Product extends Model implements HasMedia
 
     public function scopeInStock(Builder $query): Builder
     {
-        return $query->where('stock', '>', 0);
+        return $query->where(function (Builder $available): void {
+            $available->where('stock', '>', 0)
+                ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                    ->where('is_active', true)
+                    ->where('stock', '>', 0));
+        });
+    }
+
+    public function scopeWithAvailableVariantStock(Builder $query): Builder
+    {
+        return $query->withExists([
+            'variants as has_available_variant_stock' => fn (Builder $variant): Builder => $variant
+                ->where('is_active', true)
+                ->where('stock', '>', 0),
+        ]);
+    }
+
+    public function hasAvailableStock(): bool
+    {
+        if ($this->stock > 0) {
+            return true;
+        }
+
+        if (array_key_exists('has_available_variant_stock', $this->attributes)) {
+            return (int) $this->attributes['has_available_variant_stock'] > 0;
+        }
+
+        if ($this->relationLoaded('variants')) {
+            return $this->variants->contains(fn (ProductVariant $variant): bool => $variant->is_active && $variant->stock > 0);
+        }
+
+        return $this->variants()
+            ->where('is_active', true)
+            ->where('stock', '>', 0)
+            ->exists();
     }
 
     public function scopeFeatured(Builder $query): Builder

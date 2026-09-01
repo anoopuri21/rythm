@@ -8,8 +8,10 @@ use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Address;
+use App\Models\BackInStockSubscription;
 use App\Models\Order;
 use App\Services\AddressService;
+use App\Services\BackInStockSubscriptionService;
 use App\Services\SeoService;
 use App\Services\WishlistService;
 use Illuminate\Http\RedirectResponse;
@@ -27,20 +29,39 @@ final class AccountController extends Controller
 
         $this->seo->apply([
             'meta_title' => 'My Account — Rhythm Exports',
-            'meta_description' => 'Manage your profile, addresses, orders and wishlist at Rhythm Exports.',
+            'meta_description' => 'Manage your profile, addresses, orders, wishlist and stock alerts at Rhythm Exports.',
             'robots' => 'noindex, follow',
         ]);
+
+        $stockAlertQuery = BackInStockSubscription::query()
+            ->where('user_id', $user->id)
+            ->pending();
 
         return view('account.index', [
             'orders' => Order::query()
                 ->where('user_id', $user->id)
                 ->withCount('items')
-                ->orderByDesc('created_at')
-                ->limit(10)
-                ->get(),
+                ->orderByDesc('placed_at')
+                ->orderByDesc('id')
+                ->paginate(10),
             'wishlistCount' => $wishlists->countFor($user->id),
             'addresses' => $addresses->forUser($user->id),
+            'stockAlertCount' => (clone $stockAlertQuery)->count(),
+            'backInStockSubscriptions' => $stockAlertQuery
+                ->with(['product', 'variant'])
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->paginate(12, ['*'], 'stock_alert_page'),
         ]);
+    }
+
+    public function cancelBackInStockAlert(
+        BackInStockSubscription $subscription,
+        BackInStockSubscriptionService $stockAlerts,
+    ): RedirectResponse {
+        $stockAlerts->cancel(auth()->user(), $subscription);
+
+        return back()->with('stock_alert_success', 'Stock-availability request cancelled.');
     }
 
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse

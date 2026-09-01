@@ -26,6 +26,10 @@ final class WishlistService
             return false;
         }
 
+        if (! Product::query()->active()->whereKey($productId)->exists()) {
+            return false;
+        }
+
         Wishlist::create([
             'user_id' => $userId,
             'product_id' => $productId,
@@ -49,6 +53,7 @@ final class WishlistService
     {
         return Product::query()
             ->active()
+            ->withAvailableVariantStock()
             ->whereIn('id', Wishlist::query()->where('user_id', $userId)->pluck('product_id'))
             ->with(['brand', 'media'])
             ->orderByDesc(

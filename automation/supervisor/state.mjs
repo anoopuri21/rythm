@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { closeSync, fsyncSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-export const LIFECYCLES = new Set(['inactive', 'planning', 'building', 'executing', 'recovering', 'blocked', 'complete']);
+export const LIFECYCLES = new Set(['inactive', 'planning', 'building', 'executing', 'recovering', 'paused', 'blocked', 'complete']);
 export const ACTION_CLASSES = new Set(['read_only', 'disposable_restore', 'idempotent_write', 'non_idempotent_write', 'destructive', 'financial', 'credential', 'production']);
 export const OUTCOMES = new Set(['passed', 'failed', 'blocked', 'not_applicable']);
 

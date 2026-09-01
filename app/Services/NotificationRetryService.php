@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Models\NotificationDelivery;
+use App\Notifications\BackInStockNotification;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -41,7 +43,11 @@ final class NotificationRetryService
         });
 
         try {
-            app(HandleCommerceNotification::class)->retryDelivery($reserved);
+            if ($reserved->notification_type === BackInStockNotification::class) {
+                app(HandleBackInStockNotification::class)->retryDelivery($reserved);
+            } else {
+                app(HandleCommerceNotification::class)->retryDelivery($reserved);
+            }
         } catch (\Throwable $exception) {
             $reserved->update([
                 'status' => NotificationDelivery::STATUS_FAILED,

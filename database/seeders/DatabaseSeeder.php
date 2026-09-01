@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production')) {
+            throw new \RuntimeException('Development catalogue and known test credentials must never be seeded in production.');
+        }
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@rythme.test'],
             ['name' => 'Rhythm Exports Admin', 'password' => bcrypt('admin1234')],

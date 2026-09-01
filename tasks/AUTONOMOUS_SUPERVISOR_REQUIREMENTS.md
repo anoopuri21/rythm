@@ -2,7 +2,7 @@
 
 **Owner:** Project owner
 **Governance reviewer:** Agent 0 — Project Lead
-**Status:** COMPLETE — AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17; PHASE 18 EXCLUDED
+**Status:** COMPLETE — SUPERVISOR PAUSED BY OWNER; AUTHORIZATION THROUGH PHASE 17 REMAINS; PHASE 18 EXCLUDED
 **Recorded:** 27 August 2026
 **Target authorization:** Canonical Phases 6A and 8–17; Phase 18/deployment excluded
 
@@ -161,7 +161,7 @@ The existing automation cannot be reused unchanged:
 - `automation/task-agent.mjs` and `automation/config.json` enforce stale branch `feature/dev` instead of `rhythm-uat`.
 - `tasks/tasks.json` also points to stale branch/workflow and is not the canonical tracker.
 - `docs/AGENT_RULES_STRICT.md` contains superseded Filament, palette, branch and source-of-truth rules.
-- `tasks/AUTO_MODE_PROTOCOL.md` contains stale current-phase text and authority only through Phase 11.
+- `tasks/AUTO_MODE_PROTOCOL.md` previously contained stale current-phase text; its current phase and execution horizon must stay reconciled with the Master Tracker and canonical sequence.
 
 Build Chunk 0 must quarantine or update these conflicts before any automated write/commit behavior is enabled.
 

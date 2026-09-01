@@ -3,10 +3,11 @@
 **Owner:** Agent 0 — Project Lead  
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
-**Current operational priority:** Phase 10 — shipping, fulfillment, returns and India tax workflow
-**Overall status:** PHASES 0–7 AND 6A COMPLETE / PHASE 8 NEXT / AUTONOMOUS SUPERVISOR ACTIVE THROUGH PHASE 17 / NOT PRODUCTION-READY
+**Current operational priority:** Short MVP launch track — close launch blockers, owner UAT, release packaging; defer non-essential enterprise work
+**Overall status:** PHASES 0–17 AND 6A COMPLETE / MVP LAUNCH TRACK EVIDENCE COMPLETE / PHASE 17 CONDITIONAL GO RECORDED 1 SEP 2026 / AUTO MODE PAUSED / PHASE 18 DEPLOYMENT INACTIVE — AWAITS EXPLICIT OWNER COMMAND / NOT LIVE YET (4 PRE-LIVE OWNER ITEMS OPEN)
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
-**Auto Mode:** ACTIVE — Autonomous Supervisor authorized through Phase 17; Phase 18/deployment excluded
+**MVP launch plan:** `tasks/MVP_LAUNCH_PLAN.md`
+**Auto Mode:** PAUSED — MVP evidence complete; owner authorized a manual, Agent-guided **demo deployment** on 1 Sep 2026 (PR #27 merge → cPanel steps); the 4 pre-live items stay deferred until client approval
 
 ---
 
@@ -70,15 +71,15 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 6A | Agent 5, 4, 6, 8, 9 | Owner-prioritized multi-category catalogue and Homepage/Shop expansion (post-Phase-6 operation) | COMPLETE | Accepted 29 Aug 2026: 80 imported / 80 active / 0 held owner-reported MySQL UAT, Filament/local-media controls verified, Chunk 4 full regression 302 tests / 1,178 assertions |
 | 8 | Agent 12, 3, 4, 6, 9, 11 | Payment, refund and financial reconciliation operations | COMPLETE | Accepted 29 Aug 2026: 321 tests / 1,282 assertions plus owner-reported Razorpay test-mode payment, replay, failure/retry, partial/full refund and clean reconciliation |
 | 9 | Agent 14, 3, 4, 8, 9, 11 | Central notifications and external-integration event architecture | COMPLETE | Accepted 29 Aug 2026: 340 tests / 1,376 assertions plus owner-attested exact-once staging delivery, SPF/DKIM/DMARC, HTML/plain-text, signed-link and clean reconciliation gate |
-| 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | IN PROGRESS | Chunk 0 audit complete; professionally approved rules plus fulfillment/tax/RMA tests required |
-| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | PENDING | Realistic-catalog search, merchandising, SEO and responsive conversion gates pass |
-| 12 | Agent 8, 3, 4, 9, 11, 13, 15 | Security, privacy, compliance and accessibility hardening | PENDING | No unresolved critical/high finding; privacy/legal/accessibility gates pass |
-| 13 | Agent 8, 3, 4, 9, 11 | Performance, scalability and resilience | PENDING | Approved service-level, load, cache and failure-recovery targets pass |
-| 14 | Agent 8, 9, 11, 14 | Observability, backups and production operations | PENDING | Monitoring, backup/restore, incident and runbook drills pass |
-| 15 | Agent 8, 9, 11 | CI/CD and shared-hosting release packaging | PENDING | Reproducible build, migration, rollback and cPanel-compatible release artifact pass |
-| 16 | Agent 9 + all | Full QA, compatibility, UAT and release candidate | PENDING | Full UAT passes with zero critical bugs and accepted release candidate |
-| 17 | Agent 0, 7, 9, 11 | Production-readiness review and sign-off decision | PENDING | Every production release gate independently verified |
-| 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | INACTIVE | Activated only by explicit deployment command after Phase 17 acceptance |
+| 10 | Agent 15, 3, 4, 6, 9, 11, 12 | Shipping, fulfillment, returns and India tax workflow | COMPLETE | Owner-reported focused/full PHP, MySQL, rendered workflow, dependency/build, authorization, review and disabled-default gates accepted; no values enabled |
+| 11 | Agent 3, 4, 6, 8, 9, 13 | Customer experience, search and merchandising | COMPLETE | Accepted 30 Aug 2026: owner-reported MySQL 8.4.3 isolated runtime, 33 focused / 112 assertions, 394 full / 1,698 assertions, route, worker/catalogue coverage and four-viewport responsive/accessibility/SEO/stock-alert UAT all passed |
+| 12 | Agent 0 + required specialists | MVP core safety: auth, ownership, checkout, payment, inventory, basic security and approved content boundaries | COMPLETE | Accepted 1 Sep 2026: owner-reported 396 PHP tests / 1,704 assertions / 0 failures, focused 112/384, exact MySQL 8.4.3 all-Ran, clean composer/npm audits, four-viewport rendered pass with 0 console errors, keyboard/focus YES, axe critical/serious 0; no unresolved critical/high blocker. Legal wording (AS-H011) remains a standing pre-launch gate only for enabling such content; all unknown values stay disabled |
+| 13 | Agent 0 + owner | MVP performance smoke: build, bounded queries, critical-page rendering and obvious regression checks | COMPLETE | Accepted 1 Sep 2026: production build green; bounded-query/N+1 contract (`performance-phase13.test.mjs`); re-measured budgets within limits; owner-reported acceptable rendering and zero console errors at 1440/768/390/360 |
+| 14 | Agent 0 + owner | MVP minimum operations: HTTPS, external env, backup/restore, queue/cron, logs and rollback | COMPLETE | Accepted 1 Sep 2026: owner-reported bounded scheduler run DONE, SQL backup export, isolated restore into scratch DB with matching products(20)/orders(1) counts, plus Arena ops contract; host HTTPS/TLS/secrets verify at package/deploy time through release checklist §3 |
+| 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | COMPLETE | Accepted 1 Sep 2026: owner built `rythme-release-candidate.zip` (22,025,972 bytes) via git archive at the tracked HEAD; release checklist §4 (vendor/build produced at package/deploy time) and the migration-gate contract stand |
+| 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | COMPLETE | Accepted 1 Sep 2026: owner-reported **23/23 steps PASS, 0 FAIL** via `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` — browse/search/product/cart/checkout, Razorpay test payment successful, paid order visible in account and admin, cancel/invoice/account journeys pass, 0 console errors on payment/checkout, four viewports covered |
+| 17 | Agent 0 | Short go/no-go evidence review; no deployment action | COMPLETE | Decision recorded 1 Sep 2026 — **CONDITIONAL GO**: all MVP evidence gates pass; live launch stays conditioned on 4 owner pre-live items (Razorpay live keys + production webhook, AS-H011 legal wording for any legally-sensitive content, catalogue content/media rights clearance, host HTTPS/TLS verification). Phase 18 stays inactive until the explicit deployment command |
+| 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | OWNER-GUIDED DEMO DEPLOYMENT | Owner authorized demo deployment on 1 Sep 2026 after Phase 17 conditional GO; PR #27 (arena→main) opened for merging both branches; Razorpay stays in TEST mode, returns/tax/legal content stay disabled, catalogue-rights note deferred by owner until client approval. Deploy steps are executed manually by the owner on cPanel with Agent guidance; automated deployment/agent tooling remains unused |
 
 ---
 
@@ -93,9 +94,9 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | Product listing | COMPLETE | YES — phase-scoped | Query/UI/pagination tests plus four-/two-column populated renders |
 | Category/brand/price/rating filters | COMPLETE | YES — phase-scoped | Query correctness, normalized facets and populated desktop/mobile UI evidence |
 | Sorting | COMPLETE | YES — phase-scoped | Featured/newest/price tests and rendered controls |
-| Search/autocomplete | UNVERIFIED | UNVERIFIED | Relevance, performance and UX tests |
-| Product detail | UNVERIFIED | UNVERIFIED | Gallery, variants, specs and related products |
-| Recently viewed | UNVERIFIED | UNVERIFIED | Persistence/privacy behavior |
+| Search/autocomplete | IN PROGRESS | PARTIAL | Weighted MySQL-safe search and bounded typo fallback implemented; responsive/relevance/performance evidence remains |
+| Product detail | QA | PARTIAL | Gallery, variants, curated related rules and empty/error states |
+| Recently viewed | QA | PARTIAL | Bounded session persistence implemented; privacy and responsive evidence remains |
 | Stock/availability | QA | PARTIAL | Phase 3 truthful stock-aware surfaces pass; later commerce/concurrency gates remain |
 | Footer | COMPLETE | YES — phase-scoped | Truthful-link remediation and 1440/768/390/320 responsive evidence |
 
@@ -217,22 +218,24 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 
 ---
 
-## 7. Production Sign-off Gates
+## 7. MVP Launch Readiness Gates
 
-Agent 0 will not issue production sign-off until all are verified:
+Agent 0 will not issue MVP launch readiness or recommend a live launch until the following required gates are verified. The full Enterprise Feature Checklist is **not** required for this initial track; deferred items remain in the future backlog.
 
-- [ ] Master Enterprise Feature Checklist complete.
-- [ ] Homepage and Shop design match measured and accepted.
-- [ ] MySQL schema and migrations production-safe.
-- [ ] Payment, order, inventory and coupon integrity verified.
-- [ ] Authorization and role boundaries verified.
-- [ ] Security audit has zero unresolved critical/high findings.
-- [ ] Performance fits agreed shared-hosting limits.
-- [ ] Queue/scheduler strategy works without persistent workers.
-- [ ] Full automated regression and UAT pass.
-- [ ] Critical bug count is zero.
-- [ ] Catalog import report accepted.
-- [ ] Backup, recovery and operational documentation ready before deployment.
+- [x] Phase 12: payment, order, inventory, coupon and customer-data integrity verified.
+- [x] Phase 12: authentication, authorization/ownership and basic security controls verified with zero unresolved critical/high blocker.
+- [x] Exact MySQL 8 migration/runtime evidence and owner-side PHP checks accepted.
+- [x] Enabled legal, tax, privacy, return and warranty behavior has owner/professional approval; unknown values remain disabled.
+- [x] Phase 13: practical storefront/cart/checkout performance and rendering smoke passes.
+- [x] Phase 14: HTTPS, production environment/secrets, debug-off, logs, queue/cron, backup/restore and rollback pass. *(Backup/restore + queue/cron proven locally 1 Sep; host HTTPS/TLS verifies at package/deploy via release checklist §3)*
+- [x] Phase 15: versioned cPanel/shared-host release package and migration checklist pass.
+- [x] Phase 16: focused owner UAT passes for browse, search, cart, checkout, test payment, order, invoice and admin essentials.
+- [x] Browser, keyboard/accessibility and responsive checks for the agreed viewports have no release blocker.
+- [ ] Catalogue/content/media rights, approved data and real stock/publication decisions are accepted.
+- [x] Critical bug count is zero; evidence is bound to the reviewed release commit.
+- [ ] Phase 17: Agent 0 recorded **CONDITIONAL GO** on 1 Sep 2026; owner launch approval is expected with the explicit deployment command after the 4 pre-live items resolve.
+
+This readiness decision does not activate Phase 18. Deployment, live financial actions and production changes remain separately human-gated.
 
 ---
 
@@ -331,6 +334,6 @@ Phase 5 implementation and isolated qualification completed on 26 August 2026:
 
 ## 14. Current Next Action
 
-Phase 7 is accepted after automated qualification and owner-reported UAT of TOTP, roles and protected staff creation. The owner then prioritized a bounded post-Phase-6 catalogue operation before canonical Phase 8: approximately ten products in each of eight product groups, plus additional Homepage category sections and realistic Homepage/Shop QA.
+Phase 10 qualification is accepted from owner-reported evidence at candidate commit `4a6c498` on `rhythm-uat`. The owner reported passing focused/full PHP, isolated MySQL migration/status, rendered workflow, dependency/build, authorization, independent review and disabled-default checks. Arena-local automation independently records `npm run test:automation` at **104/104 passed**. Returns/tax values remain disabled; no invoice/credit-note identity or legal enablement is implied.
 
-Execution is controlled by `tasks/PHASE_6A_CATALOGUE_EXPANSION_PLAN.md`. Chunk 0 is a read-only inventory, public collection qualification and exact manifest; acquisition/import must not begin before that gate. Canonical Phase 8 remains pending during this urgent operation. Agent 10 and deployment remain inactive, and no production sign-off is implied.
+Phase 11 is `COMPLETE` under `tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md`. Agent 0 accepted the owner-reported isolated MySQL 8.4.3 runtime, 33 focused tests / 112 assertions, 394 full tests / 1,698 assertions, route and worker/catalogue coverage, and four-viewport responsive/accessibility/SEO/stock-alert UAT on 30 August 2026. The owner has since required a short, practical MVP launch track. Phase 12 remains `IN PROGRESS` under manual control; Auto Mode, Agent 10 and Phase 18/deployment remain paused or inactive.

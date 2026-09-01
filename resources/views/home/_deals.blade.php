@@ -19,8 +19,9 @@
         <div class="deal-mm__grid">
             @foreach($deals as $product)
                 @php
-                    $image = $product->heroImage();
+                    $image = $product->thumbnailImage();
                     $available = max((int) $product->stock, 0);
+                    $hasAvailableStock = $product->hasAvailableStock();
                     $href = route('product.show', $product->slug);
                 @endphp
                 <article class="pcard dealcard">
@@ -48,8 +49,12 @@
                         </p>
 
                         <p class="dealcard__stock" aria-label="Availability">
-                            @if($available > 0)
-                                <span>Available now: <b>{{ $available }}</b></span>
+                            @if($hasAvailableStock)
+                                @if($available > 0)
+                                    <span>Available now: <b>{{ $available }}</b></span>
+                                @else
+                                    <span>Available now</span>
+                                @endif
                             @else
                                 <span><b>Currently out of stock</b></span>
                             @endif

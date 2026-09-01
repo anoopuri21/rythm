@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Table('order_status_history')]
-#[Fillable(['order_id', 'from', 'to', 'note', 'actor'])]
+#[Fillable(['order_id', 'from', 'to', 'note', 'actor', 'created_at', 'updated_at'])]
 class OrderStatusHistory extends Model
 {
     use HasFactory;

@@ -4,14 +4,17 @@
     // Supports BOTH: config-array products AND Eloquent Product models.
     $isModel = is_object($product) && method_exists($product, 'getFirstMediaUrl');
     $image = $isModel
-        ? ($product->heroImage() ?: 'https://placehold.co/800x800/f7f7f7/999?text='.rawurlencode($product->name))
+        ? ($product->thumbnailImage() ?: '')
         : ($product['image'] ?? '');
     $name = $isModel ? $product->name : $product['name'];
     $brand = $isModel ? ($product->brand?->name ?? '') : ($product['brand'] ?? '');
     $price = $isModel ? (float) $product->price : (float) ($product['price'] ?? 0);
-    $old = $isModel
+    $stock = $isModel ? (int) $product->stock : (int) ($product['stock'] ?? 0);
+    $hasAvailableStock = $isModel ? $product->hasAvailableStock() : $stock > 0;
+    $oldCandidate = $isModel
         ? ($product->compare_at_price ? (float) $product->compare_at_price : null)
         : (isset($product['compare_at']) ? (float) $product['compare_at'] : (isset($product['old_price']) ? (float) $product['old_price'] : null));
+    $old = $oldCandidate !== null && $oldCandidate > $price ? $oldCandidate : null;
     $badge = $isModel
         ? ($product->is_featured ? 'Best Seller' : null)
         : ($product['badge'] ?? null);
@@ -22,10 +25,22 @@
     <a href="{{ $href }}" class="flex h-full flex-col" aria-label="View {{ $name }}">
         {{-- Image — 1:1, object-contain (kabhi cut nahi), no heavy shadows --}}
         <div class="mcard__img">
-            <img src="{{ $image }}" alt="{{ $name }} — real product photo from Bajaao"
-                 width="800" height="800" class="mcard__img-el" loading="lazy" decoding="async">
+            @if($image)
+                <img src="{{ $image }}" alt="{{ $name }}"
+                     width="480" height="480" class="mcard__img-el" loading="lazy" decoding="async">
+            @else
+                <span class="mcard__img-fallback" aria-hidden="true">Product image unavailable</span>
+            @endif
             @if($badge)
-                <span class="mcard__badge">{{ $badge }}</span>
+                @php
+                    $badgeVariant = match (Str::lower(trim($badge))) {
+                        'new' => 'new',
+                        'best seller', 'bestseller' => 'best-seller',
+                        'limited', 'limited edition' => 'limited',
+                        default => 'brand',
+                    };
+                @endphp
+                <x-ui.badge :variant="$badgeVariant" class="mcard__badge">{{ $badge }}</x-ui.badge>
             @endif
         </div>
         {{-- Body — category → name → price (+ stock hint) --}}
@@ -37,7 +52,7 @@
                 @if($old)
                     <span class="mcard__price-old">₹{{ number_format($old) }}</span>
                 @endif
-                <span class="mcard__stock">In stock</span>
+                <span class="mcard__stock {{ $hasAvailableStock ? 'text-emerald-700' : 'text-muted' }}">{{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}</span>
             </div>
         </div>
     </a>

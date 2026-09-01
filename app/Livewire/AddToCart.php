@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Models\User;
+use App\Services\BackInStockSubscriptionService;
 use App\Services\CartService;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -23,9 +24,17 @@ final class AddToCart extends Component
 
     public bool $added = false;
 
+    public bool $notifyConsent = false;
+
+    public bool $notifySuccess = false;
+
+    public ?string $notifyError = null;
+
     public function mount(Product $product): void
     {
-        $this->product = $product->load(['variants' => fn ($q) => $q->where('is_active', true), 'brand', 'media']);
+        $this->product = $product->load(['variants' => fn ($q) => $q
+            ->where('is_active', true)
+            ->orderBy('id'), 'brand', 'media']);
 
         if ($product->variants->isNotEmpty()) {
             $this->variantId = $product->variants->first()->id;
@@ -38,6 +47,9 @@ final class AddToCart extends Component
         $this->qty = 1;
         $this->error = null;
         $this->added = false;
+        $this->notifyConsent = false;
+        $this->notifySuccess = false;
+        $this->notifyError = null;
     }
 
     public function setQty(int $qty): void
@@ -68,6 +80,42 @@ final class AddToCart extends Component
             $this->dispatch('cart-updated');
         } catch (RuntimeException $e) {
             $this->error = $e->getMessage();
+        }
+    }
+
+    public function requestStockNotification(): void
+    {
+        $this->notifyError = null;
+        $this->notifySuccess = false;
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            $this->notifyError = 'Please log in to request a stock-availability email.';
+
+            return;
+        }
+
+        $variant = $this->variantId !== null
+            ? $this->product->variants->firstWhere('id', $this->variantId)
+            : null;
+
+        if ($this->variantId !== null && $variant === null) {
+            $this->notifyError = 'Please choose a valid option.';
+
+            return;
+        }
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe(
+                $user,
+                $this->product,
+                $variant,
+                $this->notifyConsent,
+            );
+            $this->notifySuccess = true;
+            $this->notifyConsent = false;
+        } catch (RuntimeException $exception) {
+            $this->notifyError = $exception->getMessage();
         }
     }
 

@@ -32,8 +32,8 @@
                 @foreach($items as $item)
                     <div class="flex gap-4 border-b border-ink/10 py-6 sm:gap-6" wire:key="page-item-{{ $item->id }}">
                         <a href="/product/{{ $item->product->slug }}" class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl border border-ink/10 bg-white p-2 sm:h-32 sm:w-32">
-                            @if($item->product->heroImage())
-                                <img src="{{ $item->product->heroImage() }}" alt="{{ $item->product->name }}" class="h-full w-full object-contain">
+                            @if($item->product->thumbnailImage())
+                                <img src="{{ $item->product->thumbnailImage() }}" alt="{{ $item->product->name }}" width="480" height="480" class="h-full w-full object-contain" loading="lazy" decoding="async">
                             @else
                                 <div class="flex h-full w-full items-center justify-center bg-paper-dark p-2 text-center text-[9px] font-bold uppercase tracking-widest text-muted">{{ $item->product->brand?->name ?? 'Rythme' }}</div>
                             @endif
@@ -86,7 +86,7 @@
 
             {{-- Price details (Flipkart-style sticky) --}}
             <aside class="lg:sticky lg:top-28 lg:self-start">
-                <div class="rounded-3xl border border-ink/10 bg-white p-6 sm:p-7">
+                <div class="ui-summary-panel p-6 sm:p-7">
                     <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-muted">Price details</h2>
                     <dl class="mt-5 space-y-3.5 text-sm">
                         <div class="flex items-center justify-between">

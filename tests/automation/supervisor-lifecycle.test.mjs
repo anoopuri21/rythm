@@ -39,6 +39,14 @@ test('bootstrap stays write-disabled throughout build', () => {
     assert.equal(result.status, 'building');
 });
 
+test('paused lifecycle never bootstraps and preserves the manual gate', () => {
+    const pausedState = { ...state, lifecycle: 'paused' };
+    const result = bootstrapDecision({ state: pausedState, audit: audit(), plan, config: { enabled: false } });
+    assert.equal(result.allowed, false);
+    assert.equal(result.status, 'paused');
+    assert.match(result.reason, /manual phase-by-phase execution/);
+});
+
 test('active lifecycle bootstraps only when audit and checkpoint are safe', () => {
     const activeState = { ...state, lifecycle: 'executing' };
     assert.equal(bootstrapDecision({ state: activeState, audit: audit(), plan, config: { enabled: true } }).allowed, true);

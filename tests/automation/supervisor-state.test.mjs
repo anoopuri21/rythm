@@ -57,7 +57,14 @@ test('atomic writer replaces valid state and refuses invalid state without damag
     const valid = checkpointState(load(), '2026-08-27T10:31:00.000Z');
     writeStateAtomic(target, valid);
     assert.deepEqual(readState(target), valid);
-    assert.equal(statSync(target).mode & 0o777, 0o600);
+    const mode = statSync(target).mode & 0o777;
+    if (process.platform === 'win32') {
+        // NTFS ACLs are not represented by POSIX chmod bits in Node. Verify
+        // the file remains owner-writable; Unix hosts enforce exact 0600.
+        assert.ok((mode & 0o200) !== 0);
+    } else {
+        assert.equal(mode, 0o600);
+    }
 
     const original = readFileSync(target, 'utf8');
     const invalid = structuredClone(valid);
@@ -74,13 +81,15 @@ test('readState rejects malformed JSON and CLI reports compact status', () => {
 
     const output = execFileSync(process.execPath, ['automation/supervisor-state.mjs', 'status'], { cwd: root, encoding: 'utf8' });
     const status = JSON.parse(output);
-    assert.equal(status.lifecycle, 'executing');
-    assert.equal(status.phase, '10');
-    assert.equal(status.next_action, 'HOMEPAGE-DISCOVERY-DB-RECOVERY-QA');
+    const current = load();
+    assert.equal(status.lifecycle, current.lifecycle);
+    assert.equal(status.phase, current.delivery.phase);
+    assert.equal(status.next_action, current.next_action.id);
 });
 
 test('published JSON schema is parseable and identifies state version one', () => {
     const schema = JSON.parse(readFileSync(path.join(root, 'automation', 'supervisor', 'state-schema.json'), 'utf8'));
+    assert.ok(schema.properties.lifecycle.enum.includes('paused'));
     assert.equal(schema.properties.schema_version.const, 1);
     assert.equal(schema.additionalProperties, false);
 });

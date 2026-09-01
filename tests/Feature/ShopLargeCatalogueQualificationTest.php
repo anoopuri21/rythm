@@ -17,7 +17,7 @@ class ShopLargeCatalogueQualificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_shop_filters_sorting_pagination_and_query_bound_with_eighty_products(): void
+    public function test_shop_filters_sorting_pagination_and_query_bound_with_more_than_five_hundred_products(): void
     {
         $parent = Category::factory()->create([
             'name' => 'Qualification Instruments',
@@ -43,7 +43,7 @@ class ShopLargeCatalogueQualificationTest extends TestCase
             Brand::factory()->create(['name' => 'Qualification Beta', 'slug' => 'qualification-beta', 'is_active' => true]),
         ]);
 
-        foreach (range(1, 80) as $number) {
+        foreach (range(1, 520) as $number) {
             Product::factory()->create([
                 'category_id' => $categories[($number - 1) % 2]->id,
                 'brand_id' => $brands[($number - 1) % 2]->id,
@@ -73,20 +73,20 @@ class ShopLargeCatalogueQualificationTest extends TestCase
         $queryCount = count(DB::getQueryLog());
         DB::disableQueryLog();
 
-        $this->assertSame(80, $page->total());
+        $this->assertSame(520, $page->total());
         $this->assertSame(12, $page->perPage());
-        $this->assertSame(7, $page->lastPage());
+        $this->assertSame(44, $page->lastPage());
         $this->assertSame('Qualification Product 01', $page->items()[0]->name);
         $this->assertLessThanOrEqual(10, $queryCount, 'Shop pagination should retain a bounded query count.');
 
-        $this->assertSame(80, $service->shopQuery(new ShopFilters(category: $parent->slug))->count());
-        $this->assertSame(40, $service->shopQuery(new ShopFilters(category: $categories[0]->slug))->count());
-        $this->assertSame(40, $service->shopQuery(new ShopFilters(brands: [$brands[0]->slug]))->count());
-        $this->assertSame(64, $service->shopQuery(new ShopFilters(inStockOnly: true))->count());
+        $this->assertSame(520, $service->shopQuery(new ShopFilters(category: $parent->slug))->count());
+        $this->assertSame(260, $service->shopQuery(new ShopFilters(category: $categories[0]->slug))->count());
+        $this->assertSame(260, $service->shopQuery(new ShopFilters(brands: [$brands[0]->slug]))->count());
+        $this->assertSame(416, $service->shopQuery(new ShopFilters(inStockOnly: true))->count());
         $this->assertSame(11, $service->shopQuery(new ShopFilters(minPrice: 2000, maxPrice: 3000))->count());
         $this->assertFalse($service->shopQuery(new ShopFilters(search: 'Inactive'))->exists());
 
         $descending = $service->shopQuery(new ShopFilters(sort: 'price-desc'))->firstOrFail();
-        $this->assertSame('Qualification Product 80', $descending->name);
+        $this->assertSame('Qualification Product 520', $descending->name);
     }
 }

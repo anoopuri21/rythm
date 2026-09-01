@@ -4,45 +4,46 @@
     "name": "Rythme / Rhythm Exports",
     "repository": "anoopuri21/rythm"
   },
-  "lifecycle": "executing",
+  "lifecycle": "paused",
   "authorization": {
     "through_phase": "17",
     "deployment_enabled": false
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "0c5a9b8248aebc8a5a45e5eed647d618b1e651e7",
-    "remote_head": "0c5a9b8248aebc8a5a45e5eed647d618b1e651e7",
+    "local_head": "969548b4f37f24ff9594b71c43fd9a815cf944d6",
+    "remote_head": "969548b4f37f24ff9594b71c43fd9a815cf944d6",
     "working_tree_clean": false
   },
   "delivery": {
-    "phase": "10",
-    "chunk": "homepage-discovery-db-recovery",
-    "task": "Dynamic homepage discovery and correct database recovery",
-    "status": "qa"
+    "phase": "18",
+    "chunk": "owner-guided-demo-deployment",
+    "task": "Owner merges PR #27 into main, then follows the guided cPanel demo-deployment steps; Agent prepares/verifies but does not perform remote production actions",
+    "status": "in_progress"
   },
   "execution": {
-    "action_class": "credential",
-    "attempt": 0,
-    "max_attempts": 0,
-    "last_verified_action": "Implemented bounded homepage discovery and error-page resilience; owner must correct the environment-only database name from maverick_academy to rhythm_db."
+    "action_class": "read_only",
+    "attempt": 1,
+    "max_attempts": 1,
+    "last_verified_action": "Owner authorized demo deployment on 1 September 2026; PR #27 (arena/01a058de-rythm -> main) created and reported MERGEABLE/CLEAN. Branch check proved remote rhythm-uat is fully contained in the session branch (0 unique commits)."
   },
   "agents": {
     "accountable": "Agent 0",
     "primary": [
-      "Agent 2",
       "Agent 3",
-      "Agent 6"
+      "Agent 4",
+      "Agent 6",
+      "Agent 8",
+      "Agent 13"
     ],
     "reviewers": [
-      "Agent 1",
       "Agent 9",
-      "Agent 13"
+      "Agent 11"
     ]
   },
   "checkpoint": {
-    "id": "6a8ac19e95ca8fe690ecb8c2bf98ec02fe3d1197dc18eab3f37ba75d71f7458c",
-    "created_at": "2026-08-29T16:00:00.000Z"
+    "id": "0a5a86bc67bee9f15c3d7b5b4517fbb82898fe0015ba9695960a6d11dc2e6dcd",
+    "created_at": "2026-09-01T06:06:58.961Z"
   },
   "decisions": [
     {
@@ -54,6 +55,84 @@
     {
       "id": "AS-D002",
       "summary": "Use a dedicated homepage_category_rows relation rather than overloading HomepageBlock text fields.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D003",
+      "summary": "Owner explicitly activated Auto Mode for Phase 12 on 30 August 2026; execute canonical Phases 12–17 sequentially while preserving human gates and keeping Phase 18/deployment inactive.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D004",
+      "summary": "Add per-user/per-product five-attempt 60-second limits to authenticated review and product-question writes to reduce abuse without changing approved moderation or purchase rules.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D005",
+      "summary": "Harden customer input boundaries by requiring product-owned active variants for cart/order operations and active products for new wishlist writes.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D006",
+      "summary": "Pause Auto Mode at owner request and handle homepage UI/UX changes as a manual plan-first task; do not infer contact details or expose real customer purchase data.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D007",
+      "summary": "Owner issued ACTIVATE AUTO MODE on 31 August 2026; supervisor re-enabled and canonical Phase 12 autonomous execution resumed with deployment, Phase 18 and Agent 10 still human-gated.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D008",
+      "summary": "Close Phase 12 Chunk 1 with a static action-boundary regression contract covering route auth/throttle matrix, Livewire guest/ownership guards, controller owner-or-signed checks and the CSRF/security-headers wiring, since the read-only sweep found every boundary already enforced.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D009",
+      "summary": "Close Phase 12 Chunk 3 on static evidence only: the accessibility acceptance rule still requires rendered four-viewport, keyboard and axe evidence, which stays with Chunk 4 owner-side qualification rather than being claimed from Arena.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D010",
+      "summary": "Pause Auto Mode at the Phase 12 owner runtime/UAT gates (protocol blockers 6 and 7) after closing the Arena-side qualification; resume only on owner evidence or a new ACTIVATE AUTO MODE command.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D011",
+      "summary": "While Phase 12 owner gates (AS-H011/AS-H012) remain open, use the resumed Auto Mode window for gate-independent Phase 13/14 Arena-side work per protocol blocker handling instead of idling.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D012",
+      "summary": "Pause Auto Mode after Phase 15/16 Arena-side preparation because every remaining MVP-track item requires owner evidence or decisions (protocol blockers 3.6/3.7); a fresh ACTIVATE AUTO MODE or the owner reports resume work.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D013",
+      "summary": "Accept Phase 12 and Phase 13 as COMPLETE on 1 September 2026 owner evidence; AS-H011 persists as a standing pre-launch rule that blocks enabling legal/return/warranty content, not the phases themselves, because every such value remains disabled.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D014",
+      "summary": "Phase 17 decision is CONDITIONAL GO: the release candidate passed all MVP evidence gates, but live launch requires four owner actions first (live payment keys, legal wording, content rights, host HTTPS). Deployment needs the owner's explicit Phase 18 command.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D015",
+      "summary": "Owner deferred the 4 pre-live items and authorized a demo deployment on 1 September 2026: Razorpay stays in test mode, legally-sensitive features stay disabled, catalogue rights noted as demo-only until client approval; owner executes cPanel steps manually with Agent guidance.",
       "confidence": "high",
       "reversible": true
     }
@@ -99,8 +178,33 @@
     },
     {
       "id": "AS-H007",
+      "status": "closed",
+      "summary": "Owner confirmed rythm.test now resolves to the rhythm_db MySQL database and cached configuration was cleared."
+    },
+    {
+      "id": "AS-H008",
+      "status": "closed",
+      "summary": "Owner reported all Phase 10 qualification gates complete at 4a6c498; no returns/tax values or legal enablement was activated."
+    },
+    {
+      "id": "AS-H009",
+      "status": "closed",
+      "summary": "Phase 11 owner-runtime, automated and rendered qualification accepted on 30 August 2026."
+    },
+    {
+      "id": "AS-H010",
+      "status": "closed",
+      "summary": "Owner lifted the hold with ACTIVATE AUTO MODE on 31 August 2026; homepage UI/UX plan content choices were already recorded and Phase 12 autonomous execution resumed."
+    },
+    {
+      "id": "AS-H011",
       "status": "open",
-      "summary": "Owner must restore rythm.test DB_DATABASE to rhythm_db, clear cached configuration, then run focused/full and rendered homepage QA without sharing credentials."
+      "summary": "Owner/legal professional must approve exact Terms, Privacy, Shipping, Returns, Warranty, Cancellation wording plus retention/deletion/consent rules before any such behavior or text is enabled; unknown behavior stays disabled."
+    },
+    {
+      "id": "AS-H012",
+      "status": "closed",
+      "summary": "Owner reported PHP focused 112/384 and full 396/1,704/0-fail, migrate:status all-Ran on MySQL 8.4.3 (MySQL Community Server), clean composer/npm audits, and the four-viewport rendered/keyboard/axe pass on 1 September 2026."
     }
   ],
   "gate_results": [
@@ -265,11 +369,449 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_9_CHUNK_5_MAIL_UAT.md",
       "verified_at": "2026-08-29T13:00:00.000Z"
+    },
+    {
+      "name": "Current-state architecture re-audit",
+      "outcome": "passed",
+      "evidence": "docs/architecture-overview.md; docs/flow-map.md; docs/risk-register.md; docs/task-priority.md",
+      "verified_at": "2026-08-29T16:30:00.000Z"
+    },
+    {
+      "name": "Phase 1 premium visual-system candidate checks",
+      "outcome": "passed",
+      "evidence": "resources/css/theme.css; resources/views/components/ui/; docs/ui-brand-guidelines.md; tests/automation/ui-theme.test.mjs; Vite production build",
+      "verified_at": "2026-08-29T17:30:00.000Z"
+    },
+    {
+      "name": "Phase 1 luxury UI refinement static and build checks",
+      "outcome": "passed",
+      "evidence": "resources/css/theme.css; shared product cards; cart and checkout summary views; tests/automation/ui-theme.test.mjs; Vite production build",
+      "verified_at": "2026-08-29T18:00:00.000Z"
+    },
+    {
+      "name": "Phase 2 storefront experience candidate checks",
+      "outcome": "passed",
+      "evidence": "docs/storefront-flow.md; docs/page-checklist.md; docs/content-coverage.md; tests/automation/storefront-phase2.test.mjs; Vite production build",
+      "verified_at": "2026-08-29T18:30:00.000Z"
+    },
+    {
+      "name": "Phase 3 backend domain and write-safety static checks",
+      "outcome": "passed",
+      "evidence": "docs/domain-model.md; docs/state-machine.md; docs/database-optimization.md; tests/automation/backend-phase3.test.mjs",
+      "verified_at": "2026-08-29T19:00:00.000Z"
+    },
+    {
+      "name": "Phase 4 performance static and production-build checks",
+      "outcome": "passed",
+      "evidence": "docs/performance-budget.md; docs/cache-strategy.md; docs/media-optimization.md; tests/automation/performance-phase4.test.mjs; Vite production bundle report",
+      "verified_at": "2026-08-29T19:30:00.000Z"
+    },
+    {
+      "name": "Phase 5 security and Phase 6 admin operations candidate checks",
+      "outcome": "passed",
+      "evidence": "docs/security-model.md; docs/permissions-matrix.md; docs/payment-security.md; docs/admin-workflows.md; docs/ops-runbook.md; docs/reporting-metrics.md; tests/automation/security-admin-phase5-6.test.mjs; Vite production build",
+      "verified_at": "2026-08-29T20:30:00.000Z"
+    },
+    {
+      "name": "Phase 7 QA and launch-readiness candidate checks",
+      "outcome": "passed",
+      "evidence": "docs/qa-checklist.md; docs/release-checklist.md; docs/rollback-plan.md; tests/Feature/LaunchSmokeTest.php; tests/Feature/AdminGovernanceTest.php; tests/Feature/ShopLargeCatalogueQualificationTest.php; tests/automation/qa-launch-phase7.test.mjs",
+      "verified_at": "2026-08-29T21:30:00.000Z"
+    },
+    {
+      "name": "Phase 7 initial owner runtime regression",
+      "outcome": "failed",
+      "evidence": "Owner reported 7 PHP failures and 3 Node failures; first actionable failures were Windows mode semantics, vendor test discovery, and stale admin audit expectations.",
+      "verified_at": "2026-08-29T22:00:00.000Z"
+    },
+    {
+      "name": "Phase 7 Windows QA remediation candidate",
+      "outcome": "passed",
+      "evidence": "tests/automation/supervisor-state.test.mjs; tests/Feature/AdminGovernanceTest.php; package.json test:automation; 96/96 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T22:15:00.000Z"
+    },
+    {
+      "name": "Phase 10 Chunk 2 manual fulfillment implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_2_MANUAL_FULFILLMENT.md; 96/96 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T21:45:00.000+05:30"
+    },
+    {
+      "name": "Phase 10 Chunk 3 disabled return workflow implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_3_RETURN_RMA_WORKFLOW.md; 99/99 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T22:45:00.000+05:30"
+    },
+    {
+      "name": "Phase 10 Chunk 4 gated tax snapshot implementation candidate",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_4_TAX_SNAPSHOT_FRAMEWORK.md; 102/102 bounded Node automation; Vite production build",
+      "verified_at": "2026-08-29T23:30:00.000+05:30"
+    },
+    {
+      "name": "Phase 10 owner-reported qualification acceptance",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_10_CHUNK_5_QUALIFICATION_GATE.md; docs/phase10-qualification.md",
+      "verified_at": "2026-08-30T00:00:00.000+05:30"
+    },
+    {
+      "name": "Phase 11 owner-reported automation",
+      "outcome": "passed",
+      "evidence": "Owner-reported npm run test:automation result; tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md",
+      "verified_at": "2026-08-30"
+    },
+    {
+      "name": "Phase 11 customer stock-alert account-management candidate checks",
+      "outcome": "passed",
+      "evidence": "AccountController.php; BackInStockSubscriptionService.php; account/index.blade.php; AccountTest.php (owner-runtime gate); tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:04:11.656Z"
+    },
+    {
+      "name": "Phase 11 stock-alert variant safety hardening candidate checks",
+      "outcome": "passed",
+      "evidence": "NotifyBackInStock.php; AddToCart.php; PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:12:52.072Z"
+    },
+    {
+      "name": "Phase 11 bounded storefront filter-input candidate checks",
+      "outcome": "passed",
+      "evidence": "ProductQueryService.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:17:41.012Z"
+    },
+    {
+      "name": "Phase 11 product SEO and stock-state truthfulness candidate checks",
+      "outcome": "passed",
+      "evidence": "ProductController.php; product/show.blade.php; livewire/add-to-cart.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:20:07.587Z"
+    },
+    {
+      "name": "Phase 11 product SEO and variant availability feature coverage candidate",
+      "outcome": "passed",
+      "evidence": "ProductController.php; product/show.blade.php; tests/Feature/ProductPageTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:20:41.570Z"
+    },
+    {
+      "name": "Phase 11 truthful compare-price candidate checks",
+      "outcome": "passed",
+      "evidence": "shop-card.blade.php; minimal-product-card.blade.php; wishlist-page.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:24:54.572Z"
+    },
+    {
+      "name": "Phase 11 shared-card stock and sale truthfulness candidate checks",
+      "outcome": "passed",
+      "evidence": "minimal-product-card.blade.php; shop-card.blade.php; wishlist-page.blade.php; add-to-cart.blade.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:27:14.837Z"
+    },
+    {
+      "name": "Phase 11 bounded account stock-alert pagination candidate checks",
+      "outcome": "passed",
+      "evidence": "AccountController.php; account/index.blade.php; tests/automation/phase11-customer-experience.test.mjs; PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:30:38.420Z"
+    },
+    {
+      "name": "Phase 11 account stock-alert pagination feature coverage candidate",
+      "outcome": "passed",
+      "evidence": "AccountController.php; account/index.blade.php; tests/Feature/AccountTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:32:57.155Z"
+    },
+    {
+      "name": "Phase 11 stock delivery re-verification and worker-bound candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Listeners/HandleBackInStockNotification.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:35:14.246Z"
+    },
+    {
+      "name": "Auto Mode activation and Phase 11 authority reconciliation",
+      "outcome": "passed",
+      "evidence": "tasks/AUTO_MODE_PROTOCOL.md; tasks/AUTONOMOUS_SUPERVISOR_REQUIREMENTS.md; tasks/TEAM_CHANGELOG.md; node automation/supervisor.mjs audit; node automation/supervisor.mjs status; node automation/supervisor-state.mjs validate",
+      "verified_at": "2026-08-30T08:36:55.944Z"
+    },
+    {
+      "name": "Phase 11 active-variant catalogue availability candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Models/Product.php; app/Services/ProductQueryService.php; app/Services/HomepageDataService.php; app/Services/WishlistService.php; resources/views/components/shop-card.blade.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:40:40.578Z"
+    },
+    {
+      "name": "Phase 11 active-record search visibility candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Services/ProductQueryService.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:43:20.148Z"
+    },
+    {
+      "name": "Phase 11 public facet active-record visibility candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Livewire/ShopIndex.php; tests/Feature/ShopPageTest.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:45:00.544Z"
+    },
+    {
+      "name": "Phase 11 Livewire facet active-variant candidate check",
+      "outcome": "passed",
+      "evidence": "app/Livewire/ShopIndex.php; tests/Feature/ShopPageTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:46:30.164Z"
+    },
+    {
+      "name": "Phase 11 truthful account pagination empty-state candidate checks",
+      "outcome": "passed",
+      "evidence": "resources/views/account/index.blade.php; tests/Feature/AccountTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:47:19.679Z"
+    },
+    {
+      "name": "Phase 11 non-positive stock request-state candidate checks",
+      "outcome": "passed",
+      "evidence": "resources/views/livewire/add-to-cart.blade.php; tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:50:15.989Z"
+    },
+    {
+      "name": "Phase 11 product availability metadata binding candidate check",
+      "outcome": "passed",
+      "evidence": "app/Http/Controllers/ProductController.php; resources/views/product/show.blade.php; tests/Feature/ProductPageTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:52:08.153Z"
+    },
+    {
+      "name": "Phase 11 bounded merchandising selector candidate checks",
+      "outcome": "passed",
+      "evidence": "app/Filament/Resources/ProductMerchandisingRuleResource.php; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:55:54.166Z"
+    },
+    {
+      "name": "Phase 11 weighted search ranking candidate checks",
+      "outcome": "passed",
+      "evidence": "tests/Feature/PhaseElevenCustomerExperienceTest.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T08:59:07.474Z"
+    },
+    {
+      "name": "Phase 11 recommendation-card availability truthfulness candidate checks",
+      "outcome": "passed",
+      "evidence": "resources/views/components/mega-product-card.blade.php; resources/views/components/minimal-product-card.blade.php; resources/views/home/_deals.blade.php; tests/automation/phase11-customer-experience.test.mjs; tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T09:03:03.645Z"
+    },
+    {
+      "name": "Phase 11 stock-request rejection-boundary candidate checks",
+      "outcome": "passed",
+      "evidence": "tests/Feature/PhaseElevenCustomerExperienceTest.php; app/Services/BackInStockSubscriptionService.php; app/Livewire/AddToCart.php; tests/automation/phase11-customer-experience.test.mjs; tasks/TEAM_CHANGELOG.md; npm run test:automation (109/109); npm run build",
+      "verified_at": "2026-08-30T09:03:52.323Z"
+    },
+    {
+      "name": "Owner Auto Mode pause and phasewise manual runbook",
+      "outcome": "passed",
+      "evidence": "automation/config.json; tasks/AUTO_MODE_PROTOCOL.md; tasks/MASTER_PROJECT_TRACKER.md; tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md; supervisor pause lifecycle/config tests",
+      "verified_at": "2026-08-30T09:13:01.934Z"
+    },
+    {
+      "name": "Owner one-command qualification runner contract",
+      "outcome": "passed",
+      "evidence": "run.sh; tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md; tests/automation/phase11-customer-experience.test.mjs; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
+      "verified_at": "2026-08-30T09:32:14.327Z"
+    },
+    {
+      "name": "Disposable MySQL runner safety correction",
+      "outcome": "passed",
+      "evidence": "run.sh fixed database guard rhythm_phase11_qa; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
+      "verified_at": "2026-08-30T09:40:35.716Z"
+    },
+    {
+      "name": "Owner runner MySQL engine evidence check",
+      "outcome": "passed",
+      "evidence": "run.sh SELECT VERSION(), @@version_comment; fixed rhythm_phase11_qa guard; bash -n run.sh; git diff --check; npm run test:automation (111/111)",
+      "verified_at": "2026-08-30T09:41:07.644Z"
+    },
+    {
+      "name": "Phase 11 owner PHP qualification review",
+      "outcome": "failed",
+      "evidence": "Owner-reported isolated migration status showed all listed migrations Ran; focused tests 30 passed, 3 failed (93 assertions); full suite 351 passed, 43 failed (1531 assertions). Failures included one seeded Fender slug mismatch and two unverified seeded test-user stock-alert cases.",
+      "verified_at": "2026-08-30T10:02:34.865Z"
+    },
+    {
+      "name": "Phase 11 fixture alignment and manual QA workflow",
+      "outcome": "passed",
+      "evidence": "Canonical Fender seed slug aligned; seeded test customer is verified for local/test fixture; run.sh removed; manual --filter and tee log instructions added; npm run test:automation 110/110; PHP runtime unavailable in Arena.",
+      "verified_at": "2026-08-30T10:02:34.865Z"
+    },
+    {
+      "name": "Windows manual QA command compatibility",
+      "outcome": "passed",
+      "evidence": "Runbook includes CMD/Cmder equivalents for isolated rhythm_phase11_qa binding, config clear, engine query, migration/status, route listing, filtered tests and file logs; npm run test:automation (110/110).",
+      "verified_at": "2026-08-30T10:10:31.512Z"
+    },
+    {
+      "name": "Phase 11 stock-alert pagination determinism fix",
+      "outcome": "passed",
+      "evidence": "AccountController orders pending stock alerts by created_at DESC then id DESC; Phase 11 automation contract updated; npm run test:automation (110/110); PHP runtime unavailable in Arena.",
+      "verified_at": "2026-08-30T10:20:42.035Z"
+    },
+    {
+      "name": "Owner verification of stock-alert pagination fix",
+      "outcome": "passed",
+      "evidence": "Owner-reported `php artisan test tests\\Feature\\AccountTest.php --filter=account_paginates`: 1 passed test, 10 assertions.",
+      "verified_at": "2026-08-30T10:29:41.026Z"
+    },
+    {
+      "name": "Phase 11 full regression log review and correction",
+      "outcome": "passed",
+      "evidence": "Owner-uploaded php-regression.txt reviewed: 41 failed, 353 passed, 1,550 assertions. Shared _deals.blade.php parse error and seeded-auth fixture expectation were isolated; corrected availability conditional and kept generic seed user unverified while AccountTest verifies its own fixture. npm run test:automation 110/110.",
+      "verified_at": "2026-08-30T10:40:23.932Z"
+    },
+    {
+      "name": "Owner Phase 11 focused and full PHP regression",
+      "outcome": "passed",
+      "evidence": "Owner-reported focused suite: 33 passed, 112 assertions. Uploaded php-regression.txt: 394 passed, 1,698 assertions, 0 failures.",
+      "verified_at": "2026-08-30T10:49:43.890Z"
+    },
+    {
+      "name": "Phase 11 owner MySQL/PHP runtime qualification",
+      "outcome": "passed",
+      "evidence": "Owner-reported rhythm_phase11_qa; MySQL 8.4.3 / MySQL Community Server - GPL; migration Nothing to migrate and all listed migrations Ran; route list 1; focused 33/112; full 394/1,698 with zero failures.",
+      "verified_at": "2026-08-30T10:57:02.898Z"
+    },
+    {
+      "name": "Phase 11 rendered responsive/accessibility/SEO/stock-alert UAT",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1440x900, 768x1024, 390x844 and 360x800 PASS; console errors 0; axe critical-serious 0; horizontal overflow 0; SEO PASS; stock alert flow PASS; known defects none.",
+      "verified_at": "2026-08-30T11:06:17.466Z"
+    },
+    {
+      "name": "Phase 11 completion acceptance",
+      "outcome": "passed",
+      "evidence": "Focused 33/112, full 394/1,698, isolated MySQL 8.4.3 rhythm_phase11_qa migration/status, worker/catalogue coverage and rendered owner UAT accepted by Agent 0; Phase 12 remains human-gated.",
+      "verified_at": "2026-08-30T11:06:17.466Z"
+    },
+    {
+      "name": "Auto Mode activation authority for Phase 12",
+      "outcome": "passed",
+      "evidence": "Owner command ACTIVATE AUTO MODE; automation/config.json enabled; AUTO_MODE_PROTOCOL, Master Tracker, runbook, Phase 12 plan and TEAM_CHANGELOG reconciled.",
+      "verified_at": "2026-08-30T11:11:56.812Z"
+    },
+    {
+      "name": "Phase 12 Chunk 0 security/privacy/accessibility baseline",
+      "outcome": "passed",
+      "evidence": "docs/phase12-security-threat-model.md; docs/phase12-authorization-matrix.md; docs/phase12-privacy-data-map.md; docs/phase12-accessibility-baseline.md; npm audit high/critical scan returned zero vulnerabilities.",
+      "verified_at": "2026-08-30T11:11:56.812Z"
+    },
+    {
+      "name": "Phase 12 review/Q&A abuse-limit remediation",
+      "outcome": "passed",
+      "evidence": "app/Livewire/ReviewSection.php; app/Livewire/ProductQuestionSection.php; tests/automation/phase11-customer-experience.test.mjs; npm run test:automation 111/111; commits 0e24046 and 5d473fe pushed to rhythm-uat.",
+      "verified_at": "2026-08-30T11:13:18.913Z"
+    },
+    {
+      "name": "Phase 12 route throttling and commerce input-boundary remediation",
+      "outcome": "passed",
+      "evidence": "routes/web.php; CartService.php; OrderService.php; WishlistService.php; CartTest.php; phase11-customer-experience.test.mjs; npm run test:automation 112/112; commit 28b064a pushed to rhythm-uat.",
+      "verified_at": "2026-08-30T11:41:24.038Z"
+    },
+    {
+      "name": "Phase 12 customer mutation route boundary documentation",
+      "outcome": "passed",
+      "evidence": "TEAM_CHANGELOG.md records account/profile/password/address/order-cancel/logout throttles and authenticated logout; automation suite 112/112; commit b7a81bc pushed to rhythm-uat.",
+      "verified_at": "2026-08-30T11:41:53.267Z"
+    },
+    {
+      "name": "Phase 12 authorization and action-surface read-only audit",
+      "outcome": "passed",
+      "evidence": "docs/phase12-authorization-matrix.md; TEAM_CHANGELOG.md; 23 Filament resources reviewed; route/Livewire action inventory; commit d418a51 pushed to rhythm-uat.",
+      "verified_at": "2026-08-30T11:52:12.035Z"
+    },
+    {
+      "name": "Homepage UI/UX plan-first hold",
+      "outcome": "passed",
+      "evidence": "tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md; Auto Mode config disabled; protocol/tracker/runbook/changelog reconciled; owner inputs remain human-gated.",
+      "verified_at": "2026-08-30T12:50:24.201Z"
+    },
+    {
+      "name": "Phase 12 Chunk 2 security configuration and secret-scan contract",
+      "outcome": "passed",
+      "evidence": "app/Http/Middleware/SecurityHeaders.php; config/app.php; config/session.php; .env.example; .env.production.example; tests/automation/security-phase12-config.test.mjs; npm run test:automation (139/140, sole failure is the Arena session-branch literal)",
+      "verified_at": "2026-08-31T17:43:22.142Z"
+    },
+    {
+      "name": "Phase 12 Chunk 3 privacy/legal/accessibility closure",
+      "outcome": "passed",
+      "evidence": "docs/phase12-privacy-data-map.md; resources/views Blade-aware sweep (0 missing alt, 0 unlabeled icon buttons, skip link/main landmark intact); routes/web.php (no deletion/export routes); app/Services/SiteSettingsService.php + OrderService.php (returns/tax disabled defaults); tests/automation/privacy-phase12-chunk3.test.mjs (7 tests)",
+      "verified_at": "2026-09-01T01:44:47.676Z"
+    },
+    {
+      "name": "Phase 12 Chunk 4 Arena-side qualification and independent review",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_12_QUALIFICATION_EVIDENCE.md; tests/automation/phase12-qualification.test.mjs; consolidated diff 4614855..HEAD reviewed (docs/tests/state only); npm run test:automation; npm run build (passed in the same session before packaging-only edits)",
+      "verified_at": "2026-09-01T01:49:41.948Z"
+    },
+    {
+      "name": "Phase 13 Arena-side static performance smoke",
+      "outcome": "passed",
+      "evidence": "tests/automation/performance-phase13.test.mjs (7 tests); docs/performance-budget.md re-measured 31 August 2026; npm run test:automation (158/159, sole failure is the Arena session-branch literal); npm run build passed",
+      "verified_at": "2026-09-01T01:56:44.983Z"
+    },
+    {
+      "name": "Phase 14 Arena-side minimum-operations verification",
+      "outcome": "passed",
+      "evidence": "tests/automation/ops-phase14.test.mjs (5 tests); routes/console.php; tasks/PHASE_0B_SHARED_HOSTING_OPERATIONS.md; docs/rollback-plan.md; docs/ops-runbook.md; .env.production.example; config/logging.php",
+      "verified_at": "2026-09-01T01:59:06.112Z"
+    },
+    {
+      "name": "Phase 15 Arena-side release-readiness contract",
+      "outcome": "passed",
+      "evidence": "tests/automation/release-phase15.test.mjs (7 tests); docs/release-checklist.md; .gitignore; .env.production.example; scripts/sandbox-rebuild.sh",
+      "verified_at": "2026-09-01T02:55:19.384Z"
+    },
+    {
+      "name": "Phase 16 owner UAT script preparation",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_16_OWNER_UAT_SCRIPT.md; tests/automation/phase16-uat-script.test.mjs (4 tests)",
+      "verified_at": "2026-09-01T02:55:19.391Z"
+    },
+    {
+      "name": "Phase 12 owner PHP runtime qualification (Evidence 1 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported on 1 September 2026 at b946775: focused suite 112 passed / 384 assertions; full suite 396 passed / 1,704 assertions / 0 failed. Arena cannot run PHP; this portion is owner-reported evidence.",
+      "verified_at": "2026-09-01T04:13:07.946Z"
+    },
+    {
+      "name": "Phase 12 owner exact-MySQL runtime evidence (Evidence 2 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: migrate:status all Ran on rhythm_db; server_version 8.4.3; version_comment MySQL Community Server - GPL.",
+      "verified_at": "2026-09-01T04:15:30.246Z"
+    },
+    {
+      "name": "Phase 12/13 owner dependency audits (Evidence 3 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: composer audit no advisories; npm audit 0 vulnerabilities.",
+      "verified_at": "2026-09-01T04:17:20.817Z"
+    },
+    {
+      "name": "Phase 12 completion acceptance (Evidence 4 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: 1440/768/390/360 zero console errors, keyboard focus YES, axe critical/serious 0, marquee/card verified post-rebuild. Combined with Evidences 1-3 this closes Phase 12; Phase 13 accepted on build + bounded-query contract + owner rendered pass.",
+      "verified_at": "2026-09-01T04:46:27.012Z"
+    },
+    {
+      "name": "Phase 14 owner backup/restore and scheduler proof (Evidence 5 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: schedule:run DONE; SQL export/import round-trip into rhythm_restore_test; live vs restored counts match (products 20/20, orders 1/1).",
+      "verified_at": "2026-09-01T05:02:21.853Z"
+    },
+    {
+      "name": "Phase 15 owner release-package build (Evidence 6B of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: rythme-release-candidate.zip, 22,025,972 bytes, git archive of tracked tree at session HEAD; vendor/build artifacts are intentionally excluded and produced at package/deploy time via release checklist section 4.",
+      "verified_at": "2026-09-01T05:06:46.368Z"
+    },
+    {
+      "name": "Phase 16 owner UAT acceptance (Evidence 6A of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: 23/23 steps PASS, 0 FAIL; test payment successful; paid order visible in account and admin; 0 console errors on payment/checkout; four viewports covered.",
+      "verified_at": "2026-09-01T05:13:23.979Z"
+    },
+    {
+      "name": "Phase 17 go/no-go review",
+      "outcome": "passed",
+      "evidence": "Agent 0 recorded CONDITIONAL GO on 1 September 2026: every MVP evidence gate passed; live launch conditioned on Razorpay live keys + production webhook, AS-H011 legal wording for legally-sensitive content, catalogue content/media rights clearance, and host HTTPS/TLS verification. Phase 18 stays inactive until an explicit deployment command.",
+      "verified_at": "2026-09-01T05:13:23.979Z"
     }
   ],
   "next_action": {
-    "id": "HOMEPAGE-DISCOVERY-DB-RECOVERY-QA",
-    "description": "Owner corrects the environment-only database selection, clears cache, and runs focused/full plus desktop/mobile homepage checks.",
+    "id": "OWNER-MERGE-PR-27-AND-DEPLOY",
+    "description": "Owner: (0) push any local-only rhythm-uat changes if they exist, (1) merge PR #27 into main on GitHub, (2) follow the guided cPanel demo deployment steps (upload/extract package, MySQL import, .env with test-mode keys, webroot to public/, migrate --force, cron entry), (3) share the demo URL for smoke verification.",
     "requires_human": true
   }
 }

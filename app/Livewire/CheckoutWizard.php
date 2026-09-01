@@ -7,13 +7,13 @@ namespace App\Livewire;
 use App\DTOs\CheckoutData;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Payment\FakePaymentGateway;
 use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
 use App\Services\OrderService;
 use App\Services\SiteSettingsService;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -88,8 +88,18 @@ final class CheckoutWizard extends Component
         ];
     }
 
-    public function selectAddress(int $addressId): void
+    public function selectAddress(int $addressId, AddressService $addresses): void
     {
+        abort_unless(auth()->check(), 403);
+
+        if (! $addresses->forUser((int) auth()->id())->contains('id', $addressId)) {
+            $this->addressId = null;
+            $this->error = 'Please choose a valid delivery address.';
+            $this->step = 1;
+
+            return;
+        }
+
         $this->addressId = $addressId;
         $this->error = null;
         $this->step = 2;
@@ -97,6 +107,7 @@ final class CheckoutWizard extends Component
 
     public function saveNewAddress(AddressService $addresses, CartService $cart): void
     {
+        abort_unless(auth()->check(), 403);
         $this->validate();
 
         $data = [
@@ -120,9 +131,11 @@ final class CheckoutWizard extends Component
 
     public function applyCoupon(CouponService $coupons): void
     {
+        abort_unless(auth()->check(), 403);
         $this->couponError = null;
 
         try {
+            $this->guardRateLimit('coupon', 20, 60);
             $totals = app(CartService::class)->totals();
             $result = $coupons->validateAndApply((string) $this->couponCode, $totals['subtotal']);
 
@@ -164,6 +177,7 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('Please sign in to continue.');
             }
 
+            $this->guardRateLimit('place-order', 5, 60);
             $cartModel = $cart->getOrCreateCart();
             $totals = $cart->totals();
 
@@ -176,6 +190,10 @@ final class CheckoutWizard extends Component
             if ($address === null) {
                 throw new RuntimeException('Please choose a delivery address.');
             }
+
+            // Fail closed before creating/reserving an order when no approved
+            // payment gateway is available for this environment.
+            $gateway = RazorpayGateway::resolve();
 
             $data = new CheckoutData(
                 addressId: $address->id,
@@ -196,10 +214,6 @@ final class CheckoutWizard extends Component
                 return;
             }
 
-            $gateway = RazorpayGateway::isConfigured()
-                ? RazorpayGateway::fromConfig()
-                : app(FakePaymentGateway::class);
-
             $payment = $order->payments()
                 ->where('status', Payment::STATUS_INITIATED)
                 ->latest()
@@ -217,7 +231,7 @@ final class CheckoutWizard extends Component
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
             } else {
                 $this->dispatch('razorpay-open', options: [
-                    'key' => (string) config('rythme.razorpay.key_id'),
+                    'key' => (string) config('services.razorpay.key_id'),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),
@@ -228,7 +242,7 @@ final class CheckoutWizard extends Component
                     'prefill' => [
                         'name' => $user->name,
                         'email' => $user->email,
-                        'contact' => (string) ($shippingAddress['phone'] ?? ''),
+                        'contact' => (string) ($data->shippingAddress['phone'] ?? ''),
                     ],
                     'theme' => ['color' => '#b20202'],
                 ]);
@@ -251,6 +265,7 @@ final class CheckoutWizard extends Component
         $this->confirming = true;
 
         try {
+            $this->guardRateLimit('confirm-payment', 10, 60);
             if ($this->orderId === null) {
                 throw new RuntimeException('No pending order found.');
             }
@@ -265,9 +280,7 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('No pending order found.');
             }
 
-            $gateway = RazorpayGateway::isConfigured()
-                ? RazorpayGateway::fromConfig()
-                : app(FakePaymentGateway::class);
+            $gateway = RazorpayGateway::resolve();
 
             $result = $gateway->verify($order, $payload);
 
@@ -338,5 +351,17 @@ final class CheckoutWizard extends Component
     private function resetFormFields(): void
     {
         $this->reset('name', 'phone', 'email', 'line1', 'line2', 'city', 'state', 'pincode', 'isDefault');
+    }
+
+    private function guardRateLimit(string $action, int $attempts, int $decaySeconds): void
+    {
+        $identity = auth()->id() !== null ? 'user:'.auth()->id() : 'ip:'.request()->ip();
+        $key = "checkout:{$action}:{$identity}";
+
+        if (RateLimiter::tooManyAttempts($key, $attempts)) {
+            throw new RuntimeException('Too many attempts. Please wait a moment and try again.');
+        }
+
+        RateLimiter::hit($key, $decaySeconds);
     }
 }

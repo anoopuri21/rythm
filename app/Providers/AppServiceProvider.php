@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\BackInStockNotificationRequested;
 use App\Events\CommerceNotificationRequested;
+use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Listeners\MarkNotificationDeliveryFailed;
 use App\Listeners\MarkNotificationDeliverySent;
@@ -23,9 +25,13 @@ use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\ProductMerchandisingRule;
 use App\Models\ProductQuestion;
 use App\Models\Refund;
+use App\Models\ReturnReason;
+use App\Models\ReturnRequest;
 use App\Models\Review;
+use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
@@ -36,8 +42,12 @@ use App\Policies\ContentPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\InteractionPolicy;
 use App\Policies\MarketingPolicy;
+use App\Policies\MerchandisingRulePolicy;
 use App\Policies\NotificationDeliveryPolicy;
 use App\Policies\OrderPolicy;
+use App\Policies\ReturnReasonPolicy;
+use App\Policies\ReturnRequestPolicy;
+use App\Policies\ShipmentPolicy;
 use App\Services\CartService;
 use App\Services\CategoryService;
 use App\Support\AdminAccess;
@@ -68,6 +78,7 @@ class AppServiceProvider extends ServiceProvider
         foreach ([
             AdminAuditLog::class => AuditPolicy::class,
             Product::class => CataloguePolicy::class,
+            ProductMerchandisingRule::class => MerchandisingRulePolicy::class,
             Category::class => CataloguePolicy::class,
             Brand::class => CataloguePolicy::class,
             Order::class => OrderPolicy::class,
@@ -84,21 +95,38 @@ class AppServiceProvider extends ServiceProvider
             HomepageCategoryRow::class => ContentPolicy::class,
             HomepageSection::class => ContentPolicy::class,
             NotificationDelivery::class => NotificationDeliveryPolicy::class,
+            ReturnRequest::class => ReturnRequestPolicy::class,
+            ReturnReason::class => ReturnReasonPolicy::class,
+            Shipment::class => ShipmentPolicy::class,
         ] as $model => $policy) {
             Gate::policy($model, $policy);
         }
 
         Product::observe(ProductHomepageObserver::class);
 
+
         foreach ([
             Product::class,
+            Category::class,
+            Brand::class,
+            Page::class,
+            Faq::class,
+            HeroSlide::class,
+            HomepageBlock::class,
+            HomepageCategoryRow::class,
+            HomepageSection::class,
+            NewsletterSubscriber::class,
             Order::class,
             Refund::class,
+            ReturnReason::class,
+            ReturnRequest::class,
+            Shipment::class,
             Coupon::class,
             SiteSetting::class,
             User::class,
             Review::class,
             ProductQuestion::class,
+            ProductMerchandisingRule::class,
             ContactMessage::class,
         ] as $auditedModel) {
             $auditedModel::observe(AdminAuditableObserver::class);
@@ -138,6 +166,7 @@ class AppServiceProvider extends ServiceProvider
             },
         );
 
+        Event::listen(BackInStockNotificationRequested::class, HandleBackInStockNotification::class);
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
         Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
         Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);

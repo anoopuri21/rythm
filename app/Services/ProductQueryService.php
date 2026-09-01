@@ -7,6 +7,7 @@ namespace App\Services;
 use App\DTOs\ShopFilters;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\ProductMerchandisingRule;
 use App\Models\Review;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,6 +20,12 @@ use Illuminate\Database\Eloquent\Collection;
 final class ProductQueryService
 {
     private const PER_PAGE = 12;
+
+    private const MAX_BRAND_FILTERS = 50;
+
+    private const MAX_ATTRIBUTE_FILTERS = 20;
+
+    private const MAX_ATTRIBUTE_VALUES = 50;
 
     public function shopQuery(ShopFilters $filters): Builder
     {
@@ -40,7 +47,8 @@ final class ProductQueryService
         $this->applySearchFilter($query, $filters->search);
         $this->applyRatingFilter($query, $filters->minRating);
         $this->applyAttributeFilters($query, $filters->attributes);
-        $this->applySort($query, $filters->sort);
+        $query->withAvailableVariantStock();
+        $this->applySort($query, $filters->sort, trim((string) $filters->search) !== '');
 
         return $query;
     }
@@ -51,16 +59,52 @@ final class ProductQueryService
     }
 
     /**
-     * Related products: same category (or parent category), excluding self,
-     * highest discount first. Eager-loaded, capped.
+     * Curated related products first, then a bounded same-category fallback.
+     * Admin rules only change discovery order; product price/stock stay owned
+     * by the Product model and are never copied into a recommendation.
      *
      * @return Collection<int, Product>
      */
-    public function related(Product $product, int $take = 4): Collection
-    {
-        return Product::query()
+    public function related(
+        Product $product,
+        int $take = 4,
+        string $ruleType = ProductMerchandisingRule::TYPE_RELATED,
+    ): Collection {
+        $take = max(1, min(12, $take));
+        $curatedIds = ProductMerchandisingRule::query()
+            ->activeNow()
+            ->where('source_product_id', $product->id)
+            ->where('rule_type', $ruleType)
+            ->orderByDesc('priority')
+            ->orderBy('id')
+            ->limit($take)
+            ->pluck('target_product_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->values()
+            ->all();
+
+        $curated = Product::query()
             ->active()
+            ->withAvailableVariantStock()
+            ->whereKey($curatedIds)
             ->whereKeyNot($product->id)
+            ->with(['brand', 'media'])
+            ->get()
+            ->keyBy('id');
+        $curatedInRuleOrder = new Collection(array_values(array_filter(array_map(
+            static fn (int $id): ?Product => $curated->get($id),
+            $curatedIds,
+        ))));
+
+        if ($curatedInRuleOrder->count() >= $take || $ruleType !== ProductMerchandisingRule::TYPE_RELATED) {
+            return $curatedInRuleOrder->take($take)->values();
+        }
+
+        $fallback = Product::query()
+            ->active()
+            ->withAvailableVariantStock()
+            ->whereKeyNot($product->id)
+            ->whereNotIn('id', $curatedInRuleOrder->pluck('id')->all())
             ->where(function (Builder $q) use ($product): void {
                 $q->where('category_id', $product->category_id)
                     ->orWhereHas('category', fn (Builder $c): Builder => $c->where('parent_id', $product->category?->parent_id));
@@ -68,14 +112,45 @@ final class ProductQueryService
             ->with(['brand', 'media'])
             ->orderByRaw('(COALESCE(compare_at_price, 0) - price) DESC')
             ->orderByDesc('id')
-            ->limit($take)
+            ->limit($take - $curatedInRuleOrder->count())
             ->get();
+
+        return $curatedInRuleOrder->concat($fallback)->values();
     }
 
     /**
-     * Matches a child category directly, or every product inside a
-     * parent category (and its children).
+     * Resolve a bounded, session-supplied recently-viewed list while preserving
+     * its customer-visible order. Only active products can reappear.
+     *
+     * @param list<int> $productIds
+     * @return Collection<int, Product>
      */
+    public function recentlyViewed(array $productIds, int $take = 4): Collection
+    {
+        $ids = array_slice(array_values(array_unique(array_filter(
+            array_map('intval', $productIds),
+            fn (int $id): bool => $id > 0,
+        ))), 0, max(1, min(12, $take)));
+
+        if ($ids === []) {
+            return new Collection();
+        }
+
+        $products = Product::query()
+            ->active()
+            ->withAvailableVariantStock()
+            ->whereKey($ids)
+            ->with(['brand', 'category', 'media'])
+            ->get()
+            ->keyBy('id');
+
+        return new Collection(array_values(array_filter(array_map(
+            fn (int $id): ?Product => $products->get($id),
+            $ids,
+        ))));
+    }
+
+    /** Matches a child category directly, or products inside a parent category. */
     private function applyCategoryFilter(Builder $query, ?string $categorySlug): void
     {
         if ($categorySlug === null || $categorySlug === '') {
@@ -88,12 +163,14 @@ final class ProductQueryService
         });
     }
 
-    /**
-     * @param  string[]  $brandSlugs
-     */
+    /** @param string[] $brandSlugs */
     private function applyBrandFilter(Builder $query, array $brandSlugs): void
     {
-        $brandSlugs = array_values(array_filter($brandSlugs));
+        $brandSlugs = array_slice(
+            array_values(array_filter(array_map('strval', $brandSlugs))),
+            0,
+            self::MAX_BRAND_FILTERS,
+        );
 
         if ($brandSlugs === []) {
             return;
@@ -127,7 +204,12 @@ final class ProductQueryService
     private function applyAvailabilityFilter(Builder $query, bool $inStockOnly): void
     {
         if ($inStockOnly) {
-            $query->where('stock', '>', 0);
+            $query->where(function (Builder $available): void {
+                $available->where('stock', '>', 0)
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->where('stock', '>', 0));
+            });
         }
     }
 
@@ -148,10 +230,61 @@ final class ProductQueryService
             return;
         }
 
-        $query->where(function (Builder $q) use ($term): void {
-            $q->where('name', 'like', "%{$term}%")
-                ->orWhere('sku', 'like', "%{$term}%")
-                ->orWhereHas('brand', fn (Builder $brand): Builder => $brand->where('name', 'like', "%{$term}%"));
+        // Portable MySQL 8/SQLite baseline. The bounded token/stem fallbacks
+        // provide useful typo tolerance without a persistent search service.
+        $term = mb_substr($term, 0, 80);
+        $likeTerm = $this->escapeLike($term);
+        $tokens = array_values(array_filter(preg_split('/\s+/', $term, -1, PREG_SPLIT_NO_EMPTY) ?: []));
+        $tokens = array_slice($tokens, 0, 5);
+
+        $query->selectRaw('products.*, CASE
+            WHEN products.name = ? THEN 120
+            WHEN products.sku = ? THEN 115
+            WHEN products.name LIKE ? THEN 90
+            WHEN products.sku LIKE ? THEN 85
+            ELSE 0
+        END AS search_relevance', [$term, $term, "%{$likeTerm}%", "%{$likeTerm}%"]);
+
+        $query->where(function (Builder $q) use ($likeTerm, $tokens): void {
+            $matches = function (Builder $match, string $value): void {
+                $match->where('products.name', 'like', "%{$value}%")
+                    ->orWhere('products.sku', 'like', "%{$value}%")
+                    ->orWhereHas('brand', fn (Builder $brand): Builder => $brand->where('name', 'like', "%{$value}%"))
+                    ->orWhereHas('category', fn (Builder $category): Builder => $category
+                        ->where('name', 'like', "%{$value}%")
+                        ->orWhere('slug', 'like', "%{$value}%"))
+                    ->orWhereHas('attributeValues', fn (Builder $attribute): Builder => $attribute
+                        ->where(function (Builder $matched) use ($value): void {
+                            $matched->where('value', 'like', "%{$value}%")
+                                ->orWhere('slug', 'like', "%{$value}%");
+                        })
+                        ->whereHas('attribute', fn (Builder $definition): Builder => $definition->where('is_active', true)))
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->whereHas('attributeValues', fn (Builder $attribute): Builder => $attribute
+                            ->where(function (Builder $matched) use ($value): void {
+                                $matched->where('value', 'like', "%{$value}%")
+                                    ->orWhere('slug', 'like', "%{$value}%");
+                            })
+                            ->whereHas('attribute', fn (Builder $definition): Builder => $definition->where('is_active', true))));
+            };
+
+            $matches($q, $likeTerm);
+
+            foreach ($tokens as $token) {
+                if (mb_strlen($token) < 5) {
+                    continue;
+                }
+
+                // Example: "guitr" still discovers "guitar". The one-char
+                // stem rule is intentionally bounded to avoid broad scans.
+                $stem = $this->escapeLike(mb_substr($token, 0, -1));
+                $q->orWhere(fn (Builder $fallback): Builder => $fallback
+                    ->where('products.name', 'like', "%{$stem}%")
+                    ->orWhere('products.sku', 'like', "%{$stem}%")
+                    ->orWhereHas('brand', fn (Builder $brand): Builder => $brand->where('name', 'like', "%{$stem}%"))
+                    ->orWhereHas('category', fn (Builder $category): Builder => $category->where('name', 'like', "%{$stem}%")));
+            }
         });
     }
 
@@ -172,16 +305,15 @@ final class ProductQueryService
         $query->whereIn('id', $ratedProductIds);
     }
 
-    /**
-     * Values inside one attribute are ORed; separate attributes are ANDed.
-     * Product-level and variant-level normalized assignments both qualify.
-     *
-     * @param  array<string, string[]>  $attributes
-     */
+    /** @param array<string, string[]> $attributes */
     private function applyAttributeFilters(Builder $query, array $attributes): void
     {
-        foreach ($attributes as $attributeSlug => $valueSlugs) {
-            $values = array_values(array_filter(array_map('strval', (array) $valueSlugs)));
+        foreach (array_slice($attributes, 0, self::MAX_ATTRIBUTE_FILTERS, true) as $attributeSlug => $valueSlugs) {
+            $values = array_slice(
+                array_values(array_filter(array_map('strval', (array) $valueSlugs))),
+                0,
+                self::MAX_ATTRIBUTE_VALUES,
+            );
 
             if ($values === []) {
                 continue;
@@ -196,12 +328,14 @@ final class ProductQueryService
                         ->where('is_filterable', true));
 
                 $product->whereHas('attributeValues', $matchesValue)
-                    ->orWhereHas('variants.attributeValues', $matchesValue);
+                    ->orWhereHas('variants', fn (Builder $variant): Builder => $variant
+                        ->where('is_active', true)
+                        ->whereHas('attributeValues', $matchesValue));
             });
         }
     }
 
-    private function applySort(Builder $query, string $sort): void
+    private function applySort(Builder $query, string $sort, bool $hasSearch = false): void
     {
         switch ($sort) {
             case 'price-asc':
@@ -217,12 +351,19 @@ final class ProductQueryService
                 break;
 
             case 'discount':
-                // Static expression, zero user input — safe raw sort.
                 $query->orderByRaw('(COALESCE(compare_at_price, 0) - price) DESC')->orderBy('id');
                 break;
 
             default: // featured
-                $query->orderByDesc('is_featured')->orderByDesc('id');
+                if ($hasSearch) {
+                    $query->orderByDesc('search_relevance');
+                }
+                $query->orderByDesc('is_featured')->orderByDesc('featured_rank')->orderByDesc('id');
         }
+    }
+
+    private function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 }

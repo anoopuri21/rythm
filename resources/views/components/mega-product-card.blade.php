@@ -1,9 +1,10 @@
 @props(['product'])
 
 @php
-    $image = $product->heroImage();
+    $image = $product->thumbnailImage();
     $onSale = $product->compare_at_price !== null && (float) $product->compare_at_price > (float) $product->price;
     $rating = $product->reviews_avg_rating ?? null;
+    $hasAvailableStock = $product->hasAvailableStock();
     $href = route('product.show', $product->slug);
 @endphp
 
@@ -12,10 +13,10 @@
      Image tile (zoom on hover) · sale badge · wishlist overlay ·
      hover "view product" bar · category · name · stars · price
      ============================================================ --}}
-<article class="pcard">
-    <div class="pcard__media">
+<article class="pcard ui-card ui-card--interactive">
+    <div class="pcard__media ui-media ui-media--product ui-media--contain">
         @if($onSale)
-            <span class="pcard__badge">Sale!</span>
+            <x-ui.badge variant="brand" class="pcard__badge">Sale</x-ui.badge>
         @endif
 
         <a href="{{ $href }}" class="pcard__img" aria-label="{{ $product->name }}" tabindex="-1">
@@ -56,6 +57,9 @@
                 <del>₹{{ number_format((float) $product->compare_at_price) }}</del>
             @endif
             <ins>₹{{ number_format((float) $product->price) }}</ins>
+        </p>
+        <p class="pcard__stock {{ $hasAvailableStock ? 'text-emerald-700' : 'text-muted' }}" aria-label="Availability">
+            {{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}
         </p>
     </div>
 </article>

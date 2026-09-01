@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Models\Product;
 use App\Services\ProductQuestionService;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -38,6 +39,7 @@ final class ProductQuestionSection extends Component
         ]);
 
         try {
+            $this->guardRateLimit();
             $questions->submit((int) auth()->id(), $this->product, $this->question);
             $this->question = '';
             $this->submitted = true;
@@ -51,5 +53,16 @@ final class ProductQuestionSection extends Component
         return view('livewire.product-question-section', [
             'questions' => $questions->publishedFor($this->product),
         ]);
+    }
+
+    private function guardRateLimit(): void
+    {
+        $key = 'question:submit:user:'.auth()->id().':product:'.$this->product->getKey();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw new RuntimeException('Too many question attempts. Please wait a moment and try again.');
+        }
+
+        RateLimiter::hit($key, 60);
     }
 }

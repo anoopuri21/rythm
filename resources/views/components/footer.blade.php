@@ -11,7 +11,7 @@
         <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,.07),transparent_42%),radial-gradient(circle_at_88%_80%,rgba(255,255,255,.05),transparent_40%)]"></div>
         <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
         <div class="relative mx-auto grid max-w-[1520px] items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
-            <div class="reveal-section" data-reveal="up">
+            <div>
                 <p class="section-kicker text-gold-light">The Rhythm Exports promise</p>
                 <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Ready to find <em class="text-gold-light">your sound?</em></h2>
                 <p class="mt-4 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
@@ -22,7 +22,7 @@
                     <a href="/contact" class="btn-ghost-light">Contact us <span aria-hidden="true">→</span></a>
                 </div>
             </div>
-            <div class="reveal-section grid grid-cols-2 gap-4" data-reveal="up">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
                     <p class="text-base font-bold text-gold-light">Catalogue filters</p>
                     <p class="mt-1 text-xs leading-5 text-white/55">Narrow instruments by category, brand, price, stock and available specifications.</p>
@@ -58,6 +58,7 @@
     </div>
 
     {{-- ============ 5-column link grid ============ --}}
+    {{-- Withheld policy routes remain intentionally unlinked until owner/legal approval: /shipping /returns /faqs. --}}
     <div class="mx-auto max-w-[1520px] px-5 py-14 sm:px-8">
         <div class="grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-5">
             {{-- Shop — DB categories --}}
@@ -88,6 +89,7 @@
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
                     <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
+                    <li><span class="text-sm text-white/45">Policy information is published after approval.</span></li>
                 </ul>
             </nav>
 

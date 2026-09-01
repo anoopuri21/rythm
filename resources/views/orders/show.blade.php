@@ -99,6 +99,90 @@
                 </ol>
             </section>
 
+            @if($order->shipments->isNotEmpty())
+                <section aria-label="Parcel tracking" class="mt-8 rounded-3xl border border-ink/10 bg-white p-6 sm:p-10">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="section-kicker mb-2">Fulfillment</p>
+                            <h2 class="font-playfair text-xl font-bold text-ink">Your parcels</h2>
+                        </div>
+                        @if($order->shipments->whereNotIn('status', ['delivered', 'cancelled'])->count() > 0)
+                            <p class="text-xs text-muted">Items may arrive in separate parcels.</p>
+                        @endif
+                    </div>
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        @foreach($order->shipments->sortBy('id') as $shipment)
+                            <article class="rounded-2xl border border-ink/10 bg-paper p-5">
+                                <div class="flex items-center justify-between gap-3">
+                                    <h3 class="text-sm font-bold text-ink">Parcel {{ $loop->iteration }}</h3>
+                                    <span class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand">
+                                        {{ str_replace('_', ' ', $shipment->status) }}
+                                    </span>
+                                </div>
+                                <ul class="mt-4 space-y-2 text-sm text-ink/80">
+                                    @foreach($shipment->items as $shipmentItem)
+                                        <li class="flex justify-between gap-3">
+                                            <span>{{ $shipmentItem->orderItem->name }}</span>
+                                            <span class="shrink-0 font-semibold">Qty {{ $shipmentItem->quantity }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                @if($shipment->carrier || $shipment->awb)
+                                    <dl class="mt-4 space-y-1 border-t border-ink/10 pt-4 text-xs">
+                                        @if($shipment->carrier)<div class="flex justify-between gap-3"><dt class="text-muted">Carrier</dt><dd class="font-semibold text-ink">{{ $shipment->carrier }}</dd></div>@endif
+                                        @if($shipment->awb)<div class="flex justify-between gap-3"><dt class="text-muted">Tracking reference</dt><dd class="break-all font-semibold text-ink">{{ $shipment->awb }}</dd></div>@endif
+                                    </dl>
+                                @endif
+                                @if($shipment->tracking_url)
+                                    <a href="{{ $shipment->tracking_url }}" target="_blank" rel="noopener noreferrer" class="text-link mt-4 inline-flex text-sm">Track with carrier</a>
+                                @endif
+                                @if($shipment->dispatched_at)
+                                    <p class="mt-3 text-[11px] text-muted">Dispatched {{ $shipment->dispatched_at->format('d M Y, h:i A') }}</p>
+                                @endif
+                                @if($shipment->delivered_at)
+                                    <p class="mt-1 text-[11px] font-semibold text-emerald-700">Delivered {{ $shipment->delivered_at->format('d M Y, h:i A') }}</p>
+                                @endif
+                            </article>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($order->returnRequests->isNotEmpty() || (auth()->check() && auth()->id() === $order->user_id && $returnsAvailable))
+                <section aria-label="Return requests" class="mt-8 rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-playfair text-xl font-bold text-ink">Return requests</h2>
+                            <p class="mt-1 text-xs text-muted">Logistical review and payment refunds are tracked separately.</p>
+                        </div>
+                        @if(auth()->check() && auth()->id() === $order->user_id && $returnsAvailable)
+                            <a href="{{ route('returns.create', $order) }}" class="rounded-full border border-brand/30 px-5 py-2 text-sm font-semibold text-brand transition hover:bg-brand/5">Request a return</a>
+                        @endif
+                    </div>
+                    @if($order->returnRequests->isNotEmpty())
+                        <div class="mt-5 space-y-3">
+                            @foreach($order->returnRequests->sortByDesc('created_at') as $returnRequest)
+                                <article class="rounded-2xl bg-paper p-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div>
+                                            <p class="text-sm font-bold text-ink">{{ $returnRequest->request_number }}</p>
+                                            <p class="mt-1 text-xs text-muted">{{ $returnRequest->reason_snapshot }} · {{ $returnRequest->items->sum('quantity') }} item(s)</p>
+                                        </div>
+                                        <span class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand">{{ str_replace('_', ' ', $returnRequest->status) }}</span>
+                                    </div>
+                                    @if(auth()->check() && auth()->id() === $order->user_id && $returnRequest->status === 'requested')
+                                        <form method="POST" action="{{ route('returns.cancel', $returnRequest) }}" class="mt-3">
+                                            @csrf
+                                            <button type="submit" class="text-xs font-semibold text-muted underline transition hover:text-brand">Cancel request</button>
+                                        </form>
+                                    @endif
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
+            @endif
+
             <div class="mt-8 grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
                 {{-- Items --}}
                 <section aria-label="Order items" class="min-w-0 rounded-3xl border border-ink/10 bg-white p-6 sm:p-8">
@@ -172,7 +256,7 @@
                     </section>
 
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ \Illuminate\Support\Facades\URL::signedRoute('orders.invoice', ['order' => $order]) }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('orders.invoice', now()->addMinutes(15), ['order' => $order]) }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" /></svg>
                             Download invoice
                         </a>

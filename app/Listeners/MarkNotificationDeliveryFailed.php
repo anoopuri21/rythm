@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Models\NotificationDelivery;
+use App\Notifications\BackInStockNotification;
 use App\Notifications\CommerceOrderNotification;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,8 @@ final class MarkNotificationDeliveryFailed
 {
     public function handle(NotificationFailed $failed): void
     {
-        if (! $failed->notification instanceof CommerceOrderNotification) {
+        if (! $failed->notification instanceof CommerceOrderNotification
+            && ! $failed->notification instanceof BackInStockNotification) {
             return;
         }
 

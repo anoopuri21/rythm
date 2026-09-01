@@ -31,10 +31,10 @@ export default {
                 },
             },
             fontFamily: {
-                playfair: ['Inter', ...defaultTheme.fontFamily.sans],
-                inter: ['Inter', ...defaultTheme.fontFamily.sans],
-                bebas: ['Inter', ...defaultTheme.fontFamily.sans],
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                playfair: ['Poppins', ...defaultTheme.fontFamily.sans],
+                inter: ['Poppins', ...defaultTheme.fontFamily.sans],
+                bebas: ['Poppins', ...defaultTheme.fontFamily.sans],
+                sans: ['Poppins', ...defaultTheme.fontFamily.sans],
             },
             animation: {
                 'bounce-slow': 'bounce 2s infinite',

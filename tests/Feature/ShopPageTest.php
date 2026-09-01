@@ -204,6 +204,43 @@ class ShopPageTest extends TestCase
             ->assertDontSee('Yamaha F310 Acoustic Guitar');
     }
 
+    public function test_category_facets_ignore_inactive_variant_attributes(): void
+    {
+        $category = Category::where('slug', 'acoustic-guitars')->firstOrFail();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'brand_id' => Brand::where('slug', 'fender')->firstOrFail()->id,
+            'name' => 'Facet visibility product',
+            'slug' => 'facet-visibility-product',
+            'sku' => 'RYM-FACET-VISIBILITY',
+            'stock' => 0,
+        ]);
+        $attribute = ProductAttribute::create([
+            'name' => 'Hidden finish QA',
+            'slug' => 'hidden-finish-qa',
+            'type' => 'select',
+            'is_filterable' => true,
+            'is_variant' => true,
+            'is_active' => true,
+        ]);
+        $value = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Hidden finish value QA',
+            'slug' => 'hidden-finish-value-qa',
+        ]);
+        $variant = ProductVariant::factory()->for($product)->create([
+            'stock' => 2,
+            'is_active' => false,
+        ]);
+        $attribute->categories()->attach($category->id, ['is_filterable' => true]);
+        $value->variants()->attach($variant->id);
+
+        Livewire::test(ShopIndex::class)
+            ->call('setCategory', $category->slug)
+            ->assertDontSee('Hidden finish QA')
+            ->assertDontSee('Hidden finish value QA');
+    }
+
     public function test_livewire_sort_price_ascending(): void
     {
         Livewire::test(ShopIndex::class, ['sort' => 'price-asc'])

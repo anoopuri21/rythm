@@ -19,10 +19,10 @@
             'url' => route('product.show', $product),
             'priceCurrency' => 'INR',
             'price' => $product->price,
-            'availability' => $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'availability' => $hasAvailableStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
             'itemCondition' => 'https://schema.org/NewCondition',
         ],
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
     </script>
 @endpush
 
@@ -54,7 +54,9 @@
                         <template x-for="(img, i) in images" :key="i">
                             <div x-show="active === i" x-transition.opacity.duration.300 class="absolute inset-0 flex items-center justify-center p-8 sm:p-12">
                                 <img x-show="img" :src="img" :alt="$el.closest('div').parentElement?.dataset?.name ?? '{{ $product->name }}'"
-                                     class="h-full w-full object-contain" loading="lazy" decoding="async">
+                                     class="h-full w-full object-contain"
+                                     :loading="i === 0 ? 'eager' : 'lazy'"
+                                     :fetchpriority="i === 0 ? 'high' : 'low'" decoding="async">
                                 <div x-show="!img"
                                      class="flex h-full w-full flex-col items-center justify-center gap-4 rounded-3xl bg-gradient-to-br from-paper-dark via-paper to-paper-dark">
                                     <svg class="h-20 w-20 text-brand/25" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -134,6 +136,12 @@
                             <span class="text-[11px] font-semibold leading-tight text-ink">Gateway payment options</span>
                         </div>
                     </div>
+                    <nav class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted" aria-label="Purchase policies">
+                        <a href="/shipping" class="underline underline-offset-4 hover:text-brand">Shipping information</a>
+                        <a href="/returns" class="underline underline-offset-4 hover:text-brand">Returns and refund requests</a>
+                        <a href="/privacy" class="underline underline-offset-4 hover:text-brand">Payment and privacy safety</a>
+                        <a href="{{ route('orders.lookup') }}" class="underline underline-offset-4 hover:text-brand">Track an order</a>
+                    </nav>
                 </div>
             </div>
 
@@ -177,8 +185,8 @@
                             <dd class="text-sm font-semibold text-ink">Brand New</dd>
                         </div>
                         <div class="flex items-center justify-between gap-6 px-6 py-4">
-                            <dt class="text-sm text-muted">Warranty</dt>
-                            <dd class="text-sm font-semibold text-ink">1 Year</dd>
+                            <dt class="text-sm text-muted">Product support</dt>
+                            <dd class="text-sm font-semibold text-ink"><a href="{{ route('contact', ['product' => $product->slug]) }}" class="text-brand underline underline-offset-4">Ask the team</a></dd>
                         </div>
                     </dl>
                 </div>
@@ -189,6 +197,41 @@
 
             {{-- ===== PRODUCT Q&A ===== --}}
             <livewire:product-question-section :product="$product" :key="'questions-' . $product->id" />
+
+            @if($productFaqs->isNotEmpty())
+                <section class="mt-16 max-w-4xl" aria-labelledby="product-faq-title">
+                    <div class="mb-6 flex items-end justify-between gap-4">
+                        <div>
+                            <p class="section-kicker mb-3">Buying with confidence</p>
+                            <h2 id="product-faq-title" class="text-2xl font-bold text-ink sm:text-3xl">Frequently asked questions</h2>
+                        </div>
+                        <a href="/faqs" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                    </div>
+                    <div class="divide-y divide-ink/10">
+                        @foreach($productFaqs as $faq)
+                            <details class="group py-5 first:pt-0">
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-5 font-semibold text-ink">
+                                    {{ $faq->question }}
+                                    <span class="text-xl font-normal text-brand transition group-open:rotate-45" aria-hidden="true">＋</span>
+                                </summary>
+                                <div class="prose-sm max-w-none pt-3 leading-7 text-muted">{!! $faq->answer !!}</div>
+                            </details>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($recentlyViewed->isNotEmpty())
+                <section aria-labelledby="recently-viewed-title" class="mt-20">
+                    <p class="section-kicker mb-3">Continue exploring</p>
+                    <h2 id="recently-viewed-title" class="text-2xl font-bold text-ink sm:text-3xl">Recently viewed</h2>
+                    <div class="mt-8 grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($recentlyViewed as $recentProduct)
+                            <x-shop-card :product="$recentProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
 
             {{-- ===== RELATED ===== --}}
             @if($related->isNotEmpty())
@@ -207,6 +250,35 @@
                     <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
                         @foreach($related as $relatedProduct)
                             <x-shop-card :product="$relatedProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($complementary->isNotEmpty())
+                <section aria-labelledby="complementary-products-title" class="mt-20">
+                    <div class="mb-8">
+                        <p class="section-kicker mb-3">Build your rig</p>
+                        <h2 id="complementary-products-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Complete your setup</h2>
+                        <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Curated additions selected for this product. Prices, stock and availability are shown from each product’s current record.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($complementary as $complementaryProduct)
+                            <x-shop-card :product="$complementaryProduct" />
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            @if($frequentlyBought->isNotEmpty())
+                <section aria-labelledby="frequently-bought-title" class="mt-20">
+                    <div class="mb-8">
+                        <p class="section-kicker mb-3">Curated pairing</p>
+                        <h2 id="frequently-bought-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Often paired with this item</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-4">
+                        @foreach($frequentlyBought as $pairedProduct)
+                            <x-shop-card :product="$pairedProduct" />
                         @endforeach
                     </div>
                 </section>

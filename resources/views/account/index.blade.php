@@ -37,6 +37,8 @@
                     'overview' => ['Overview', 'heroicon-o-home'],
                     'orders' => ['Orders', 'heroicon-o-shopping-bag'],
                     'addresses' => ['Addresses', 'heroicon-o-map-pin'],
+                    'stock-alerts' => ['Stock alerts', 'heroicon-o-bell-alert'],
+                    'support' => ['Support', 'heroicon-o-chat-bubble-left-right'],
                     'settings' => ['Settings', 'heroicon-o-cog-6-tooth'],
                 ] as $key => [$label, $icon])
                     <button type="button" role="tab" id="account-tab-{{ $key }}" aria-controls="account-panel-{{ $key }}"
@@ -51,11 +53,12 @@
 
             {{-- ===== OVERVIEW ===== --}}
             <section x-show="tab === 'overview'" id="account-panel-overview" role="tabpanel" aria-labelledby="account-tab-overview" class="py-10">
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
                     @foreach([
                         ['Orders', $orders->count(), '/'],
                         ['Wishlist', $wishlistCount, '/wishlist'],
                         ['Addresses', $addresses->count(), '#addresses'],
+                        ['Stock alerts', $stockAlertCount, '#stock-alerts'],
                         ['Member since', auth()->user()->created_at?->format('Y'), '/'],
                     ] as [$label, $value, $href])
                         <div class="rounded-3xl border border-ink/10 bg-white p-6 text-center">
@@ -91,6 +94,7 @@
                 @if($orders->isNotEmpty())
                     <div class="mt-6">
                         <x-order-list :orders="$orders" />
+                        <div class="mt-8">{{ $orders->links() }}</div>
                     </div>
                 @else
                     <p class="mt-6 rounded-2xl border border-dashed border-ink/15 bg-white px-6 py-12 text-center text-sm text-muted">
@@ -221,6 +225,79 @@
                             <button type="submit" class="rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">Save address</button>
                         </div>
                     </form>
+                </div>
+            </section>
+
+            {{-- ===== STOCK ALERTS ===== --}}
+            <section x-show="tab === 'stock-alerts'" x-cloak id="account-panel-stock-alerts" role="tabpanel" aria-labelledby="account-tab-stock-alerts" class="py-10">
+                <div class="flex items-end justify-between gap-4">
+                    <div>
+                        <p class="section-kicker mb-3">Your requests</p>
+                        <h2 class="font-playfair text-2xl font-bold text-ink">Stock alerts</h2>
+                    </div>
+                    <a href="{{ route('shop.index') }}" class="text-link text-sm">Keep browsing <span aria-hidden="true">→</span></a>
+                </div>
+
+                @if(session('stock_alert_success'))
+                    <p class="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('stock_alert_success') }}</p>
+                @endif
+
+                @if($stockAlertCount > 0 && $backInStockSubscriptions->isNotEmpty())
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        @foreach($backInStockSubscriptions as $subscription)
+                            <div class="flex items-start justify-between gap-5 rounded-3xl border border-ink/10 bg-white p-6">
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-brand">Waiting for stock</p>
+                                    <h3 class="mt-2 truncate font-semibold text-ink">{{ $subscription->product->name }}</h3>
+                                    @if($subscription->variant)
+                                        <p class="mt-1 text-sm text-muted">Option: {{ $subscription->variant->name }}</p>
+                                    @endif
+                                    <p class="mt-2 text-xs leading-5 text-muted">We will send one availability email if this item is restocked. This is not a marketing subscription.</p>
+                                </div>
+                                <form method="POST" action="{{ route('account.stock-alerts.destroy', $subscription) }}" class="shrink-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-semibold text-muted underline underline-offset-4 transition hover:text-brand">Cancel</button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                    @if($backInStockSubscriptions->hasPages())
+                        <div class="mt-6">{{ $backInStockSubscriptions->onEachSide(1)->links() }}</div>
+                    @endif
+                @elseif($stockAlertCount > 0)
+                    <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
+                        <p class="text-4xl" aria-hidden="true">↔</p>
+                        <h3 class="mt-4 font-playfair text-xl font-bold text-ink">No requests on this page</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">Your active stock alerts are on another page.</p>
+                        <a href="{{ request()->fullUrlWithQuery(['stock_alert_page' => 1]) }}" class="mt-4 inline-flex text-sm font-bold text-brand underline underline-offset-4">View first page</a>
+                    </div>
+                @else
+                    <div class="mt-6 rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-14 text-center">
+                        <p class="text-4xl" aria-hidden="true">🔔</p>
+                        <h3 class="mt-4 font-playfair text-xl font-bold text-ink">No active stock alerts</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">When an item is unavailable, you can request a single stock-availability email from its product page.</p>
+                    </div>
+                @endif
+            </section>
+
+            {{-- ===== SUPPORT ===== --}}
+            <section x-show="tab === 'support'" x-cloak id="account-panel-support" role="tabpanel" aria-labelledby="account-tab-support" class="py-10">
+                <h2 class="text-2xl font-bold text-ink">Customer support</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-muted">Choose the shortest route for an order, product, delivery or post-delivery question. Include your order number when one exists.</p>
+                <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <a href="{{ route('contact') }}" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Contact the team</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">Send a product, account or service question.</p>
+                    </a>
+                    <a href="{{ route('orders.lookup') }}" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Track an order</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">View the latest recorded order status securely.</p>
+                    </a>
+                    <a href="/returns" class="ui-card ui-card--interactive p-6">
+                        <h3 class="font-semibold text-ink">Return or refund help</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
+                    </a>
                 </div>
             </section>
 

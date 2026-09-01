@@ -21,6 +21,8 @@ final class CommerceNotificationService
         'amount',
         'currency',
         'refund_id',
+        'shipment_id',
+        'shipment_status',
     ];
 
     /** @param array<string, mixed> $metadata */

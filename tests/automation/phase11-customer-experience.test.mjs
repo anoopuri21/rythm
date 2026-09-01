@@ -1,0 +1,193 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+
+test('Phase 11 search stays bounded, weighted and MySQL/shared-host safe', () => {
+  const service = read('app/Services/ProductQueryService.php');
+  const product = read('app/Models/Product.php');
+  const shopIndex = read('app/Livewire/ShopIndex.php');
+  const shopFeature = read('tests/Feature/ShopPageTest.php');
+  const migration = read('database/migrations/2026_08_30_000001_create_product_merchandising_rules_table.php');
+
+  assert.match(service, /search_relevance/);
+  assert.match(service, /orWhereHas\('variants'/);
+  assert.match(product, /scopeWithAvailableVariantStock/);
+  assert.match(product, /hasAvailableStock/);
+  assert.match(shopIndex, /->where\('is_active', true\)/);
+  assert.match(shopFeature, /test_category_facets_ignore_inactive_variant_attributes/);
+  assert.match(service, /mb_substr\(\$term, 0, 80\)/);
+  assert.match(service, /array_slice\(\$tokens, 0, 5\)/);
+  assert.match(service, /MAX_BRAND_FILTERS/);
+  assert.match(service, /MAX_ATTRIBUTE_FILTERS/);
+  assert.match(service, /MAX_ATTRIBUTE_VALUES/);
+  for (const field of ['products.name', 'products.sku', "orWhereHas('brand'", "orWhereHas('category'", "orWhereHas('attributeValues'"]) {
+    assert.ok(service.includes(field), `missing search field: ${field}`);
+  }
+  assert.match(migration, /product_merchandising_rules_unique/);
+  assert.match(migration, /product_merchandising_source_idx/);
+  assert.doesNotMatch(service, /MeiliSearch|Typesense|persistent.*daemon/i);
+});
+
+test('Phase 11 merchandising rules are admin-managed and price-safe', () => {
+  const model = read('app/Models/ProductMerchandisingRule.php');
+  const resource = read('app/Filament/Resources/ProductMerchandisingRuleResource.php');
+  const policy = read('app/Policies/MerchandisingRulePolicy.php');
+
+  for (const type of ['TYPE_RELATED', 'TYPE_COMPLEMENTARY', 'TYPE_FREQUENTLY_BOUGHT_TOGETHER']) {
+    assert.match(model, new RegExp(type));
+  }
+  assert.match(model, /A product cannot recommend itself/);
+  assert.match(resource, /Only curated product links are shown/);
+  assert.match(resource, /different\('source_product_id'\)/);
+  assert.match(resource, /relationship\('sourceProduct', 'name'/);
+  assert.match(resource, /relationship\('targetProduct', 'name'/);
+  assert.doesNotMatch(resource, /preload\(\)/);
+  assert.match(policy, /CATALOGUE_MANAGE/);
+});
+
+test('Phase 11 stock requests require verified consent and a bounded command', () => {
+  const migration = read('database/migrations/2026_08_30_000002_create_back_in_stock_subscriptions_table.php');
+  const service = read('app/Services/BackInStockSubscriptionService.php');
+  const component = read('app/Livewire/AddToCart.php');
+  const command = read('app/Console/Commands/NotifyBackInStock.php');
+  const accountController = read('app/Http/Controllers/AccountController.php');
+  const feature = read('tests/Feature/PhaseElevenCustomerExperienceTest.php');
+  const accountTest = read('tests/Feature/AccountTest.php');
+
+  assert.match(migration, /back_in_stock_user_target_unique/);
+  assert.match(migration, /consent_at/);
+  assert.match(service, /Please confirm stock-availability email consent/);
+  assert.match(service, /hasVerifiedEmail/);
+  assert.match(service, /abort\(403\)/);
+  assert.match(accountController, /->pending\(\)/);
+  assert.match(accountController, /with\(\['product', 'variant'\]\)/);
+  assert.match(service, /targetKey/);
+  assert.match(component, /notifyConsent/);
+  assert.match(component, /requestStockNotification/);
+  assert.match(command, /--limit=100/);
+  assert.match(command, /limit > 500/);
+  assert.match(command, /! \$variant->is_active/);
+  assert.match(component, /Please choose a valid option/);
+  assert.match(feature, /test_notification_command_rejects_limits_outside_the_worker_bound/);
+  assert.match(feature, /test_stock_request_requires_a_verified_email/);
+  assert.match(feature, /test_stock_request_rejects_an_inactive_or_foreign_variant/);
+  assert.match(feature, /test_stale_livewire_variant_selection_cannot_create_a_product_level_request/);
+  assert.match(feature, /test_delivery_skips_a_customer_whose_email_is_no_longer_verified/);
+  assert.match(feature, /test_search_ignores_inactive_variant_attributes/);
+  assert.match(feature, /test_exact_name_match_ranks_ahead_of_contains_match/);
+  assert.match(feature, /test_non_positive_stock_keeps_the_stock_request_path_visible/);
+  assert.match(feature, /fender-cd-60s-dreadnought-acoustic-guitar/);
+  assert.doesNotMatch(feature, /fender-cd-60s-acoustic-guitar/);
+  assert.match(accountTest, /forceFill\(\['email_verified_at' => now\(\)\]\)/);
+});
+
+test('Phase 12 customer writes have scoped abuse limits', () => {
+  const review = read('app/Livewire/ReviewSection.php');
+  const question = read('app/Livewire/ProductQuestionSection.php');
+  const routes = read('routes/web.php');
+
+  for (const component of [review, question]) {
+    assert.match(component, /use Illuminate\\Support\\Facades\\RateLimiter/);
+    assert.match(component, /RateLimiter::tooManyAttempts/);
+    assert.match(component, /RateLimiter::hit\(\$key, 60\)/);
+    assert.match(component, /Too many (review|question) attempts/);
+    assert.match(component, /user:\'\.auth\(\)->id\(\)/);
+    assert.match(component, /product:\'\.\$this->product->getKey\(\)/);
+  }
+
+  for (const route of [
+    /account\/profile[\s\S]{0,140}throttle:10,1/,
+    /account\/password[\s\S]{0,140}throttle:5,1/,
+    /account\/addresses[\s\S]{0,160}throttle:10,1/,
+    /orders\/\{order\}\/retry-payment[\s\S]{0,140}auth[\s\S]{0,80}throttle:3,1/,
+    /orders\/\{order\}\/cancel[\s\S]{0,140}auth[\s\S]{0,80}throttle:5,1/,
+    /Route::post\('\/logout'[\s\S]{0,100}auth[\s\S]{0,100}throttle:10,1/,
+  ]) assert.match(routes, route);
+});
+
+test('Phase 12 cart, order, wishlist and checkout boundaries reject mismatched records', () => {
+  const cart = read('app/Services/CartService.php');
+  const orders = read('app/Services/OrderService.php');
+  const wishlists = read('app/Services/WishlistService.php');
+  const checkout = read('app/Livewire/CheckoutWizard.php');
+  const cartFeature = read('tests/Feature/CartTest.php');
+  const checkoutFeature = read('tests/Feature/CheckoutTest.php');
+
+  assert.match(cart, /\$variant->product_id/);
+  assert.match(cart, /! \$variant->is_active/);
+  assert.match(cart, /\$item->variant->product_id/);
+  assert.match(orders, /\$item->product_variant_id !== null/);
+  assert.match(orders, /\$item->variant === null/);
+  assert.match(orders, /\$item->variant->product_id/);
+  assert.match(wishlists, /Product::query\(\)->active\(\)->whereKey\(\$productId\)->exists\(\)/);
+  assert.match(checkout, /public function selectAddress\(int \$addressId, AddressService \$addresses\)/);
+  assert.match(checkout, /forUser\(\(int\) auth\(\)->id\(\)\)->contains\('id', \$addressId\)/);
+  assert.match(checkout, /public function applyCoupon\(CouponService \$coupons\): void\s*\{\s*abort_unless\(auth\(\)->check\(\), 403\);/);
+  assert.match(cartFeature, /test_cart_rejects_a_variant_belonging_to_another_product/);
+  assert.match(checkoutFeature, /test_checkout_rejects_another_customers_address_before_place_order/);
+});
+
+test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {
+  const listener = read('app/Listeners/HandleBackInStockNotification.php');
+  const notification = read('app/Notifications/BackInStockNotification.php');
+  const provider = read('app/Providers/AppServiceProvider.php');
+  const retry = read('app/Services/NotificationRetryService.php');
+
+  assert.match(listener, /recordEvent/);
+  assert.match(listener, /hasVerifiedEmail/);
+  assert.match(listener, /reserveDelivery/);
+  assert.match(listener, /BackInStockNotification::class/);
+  assert.match(notification, /return \['mail'\]/);
+  assert.match(provider, /BackInStockNotificationRequested::class/);
+  assert.match(retry, /HandleBackInStockNotification/);
+  assert.doesNotMatch(notification, /database/);
+});
+
+test('Phase 11 product recommendations keep truthful empty states and current product pricing', () => {
+  const controller = read('app/Http/Controllers/ProductController.php');
+  const accountController = read('app/Http/Controllers/AccountController.php');
+  const accountFeature = read('tests/Feature/AccountTest.php');
+  const view = read('resources/views/product/show.blade.php');
+  const addToCartView = read('resources/views/livewire/add-to-cart.blade.php');
+  const shopCard = read('resources/views/components/shop-card.blade.php');
+  const megaCard = read('resources/views/components/mega-product-card.blade.php');
+  const minimalCard = read('resources/views/components/minimal-product-card.blade.php');
+  const dealsView = read('resources/views/home/_deals.blade.php');
+  const wishlistView = read('resources/views/livewire/wishlist-page.blade.php');
+  const accountView = read('resources/views/account/index.blade.php');
+  const plan = read('tasks/PHASE_11_CUSTOMER_EXPERIENCE_PLAN.md');
+
+  assert.match(controller, /TYPE_COMPLEMENTARY/);
+  assert.match(controller, /TYPE_FREQUENTLY_BOUGHT_TOGETHER/);
+  assert.match(view, /\$complementary->isNotEmpty\(\)/);
+  assert.match(view, /\$frequentlyBought->isNotEmpty\(\)/);
+  assert.match(view, /Prices, stock and availability/);
+  assert.match(view, /\$hasAvailableStock/);
+  assert.match(controller, /canonical_url/);
+  assert.match(controller, /robots.*index, follow/s);
+  assert.match(controller, /\'hasAvailableStock\' => \$hasAvailableStock/);
+  assert.match(controller, /hasAvailableStock/);
+  assert.match(addToCartView, /\$stock <= 0/);
+  assert.match(shopCard, /compare_at_price > \(float\) \$product->price/);
+  assert.match(shopCard, /hasAvailableStock\(\)/);
+  assert.match(megaCard, /hasAvailableStock\(\)/);
+  assert.match(minimalCard, /\$hasAvailableStock = \$isModel \? \$product->hasAvailableStock\(\) : \$stock > 0/);
+  assert.match(minimalCard, /\$hasAvailableStock \? 'In stock' : 'Out of stock'/);
+  assert.match(dealsView, /\$hasAvailableStock = \$product->hasAvailableStock\(\)/);
+  assert.match(dealsView, /@if\(\$hasAvailableStock\)/);
+  assert.doesNotMatch(dealsView, /Available now@if/);
+  assert.match(wishlistView, /compare_at_price > \(float\) \$product->price/);
+  assert.match(accountController, /cancelBackInStockAlert/);
+  assert.match(accountController, /stockAlertCount/);
+  assert.match(accountController, /orderByDesc\('created_at'\).*orderByDesc\('id'\)/s);
+  assert.match(accountController, /paginate\(12, \['\*'\], 'stock_alert_page'\)/);
+  assert.match(accountFeature, /test_account_paginates_stock_alerts_without_changing_the_total/);
+  assert.match(accountView, /\$stockAlertCount > 0/);
+  assert.match(accountView, /No requests on this page/);
+  assert.match(accountView, /hasPages\(\)/);
+  assert.match(accountView, /account\.stock-alerts\.destroy/);
+  assert.match(accountView, /not a marketing subscription/i);
+  assert.match(plan, /Gift cards.*abandoned-cart marketing.*price-drop alerts/is);
+});

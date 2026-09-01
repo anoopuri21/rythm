@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Models\NotificationDelivery;
+use App\Notifications\BackInStockNotification;
 use App\Notifications\CommerceOrderNotification;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,8 @@ final class MarkNotificationDeliverySent
 {
     public function handle(NotificationSent $sent): void
     {
-        if (! $sent->notification instanceof CommerceOrderNotification) {
+        if (! $sent->notification instanceof CommerceOrderNotification
+            && ! $sent->notification instanceof BackInStockNotification) {
             return;
         }
 

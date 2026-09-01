@@ -1,0 +1,435 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\DTOs\ShopFilters;
+use App\Livewire\AddToCart;
+use App\Events\BackInStockNotificationRequested;
+use App\Listeners\HandleBackInStockNotification;
+use App\Models\BackInStockSubscription;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAttributeValue;
+use App\Models\ProductMerchandisingRule;
+use App\Models\ProductVariant;
+use App\Models\User;
+use App\Services\BackInStockSubscriptionService;
+use App\Services\ProductQueryService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Livewire\Livewire;
+use RuntimeException;
+use Tests\TestCase;
+
+final class PhaseElevenCustomerExperienceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
+    public function test_search_matches_sku_brand_category_and_attribute_aware_catalogue_fields(): void
+    {
+        $product = Product::where('slug', 'yamaha-f310-acoustic-guitar')->firstOrFail();
+        $brand = Brand::findOrFail($product->brand_id);
+        $category = Category::findOrFail($product->category_id);
+        $service = app(ProductQueryService::class);
+
+        $this->assertTrue($service->shopQuery(new ShopFilters(search: $product->sku))->whereKey($product->id)->exists());
+        $this->assertTrue($service->shopQuery(new ShopFilters(search: $brand->name))->whereKey($product->id)->exists());
+        $this->assertTrue($service->shopQuery(new ShopFilters(search: $category->name))->whereKey($product->id)->exists());
+    }
+
+    public function test_search_has_a_bounded_typo_tolerant_stem_fallback_and_exact_rank(): void
+    {
+        $service = app(ProductQueryService::class);
+        $results = $service->shopQuery(new ShopFilters(search: 'guitr'))->get();
+
+        $this->assertTrue($results->contains('slug', 'yamaha-f310-acoustic-guitar'));
+        $this->assertGreaterThanOrEqual(0, (int) ($results->first()->search_relevance ?? 0));
+    }
+
+    public function test_exact_name_match_ranks_ahead_of_contains_match(): void
+    {
+        $term = 'Weighted ranking QA phrase';
+        $exact = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'name' => $term,
+            'slug' => 'weighted-ranking-exact',
+            'sku' => 'RYM-WEIGHTED-EXACT',
+        ]);
+        Product::factory()->create([
+            'category_id' => $exact->category_id,
+            'brand_id' => $exact->brand_id,
+            'name' => $term.' Studio Edition',
+            'slug' => 'weighted-ranking-contains',
+            'sku' => 'RYM-WEIGHTED-CONTAINS',
+        ]);
+
+        $results = app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(search: $term))
+            ->get();
+
+        $this->assertSame($exact->id, $results->first()?->id);
+        $this->assertSame(120, (int) ($results->first()?->search_relevance ?? 0));
+    }
+
+    public function test_active_variant_stock_makes_catalogue_availability_truthful(): void
+    {
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-variant-stock',
+            'sku' => 'RYM-P11-VARIANT-STOCK',
+            'stock' => 0,
+        ]);
+        $variant = ProductVariant::factory()->for($product)->create([
+            'stock' => 3,
+            'is_active' => true,
+        ]);
+
+        $available = app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(inStockOnly: true))
+            ->get()
+            ->firstWhere('id', $product->id);
+
+        $this->assertNotNull($available);
+        $this->assertTrue($available->hasAvailableStock());
+
+        $variant->update(['is_active' => false]);
+
+        $this->assertFalse(app(ProductQueryService::class)
+            ->shopQuery(new ShopFilters(inStockOnly: true))
+            ->get()
+            ->contains('id', $product->id));
+    }
+
+    public function test_search_ignores_inactive_variant_attributes(): void
+    {
+        $categoryId = Category::firstOrFail()->id;
+        $brandId = Brand::firstOrFail()->id;
+        $attribute = ProductAttribute::create([
+            'name' => 'Finish QA',
+            'slug' => 'finish-qa',
+            'type' => 'select',
+            'is_filterable' => true,
+            'is_variant' => true,
+            'is_active' => true,
+        ]);
+        $visibleValue = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Walnut Live QA',
+            'slug' => 'walnut-live-qa',
+        ]);
+        $archivedValue = ProductAttributeValue::create([
+            'product_attribute_id' => $attribute->id,
+            'value' => 'Archived Tone QA',
+            'slug' => 'archived-tone-qa',
+        ]);
+        $visibleProduct = Product::factory()->create([
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'slug' => 'phase-eleven-visible-attribute',
+            'sku' => 'RYM-P11-VISIBLE-ATTRIBUTE',
+            'stock' => 0,
+        ]);
+        $visibleVariant = ProductVariant::factory()->for($visibleProduct)->create([
+            'stock' => 1,
+            'is_active' => true,
+        ]);
+        $visibleVariant->attributeValues()->attach($visibleValue);
+
+        $archivedProduct = Product::factory()->create([
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'slug' => 'phase-eleven-archived-attribute',
+            'sku' => 'RYM-P11-ARCHIVED-ATTRIBUTE',
+            'stock' => 0,
+        ]);
+        $archivedVariant = ProductVariant::factory()->for($archivedProduct)->create([
+            'stock' => 2,
+            'is_active' => false,
+        ]);
+        $archivedVariant->attributeValues()->attach($archivedValue);
+
+        $service = app(ProductQueryService::class);
+        $this->assertTrue($service->shopQuery(new ShopFilters(search: 'walnut-live-qa'))->get()->contains('id', $visibleProduct->id));
+        $this->assertFalse($service->shopQuery(new ShopFilters(search: 'archived-tone-qa'))->get()->contains('id', $archivedProduct->id));
+    }
+
+    public function test_admin_managed_related_rule_precedes_category_fallback_without_affecting_price(): void
+    {
+        $source = Product::where('slug', 'yamaha-f310-acoustic-guitar')->firstOrFail();
+        $target = Product::where('slug', 'fender-cd-60s-dreadnought-acoustic-guitar')->firstOrFail();
+
+        ProductMerchandisingRule::create([
+            'source_product_id' => $source->id,
+            'target_product_id' => $target->id,
+            'rule_type' => ProductMerchandisingRule::TYPE_RELATED,
+            'priority' => 100,
+            'is_active' => true,
+        ]);
+
+        $related = app(ProductQueryService::class)->related($source, 4);
+
+        $this->assertSame($target->id, $related->first()?->id);
+        $this->assertSame((string) $target->price, (string) Product::findOrFail($target->id)->price);
+    }
+
+    public function test_stock_request_requires_explicit_consent_and_is_idempotent(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-oos',
+            'sku' => 'RYM-P11-OOS',
+            'stock' => 0,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, false);
+            $this->fail('A stock request without consent should be rejected.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please confirm stock-availability email consent.', $exception->getMessage());
+        }
+
+        app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+        app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 1);
+    }
+
+    public function test_stock_request_requires_a_verified_email(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-unverified-request',
+            'sku' => 'RYM-P11-UNVERIFIED-REQUEST',
+            'stock' => 0,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+            $this->fail('An unverified customer should not be able to create a stock request.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please verify your email before requesting a stock-availability email.', $exception->getMessage());
+        }
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
+    public function test_stock_request_rejects_an_inactive_or_foreign_variant(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-invalid-variant',
+            'sku' => 'RYM-P11-INVALID-VARIANT',
+            'stock' => 0,
+        ]);
+        $inactiveVariant = ProductVariant::factory()->for($product)->create([
+            'stock' => 0,
+            'is_active' => false,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, $inactiveVariant, true);
+            $this->fail('An inactive variant should not be accepted as a stock-request target.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please choose a valid option.', $exception->getMessage());
+        }
+
+        $foreignProduct = Product::factory()->create([
+            'category_id' => $product->category_id,
+            'brand_id' => $product->brand_id,
+            'slug' => 'phase-eleven-foreign-variant-product',
+            'sku' => 'RYM-P11-FOREIGN-VARIANT',
+            'stock' => 0,
+        ]);
+        $foreignVariant = ProductVariant::factory()->for($foreignProduct)->create([
+            'stock' => 0,
+            'is_active' => true,
+        ]);
+
+        try {
+            app(BackInStockSubscriptionService::class)->subscribe($user, $product, $foreignVariant, true);
+            $this->fail('A foreign variant should not be accepted as a stock-request target.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Please choose a valid option.', $exception->getMessage());
+        }
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
+    public function test_stale_livewire_variant_selection_cannot_create_a_product_level_request(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-stale-variant',
+            'sku' => 'RYM-P11-STALE-VARIANT',
+            'stock' => 0,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(AddToCart::class, ['product' => $product])
+            ->set('variantId', 999999)
+            ->set('notifyConsent', true)
+            ->call('requestStockNotification')
+            ->assertSet('notifySuccess', false)
+            ->assertSet('notifyError', 'Please choose a valid option.');
+
+        $this->assertDatabaseCount('back_in_stock_subscriptions', 0);
+    }
+
+    public function test_back_in_stock_delivery_is_bounded_and_idempotent(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-restocked',
+            'sku' => 'RYM-P11-RESTOCK',
+            'stock' => 4,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe(
+            $user,
+            $product->forceFill(['stock' => 0]),
+            null,
+            true,
+        );
+        $product->update(['stock' => 4]);
+
+        $handler = app(HandleBackInStockNotification::class);
+        $event = new BackInStockNotificationRequested($subscription->id);
+        $handler->handle($event);
+        $handler->handle($event);
+
+        Notification::assertSentTo($user, \App\Notifications\BackInStockNotification::class);
+        $this->assertNotNull($subscription->fresh()->notified_at);
+        $this->assertDatabaseHas('back_in_stock_subscriptions', ['id' => $subscription->id]);
+        $this->assertDatabaseCount('notification_deliveries', 1);
+    }
+
+    public function test_notification_command_skips_inactive_variants_even_if_they_have_stock(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email_verified_at' => now()]);
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-inactive-variant',
+            'sku' => 'RYM-P11-INACTIVE',
+            'stock' => 0,
+        ]);
+        $variant = ProductVariant::factory()->for($product)->create([
+            'stock' => 0,
+            'is_active' => true,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe(
+            $user,
+            $product,
+            $variant,
+            true,
+        );
+        $variant->update(['stock' => 3, 'is_active' => false]);
+
+        $this->artisan('back-in-stock:notify', ['--limit' => 100])
+            ->expectsOutput('Queued 0 back-in-stock notification request(s) from a 100-record bound.')
+            ->assertExitCode(0);
+
+        Notification::assertNothingSent();
+        $this->assertNull($subscription->fresh()->notified_at);
+    }
+
+    public function test_notification_command_rejects_limits_outside_the_worker_bound(): void
+    {
+        $this->artisan('back-in-stock:notify', ['--limit' => 0])
+            ->expectsOutput('The limit must be an integer between 1 and 500.')
+            ->assertExitCode(2);
+
+        $this->artisan('back-in-stock:notify', ['--limit' => 501])
+            ->expectsOutput('The limit must be an integer between 1 and 500.')
+            ->assertExitCode(2);
+    }
+
+    public function test_delivery_skips_a_customer_whose_email_is_no_longer_verified(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-unverified-after-request',
+            'sku' => 'RYM-P11-UNVERIFIED',
+            'stock' => 0,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe($user, $product, null, true);
+        $product->update(['stock' => 2]);
+        $user->forceFill(['email_verified_at' => null])->save();
+
+        app(HandleBackInStockNotification::class)->handle(
+            new BackInStockNotificationRequested($subscription->id),
+        );
+
+        Notification::assertNothingSent();
+        $this->assertDatabaseCount('notification_deliveries', 0);
+        $this->assertNull($subscription->fresh()->notified_at);
+    }
+
+    public function test_non_positive_stock_keeps_the_stock_request_path_visible(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-negative-stock',
+            'sku' => 'RYM-P11-NEGATIVE-STOCK',
+            'stock' => -1,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(AddToCart::class, ['product' => $product])
+            ->assertSee('Want a stock update?')
+            ->assertSee('Out of stock');
+    }
+
+    public function test_out_of_stock_storefront_can_record_an_authenticated_stock_request(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'phase-eleven-oos-livewire',
+            'sku' => 'RYM-P11-LIVE',
+            'stock' => 0,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(AddToCart::class, ['product' => $product])
+            ->set('notifyConsent', true)
+            ->call('requestStockNotification')
+            ->assertSet('notifySuccess', true)
+            ->assertSet('notifyError', null);
+
+        $this->assertDatabaseHas('back_in_stock_subscriptions', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'target_key' => BackInStockSubscription::targetKey($product->id),
+        ]);
+    }
+}

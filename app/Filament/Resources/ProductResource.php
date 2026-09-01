@@ -90,7 +90,17 @@ class ProductResource extends Resource
                                     ->label('Featured rank')
                                     ->helperText('Order in homepage Best Sellers (0 = first).'),
                                 Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
-                                RichEditor::make('description')->columnSpanFull(),
+                                RichEditor::make('description')->maxLength(100000)->columnSpanFull(),
+                            ]),
+                        Section::make('Optional tax classification')
+                            ->description('Leave blank unless approved product classification and rate values are available.')
+                            ->columns(3)
+                            ->schema([
+                                TextInput::make('hsn_code')->label('HSN code')->maxLength(20),
+                                TextInput::make('tax_classification')->maxLength(80),
+                                TextInput::make('tax_rate')
+                                    ->label('Approved tax rate (%)')
+                                    ->numeric()->minValue(0)->maxValue(100)->suffix('%'),
                             ]),
                         Section::make('Variants')
                             ->description('Optional — finishes, sizes or configurations.')
@@ -116,9 +126,13 @@ class ProductResource extends Resource
                             ->collapsible()
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('gallery')
-                                    ->collection('gallery')->multiple()->image()->maxFiles(12),
+                                    ->collection('gallery')->multiple()->image()->maxFiles(12)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+                                    ->maxSize(5120),
                                 SpatieMediaLibraryFileUpload::make('og')
-                                    ->collection('og')->image()->maxFiles(1)->label('Social share image'),
+                                    ->collection('og')->image()->maxFiles(1)->label('Social share image')
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->maxSize(3072),
                             ]),
                     ]),
                 Tabs\Tab::make('SEO')
@@ -137,6 +151,9 @@ class ProductResource extends Resource
                 TextColumn::make('category.name')->badge()->color('gray'),
                 TextColumn::make('brand.name')->badge()->color('gray'),
                 TextColumn::make('price')->money('INR')->sortable(),
+                TextColumn::make('hsn_code')->label('HSN')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('tax_classification')->label('Tax class')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('tax_rate')->label('Tax rate')->suffix('%')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('compare_at_price')->money('INR')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('stock')
                     ->badge()

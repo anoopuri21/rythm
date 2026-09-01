@@ -58,6 +58,40 @@ class AdminGovernanceTest extends TestCase
         $this->assertFalse(User::factory()->create()->hasAdminPermission(AdminAccess::CATALOGUE_VIEW));
     }
 
+    public function test_every_staff_role_matches_the_complete_permission_contract(): void
+    {
+        $permissions = [
+            AdminAccess::CATALOGUE_VIEW, AdminAccess::CATALOGUE_MANAGE,
+            AdminAccess::ORDERS_VIEW, AdminAccess::ORDERS_MANAGE,
+            AdminAccess::CUSTOMERS_VIEW, AdminAccess::INTERACTIONS_MANAGE,
+            AdminAccess::CONTENT_MANAGE, AdminAccess::MARKETING_MANAGE,
+            AdminAccess::FINANCE_VIEW, AdminAccess::FINANCE_MANAGE,
+            AdminAccess::SETTINGS_MANAGE, AdminAccess::STAFF_MANAGE,
+            AdminAccess::AUDIT_VIEW, AdminAccess::NOTIFICATIONS_VIEW,
+        ];
+        $all = $permissions;
+        $expected = [
+            User::ROLE_SUPER_ADMIN => $all,
+            User::ROLE_ADMIN => $all,
+            User::ROLE_CATALOGUE_MANAGER => [AdminAccess::CATALOGUE_VIEW, AdminAccess::CATALOGUE_MANAGE],
+            User::ROLE_ORDER_MANAGER => [AdminAccess::ORDERS_VIEW, AdminAccess::ORDERS_MANAGE, AdminAccess::CUSTOMERS_VIEW, AdminAccess::CATALOGUE_VIEW],
+            User::ROLE_SUPPORT => [AdminAccess::ORDERS_VIEW, AdminAccess::CUSTOMERS_VIEW, AdminAccess::INTERACTIONS_MANAGE, AdminAccess::CATALOGUE_VIEW, AdminAccess::NOTIFICATIONS_VIEW],
+            User::ROLE_MARKETING => [AdminAccess::CATALOGUE_VIEW, AdminAccess::CONTENT_MANAGE, AdminAccess::MARKETING_MANAGE],
+            User::ROLE_FINANCE => [AdminAccess::ORDERS_VIEW, AdminAccess::CUSTOMERS_VIEW, AdminAccess::FINANCE_VIEW, AdminAccess::FINANCE_MANAGE],
+        ];
+
+        foreach ($expected as $role => $granted) {
+            $user = $this->staff($role);
+            foreach ($permissions as $permission) {
+                $this->assertSame(
+                    in_array($permission, $granted, true),
+                    $user->hasAdminPermission($permission),
+                    "Unexpected {$permission} result for {$role}",
+                );
+            }
+        }
+    }
+
     public function test_model_authorization_uses_the_central_matrix(): void
     {
         $catalogue = $this->staff(User::ROLE_CATALOGUE_MANAGER);
@@ -138,13 +172,13 @@ class AdminGovernanceTest extends TestCase
         $product = Product::factory()->create(['price' => 100, 'stock' => 4]);
         $this->actingAs($actor);
 
-        $product->update(['price' => 120, 'stock' => 3, 'name' => 'Name is intentionally not audited']);
+        $product->update(['price' => 120, 'stock' => 3, 'name' => 'Audited product name']);
         $audit = AdminAuditLog::sole();
         $this->assertSame('product.updated', $audit->action);
-        $this->assertSame(['price', 'stock'], array_keys($audit->before_values));
+        $this->assertSame(['name', 'price', 'stock'], array_keys($audit->before_values));
         $this->assertSame('100.00', $audit->before_values['price']);
         $this->assertSame('120', (string) $audit->after_values['price']);
-        $this->assertArrayNotHasKey('name', $audit->after_values);
+        $this->assertSame('Audited product name', $audit->after_values['name']);
 
         SiteSetting::create(['key' => 'provider_api_secret', 'value' => 'old'])->update(['value' => 'new-secret']);
         $settingAudit = AdminAuditLog::query()->where('action', 'site_setting.updated')->sole();

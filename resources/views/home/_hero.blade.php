@@ -26,12 +26,12 @@
                     @forelse($slides as $slide)
                         <article class="swiper-slide relative overflow-hidden">
                             <picture class="absolute inset-0">
-                                @if($slide->getFirstMediaUrl('mobile_image'))
+                                @if($slide->mobileImageUrl())
                                     <source media="(max-width: 767px)"
-                                            srcset="{{ $slide->getFirstMediaUrl('mobile_image') }}"
-                                            width="900" height="1200">
+                                            srcset="{{ $slide->mobileImageUrl() }}"
+                                            width="768" height="1024">
                                 @endif
-                                <img src="{{ $slide->getFirstMediaUrl('desktop_image') ?: $fallbackSlideImages[$loop->index % 3] }}"
+                                <img src="{{ $slide->desktopImageUrl() ?: $fallbackSlideImages[$loop->index % 3] }}"
                                      alt="" width="1200" height="896"
                                      class="hero-slide-image absolute inset-0 h-full w-full object-cover"
                                      loading="{{ $loop->first ? 'eager' : 'lazy' }}"
@@ -52,7 +52,7 @@
                                 @endif
                                 <p class="mt-4 max-w-sm text-sm leading-6 text-white/70 line-clamp-2">{{ $slide->copy }}</p>
                                 <div class="mt-7">
-                                    <a href="{{ $slide->cta_href }}" class="hero-mm__cta">{{ $slide->cta_label ?: 'View details' }}</a>
+                                    <a href="{{ str_starts_with((string) $slide->cta_href, '/') && ! str_starts_with((string) $slide->cta_href, '//') ? $slide->cta_href : '/shop' }}" class="hero-mm__cta">{{ $slide->cta_label ?: 'View details' }}</a>
                                 </div>
                             </div>
                         </article>

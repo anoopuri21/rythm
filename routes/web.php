@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\ReturnRequestController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
@@ -72,7 +73,9 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
-Route::post('/logout', LogoutController::class)->name('logout');
+Route::post('/logout', LogoutController::class)
+    ->middleware(['auth', 'throttle:10,1'])
+    ->name('logout');
 
 // Email verification (Laravel built-in)
 Route::middleware('auth')->group(function () {
@@ -111,12 +114,34 @@ Route::middleware('auth')->group(function () {
     Route::patch('/account/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])
         ->middleware('throttle:30,1')
         ->name('account.notifications.unread');
-    Route::patch('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
-    Route::patch('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
-    Route::post('/account/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
-    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
-    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('account.addresses.default');
-    Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
+    Route::patch('/account/profile', [AccountController::class, 'updateProfile'])
+        ->middleware('throttle:10,1')
+        ->name('account.profile.update');
+    Route::patch('/account/password', [AccountController::class, 'updatePassword'])
+        ->middleware('throttle:5,1')
+        ->name('account.password.update');
+    Route::delete('/account/stock-alerts/{subscription}', [AccountController::class, 'cancelBackInStockAlert'])
+        ->middleware('throttle:10,1')
+        ->name('account.stock-alerts.destroy');
+    Route::post('/account/addresses', [AccountController::class, 'storeAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.store');
+    Route::patch('/account/addresses/{address}', [AccountController::class, 'updateAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.update');
+    Route::patch('/account/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.default');
+    Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])
+        ->middleware('throttle:10,1')
+        ->name('account.addresses.destroy');
+    Route::get('/orders/{order}/returns/create', [ReturnRequestController::class, 'create'])->name('returns.create');
+    Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('returns.store');
+    Route::post('/return-requests/{returnRequest}/cancel', [ReturnRequestController::class, 'cancel'])
+        ->middleware('throttle:5,1')
+        ->name('returns.cancel');
 });
 
 // Payment callbacks — Razorpay posts here (CSRF excluded in bootstrap/app.php)
@@ -124,7 +149,7 @@ Route::post('/payment/razorpay/callback', [RazorpayController::class, 'callback'
     ->middleware('throttle:10,1')
     ->name('payment.razorpay.callback');
 Route::post('/payment/razorpay/webhook', [RazorpayController::class, 'webhook'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:120,1')
     ->name('payment.razorpay.webhook');
 
 Route::post('/newsletter', NewsletterSubscriptionController::class)
@@ -134,9 +159,11 @@ Route::post('/newsletter', NewsletterSubscriptionController::class)
 // Order detail + tracking — owner, signed link, or guest lookup result
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])
-    ->middleware('throttle:3,1')
+    ->middleware(['auth', 'throttle:3,1'])
     ->name('orders.retry-payment');
-Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
+    ->middleware(['auth', 'throttle:5,1'])
+    ->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 
 // Guest order lookup (no login needed)

@@ -664,3 +664,379 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Error rendering hardened** — Navbar category composition returns an empty list when the configured database has no categories table, preventing error pages from recursively failing.
 - **Configuration blocker identified** — `rythm.test` is pointed at unrelated database `maverick_academy`; owner must restore `DB_DATABASE=rhythm_db` and clear cached configuration. No tables will be created in the wrong database.
 - **QA pending** — Focused homepage/admin tests, full regression and rendered desktop/mobile checks remain required.
+
+## 29 August 2026 — Current-State Architecture Re-audit
+
+- **Inventory refreshed** — Routes, controllers, Livewire, Filament, Blade/JS, models, relationships, migrations, seeders, services, media, authorization, payments and shared-host operations were mapped against current `rhythm-uat`.
+- **Commerce flows documented** — Browse/search, cart/login merge, checkout, callback/webhook, order, cancellation/refund, notifications, catalogue activation and fulfillment paths are traced end to end.
+- **Risks prioritized** — Wrong-database selection remains the immediate critical owner blocker; tax/legal, fulfillment/RMA, security, backups, observability and release packaging remain explicit later gates.
+- **Backlog reconciled** — Work stays in the canonical Phase 10–17 sequence; this re-audit does not reset completed delivery phases or activate Phase 18.
+
+## 30 August 2026 — Phase 10 acceptance and Phase 11 activation
+
+- **Phase 10 qualification reconciled** — The owner reported passing focused/full PHP, isolated MySQL migration/status, rendered fulfillment/RMA/tax workflow, dependency/build, authorization, independent review and disabled-default checks at candidate `4a6c498` on `rhythm-uat`. This evidence is explicitly owner-reported; Arena independently verified Node automation at 104/104.
+- **Safety boundary retained** — Returns/tax values remain disabled; no invoice/credit-note identity, legal promise or deployment authorization was introduced.
+- **Phase 11 activated** — Canonical tracker and supervisor checkpoint now identify Phase 11 as `IN PROGRESS`.
+- **Weighted search baseline added** — MySQL/SQLite-portable name, SKU, brand, category and normalized attribute matching now includes exact ranking and bounded typo-stem tolerance without a persistent search daemon.
+- **Merchandising controls added** — Catalogue-authorized staff can manage time-bounded related, complementary and frequently-bought-together product links; recommendation rules never alter product price or stock.
+- **Consent-safe stock requests added** — Authenticated customers can store an explicit one-item stock-availability request without guest email collection or marketing opt-in. The bounded `back-in-stock:notify` command reserves central notification deliveries idempotently; scheduling it remains an operations/release gate.
+- **Phase 11 static contract added** — Five Node checks now cover bounded search, price-safe merchandising, verified-consent stock requests, central mail delivery and truthful recommendation empty states.
+- **Owner automation evidence recorded** — The owner reported `npm run test:automation` at **109 passed, 0 failed**. This is explicitly owner-reported evidence; PHP/MySQL/rendered Phase 11 gates remain separate.
+
+## 30 August 2026 — Phase 11 Chunk 2 qualification gate opened
+
+- **Customer self-service delivered** — Authenticated customers can view active verified-email stock-availability requests in Account and cancel only their own pending request; cross-customer cancellation returns HTTP 403.
+- **Truthful boundaries retained** — Stock alerts are visibly separate from marketing preferences; the product flow remains authenticated, consent-based and mail-only, with no guest email collection, price-drop alert or abandoned-cart behavior.
+- **Candidate checks passed** — Arena-local `git diff --check`, `npm run test:automation` (**109/109**) and `npm run build` passed. The implementation and checkpoint were pushed to `rhythm-uat` at `29bbad1` and `a4fa52f`.
+- **Qualification gate opened** — `tasks/PHASE_11_CHUNK_2_STOCK_DELIVERY_AND_CX_QUALIFICATION.md` now defines the isolated MySQL/PHP, bounded worker, realistic-catalog, responsive/accessibility, SEO and owner conversion-UAT evidence required before Phase 11 completion.
+
+## 30 August 2026 — Auto Mode reactivated for Phase 11
+
+- **Explicit activation received** — The owner issued the registered command `ACTIVATE AUTO MODE`; Agent 0 resumes continuous execution within the approved Phase 11–17 horizon.
+- **Activation boundary retained** — Phase 11 Chunk 2 is the active task. The mandatory owner-runtime PHP/MySQL and rendered/UAT gates remain human-gated; Phase 18, Agent 10 and deployment remain inactive.
+- **Authority reconciliation completed** — The current branch is `rhythm-uat`, local and remote HEAD are `74ef5b5`, the working tree is clean, all authoritative sources are present, and no workspace `vendor` entry exists.
+- **Protocol state reconciled** — The Auto Mode header and current-priority section now reflect Phase 11 rather than the completed Phase 6A/Phase 8–10 work.
+
+## 30 August 2026 — Phase 11 variant-aware availability hardening
+
+- **Catalogue availability made variant-aware** — Active in-stock variants now qualify a product for the Shop in-stock filter even when parent stock is zero; inactive variants never qualify.
+- **Shared-card truthfulness preserved** — Shop, homepage, related and wishlist queries expose a bounded active-variant stock-existence flag, and the shared Shop card uses it without introducing per-card queries.
+- **Regression coverage added** — Phase 11 feature coverage verifies active-variant inclusion and inactive-variant exclusion; automation and production build remain green.
+- **Scope boundary retained** — No product stock is inferred or rewritten; the change only reads current parent/active-variant state.
+
+## 30 August 2026 — Phase 11 public search visibility hardening
+
+- **Inactive variant data excluded** — Public search and normalized attribute facets now inspect only active variants; inactive attribute definitions are excluded from direct attribute search matches.
+- **Regression coverage added** — Phase 11 tests prove an active variant attribute remains searchable while an inactive variant attribute does not leak into public results.
+- **Qualification contract tightened** — The Chunk 2 catalogue evidence now requires active-record search coverage and explicit inactive-record exclusion.
+- **Scope boundary retained** — No catalogue data is deleted or rewritten; this is a read-boundary correction only.
+
+## 30 August 2026 — Phase 11 inactive facet visibility correction
+
+- **Facet read boundary fixed** — Category-aware Shop facets now include values from active products and active variants only; inactive variants cannot expose hidden option values.
+- **Regression coverage added** — Shop feature coverage verifies an attribute attached only to an inactive variant is absent from the public facet UI.
+- **Qualification evidence aligned** — Search and facet exclusion is now covered in both the service query and Livewire facet path.
+- **Scope boundary retained** — No product, variant or attribute records were changed; only public read filtering was tightened.
+
+## 30 August 2026 — Phase 11 account paginator empty-state correction
+
+- **Truthful pagination state** — Account no longer displays “No active stock alerts” when a customer opens an out-of-range stock-alert page while active requests still exist.
+- **Recovery path added** — The empty page now explains that requests are on another page and links back to the first page while preserving the separate bounded paginator.
+- **Regression coverage added** — Account feature coverage verifies the out-of-range page state and the existing truthful total.
+- **Scope boundary retained** — No request rows or pagination behavior were changed; only misleading empty-state rendering was corrected.
+
+## 30 August 2026 — Phase 11 non-positive stock request-state correction
+
+- **Availability boundary fixed** — The product stock-request surface now treats every non-positive stock value as unavailable, including defensive handling for an unexpected negative inventory value.
+- **Regression coverage added** — Livewire feature coverage verifies that the request path and out-of-stock state remain visible for non-positive stock.
+- **Scope boundary retained** — No inventory values were changed; the correction only aligns rendering with the existing non-positive-stock add-to-cart guard.
+
+## 30 August 2026 — Phase 11 product SEO availability binding correction
+
+- **SEO availability fixed** — ProductController now passes its computed availability state into the product view, so Product JSON-LD reports active parent or variant stock instead of relying on an unbound Blade variable.
+- **Availability logic centralized** — The controller reuses the Product availability helper shared by catalogue cards and variant-aware stock checks.
+- **Regression contract strengthened** — Automation now verifies the controller-to-view availability binding; the existing variant-aware product test covers the rendered `InStock` JSON-LD path.
+- **Scope boundary retained** — No catalogue or inventory data changed; this corrects only rendered metadata truthfulness.
+
+## 30 August 2026 — Phase 11 product availability view binding regression
+
+- **Rendered SEO contract verified** — ProductPageTest now has the controller-to-view availability binding in place, so active variant stock can produce `schema.org/InStock` rather than an undefined Blade variable.
+- **Regression guard strengthened** — The static Phase 11 contract requires the explicit `hasAvailableStock` view payload.
+- **Scope boundary retained** — No catalogue or inventory data changed; this was a view-data binding correction.
+
+## 30 August 2026 — Phase 11 merchandising selector bound
+
+- **Admin catalogue load bounded** — Related and target product selectors remain searchable and active-product scoped without preloading the entire catalogue into the merchandising form.
+- **Qualification contract aligned** — Chunk 2 evidence now includes the bounded admin selector behavior for the realistic-catalogue review.
+- **Scope boundary retained** — No merchandising rules or product records were changed; only form query behavior was narrowed.
+
+## 30 August 2026 — Phase 11 weighted-search regression coverage
+
+- **Ranking contract covered** — Phase 11 feature coverage now creates exact-name and contains-name candidates and verifies the exact result ranks first with the expected relevance score.
+- **Qualification evidence strengthened** — Weighted ranking is now an explicit automated candidate check alongside the existing SKU, brand, category, attribute and bounded typo coverage.
+- **Scope boundary retained** — No production search index or persistent search service was introduced; the test uses the existing bounded MySQL/SQLite-portable query path.
+
+## 30 August 2026 — Phase 11 recommendation-card availability truthfulness
+
+- **Variant-aware card state** — Homepage mega cards, deal cards and the compatibility minimal card now use the bounded active-variant availability flag instead of trusting a zero parent stock value.
+- **Deal copy corrected** — A deal with only an active in-stock variant now says it is available without inventing a parent-level quantity; parent quantity remains shown only when it is the available source.
+- **Regression contract strengthened** — The Phase 11 automation contract requires recommendation and deal card availability to call `Product::hasAvailableStock()`.
+- **Scope boundary retained** — No product or inventory values were changed; cards only render current availability metadata already selected by bounded homepage queries.
+
+## 30 August 2026 — Phase 11 stock-request rejection coverage
+
+- **Verification boundary covered** — Feature coverage now explicitly rejects unverified customers, inactive or foreign variants and stale Livewire variant selections before any subscription row can be created.
+- **Static contract strengthened** — The Phase 11 automation suite requires those runtime regression tests alongside consent, worker-limit, inactive-variant and delivery re-verification coverage.
+- **Scope boundary retained** — The tests validate existing service and component guards; they do not collect guest email addresses or add marketing behavior.
+
+## 30 August 2026 — Owner requested manual phase-by-phase execution
+
+- **Auto Mode paused** — The owner issued `PAUSE AUTO MODE`; the supervisor configuration is disabled and the project has returned to ask-first/manual owner qualification mode.
+- **Owner runbook added** — `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` lists every owner-side task, achievement condition and redacted evidence pack from Phase 1 through the Phase 17 readiness boundary.
+- **Current gate retained** — Phase 11 remains `IN PROGRESS`; Phases 1–10 and 6A remain recorded as accepted, while Phase 18 and Agent 10 remain inactive.
+- **Safety boundary retained** — Manual phase execution must still use isolated destructive tests, protect persistent UAT, avoid secrets in evidence and avoid invented legal/tax/shipping/warranty promises.
+
+## 30 August 2026 — Owner runner retired by request
+
+- **One-command runner → Manual execution restored** — The owner requested removal of `run.sh`; it is no longer part of the repository or owner workflow.
+- **Manual evidence retained** — Focused failed tests can be rerun with PHPUnit `--filter`, and complete output can be captured with `2>&1 | tee storage/logs/<name>.log`.
+- **Safety boundary retained** — Isolated MySQL migration/status, in-memory SQLite PHP tests, redacted evidence and Agent 0 review remain mandatory; no persistent destructive test or deployment is authorized.
+- **Windows shell support clarified** — The owner runbook now provides CMD/Cmder equivalents for environment overrides, Tinker quoting, directory creation and log redirection; Bash-only `tee`/`mkdir -p` syntax is not required.
+
+## 30 August 2026 — Phase 11 owner PHP regression review
+
+- **Focused suite improved** — After fixture alignment, the owner reported **33 focused tests passed / 112 assertions**.
+- **Full-suite root causes isolated** — The uploaded full log reported **41 failed / 353 passed / 1,550 assertions**. One seeded authentication expectation failed because the generic seeded customer had been made verified; the remaining homepage-related failures shared a Blade parse error in `_deals.blade.php` caused by an inline nested conditional.
+- **Corrections applied** — The generic seeded customer remains unverified so AuthTest preserves its contract; AccountTest verifies its own authenticated fixture; the canonical Fender seed slug and deterministic stock-alert pagination remain aligned; the deals availability conditional is now expanded into valid block directives.
+- **Qualification remains open** — Arena verified the static/automation contract at **110/110**, but owner must rerun focused and full PHP suites after pulling the correction. No browser or next-phase task is authorized yet.
+
+## 30 August 2026 — Phase 11 PHP regression accepted
+
+- **Focused suite passed** — Owner reported **33 tests / 112 assertions** with zero failures after the fixture, Blade and pagination corrections.
+- **Full PHP regression passed** — Owner uploaded the redacted `php-regression.txt`; the suite completed with **394 tests / 1,698 assertions** and zero failures.
+- **Remaining gate** — Rendered responsive/accessibility/SEO/conversion UAT remains open. Phase 11 is not yet complete.
+
+## 30 August 2026 — Phase 11 owner runtime qualification accepted
+
+- **Isolated MySQL gate passed** — Owner reported `rhythm_phase11_qa`, MySQL `8.4.3`, `MySQL Community Server - GPL`, `Nothing to migrate`, all listed migrations `Ran`, and one stock-alert cancellation route.
+- **PHP gate passed** — Focused Phase 11/account suite passed **33 tests / 112 assertions**; full regression passed **394 tests / 1,698 assertions** with zero failures.
+- **Worker/search automated coverage passed** — The full suite passed bounded limit rejection, inactive-target skip, notification idempotency, account ownership/pagination and the >500-product catalogue qualification test using non-sending test fakes.
+- **Remaining owner gate** — Four-viewport rendered responsive, keyboard/accessibility, SEO, console/overflow/link and conversion UAT evidence is still required before Phase 11 completion.
+
+
+## 30 August 2026 — Auto Mode activated for Phase 12
+
+- **Explicit owner activation received** — The owner issued `ACTIVATE AUTO MODE`; the supervisor configuration is enabled and canonical Phase 12 is now `IN PROGRESS`.
+- **Plan generated** — `tasks/AUTO_MODE_PHASE_12_PLAN.md` sequences baseline security/privacy/accessibility inventory, safe remediation, privacy/accessibility decisions and independent qualification.
+- **Authority and safety retained** — Auto Mode may not activate Agent 10, deployment, production actions, credentials, live payments, destructive persistent-UAT operations or invented legal/customer-rights rules.
+- **Current next action** — Begin the read-only Phase 12 Chunk 0 baseline threat model and gate inventory on `rhythm-uat`.
+
+
+## 30 August 2026 — Phase 12 Chunk 0 baseline inventory
+
+- **Read-only baseline completed** — Route/controller/Livewire/Filament surface, security middleware/configuration, input boundaries, ownership controls, media upload controls, PII stores and accessibility review surfaces were inventoried.
+- **Evidence recorded** — `docs/phase12-security-threat-model.md`, `docs/phase12-authorization-matrix.md`, `docs/phase12-privacy-data-map.md` and `docs/phase12-accessibility-baseline.md` record observed controls and open review items without customer records or secrets.
+- **Scan result** — `npm audit --omit=dev --audit-level=high` reported zero high/critical vulnerabilities; PHP/Composer checks remain an external disposable-runtime gate.
+- **Open review items retained** — CSP strictness, proxy/HSTS behavior, provider callback exception testing, mutation abuse budgets, upload malware/retention policy and privacy/legal decisions remain open; no unsupported completion claim was made.
+
+
+## 30 August 2026 — Phase 12 review and Q&A abuse limits
+
+- **Safe throttling correction** — Authenticated Livewire review and product-question submissions now use a per-user/per-product five-attempt, 60-second limiter before the domain write.
+- **Regression contract added** — The automation suite requires the limiter, bounded key scope and user-facing failure boundary in both components; `npm run test:automation` passed **111/111**.
+- **Scope boundary retained** — No review/Q&A business rules, customer data or production records changed; broader authorization, upload, CSP, privacy and owner-runtime gates remain open.
+
+## 30 August 2026 — Phase 12 cart/order/wishlist integrity boundaries
+
+- **Variant ownership hardened** — Cart add/update and order creation now reject missing, inactive or product-mismatched variants instead of falling back to parent-product stock.
+- **Wishlist input boundary hardened** — Authenticated wishlist writes now accept only active products; inactive or unknown product IDs cannot be newly persisted.
+- **Regression contract added** — Cart feature coverage and automation checks cover the mismatched-variant boundary; `npm run test:automation` passed **112/112**.
+- **Scope boundary retained** — No catalogue, customer, order or persistent-UAT records were changed; owner PHP runtime verification remains required.
+
+## 30 August 2026 — Phase 12 customer mutation route boundaries
+
+- **Route abuse controls expanded** — Profile, password, address, order-cancellation and logout writes now have explicit throttles; logout also requires the authenticated route boundary.
+- **Regression contract expanded** — Automation checks cover the new route middleware and existing owner-scoped action behavior; `npm run test:automation` passed **111/111**.
+- **Scope boundary retained** — Rate limits do not change approved customer-rights or order-state rules; owner PHP/runtime verification is still required.
+
+## 30 August 2026 — Phase 12 authorization and action-surface audit
+
+- **Read-only audit continued** — Reviewed the public/customer route mutations, Livewire write actions, 23 Filament resource classes, strict authorization/MFA configuration and explicit model-policy registration.
+- **Evidence recorded** — The authorization matrix now records the 23-resource inventory and the intentional `AdminAuditLog` explicit-policy exception.
+- **Findings retained conservatively** — CSP strictness, HSTS/trusted-proxy behavior, provider callback runtime cases, upload malware/retention policy and privacy/legal decisions remain open review/runtime gates; no unsupported security-complete claim was made.
+
+
+## 30 August 2026 — Auto Mode held for homepage UI/UX plan
+
+- **Owner hold received** — The owner requested `continuecontinuehold karo abhi`; Auto Mode is paused and ask-first/manual execution is authoritative for the homepage task.
+- **Plan-first requirement recorded** — `tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md` defines top bar, truthful offer loop, authenticated recent-purchase card, responsive behavior, privacy rules and test gates before code changes.
+- **Open owner inputs** — Exact phone/email/social URLs, the privacy-safe “last buy” data scope and whether card price means item price or order total must be confirmed before implementation.
+- **Safety boundary retained** — No customer social proof, unsupported offers, invented contact details, production action or destructive UAT operation will be inferred.
+
+## 31 August 2026 — Homepage minor UI/UX implementation and Arena verification
+
+- **Configuration-driven shell added** — The optional top bar now reads phone, email and social URLs from `config/rythme.php` / environment values and hides missing values; non-HTTPS social URLs are not rendered.
+- **Truthful offer presentation added** — A post-hero looping strip uses the existing bounded `bestDeals` product data and renders only discounts from 10% through 50%; hover/focus pauses it and reduced-motion disables animation.
+- **Demo preview boundary retained** — The site-wide recent-purchase component contains five synthetic front-end-only cards, shows unit price, rotates every 10 seconds with fade transitions, labels itself `Demo preview`, and persists browser dismissal without Admin/customer/order data.
+- **Scope retained** — No real contact values, customer names, purchases, order totals, production social proof or autonomous/deployment work were introduced. Runtime/browser/PHP/MySQL qualification remains open.
+- **Arena verification** — The targeted homepage contract passed **4/4** and the Vite production build passed. Full Node automation passed **114/116**; two existing supervisor assertions still expect an executing lifecycle even though the owner-approved Auto Mode state is paused, so they remain outside this homepage scope.
+
+## 31 August 2026 — Homepage offer pop-up clarification and implementation
+
+- **Owner clarification received** — Use an existing homepage `bestDeals` product and its actual stored 10–50% discount for the pop-up.
+- **Display rule recorded** — The pop-up is included only in the homepage view, stays visible until its close button is used, and is suppressed for 24 hours after close using a versioned browser timestamp.
+- **Truthfulness boundary retained** — If no eligible existing offer is available, the pop-up does not render; no discount, scarcity, countdown or customer data is fabricated.
+- **Popup verification** — The targeted homepage contract passed **5/5** and the Vite production build passed after adding the popup; full Node automation is **115/117** with the same two pre-existing paused-versus-executing supervisor expectation failures.
+
+## 31 August 2026 — Homepage UI verification and performance polish
+
+- **Popup loading polished** — The offer image now uses lazy loading with low fetch priority so it does not compete with the hero for initial rendering; fixed dimensions remain declared to avoid layout shift.
+- **Interaction polish added** — Popup close is idempotent, restores prior focus when possible, and the recent-purchase rotation stops while the tab is hidden to avoid unnecessary background work.
+- **Reduced-motion polish retained** — Marquee compositor hints are released when motion is reduced, while the popup and recent-card transitions remain disabled as appropriate.
+
+## 31 August 2026 — Manual Phase 12 action-boundary continuation
+
+- **Owner resume scope recorded** — Manual Phase 12 application development resumed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
+- **Order mutation routes hardened** — Customer payment-retry and cancellation POST routes now require the explicit `auth` middleware in addition to their existing throttles; controller ownership checks remain defense in depth.
+- **Regression/documentation contract updated** — Static automation and the Phase 12 authorization/threat-model records now require the explicit route boundary. PHP/runtime qualification remains owner-side.
+
+## 31 August 2026 — Manual Phase 12 security-configuration continuation
+
+- **Order mutation boundary retained** — The manually resumed hardening pass keeps cancel/retry-payment routes explicitly authenticated and throttled.
+- **CSP surface reduced conservatively** — Unused Google/CDN script origins were removed and `frame-ancestors 'self'` was added; existing inline Alpine/Livewire allowances remain because runtime compatibility evidence for nonce migration is not available in Arena.
+- **Scope boundary retained** — No Auto Mode activation, deployment, Phase 18/Agent 10 work, credential change, production operation or destructive UAT operation was performed.
+
+## 31 August 2026 — Manual Phase 12 order-link privacy hardening
+
+- **Read-only order links bounded** — Customer-facing order invoices and Filament-generated invoice links now use temporary 15-minute signed URLs; authenticated owners retain their direct access path.
+- **Regression contract added** — Static security automation now rejects permanent invoice links and requires the bounded signed route in both customer and admin views.
+- **Scope retained** — No customer/order records, payment state, credentials or persistent UAT data were changed; owner PHP/runtime verification remains required.
+
+## 31 August 2026 — MVP launch-track simplification
+
+- **Enterprise roadmap → short practical MVP path** — The owner requested that remaining work be reduced to the minimum needed for a functional client-facing e-commerce demo and a safe eventual launch.
+- **Canonical phases 12–17 streamlined** — Phase 12 now covers only core security, authorization, privacy and payment/order blockers; Phase 13 practical performance smoke; Phase 14 minimum operations; Phase 15 cPanel/shared-host release packaging; Phase 16 focused client UAT; Phase 17 evidence review and go/no-go.
+- **Phase 18 remains separately inactive** — Deployment still requires an explicit owner activation after Phase 17 acceptance; Auto Mode and Agent 10 remain paused/inactive.
+- **Future backlog created** — Advanced scalability/resilience, full observability, broad CI/CD, full penetration testing, extended compatibility/accessibility work, analytics/marketing and unapproved legal/privacy workflows are deferred unless a real launch blocker appears.
+- **Mandatory gates preserved** — Payment/order/inventory correctness, authorization, owner-approved legal/tax/privacy behavior, backup/restore, rollback, owner runtime/UAT and go/no-go evidence cannot be deferred or bypassed.
+- **Documents updated** — `tasks/MVP_LAUNCH_PLAN.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/CANONICAL_PHASE_SEQUENCE.md`, `docs/task-priority.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the current Phase 12 plan now reflect the shortened track. No production-readiness claim is made.
+
+## 31 August 2026 — Manual Phase 12 checkout ownership continuation
+
+- **Checkout state boundary tightened** — `CheckoutWizard::selectAddress` now verifies the address belongs to the authenticated customer before advancing to payment; invalid selection resets to the address step with a safe message.
+- **Authenticated coupon action enforced** — `CheckoutWizard::applyCoupon` now has an explicit authentication guard in addition to the protected checkout route.
+- **Regression/documentation added** — A focused PHP test and static Phase 12 contract cover cross-customer address rejection; the authorization matrix and threat model record the new boundary.
+- **Arena checks passed** — Phase 11 customer-experience automation **7/7** and security automation **10/10** passed; PHP runtime tests remain owner-side because PHP/Composer are unavailable in Arena.
+- **Scope retained** — No order, payment, address, customer or persistent UAT data was changed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
+
+## 31 August 2026 — Auto Mode reactivation and Phase 12 Chunk 1 closure
+
+- **Auto Mode ACTIVE again** — The owner issued `ACTIVATE AUTO MODE`, lifting the 30 August manual hold; `automation/config.json` is enabled, the supervisor lifecycle is `executing`, and the protocol/tracker state was reconciled. Deployment, Phase 18 and Agent 10 remain human-gated.
+- **Phase 12 Chunk 1 COMPLETE** — The remaining customer-facing action-boundary sweep re-read every mutating web route, Livewire write action and sensitive controller; all auth, throttle, ownership, signed-link and CSRF boundaries were already enforced and no new defect was found.
+- **Regression contract added** — `tests/automation/security-phase12-boundaries.test.mjs` locks the route throttle/auth matrix, CSRF exception scope, Livewire guest/ownership guards, cart session binding, order/return/notification/address ownership checks and the planning-document closure records.
+- **Documentation updated** — `docs/phase12-authorization-matrix.md` gained the Chunk 1 closure record; the Phase 12 plan marks Chunk 1 COMPLETE with Chunk 2 (security configuration/dependency-secret contract) next.
+- **Gates** — `npm run test:automation` 130/131 and `npm run build` passed in Arena. The single failure is the supervisor's canonical-branch assertion: the Arena session checkout is `arena/01a058de-rythm` at the exact `rhythm-uat` head, so the branch literal mismatch is environment-mapped, not a code regression; it passes on the `rhythm-uat` checkout. PHP/Composer/MySQL and rendered browser checks remain owner-side.
+
+## 31 August 2026 — Phase 12 Chunk 2 security-configuration and secret-scan contract
+
+- **Chunk 2 COMPLETE** — Application security defaults re-reviewed: env-driven `APP_DEBUG` defaulting false, production-only HSTS, bounded CSP (self + approved Razorpay/fonts/media origins only), secure-by-default session cookie attributes.
+- **Tracked-tree scans passed** — Read-only `git grep` scans found no private keys, Razorpay/AWS/Stripe-style keys or hardcoded credentials; env templates keep empty secrets with production-safe flags; no `vendor/`, `node_modules/` or `.env` is tracked.
+- **Dependency pins re-verified** — Laravel exact `13.24.0`/`v13.24.0`, PHP `^8.3`, npm `lockfileVersion` 3; `composer audit`/`npm audit` remain owner-side pre-release gates.
+- **Contract added** — `tests/automation/security-phase12-config.test.mjs` (9 tests) locks headers/CSP, env-safe flags, secret-scan cleanliness, artifact exclusions and stack pins; Phase 12 plan now records the environment-only production requirements list.
+
+## 31 August 2026 — Phase 12 Chunk 3 privacy/legal/accessibility closure
+
+- **Chunk 3 COMPLETE (Arena scope)** — The privacy data map was re-confirmed against the enabled MVP flows; no new data category or unmapped flow was found.
+- **Static accessibility sweep clean** — Blade-aware scan of every view found zero images missing `alt`, zero icon-only buttons without an accessible name, and the layout skip link/`main` landmark intact; this complements, not replaces, the Chunk 4 rendered four-viewport/keyboard/axe evidence.
+- **Disabled-defaults locked** — No account deletion/export/erasure route exists; `returns_enabled` and `tax_rules_enabled` remain default-disabled until approved wording arrives.
+- **Human gate AS-H011 recorded** — Owner/professional legal, tax, return, warranty and privacy wording decisions remain required before any such behavior or text is enabled or published.
+- **Contract added** — `tests/automation/privacy-phase12-chunk3.test.mjs` (7 tests) locks the image/label/landmark checks, deletion-route absence, disabled defaults and the privacy-map human-gate list.
+
+## 31 August 2026 — Phase 12 Arena-side qualification and Auto Mode pause at owner gates
+
+- **Chunk 4 (Arena part) COMPLETE** — Agent 0's independent review of the consolidated session diff confirmed zero production-code changes and no weakened regression contract; the full Node automation suite and the production build pass with only the environment-mapped Arena session-branch literal failing.
+- **Redacted evidence pack published** — `tasks/PHASE_12_QUALIFICATION_EVIDENCE.md` records every Arena-side gate result and binds the exact owner-side actions (PHP focused/full suites in the disposable QA copy, MySQL 8.4.3 `migrate:status`, four-viewport rendered/axe/keyboard pass, dependency audits) plus the AS-H011 legal wording decision.
+- **Auto Mode PAUSED at genuine blockers** — Protocol blockers 3.6/3.7 apply (PHP/Composer/MySQL unavailable in Arena; legal/privacy wording is an owner decision). Human gates AS-H011 and AS-H012 are open; Phase 12 remains IN PROGRESS and NOT PRODUCTION-READY.
+- **Contract added** — `tests/automation/phase12-qualification.test.mjs` (5 tests) locks the IN PROGRESS posture, the evidence-pack contents, the open human gates and the zero-critical-blocker rule; the Phase 10 qualification test now expects the paused owner-gate state.
+
+## 31 August 2026 — Auto Mode resumed; Phase 13 Arena-side static performance smoke
+
+- **Owner reactivated Auto Mode** — Execution resumed on work independent of the open Phase 12 owner gates (AS-H011/AS-H012 stay open and unchanged).
+- **Bounded-query/N+1 contract added** — `tests/automation/performance-phase13.test.mjs` (7 tests) locks the shop PER_PAGE=12 + eager brand/category/media + reviews count, product-detail eager loads with the inactive-404 guard, cart single-query payload, account(10)/stock-alert(12)/notification(12) pagination and homepage caching, plus the budget-document policy rows.
+- **Budgets re-measured** — The 31 August Vite build records global JS 2.87 KB gzip (≤15) and global CSS 27.93 KB gzip (≤30); both moved slightly with the homepage UI additions but remain inside budget; `docs/performance-budget.md` updated truthfully.
+- **Phase 13 status** — IN PROGRESS: Arena static smoke passed; owner rendered four-viewport page-speed/error checks and the Phase 12 runtime evidence remain the completion gates.
+
+## 31 August 2026 — Phase 14 Arena-side minimum-operations verification
+
+- **Operations contract added** — `tests/automation/ops-phase14.test.mjs` (5 tests) locks the bounded every-minute queue worker (`--stop-when-empty --max-time=50 --tries=3 --timeout=45` with `withoutOverlapping(2)`), the cPanel per-minute `schedule:run` cron contract, the exact-MySQL-8 requirement with the no-MariaDB rule and the persistent-data protection rule.
+- **Rollback/backup surfaces verified** — `docs/rollback-plan.md` retains config/application/migration rollback layers, financial integrity checks, post-rollback validation and the deployment-relock closeout; `docs/ops-runbook.md` retains preflight, backups and the "a backup is not qualified until a restore test passes" rule.
+- **Production env defaults verified** — `LOG_LEVEL=warning`, `QUEUE_CONNECTION=database`, `SESSION_DRIVER=database` present in the production template; logging channel remains env-driven.
+- **Phase 14 status** — IN PROGRESS: Arena static verification passed; owner backup/restore proof and host HTTPS remain the completion gates.
+
+## 31 August 2026 — Supervisor posture-consistency test refactor
+
+- **Invariant-preserving refactor** — The `phase10-qualification` and `phase12-qualification` contracts no longer hard-code one lifecycle literal; they now assert the stronger safety invariants that must hold in every sanctioned posture: (a) `paused` ⇒ supervisor disabled and waiting on a human, (b) `executing`/`recovering`/`blocked` ⇒ supervisor explicitly enabled, (c) Phase 12 stays `in_progress`, (d) AS-H011/AS-H012 stay open, (e) deployment stays disabled. The hard-coded literals broke on each legitimate owner activate/pause toggle; the new invariants cannot be satisfied by an inconsistent state.
+- **State resync** — The reactivation had changed `automation/config.json` without flipping the supervisor lifecycle; the state now records `executing` with an autonomous next action, and the protocol/tracker status lines reflect the resumed Auto Mode.
+
+## 31 August 2026 — Phase 15/16 Arena-side release readiness
+
+- **Phase 15 contract added** — `tests/automation/release-phase15.test.mjs` (7 tests) locks the seven-section release checklist, its no-deployment-authority line, package hygiene (no env/keys/dumps/node_modules in archives), lockfile builds, backup-gated forward migrations and `.gitignore` artifact exclusions; `scripts/sandbox-rebuild.sh` scanned clean of credential material.
+- **Phase 16 owner UAT script prepared** — `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` gives the owner 23 numbered, copy-safe steps covering browse/search, cart, gated checkout, Razorpay test payment, invoice/cancel/refund-pending, account surfaces, admin/MFA essentials, the four agreed viewports and a result template; `tests/automation/phase16-uat-script.test.mjs` (4 tests) keeps it consistent.
+- **Status** — Phases 15 and 16 are IN PROGRESS (Arena-side preparation done; owner package build and UAT execution remain). With this, every gate-independent Arena task on the MVP track is complete; only owner-run evidence remains (AS-H011, AS-H012, Phase 15 package, Phase 16 UAT, Phase 17 decision).
+
+## 31 August 2026 — Owner Evidence #1: focused PASS, one flaky fixture fixed
+
+- **Owner-reported focused suite** — 112 passed / 384 assertions (CheckoutTest, CouponTest, AuthTest, SecurityHeadersTest, OrderTrackingTest, PaymentRetryTest, AccountTest) on `arena/01a058de-rythm`. ✅
+- **Owner-reported full suite** — 395 passed / 1 failed (1703 assertions); sole failure: `CartTest::test_cart_rejects_a_variant_belonging_to_another_product` hit `brands.slug` UNIQUE violation for the seeded name "Ibanez".
+- **Root cause (diagnosed)** — `BrandFactory` was the only factory without a unique slug suffix; its 8-name pool overlaps the seeded brands, so any test running after `$this->seed()` could collide (≈7/8 per factory brand). CategoryFactory/ProductFactory already carry the suffix convention. Test-infrastructure defect only; no production code or behavior is affected.
+- **Safe reversible correction (Phase 12 manual scope)** — `BrandFactory` slug now `Str::slug($name) . '-' . Str::random(4)`; the 4 in-repo `Brand::factory()` callers were reviewed (explicit-slug or slug-agnostic), so no assertion depends on the bare slug.
+- **Next** — owner re-pulls and re-runs the full suite; acceptance of Evidence #1 waits for that green result.
+
+## 1 September 2026 — Owner Evidence #1 ACCEPTED: PHP runtime suites green
+
+- **Focused Phase 12 suite** — owner-reported 112 passed / 384 assertions on the qualification set (Checkout, Coupon, Auth, SecurityHeaders, OrderTracking, PaymentRetry, Account).
+- **Full suite after the BrandFactory fix** — owner-reported **396 passed / 1,704 assertions / 0 failed** at commit `b946775` on `arena/01a058de-rythm`.
+- **AS-H012 partial** — the PHP-runtime portion of the Phase 12 owner gate is now satisfied; `migrate:status` on MySQL 8.4.3, rendered viewport/axe pass and dependency audits remain before AS-H012 closes.
+
+## 1 September 2026 — Owner Evidence #2 ACCEPTED: exact MySQL 8.4.3 runtime
+
+- **Migration status** — owner-reported `php artisan migrate:status` on the persistent `rhythm_db` shows every migration `Ran` (through batch 12); nothing pending.
+- **Engine identity** — owner-reported `SELECT VERSION(), @@version_comment` → `8.4.3` / `MySQL Community Server - GPL`: the exact-MySQL-8 gate stays satisfied; no MariaDB substitution.
+- **AS-H012 partial progress** — PHP suites (Evidence #1) and exact-MySQL runtime (Evidence #2) now satisfied; rendered viewport/axe pass and dependency audits remain.
+
+## 1 September 2026 — Owner Evidence #3 ACCEPTED: dependency audits clean
+
+- **Composer** — owner-reported `composer audit`: No security vulnerability advisories found.
+- **npm** — owner-reported `npm audit`: found 0 vulnerabilities.
+- **AS-H012 progress** — PHP suites, exact MySQL and dependency audits satisfied; only the rendered four-viewport/axe/keyboard pass remains for AS-H012. Phase 13's owner page-speed observation will ride on the same browser pass.
+
+## 1 September 2026 — Evidence #4 early findings: marquee/card defects traced to stale local build
+
+- **Owner-reported (4 screenshots)** — the after-hero offer marquee renders as a static wrapped strip and the bottom-left recent-purchase card appears unstyled/non-rotating on rythm.test.
+- **Diagnosis (Agent 0)** — source code verified complete and correct: `_offer-marquee` include sits directly after the hero, `recent-purchase-card` renders from the layout, and a fresh `npm run build` compile contains the `offerMarquee` keyframes, `.recent-purchase` styles and both JS behaviors. `public/build` is gitignored, so the owner's `git checkout` left their compiled CSS/JS from before the 31 August homepage features.
+- **Fix path** — owner-side frontend rebuild (`npm install`, `npm run build`, `php artisan optimize:clear`, hard refresh); no code change required. If defects persist after the rebuild, they re-enter as code findings with fresh screenshots.
+
+## 1 September 2026 — Evidence #4 progress: marquee/card fix confirmed by owner
+
+- Owner ran `npm install`, `npm run build`, `php artisan optimize:clear` and hard-refreshed; the offer marquee now loops correctly and the recent-purchase demo card renders/rotates/closes as designed.
+- Owner reports the view is correct on all four screen sizes (1440×900, 768×1024, 390×844, 360×800).
+- Evidence #4 remains open only for the quick console-error, keyboard-Tab and axe confirmations; AS-H012 stays open until those report.
+
+## 1 September 2026 — 🎯 PHASE 12 COMPLETE; PHASE 13 COMPLETE
+
+- **Owner Evidence #4 accepted** — 1440×900, 768×1024, 390×844 and 360×800 all render perfectly with **0 console errors**; keyboard Tab is fully reachable with visible focus; **axe critical/serious 0**. The marquee/recent-purchase defects were fixed by the owner-side frontend rebuild (stale `public/build`), verified by the owner across all sizes.
+- **AS-H012 closed** — all Phase 12 runtime gates are now satisfied: PHP focused 112/384 + full 396/1,704/0-fail, exact MySQL 8.4.3 with all migrations Ran, clean composer/npm audits, and the rendered/keyboard/axe pass.
+- **Agent 0 acceptance** — Phase 12 (MVP core safety) and Phase 13 (performance smoke) are marked **COMPLETE** in the tracker and canonical sequence; MVP readiness gates §7 updated (six gates ticked). AS-H011 stays open as the standing pre-launch rule: no legal/return/warranty content may be enabled until the owner/legal decision arrives; every such value remains disabled.
+- **Frontier** — only owner evidence remains before Phase 17: Evidence 5 (backup/restore + scheduler) and Evidence 6 (Phase 16 UAT script + Phase 15 cPanel package).
+
+## 1 September 2026 — Owner Evidence #5 progress: scheduler PASS, restore-import PASS
+
+- **Scheduler** — owner-reported `php artisan schedule:run`: the bounded `queue:work --stop-when-empty --max-time=50 --tries=3 --timeout=45` invocation completed (DONE) on Laragon PHP 8.3.30; shared-host queue contract works on the owner machine.
+- **Backup + restore import** — owner exported `rhythm_db` to SQL and imported it into `rhythm_restore_test` successfully (`products_count: 20` read back from the restored copy).
+- **Open micro-step** — final source-vs-restore count comparison (products + orders on both databases) requested to formally close Evidence #5.
+
+## 1 September 2026 — ✅ EVIDENCE #5 ACCEPTED; PHASE 14 COMPLETE
+
+- **Backup/restore proof** — owner-reported counts: live products 20 = restored 20; live orders 1 = restored 1. The backup file restores fully into an isolated database; scratch DB dropped afterwards.
+- **Scheduler/queue** — bounded `queue:work` invocation ran clean via `schedule:run` on the owner machine (same command the cPanel cron will invoke).
+- **Phase 14 marked COMPLETE** — tracker, canonical sequence and readiness gates updated; host HTTPS/TLS/production secrets verification is carried into the Phase 15/16 host steps via release checklist §3 (cannot be proven on localhost).
+- **Frontier** — only Evidence #6 remains: Phase 16 owner UAT script run + Phase 15 release package; then Phase 17 go/no-go review.
+
+## 1 September 2026 — Evidence #6 Part B: release package built
+
+- **Owner-reported** — `rythme-release-candidate.zip` (22,025,972 bytes ≈ 22 MB) created via `git archive` from the tracked tree at the session HEAD on the owner machine; the file stays local to the owner machine and is not committed.
+- **Part A pending** — Phase 16 UAT script results (23 numbered journeys) awaited; on their pass plus Agents' review, Phase 15/16 close and Phase 17 go/no-go begins.
+
+## 1 September 2026 — 🏁 MVP LAUNCH TRACK COMPLETE: Phases 15/16 COMPLETE, Phase 17 CONDITIONAL GO
+
+- **Owner Evidence #6 Part A accepted** — Phase 16 UAT script: **23/23 steps PASS, 0 FAIL**; Razorpay test payment successful; paid order visible to customer and in admin; cancel/invoice/account journeys pass; 0 console errors on payment/checkout.
+- **Phases 15 & 16 marked COMPLETE** — release-candidate zip (22,025,972 bytes) built from the tracked HEAD; critical-journey UAT green end to end.
+- **Phase 17 decision: CONDITIONAL GO** — every mandatory MVP evidence gate passed and is bound to the review timeline. Live launch is explicitly conditioned on 4 owner items: (1) Razorpay live keys + production webhook, (2) AS-H011 legal wording for any legally-sensitive content (all unknown values stay disabled), (3) catalogue content/media rights clearance, (4) host HTTPS/TLS verification during deployment.
+- **Phase 18/Agent 10** — remain inactive; deployment requires the owner's explicit command after the pre-live items close.
+
+## 1 September 2026 — Owner authorizes guided DEMO deployment; PR #27 opened for main
+
+- **Owner decision** — The 4 pre-live items (Razorpay live keys, AS-H011 legal wording, catalogue content rights, host-side HTTPS) are deferred until after client approval; the application will be deployed to the server as a **client demo** now, with Razorpay in TEST mode and returns/tax/legal content remaining disabled/unpublished.
+- **Branch reconciliation verified** — `origin/main` already contains all of `rhythm-uat` via PR #26, and `arena/01a058de-rythm` adds all MVP-track work on top; remote `rhythm-uat` has 0 unique commits, so one PR covers both branches. If the owner has LOCAL-only rhythm-uat changes, they must push them before deploying.
+- **PR #27** — "Release candidate: MVP launch track complete (Phases 0–17)" opened from `arena/01a058de-rythm` into `main`; GitHub reports MERGEABLE/CLEAN. Owner merges it (Agent does not write to `main`).
+- **Phase 18 row** — moved from INACTIVE to owner-guided demo deployment; automated deployment tooling and the deployment-enabled authorization flag remain OFF.

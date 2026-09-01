@@ -35,6 +35,8 @@ final class HandleCommerceNotification
                 'amount' => $requested->metadata['amount'] ?? null,
                 'currency' => $requested->metadata['currency'] ?? $order->currency,
                 'refund_id' => $requested->metadata['refund_id'] ?? null,
+                'shipment_id' => $requested->metadata['shipment_id'] ?? null,
+                'shipment_status' => $requested->metadata['shipment_status'] ?? null,
             ],
         );
         [$title, $message] = $this->copy($requested->eventType, $order->order_number);
@@ -103,6 +105,8 @@ final class HandleCommerceNotification
             'order.confirmed' => ['Order confirmed', "Payment for order {$orderNumber} was confirmed."],
             'order.processing' => ['Order processing', "Order {$orderNumber} is being prepared."],
             'order.shipped' => ['Order shipped', "Order {$orderNumber} has shipped."],
+            'shipment.dispatched' => ['Parcel dispatched', "A parcel for order {$orderNumber} has been dispatched."],
+            'shipment.delivered' => ['Parcel delivered', "A parcel for order {$orderNumber} was marked delivered."],
             'order.delivered' => ['Order delivered', "Order {$orderNumber} was delivered."],
             'order.cancelled' => ['Order cancelled', "Order {$orderNumber} was cancelled."],
             'payment.failed' => ['Payment failed', "Payment for order {$orderNumber} was not completed."],

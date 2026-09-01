@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** ACTIVE — Phase 6A in progress; current Agent 0 authority through Phase 11
-**Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 acceptance; Phase 18 excluded
+**Status:** PAUSED — all gate-independent MVP-track work finished 31 August 2026; every remaining item needs owner evidence or decisions (AS-H011/AS-H012, Phase 15 package, Phase 16 UAT, Phase 17)
+**Autonomous Supervisor:** PAUSED at protocol blockers 3.6/3.7; a new `ACTIVATE AUTO MODE` or owner evidence resumes work; Phase 18/deployment remains excluded and separately gated
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,10 +150,10 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** Yes — existing Agent 0 Auto Mode is owner-authorized through Phase 11.
-- **Autonomous Supervisor:** ACTIVE through Phase 17 after Agent 0 accepted build and simulation evidence; Phase 18 remains excluded.
-- **Completed phases:** Canonical Phases 0–7 (`COMPLETE`).
-- **Current priority:** Phase 6A multi-category catalogue and Homepage/Shop expansion (`IN PROGRESS`) before Phase 8.
+- **Active:** No (paused at owner evidence) — on 1 September 2026 the owner-supplied runtime/rendered evidence closed AS-H012 and Agent 0 accepted Phases 12 and 13 as COMPLETE. The supervisor stays paused while the owner collects Phase 14–16 evidence; AS-H011 remains the standing pre-launch rule.
+- **Autonomous Supervisor:** PAUSED awaiting owner evidence/decisions; Phase 18 remains excluded and Agent 10 inactive.
+- **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
+- **Current priority:** Manual homepage UI/UX changes — plan first, then implement after required content/privacy decisions.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.
 - **Phase 7 acceptance:** Owner confirmed TOTP, roles and protected staff-user creation; Agent 0 marked Phase 7 `COMPLETE` on 26 August 2026.
 - **Programme contract:** `tasks/AUTO_MODE_PHASE_6_TO_11_PROGRAMME.md`; routine inter-phase confirmation is waived through Phase 11, but mandatory gates and genuine blockers are not.

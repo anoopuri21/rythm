@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Address;
+use App\Models\BackInStockSubscription;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
+use App\Services\BackInStockSubscriptionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -21,6 +26,7 @@ class AccountTest extends TestCase
         $this->seed();
 
         $this->user = User::where('email', 'test@example.com')->firstOrFail();
+        $this->user->forceFill(['email_verified_at' => now()])->save();
         $this->actingAs($this->user);
     }
 
@@ -39,6 +45,7 @@ class AccountTest extends TestCase
             ->assertSee('Overview', escape: false)
             ->assertSee('Orders', escape: false)
             ->assertSee('Addresses', escape: false)
+            ->assertSee('Stock alerts', escape: false)
             ->assertSee('Settings', escape: false)
             ->assertSee($this->user->name);
     }
@@ -197,6 +204,89 @@ class AccountTest extends TestCase
 
         $this->delete('/account/addresses/'.$address->id)->assertForbidden();
         $this->assertDatabaseHas('addresses', ['id' => $address->id]);
+    }
+
+    public function test_account_lists_and_cancels_owned_stock_alert(): void
+    {
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'account-stock-alert',
+            'sku' => 'RYM-ACCOUNT-STOCK',
+            'stock' => 0,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe(
+            $this->user,
+            $product,
+            null,
+            true,
+        );
+
+        $this->get('/account')
+            ->assertOk()
+            ->assertSee('Stock alerts')
+            ->assertSee($product->name)
+            ->assertSee('Cancel');
+
+        $this->delete(route('account.stock-alerts.destroy', $subscription))
+            ->assertRedirect()
+            ->assertSessionHas('stock_alert_success');
+
+        $this->assertNotNull($subscription->fresh()->cancelled_at);
+    }
+
+    public function test_customer_cannot_cancel_another_customers_stock_alert(): void
+    {
+        $other = User::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => Category::firstOrFail()->id,
+            'brand_id' => Brand::firstOrFail()->id,
+            'slug' => 'foreign-stock-alert',
+            'sku' => 'RYM-FOREIGN-STOCK',
+            'stock' => 0,
+        ]);
+        $subscription = app(BackInStockSubscriptionService::class)->subscribe($other, $product, null, true);
+
+        $this->delete(route('account.stock-alerts.destroy', $subscription))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('back_in_stock_subscriptions', [
+            'id' => $subscription->id,
+            'cancelled_at' => null,
+        ]);
+    }
+
+    public function test_account_paginates_stock_alerts_without_changing_the_total(): void
+    {
+        $categoryId = Category::firstOrFail()->id;
+        $brandId = Brand::firstOrFail()->id;
+
+        foreach (range(1, 13) as $number) {
+            $product = Product::factory()->create([
+                'category_id' => $categoryId,
+                'brand_id' => $brandId,
+                'name' => "Account stock alert {$number}",
+                'slug' => "account-stock-alert-{$number}",
+                'sku' => sprintf('RYM-ACCOUNT-%02d', $number),
+                'stock' => 0,
+            ]);
+
+            app(BackInStockSubscriptionService::class)->subscribe($this->user, $product, null, true);
+        }
+
+        $this->get('/account?stock_alert_page=2')
+            ->assertOk()
+            ->assertSee('Stock alerts')
+            ->assertSee('13')
+            ->assertSee('Account stock alert 1')
+            ->assertDontSee('Account stock alert 13')
+            ->assertSee('stock_alert_page=1', escape: false);
+
+        $this->get('/account?stock_alert_page=99')
+            ->assertOk()
+            ->assertSee('No requests on this page')
+            ->assertDontSee('No active stock alerts')
+            ->assertSee('View first page');
     }
 
     public function test_orders_listed_for_owner(): void
