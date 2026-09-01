@@ -1,4 +1,34 @@
-@php $content = $page->content; @endphp
+@php
+    /** @var \App\Models\Page $page */
+    $content = $page->content;
+    $s = $page->settings ?? [];
+
+    $kicker = $s['contact_kicker'] ?? "We're listening";
+
+    $cards = collect($s['cards'] ?? [])
+        ->filter(fn ($row) => filled($row['title'] ?? null))
+        ->values();
+    if ($cards->isEmpty()) {
+        $cards = collect([
+            ['icon' => '🎧', 'title' => 'Support & orders', 'line1' => 'support@rythme.store', 'line2' => '+91 98765 43210', 'line3' => 'Mon–Sat, 10am–7pm IST'],
+            ['icon' => '🏠', 'title' => 'Showroom', 'line1' => '42, Music Lane, Karol Bagh', 'line2' => 'New Delhi, Delhi 110005', 'line3' => 'Walk-ins welcome'],
+            ['icon' => '🤝', 'title' => 'Partnerships', 'line1' => 'partners@rythme.store', 'line2' => 'Brands, dealers, teachers', 'line3' => 'Reply within 2 days'],
+        ]);
+    }
+
+    $whatsappEnabled = (bool) ($s['whatsapp_enabled'] ?? true);
+    $whatsappNumber = $s['whatsapp_number'] ?? '+91 98765 43210';
+    $whatsappDigits = preg_replace('/\D+/', '', (string) $whatsappNumber);
+    $whatsappTitle = $s['whatsapp_title'] ?? 'Prefer WhatsApp?';
+    $whatsappText = $s['whatsapp_text'] ?? 'Message us photos of your gear — we love a good setup question.';
+    $whatsappButton = $s['whatsapp_button'] ?? 'Chat on WhatsApp';
+
+    // Only trusted Google Maps embed URLs are rendered inside the iframe.
+    $mapEmbedUrl = $s['map_embed_url'] ?? null;
+    if (! is_string($mapEmbedUrl) || ! str_starts_with($mapEmbedUrl, 'https://www.google.com/maps/embed')) {
+        $mapEmbedUrl = null;
+    }
+@endphp
 
 <div class="bg-paper">
     <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-12">
@@ -8,7 +38,7 @@
             <span class="font-semibold text-ink" aria-current="page">Contact</span>
         </nav>
 
-        <p class="section-kicker mb-4">We're listening</p>
+        <p class="section-kicker mb-4">{{ $kicker }}</p>
         <h1 class="section-title">{{ $page->title }}</h1>
         @if($content)
             <div class="mt-5 max-w-2xl space-y-4 text-base leading-7 text-muted sm:text-lg [&_a]:text-brand [&_a]:underline">
@@ -71,31 +101,53 @@
                 </form>
             </div>
 
-            {{-- Info --}}
+            {{-- Info — admin managed --}}
             <aside class="space-y-5">
-                @foreach([
-                    ['🎧', 'Support & orders', 'support@rythme.store', '+91 98765 43210', 'Mon–Sat, 10am–7pm IST'],
-                    ['🏠', 'Showroom', '42, Music Lane, Karol Bagh', 'New Delhi, Delhi 110005', 'Walk-ins welcome'],
-                    ['🤝', 'Partnerships', 'partners@rythme.store', 'Brands, dealers, teachers', 'Reply within 2 days'],
-                ] as [$icon, $title, $line1, $line2, $line3])
+                @foreach($cards as $card)
                     <div class="flex gap-4 rounded-3xl border border-ink/10 bg-white p-6">
-                        <span class="text-2xl" aria-hidden="true">{{ $icon }}</span>
+                        @if(filled($card['icon'] ?? null))
+                            <span class="text-2xl" aria-hidden="true">{{ $card['icon'] }}</span>
+                        @endif
                         <div>
-                            <h2 class="text-sm font-bold text-ink">{{ $title }}</h2>
-                            <p class="mt-1.5 text-sm font-semibold text-brand">{{ $line1 }}</p>
-                            <p class="text-sm text-muted">{{ $line2 }}</p>
-                            <p class="text-xs text-muted">{{ $line3 }}</p>
+                            <h2 class="text-sm font-bold text-ink">{{ $card['title'] }}</h2>
+                            @if(filled($card['line1'] ?? null))
+                                <p class="mt-1.5 text-sm font-semibold text-brand">{{ $card['line1'] }}</p>
+                            @endif
+                            @if(filled($card['line2'] ?? null))
+                                <p class="text-sm text-muted">{{ $card['line2'] }}</p>
+                            @endif
+                            @if(filled($card['line3'] ?? null))
+                                <p class="text-xs text-muted">{{ $card['line3'] }}</p>
+                            @endif
                         </div>
                     </div>
                 @endforeach
-                <div class="rounded-3xl bg-ink p-6 text-white">
-                    <h2 class="text-sm font-bold">Prefer WhatsApp?</h2>
-                    <p class="mt-1.5 text-sm text-white/60">Message us photos of your gear — we love a good setup question.</p>
-                    <a href="tel:+919876543210" class="mt-4 inline-block rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-white transition hover:bg-brand-dark">
-                        Chat on WhatsApp
-                    </a>
-                </div>
+
+                @if($whatsappEnabled && $whatsappDigits !== '')
+                    <div class="rounded-3xl bg-ink p-6 text-white">
+                        <h2 class="text-sm font-bold">{{ $whatsappTitle }}</h2>
+                        <p class="mt-1.5 text-sm text-white/60">{{ $whatsappText }}</p>
+                        <a href="https://wa.me/{{ $whatsappDigits }}" target="_blank" rel="noopener noreferrer"
+                           class="mt-4 inline-block rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-white transition hover:bg-brand-dark">
+                            {{ $whatsappButton }}
+                        </a>
+                    </div>
+                @endif
             </aside>
         </div>
+
+        {{-- Map — admin managed, hidden when no embed URL is set --}}
+        @if($mapEmbedUrl)
+            <div class="mt-12 overflow-hidden rounded-3xl border border-ink/10 bg-white">
+                <iframe
+                    src="{{ $mapEmbedUrl }}"
+                    title="Store location map"
+                    class="h-80 w-full sm:h-96"
+                    style="border:0"
+                    loading="lazy"
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        @endif
     </div>
 </div>

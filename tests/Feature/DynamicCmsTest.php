@@ -146,6 +146,55 @@ class DynamicCmsTest extends TestCase
             ->assertSee('About Rhythm Exports');
     }
 
+    public function test_admin_can_edit_about_page_design_settings(): void
+    {
+        $about = Page::where('slug', 'about')->firstOrFail();
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Filament\Resources\PageResource\Pages\ManagePages::class)
+            ->callAction(
+                \Filament\Actions\Testing\TestAction::make('edit')->table($about),
+                data: [
+                    'settings.hero_kicker' => 'Sangeet ki duniya',
+                    'settings.promise_heading' => 'Managed from the admin',
+                ],
+            )
+            ->assertHasNoErrors();
+
+        $about->refresh();
+        $this->assertSame('Sangeet ki duniya', $about->setting('hero_kicker'));
+        $this->assertSame('Managed from the admin', $about->setting('promise_heading'));
+
+        $this->get('/about')
+            ->assertOk()
+            ->assertSee('Sangeet ki duniya')
+            ->assertSee('Managed from the admin');
+    }
+
+    public function test_admin_can_edit_contact_page_design_settings(): void
+    {
+        $contact = Page::where('slug', 'contact')->firstOrFail();
+
+        \Livewire\Livewire::actingAs($this->admin)
+            ->test(\App\Filament\Resources\PageResource\Pages\ManagePages::class)
+            ->callAction(
+                \Filament\Actions\Testing\TestAction::make('edit')->table($contact),
+                data: [
+                    'settings.contact_kicker' => 'Sampark karein',
+                    'settings.whatsapp_number' => '+91 90000 00001',
+                ],
+            )
+            ->assertHasNoErrors();
+
+        $contact->refresh();
+        $this->assertSame('Sampark karein', $contact->setting('contact_kicker'));
+
+        $this->get('/contact')
+            ->assertOk()
+            ->assertSee('Sampark karein')
+            ->assertSee('https://wa.me/919000000001');
+    }
+
     public function test_guest_cannot_access_pages_admin(): void
     {
         $this->get('/admin/pages')->assertRedirect('/admin/login');
