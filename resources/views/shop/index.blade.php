@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="bg-paper">
-        {{-- Page header --}}
+        {{-- Page header
         <header class="border-b border-ink/10 bg-paper">
             <div class="mx-auto max-w-7xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20 lg:px-12">
                 <nav aria-label="Breadcrumb" class="mb-6 flex items-center gap-2 text-xs text-muted">
@@ -22,7 +22,7 @@
                 </p>
             </div>
         </header>
-
+         --}}
         {{-- Livewire shop grid: filters + sort + products (zero-refresh) --}}
         <livewire:shop-index />
     </div>
