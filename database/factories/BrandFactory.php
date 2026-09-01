@@ -20,7 +20,9 @@ class BrandFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name),
+            // Suffix keeps factory slugs unique against seeded brand rows
+            // (same convention as CategoryFactory and ProductFactory).
+            'slug' => Str::slug($name).'-'.Str::lower(Str::random(4)),
             'description' => fake()->sentence(),
             'sort_order' => fake()->numberBetween(0, 50),
             'is_active' => true,
