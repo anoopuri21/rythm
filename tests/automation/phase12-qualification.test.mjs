@@ -34,11 +34,19 @@ await test('the evidence pack binds the remaining owner-side and legal human gat
     assert.match(pack, /1440×900, 768×1024, 390×844, 360×800/);
 });
 
-await test('supervisor state pauses at the owner gates with deployment still disabled', () => {
+await test('supervisor keeps the Phase 12 owner gates open with deployment disabled', () => {
+    const config = JSON.parse(read('automation/config.json'));
     assert.equal(state.delivery.phase, '12');
-    assert.equal(state.lifecycle, 'paused');
-    assert.equal(state.next_action.requires_human, true);
     assert.equal(state.authorization.deployment_enabled, false);
+    // Sanctioned postures: paused (config disabled, awaiting a human) or an
+    // active posture (config enabled) while independent Arena-side work runs.
+    if (state.lifecycle === 'paused') {
+        assert.equal(config.enabled, false, 'paused supervisor must not stay enabled');
+        assert.equal(state.next_action.requires_human, true, 'paused supervisor must wait on a human');
+    } else {
+        assert.ok(['executing', 'recovering', 'blocked'].includes(state.lifecycle), `unexpected lifecycle ${state.lifecycle}`);
+        assert.equal(config.enabled, true, 'active supervisor requires enablement');
+    }
     const openGates = state.human_gates.filter((gate) => gate.status === 'open').map((gate) => gate.id);
     assert.ok(openGates.includes('AS-H011'), 'AS-H011 legal-text gate must be open');
     assert.ok(openGates.includes('AS-H012'), 'AS-H012 owner runtime gate must be open');

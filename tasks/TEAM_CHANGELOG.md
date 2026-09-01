@@ -952,3 +952,8 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Rollback/backup surfaces verified** — `docs/rollback-plan.md` retains config/application/migration rollback layers, financial integrity checks, post-rollback validation and the deployment-relock closeout; `docs/ops-runbook.md` retains preflight, backups and the "a backup is not qualified until a restore test passes" rule.
 - **Production env defaults verified** — `LOG_LEVEL=warning`, `QUEUE_CONNECTION=database`, `SESSION_DRIVER=database` present in the production template; logging channel remains env-driven.
 - **Phase 14 status** — IN PROGRESS: Arena static verification passed; owner backup/restore proof and host HTTPS remain the completion gates.
+
+## 31 August 2026 — Supervisor posture-consistency test refactor
+
+- **Invariant-preserving refactor** — The `phase10-qualification` and `phase12-qualification` contracts no longer hard-code one lifecycle literal; they now assert the stronger safety invariants that must hold in every sanctioned posture: (a) `paused` ⇒ supervisor disabled and waiting on a human, (b) `executing`/`recovering`/`blocked` ⇒ supervisor explicitly enabled, (c) Phase 12 stays `in_progress`, (d) AS-H011/AS-H012 stay open, (e) deployment stays disabled. The hard-coded literals broke on each legitimate owner activate/pause toggle; the new invariants cannot be satisfied by an inconsistent state.
+- **State resync** — The reactivation had changed `automation/config.json` without flipping the supervisor lifecycle; the state now records `executing` with an autonomous next action, and the protocol/tracker status lines reflect the resumed Auto Mode.
