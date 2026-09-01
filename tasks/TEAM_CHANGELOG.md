@@ -977,3 +977,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Focused Phase 12 suite** — owner-reported 112 passed / 384 assertions on the qualification set (Checkout, Coupon, Auth, SecurityHeaders, OrderTracking, PaymentRetry, Account).
 - **Full suite after the BrandFactory fix** — owner-reported **396 passed / 1,704 assertions / 0 failed** at commit `b946775` on `arena/01a058de-rythm`.
 - **AS-H012 partial** — the PHP-runtime portion of the Phase 12 owner gate is now satisfied; `migrate:status` on MySQL 8.4.3, rendered viewport/axe pass and dependency audits remain before AS-H012 closes.
+
+## 1 September 2026 — Owner Evidence #2 ACCEPTED: exact MySQL 8.4.3 runtime
+
+- **Migration status** — owner-reported `php artisan migrate:status` on the persistent `rhythm_db` shows every migration `Ran` (through batch 12); nothing pending.
+- **Engine identity** — owner-reported `SELECT VERSION(), @@version_comment` → `8.4.3` / `MySQL Community Server - GPL`: the exact-MySQL-8 gate stays satisfied; no MariaDB substitution.
+- **AS-H012 partial progress** — PHP suites (Evidence #1) and exact-MySQL runtime (Evidence #2) now satisfied; rendered viewport/axe pass and dependency audits remain.

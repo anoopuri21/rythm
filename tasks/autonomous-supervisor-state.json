@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "b946775f43082a0a97f225f1573a24615a0cf18a",
-    "remote_head": "b946775f43082a0a97f225f1573a24615a0cf18a",
+    "local_head": "5d25b3a0d19a5e095b0a029c52040cfcaea210f1",
+    "remote_head": "5d25b3a0d19a5e095b0a029c52040cfcaea210f1",
     "working_tree_clean": false
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner Evidence #1 (AS-H012 PHP portion) accepted: focused 112/384 and full 396/1704/0-fail reported on arena/01a058de-rythm at b946775 after the BrandFactory fixture fix. Remaining for AS-H012: MySQL 8.4.3 migrate:status, rendered viewport/axe pass, dependency audits."
+    "last_verified_action": "Owner Evidence #2 accepted: migrate:status all Ran on persistent rhythm_db (through batch 12); SELECT VERSION()=8.4.3 and @@version_comment=MySQL Community Server - GPL confirm the exact MySQL 8 engine."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "d7677ab96b713470086511f959970a0a316cdaf1047882cb6ce8a2799f64b4bf",
-    "created_at": "2026-09-01T04:13:07.946Z"
+    "id": "293e199acac848afaf30e2bc2f4c0f07a20e66ff23093cade3a0f9971b213395",
+    "created_at": "2026-09-01T04:15:30.246Z"
   },
   "decisions": [
     {
@@ -747,6 +747,12 @@
       "outcome": "passed",
       "evidence": "Owner-reported on 1 September 2026 at b946775: focused suite 112 passed / 384 assertions; full suite 396 passed / 1,704 assertions / 0 failed. Arena cannot run PHP; this portion is owner-reported evidence.",
       "verified_at": "2026-09-01T04:13:07.946Z"
+    },
+    {
+      "name": "Phase 12 owner exact-MySQL runtime evidence (Evidence 2 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: migrate:status all Ran on rhythm_db; server_version 8.4.3; version_comment MySQL Community Server - GPL.",
+      "verified_at": "2026-09-01T04:15:30.246Z"
     }
   ],
   "next_action": {
