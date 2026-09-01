@@ -33,9 +33,14 @@ class CouponResource extends Resource
     public static function form(Schema $form): Schema
     {
         return $form->schema([
-            TextInput::make('code')->required()->maxLength(50)->uppercase()
+            TextInput::make('code')->required()->maxLength(50)
+                // `->uppercase()` does not exist in the locked Filament version;
+                // uppercase visually via CSS and normalise the state on save
+                // (the Coupon model mutator also uppercases as a safety net).
+                ->extraInputAttributes(['class' => 'uppercase'])
+                ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? strtoupper(trim($state)) : $state)
                 ->unique(ignoreRecord: true)
-                ->helperText('Customer enters this code at checkout.'),
+                ->helperText('Customer enters this code at checkout. Saved in UPPERCASE.'),
             Select::make('type')->options([
                 Coupon::TYPE_PERCENT => 'Percent (%)',
                 Coupon::TYPE_FIXED => 'Fixed (₹)',
