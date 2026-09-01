@@ -923,3 +923,11 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Tracked-tree scans passed** — Read-only `git grep` scans found no private keys, Razorpay/AWS/Stripe-style keys or hardcoded credentials; env templates keep empty secrets with production-safe flags; no `vendor/`, `node_modules/` or `.env` is tracked.
 - **Dependency pins re-verified** — Laravel exact `13.24.0`/`v13.24.0`, PHP `^8.3`, npm `lockfileVersion` 3; `composer audit`/`npm audit` remain owner-side pre-release gates.
 - **Contract added** — `tests/automation/security-phase12-config.test.mjs` (9 tests) locks headers/CSP, env-safe flags, secret-scan cleanliness, artifact exclusions and stack pins; Phase 12 plan now records the environment-only production requirements list.
+
+## 31 August 2026 — Phase 12 Chunk 3 privacy/legal/accessibility closure
+
+- **Chunk 3 COMPLETE (Arena scope)** — The privacy data map was re-confirmed against the enabled MVP flows; no new data category or unmapped flow was found.
+- **Static accessibility sweep clean** — Blade-aware scan of every view found zero images missing `alt`, zero icon-only buttons without an accessible name, and the layout skip link/`main` landmark intact; this complements, not replaces, the Chunk 4 rendered four-viewport/keyboard/axe evidence.
+- **Disabled-defaults locked** — No account deletion/export/erasure route exists; `returns_enabled` and `tax_rules_enabled` remain default-disabled until approved wording arrives.
+- **Human gate AS-H011 recorded** — Owner/professional legal, tax, return, warranty and privacy wording decisions remain required before any such behavior or text is enabled or published.
+- **Contract added** — `tests/automation/privacy-phase12-chunk3.test.mjs` (7 tests) locks the image/label/landmark checks, deletion-route absence, disabled defaults and the privacy-map human-gate list.

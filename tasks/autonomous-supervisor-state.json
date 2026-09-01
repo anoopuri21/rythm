@@ -17,15 +17,15 @@
   },
   "delivery": {
     "phase": "12",
-    "chunk": "phase12-chunk3-privacy-legal-a11y",
-    "task": "Phase 12 Chunk 2 closed with the security-config/secret-scan contract; Chunk 3 privacy data-map confirmation and accessibility-baseline defect review next, with legal text decisions human-gated",
+    "chunk": "phase12-chunk4-qualification",
+    "task": "Phase 12 independent qualification: static/automation suites and Agent 0 review in Arena, owner PHP/MySQL runtime and rendered UAT gates human-side",
     "status": "in_progress"
   },
   "execution": {
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 12 Chunk 2 closed: security defaults re-reviewed (env-driven debug, production-only HSTS, bounded CSP, secure session cookies), tracked-tree secret/artifact scans passed, Laravel 13.24.0/PHP ^8.3/lockfile v3 pins verified, and security-phase12-config.test.mjs (9 tests) added. Automation 139/140 with only the Arena session-branch literal mismatch remaining; production build previously passed unchanged."
+    "last_verified_action": "Phase 12 Chunk 3 closed: privacy data map confirmed against enabled flows, Blade-aware static accessibility sweep clean (alt coverage, icon-button names, skip link/landmark), deletion/export routes absent, returns/tax disabled defaults locked, privacy-phase12-chunk3.test.mjs (7 tests) added, and the legal/tax/return/warranty/privacy wording decision recorded as human gate AS-H011."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "cf2dee4a079f9b541181b6dd2ac64cc060b28b6526aa52f938179a26fa227b99",
-    "created_at": "2026-08-31T17:43:22.142Z"
+    "id": "d37cd8f28ee58fb6d890a9f705687c0d5b6744924fe4acf03fe55948be0fab14",
+    "created_at": "2026-09-01T01:44:47.698Z"
   },
   "decisions": [
     {
@@ -91,6 +91,12 @@
     {
       "id": "AS-D008",
       "summary": "Close Phase 12 Chunk 1 with a static action-boundary regression contract covering route auth/throttle matrix, Livewire guest/ownership guards, controller owner-or-signed checks and the CSRF/security-headers wiring, since the read-only sweep found every boundary already enforced.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D009",
+      "summary": "Close Phase 12 Chunk 3 on static evidence only: the accessibility acceptance rule still requires rendered four-viewport, keyboard and axe evidence, which stays with Chunk 4 owner-side qualification rather than being claimed from Arena.",
       "confidence": "high",
       "reversible": true
     }
@@ -153,6 +159,11 @@
       "id": "AS-H010",
       "status": "closed",
       "summary": "Owner lifted the hold with ACTIVATE AUTO MODE on 31 August 2026; homepage UI/UX plan content choices were already recorded and Phase 12 autonomous execution resumed."
+    },
+    {
+      "id": "AS-H011",
+      "status": "open",
+      "summary": "Owner/legal professional must approve exact Terms, Privacy, Shipping, Returns, Warranty, Cancellation wording plus retention/deletion/consent rules before any such behavior or text is enabled; unknown behavior stays disabled."
     }
   ],
   "gate_results": [
@@ -671,11 +682,17 @@
       "outcome": "passed",
       "evidence": "app/Http/Middleware/SecurityHeaders.php; config/app.php; config/session.php; .env.example; .env.production.example; tests/automation/security-phase12-config.test.mjs; npm run test:automation (139/140, sole failure is the Arena session-branch literal)",
       "verified_at": "2026-08-31T17:43:22.142Z"
+    },
+    {
+      "name": "Phase 12 Chunk 3 privacy/legal/accessibility closure",
+      "outcome": "passed",
+      "evidence": "docs/phase12-privacy-data-map.md; resources/views Blade-aware sweep (0 missing alt, 0 unlabeled icon buttons, skip link/main landmark intact); routes/web.php (no deletion/export routes); app/Services/SiteSettingsService.php + OrderService.php (returns/tax disabled defaults); tests/automation/privacy-phase12-chunk3.test.mjs (7 tests)",
+      "verified_at": "2026-09-01T01:44:47.676Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-12-CHUNK-3-PRIVACY-A11Y",
-    "description": "Confirm the privacy data map still matches enabled demo flows, review the accessibility baseline for evidence-backed critical blockers, and record the owner legal/tax/return/warranty text decisions as the explicit human gate with unknown behavior kept disabled.",
+    "id": "PHASE-12-CHUNK-4-QUALIFICATION",
+    "description": "Arena-side part of Chunk 4: run the full static/automation suite, perform the Agent 0 independent review of Phase 12 chunks 1-3 and assemble the redacted evidence pack; owner PHP/MySQL runtime and rendered UAT gates follow.",
     "requires_human": false
   }
 }

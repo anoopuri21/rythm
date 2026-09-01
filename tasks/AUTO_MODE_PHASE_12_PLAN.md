@@ -1,6 +1,6 @@
 # Manual Execution Plan — Phase 12 MVP Safety, Authorization, Payment/Order and Privacy Blockers
 
-**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunks 1 and 2 closed
+**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunks 1–3 closed; Chunk 4 qualification and the AS-H011 legal-text decision remain
 **Canonical phase:** 12
 **Branch:** `rhythm-uat`
 **Execution mode:** Auto Mode autonomous execution; deployment, Phase 18 and Agent 10 remain separately gated
@@ -55,10 +55,12 @@ Production values must come exclusively from the environment on the host (cPanel
 
 ### Chunk 3 — MVP privacy, legal and accessibility blockers
 
-- Record the minimum PII/data-flow and customer-data ownership boundaries needed for the enabled demo flows.
-- Obtain owner/professional decisions for any legal, tax, return, warranty or privacy text required by enabled behavior; keep unknown behavior disabled.
-- Do not implement account deletion/export, detailed retention tooling or a consent banner until exact retention/legal behavior and actual tracking use are approved.
-- Remediate only evidence-backed critical accessibility blockers and add regression coverage; defer non-blocking polish.
+**Status:** COMPLETE — closed 31 August 2026 under Auto Mode; privacy map confirmed against enabled flows, static critical-accessibility-defect sweep clean with regression coverage added, and the legal/tax/return/warranty/privacy wording decision is recorded as human gate **AS-H011** with unknown behavior kept disabled
+
+- The privacy data map (`docs/phase12-privacy-data-map.md`) was re-read against the enabled demo flows (accounts, addresses, cart/session, checkout, orders, payments, reviews, Q&A, wishlist, stock alerts, notifications, contact, newsletter, disabled returns) and still matches the schema/code inventory; its five owner/professional decisions remain open and untouched.
+- Static accessibility sweep across every Blade view found **zero evidence-backed critical defects**: all rendered images carry `alt`, icon-only buttons keep accessible names, and the layout keeps its skip link and `main` landmark. This does not replace the Chunk 4 rendered four-viewport, keyboard and axe evidence.
+- No account deletion/export/erasure route exists, returns stay disabled (`returns_enabled` default `0`), and tax stays disabled (`tax_rules_enabled` default `0`) until approved wording exists.
+- Regression contract: `tests/automation/privacy-phase12-chunk3.test.mjs`.
 
 ### Chunk 4 — independent Phase 12 qualification
 

@@ -1,7 +1,7 @@
 # Phase 12 — Privacy Data Map Baseline
 
-**Status:** Inventory only; retention, export, deletion and legal wording are not approved.
-**Date:** 30 August 2026
+**Status:** Confirmed 31 August 2026 against the enabled MVP flows (accounts, addresses, cart/session, checkout, orders, payments, reviews, Q&A, wishlist, stock alerts, notifications, contact, newsletter; returns and tax remain disabled); retention, export, deletion and legal wording are still not approved.
+**Date:** 30 August 2026 (confirmed 31 August 2026)
 **Safety:** No customer records, credentials or raw uploaded evidence are included.
 
 ## Data categories observed in the schema/code
