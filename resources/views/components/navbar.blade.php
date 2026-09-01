@@ -139,7 +139,7 @@
 
             {{-- Right meta: currency · sale pill --}}
             <div class="nav__meta">
-                <div class="nav__meta-dd" x-data="{ open: false }" @click.outside="open = false">
+                {{-- <div class="nav__meta-dd" x-data="{ open: false }" @click.outside="open = false">
                     <button type="button" :aria-expanded="open" @click="open = !open">
                         INR ₹
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -148,7 +148,7 @@
                         <li><button type="button" @click="open = false">INR ₹</button></li>
                         <li><button type="button" @click="open = false">USD $</button></li>
                     </ul>
-                </div>
+                </div> --}}
                 <a href="/shop?on_sale=1" class="nav__sale">Browse current offers</a>
             </div>
         </div>

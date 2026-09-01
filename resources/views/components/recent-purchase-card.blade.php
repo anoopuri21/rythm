@@ -38,8 +38,7 @@
 <div id="recent-purchase-preview" class="recent-purchase" data-recent-purchase-demo>
     <div class="recent-purchase__head">
         <div>
-            <p class="recent-purchase__eyebrow">Recent buy</p>
-            <p class="recent-purchase__demo">Demo preview</p>
+            <p class="recent-purchase__demo">Recent buy</p>
         </div>
         <button type="button" class="recent-purchase__close" data-recent-purchase-close aria-label="Close recent purchase preview" title="Close preview">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
