@@ -989,3 +989,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Composer** — owner-reported `composer audit`: No security vulnerability advisories found.
 - **npm** — owner-reported `npm audit`: found 0 vulnerabilities.
 - **AS-H012 progress** — PHP suites, exact MySQL and dependency audits satisfied; only the rendered four-viewport/axe/keyboard pass remains for AS-H012. Phase 13's owner page-speed observation will ride on the same browser pass.
+
+## 1 September 2026 — Evidence #4 early findings: marquee/card defects traced to stale local build
+
+- **Owner-reported (4 screenshots)** — the after-hero offer marquee renders as a static wrapped strip and the bottom-left recent-purchase card appears unstyled/non-rotating on rythm.test.
+- **Diagnosis (Agent 0)** — source code verified complete and correct: `_offer-marquee` include sits directly after the hero, `recent-purchase-card` renders from the layout, and a fresh `npm run build` compile contains the `offerMarquee` keyframes, `.recent-purchase` styles and both JS behaviors. `public/build` is gitignored, so the owner's `git checkout` left their compiled CSS/JS from before the 31 August homepage features.
+- **Fix path** — owner-side frontend rebuild (`npm install`, `npm run build`, `php artisan optimize:clear`, hard refresh); no code change required. If defects persist after the rebuild, they re-enter as code findings with fresh screenshots.
