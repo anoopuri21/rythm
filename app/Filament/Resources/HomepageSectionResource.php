@@ -66,7 +66,6 @@ class HomepageSectionResource extends Resource
                 ->helperText('The emphasised part of the heading (brand colour).'),
             RichEditor::make('content')->maxLength(50000)
                 ->label('Body content')
-                ->profile('default')
                 ->helperText('Long-form body shown in this section (optional).'),
             TextInput::make('sort_order')->numeric()->default(0),
             Toggle::make('is_active')->default(true),

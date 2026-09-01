@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * Homepage SEO lives on the page with slug = null (only one allowed).
  */
 #[Table('pages')]
-#[Fillable(['slug', 'title', 'template', 'content', 'sort_order', 'is_active'])]
+#[Fillable(['slug', 'title', 'template', 'content', 'settings', 'sort_order', 'is_active'])]
 class Page extends Model
 {
     use HasFactory;
@@ -34,9 +34,18 @@ class Page extends Model
 
     protected $casts = [
         'content' => SanitizedHtml::class,
+        'settings' => 'array',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Read a nested design setting with a fallback (e.g. `setting('whatsapp_number')`).
+     */
+    public function setting(string $key, mixed $default = null): mixed
+    {
+        return data_get($this->settings, $key, $default);
+    }
 
     public function seoEntry(): MorphOne
     {
