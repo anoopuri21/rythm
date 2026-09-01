@@ -2,7 +2,7 @@
 #  FALLBACK ONLY — sirf tab use karo jab symlink method fail ho.
 #  Ye file public_html/.htaccess ke naam se rakhni hai.
 #  Kya karti hai: har request ko chupchap Laravel ke public/ folder me bhej deti hai.
-#  Guide: docs/DEPLOY_HOSTINGER.md -> "Plan B"
+#  Guide: docs/DEPLOY_MILESWEB.md -> "Plan B"
 # ============================================================
 <IfModule mod_rewrite.c>
     RewriteEngine On

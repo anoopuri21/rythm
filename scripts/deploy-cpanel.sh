@@ -1,27 +1,56 @@
 #!/usr/bin/env bash
 # =====================================================================
-#  Rhythm Exports — Hostinger deploy helper
-#  Ye script SERVER pe (Hostinger SSH me) chalti hai, aapke laptop pe nahi.
+#  Rhythm Exports — cPanel shared hosting deploy helper (MilesWeb Business)
+#  Ye script SERVER pe (cPanel SSH/Terminal me) chalti hai, aapke laptop pe nahi.
 #
-#  Pehli baar:   bash scripts/deploy-hostinger.sh setup
-#  Har update:   bash scripts/deploy-hostinger.sh update
-#  Health check: bash scripts/deploy-hostinger.sh check
+#  Pehli baar:   bash scripts/deploy-cpanel.sh setup
+#  Har update:   bash scripts/deploy-cpanel.sh update
+#  Health check: bash scripts/deploy-cpanel.sh check
 #
-#  Full guide: docs/DEPLOY_HOSTINGER.md
+#  Full guide: docs/DEPLOY_MILESWEB.md
 # =====================================================================
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$APP_DIR"
 
-# Hostinger pe PHP 8.3 ka binary — agar alag ho to yahan badal do
-PHP_BIN="${PHP_BIN:-php}"
-COMPOSER_BIN="${COMPOSER_BIN:-composer2}"
-
 say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$1"; }
 ok()   { printf '\033[1;32m  ✔ %s\033[0m\n' "$1"; }
 warn() { printf '\033[1;33m  ! %s\033[0m\n' "$1"; }
 die()  { printf '\033[1;31m  ✘ %s\033[0m\n' "$1" >&2; exit 1; }
+
+# ---------------------------------------------------------------------
+#  cPanel pe `php` command aksar PURANA version hota hai (7.4 etc).
+#  Isliye PHP 8.3/8.4 ka binary khud dhoondte hain. Ye is script ka
+#  sabse zaruri hissa hai — 90% cPanel deploy yahin fail hote hain.
+# ---------------------------------------------------------------------
+detect_php() {
+  if [ -n "${PHP_BIN:-}" ]; then return; fi
+  local c
+  for c in /opt/alt/php84/usr/bin/php /opt/alt/php83/usr/bin/php \
+           /opt/cpanel/ea-php84/root/usr/bin/php /opt/cpanel/ea-php83/root/usr/bin/php \
+           /usr/local/bin/ea-php84 /usr/local/bin/ea-php83 \
+           /usr/local/bin/php php; do
+    if command -v "$c" >/dev/null 2>&1 \
+       && "$c" -r 'exit(version_compare(PHP_VERSION,"8.3.0",">=")?0:1);' 2>/dev/null; then
+      PHP_BIN="$c"; return
+    fi
+  done
+  PHP_BIN="php"
+}
+
+detect_composer() {
+  if [ -n "${COMPOSER_BIN:-}" ]; then return; fi
+  local c
+  for c in /opt/cpanel/composer/bin/composer "$HOME/composer.phar" \
+           /usr/local/bin/composer composer composer2; do
+    if [ -f "$c" ] || command -v "$c" >/dev/null 2>&1; then COMPOSER_BIN="$c"; return; fi
+  done
+  COMPOSER_BIN=""
+}
+
+detect_php
+detect_composer
 
 require_env() {
   [ -f .env ] || die ".env file nahi mila. Pehle: cp .env.staging.example .env  (phir values bharo)"
@@ -29,24 +58,33 @@ require_env() {
 
 php_version_check() {
   say "PHP version check"
-  command -v "$PHP_BIN" >/dev/null || die "PHP nahi mila. 'php -v' chala ke sahi binary ka path PHP_BIN me set karo."
-  "$PHP_BIN" -r 'exit(version_compare(PHP_VERSION, "8.3.0", ">=") ? 0 : 1);' \
-    || die "PHP 8.3+ chahiye. Abhi: $("$PHP_BIN" -r 'echo PHP_VERSION;'). hPanel -> Advanced -> PHP Configuration se badlo."
-  ok "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;')"
+  command -v "$PHP_BIN" >/dev/null 2>&1 || [ -f "$PHP_BIN" ] \
+    || die "PHP nahi mila. cPanel Terminal me 'ls /opt/cpanel/' chalao aur sahi path PHP_BIN me do."
+  "$PHP_BIN" -r 'exit(version_compare(PHP_VERSION, "8.3.0", ">=") ? 0 : 1);' 2>/dev/null \
+    || die "PHP 8.3+ chahiye. Abhi: $("$PHP_BIN" -r 'echo PHP_VERSION;' 2>/dev/null).
+   Fix: cPanel -> Software -> 'Select PHP Version' me 8.3 karo.
+   Agar wahan already 8.3 hai lekin CLI purana hai, to ye chalao:
+     ls -d /opt/cpanel/ea-php8*  /opt/alt/php8*  2>/dev/null
+   aur milne wale path ke saath: PHP_BIN=<path>/php bash scripts/deploy-cpanel.sh setup"
+  ok "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;')  ($PHP_BIN)"
 
   local missing=""
   for ext in curl fileinfo gd intl mbstring pdo_mysql tokenizer xml zip; do
     "$PHP_BIN" -m | grep -qi "^${ext}$" || missing="$missing $ext"
   done
   [ -z "$missing" ] && ok "Saare zaruri PHP extensions maujood hain" \
-    || warn "Ye extensions missing hain:$missing  (hPanel -> PHP Configuration -> PHP extensions me enable karo)"
+    || warn "Ye extensions missing hain:$missing  (cPanel -> Select PHP Version -> Extensions me tick karo)"
 }
 
 install_deps() {
   say "Composer dependencies install (production mode)"
-  command -v "$COMPOSER_BIN" >/dev/null || COMPOSER_BIN="composer"
-  command -v "$COMPOSER_BIN" >/dev/null || die "Composer nahi mila. Hostinger SSH me 'composer2 -V' try karo."
-  "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+  [ -n "$COMPOSER_BIN" ] || die "Composer nahi mila. Ek baar ye chalao:
+     cd ~ && curl -sS https://getcomposer.org/installer | $PHP_BIN
+   phir dobara: bash scripts/deploy-cpanel.sh setup"
+  ok "Composer: $COMPOSER_BIN"
+  # Composer ko HAMESHA sahi PHP se chalao (cPanel ka default purana ho sakta hai)
+  "$PHP_BIN" "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction \
+    || "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
   ok "vendor/ ready"
 }
 
@@ -73,6 +111,17 @@ storage_perms() {
   mkdir -p storage/framework/{cache/data,sessions,testing,views} storage/logs bootstrap/cache
   chmod -R 775 storage bootstrap/cache 2>/dev/null || true
   ok "Folders ready aur writable"
+}
+
+db_check() {
+  say "Database connection test"
+  "$PHP_BIN" artisan db:show --json >/dev/null 2>&1 \
+    && ok "Database se connection ban gaya" \
+    || die "Database se connect nahi ho pa raha.
+   Fix: .env me DB_DATABASE / DB_USERNAME / DB_PASSWORD check karo.
+   cPanel me naam ke aage username prefix lagta hai (jaise milesxyz_rythm).
+   Aur cPanel -> MySQL Databases -> 'Add User To Database' me user ko
+   ALL PRIVILEGES dena mat bhoolna."
 }
 
 migrate() {
@@ -119,18 +168,18 @@ health() {
 case "${1:-}" in
   setup)
     php_version_check; require_env; install_deps; check_assets
-    app_key; storage_perms; migrate; seed; storage_link; optimize; health
+    app_key; storage_perms; db_check; migrate; seed; storage_link; optimize; health
     say "SETUP COMPLETE 🎉  Ab browser me apna domain kholo." ;;
   update)
     require_env
     say "Maintenance mode ON"; "$PHP_BIN" artisan down --render="errors::503" || true
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
-    install_deps; check_assets; storage_perms; migrate; optimize
+    install_deps; check_assets; storage_perms; db_check; migrate; optimize
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
-    php_version_check; check_assets; health ;;
+    php_version_check; check_assets; require_env; db_check; health ;;
   *)
-    echo "Use karo:  bash scripts/deploy-hostinger.sh [setup|update|check]"; exit 1 ;;
+    echo "Use karo:  bash scripts/deploy-cpanel.sh [setup|update|check]"; exit 1 ;;
 esac

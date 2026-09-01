@@ -40,16 +40,16 @@ php artisan serve                     # http://127.0.0.1:8000
 > `public/build/` is gitignored — **`npm run build` compulsory hai** fresh clone pe,
 > warna page bina CSS ke dikhega ("Vite manifest not found").
 
-## Deploy (Hostinger shared hosting)
+## Deploy (MilesWeb / cPanel shared hosting)
 
-Step-by-step, non-technical guide: **[docs/DEPLOY_HOSTINGER.md](docs/DEPLOY_HOSTINGER.md)**
+Step-by-step, non-technical guide: **[docs/DEPLOY_MILESWEB.md](docs/DEPLOY_MILESWEB.md)**
 
 ```bash
-# server (SSH) pe:
-git clone https://github.com/anoopuri21/rythm.git app && cd app
+# server (cPanel SSH / Terminal) pe:
+cd ~ && git clone https://github.com/anoopuri21/rythm.git app && cd app
 cp .env.staging.example .env    # values bharo
-bash scripts/deploy-hostinger.sh setup     # pehli baar
-bash scripts/deploy-hostinger.sh update    # har update
+bash scripts/deploy-cpanel.sh setup     # pehli baar
+bash scripts/deploy-cpanel.sh update    # har update
 ```
 
 > `public/build/` ab repo me committed hai (shared hosting pe npm nahi hota).
