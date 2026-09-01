@@ -17,15 +17,15 @@
   },
   "delivery": {
     "phase": "12",
-    "chunk": "phase13-static-performance-smoke",
-    "task": "Phase 12 owner gates still open; Phase 13 Arena-side bounded-query/build-budget contract executed meanwhile",
+    "chunk": "phase14-ops-contracts-arena",
+    "task": "Phase 14 Arena-side minimum-operations contract executed; Phase 15 release-package checklist verification next",
     "status": "in_progress"
   },
   "execution": {
     "action_class": "idempotent_write",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 13 Arena-side static smoke passed: performance-phase13.test.mjs (7 tests) locks bounded queries/pagination/caching and re-measured 31 August build budgets (global JS 2.87KB<=15, CSS 27.93KB<=30 gzip); docs/performance-budget.md updated; suite 158/159 with only the Arena session-branch literal failing; production build green."
+    "last_verified_action": "Phase 14 Arena-side verification passed: ops-phase14.test.mjs (5 tests) locks the bounded queue scheduler, cPanel cron contract, exact-MySQL-8 gate, rollback layers with financial-integrity protection, backup restore-qualification rule and production log/queue env defaults."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "ff9e102a97c3266ee4aef5c905cbe72537558ebdb30c5e69c38732b8ed0c4b11",
-    "created_at": "2026-09-01T01:56:44.983Z"
+    "id": "b6a39fff996b4113a5987e8130d586936a18bc5e425d1975e6bc8bf8ba0e28b6",
+    "created_at": "2026-09-01T01:59:06.112Z"
   },
   "decisions": [
     {
@@ -717,11 +717,17 @@
       "outcome": "passed",
       "evidence": "tests/automation/performance-phase13.test.mjs (7 tests); docs/performance-budget.md re-measured 31 August 2026; npm run test:automation (158/159, sole failure is the Arena session-branch literal); npm run build passed",
       "verified_at": "2026-09-01T01:56:44.983Z"
+    },
+    {
+      "name": "Phase 14 Arena-side minimum-operations verification",
+      "outcome": "passed",
+      "evidence": "tests/automation/ops-phase14.test.mjs (5 tests); routes/console.php; tasks/PHASE_0B_SHARED_HOSTING_OPERATIONS.md; docs/rollback-plan.md; docs/ops-runbook.md; .env.production.example; config/logging.php",
+      "verified_at": "2026-09-01T01:59:06.112Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-14-OPS-CONTRACTS-ARENA",
-    "description": "Phase 14 Arena-side minimum-operations verification: confirm the every-minute queue/cron schedule wiring, rollback/backup documentation, log/env safety and add a static contract; owner restore/rollback proof stays human-gated.",
+    "id": "PHASE-15-RELEASE-PACKAGE-ARENA",
+    "description": "Phase 15 Arena-side: verify the release checklist and packaging contracts (gitignore exclusions, version/commit evidence conventions, migration checklist) and add a static contract; the actual cPanel package build and upload stay owner-side.",
     "requires_human": false
   }
 }

@@ -945,3 +945,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Bounded-query/N+1 contract added** — `tests/automation/performance-phase13.test.mjs` (7 tests) locks the shop PER_PAGE=12 + eager brand/category/media + reviews count, product-detail eager loads with the inactive-404 guard, cart single-query payload, account(10)/stock-alert(12)/notification(12) pagination and homepage caching, plus the budget-document policy rows.
 - **Budgets re-measured** — The 31 August Vite build records global JS 2.87 KB gzip (≤15) and global CSS 27.93 KB gzip (≤30); both moved slightly with the homepage UI additions but remain inside budget; `docs/performance-budget.md` updated truthfully.
 - **Phase 13 status** — IN PROGRESS: Arena static smoke passed; owner rendered four-viewport page-speed/error checks and the Phase 12 runtime evidence remain the completion gates.
+
+## 31 August 2026 — Phase 14 Arena-side minimum-operations verification
+
+- **Operations contract added** — `tests/automation/ops-phase14.test.mjs` (5 tests) locks the bounded every-minute queue worker (`--stop-when-empty --max-time=50 --tries=3 --timeout=45` with `withoutOverlapping(2)`), the cPanel per-minute `schedule:run` cron contract, the exact-MySQL-8 requirement with the no-MariaDB rule and the persistent-data protection rule.
+- **Rollback/backup surfaces verified** — `docs/rollback-plan.md` retains config/application/migration rollback layers, financial integrity checks, post-rollback validation and the deployment-relock closeout; `docs/ops-runbook.md` retains preflight, backups and the "a backup is not qualified until a restore test passes" rule.
+- **Production env defaults verified** — `LOG_LEVEL=warning`, `QUEUE_CONNECTION=database`, `SESSION_DRIVER=database` present in the production template; logging channel remains env-driven.
+- **Phase 14 status** — IN PROGRESS: Arena static verification passed; owner backup/restore proof and host HTTPS remain the completion gates.
