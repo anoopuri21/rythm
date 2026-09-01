@@ -1001,3 +1001,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - Owner ran `npm install`, `npm run build`, `php artisan optimize:clear` and hard-refreshed; the offer marquee now loops correctly and the recent-purchase demo card renders/rotates/closes as designed.
 - Owner reports the view is correct on all four screen sizes (1440×900, 768×1024, 390×844, 360×800).
 - Evidence #4 remains open only for the quick console-error, keyboard-Tab and axe confirmations; AS-H012 stays open until those report.
+
+## 1 September 2026 — 🎯 PHASE 12 COMPLETE; PHASE 13 COMPLETE
+
+- **Owner Evidence #4 accepted** — 1440×900, 768×1024, 390×844 and 360×800 all render perfectly with **0 console errors**; keyboard Tab is fully reachable with visible focus; **axe critical/serious 0**. The marquee/recent-purchase defects were fixed by the owner-side frontend rebuild (stale `public/build`), verified by the owner across all sizes.
+- **AS-H012 closed** — all Phase 12 runtime gates are now satisfied: PHP focused 112/384 + full 396/1,704/0-fail, exact MySQL 8.4.3 with all migrations Ran, clean composer/npm audits, and the rendered/keyboard/axe pass.
+- **Agent 0 acceptance** — Phase 12 (MVP core safety) and Phase 13 (performance smoke) are marked **COMPLETE** in the tracker and canonical sequence; MVP readiness gates §7 updated (six gates ticked). AS-H011 stays open as the standing pre-launch rule: no legal/return/warranty content may be enabled until the owner/legal decision arrives; every such value remains disabled.
+- **Frontier** — only owner evidence remains before Phase 17: Evidence 5 (backup/restore + scheduler) and Evidence 6 (Phase 16 UAT script + Phase 15 cPanel package).

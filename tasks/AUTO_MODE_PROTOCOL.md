@@ -150,7 +150,7 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** No (paused at genuine blockers) — after the 31 August 2026 reactivation, Phases 13–15 Arena-side contracts and the Phase 16 owner UAT script were completed; nothing gate-independent remains, so the supervisor paused per protocol blockers 3.6/3.7.
+- **Active:** No (paused at owner evidence) — on 1 September 2026 the owner-supplied runtime/rendered evidence closed AS-H012 and Agent 0 accepted Phases 12 and 13 as COMPLETE. The supervisor stays paused while the owner collects Phase 14–16 evidence; AS-H011 remains the standing pre-launch rule.
 - **Autonomous Supervisor:** PAUSED awaiting owner evidence/decisions; Phase 18 remains excluded and Agent 10 inactive.
 - **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
 - **Current priority:** Manual homepage UI/UX changes — plan first, then implement after required content/privacy decisions.

@@ -27,16 +27,17 @@ const assertPostureConsistency = () => {
     assert.equal(current.git.branch, 'rhythm-uat');
 };
 
-test('canonical planning files record accepted Phase 11 and active Phase 12', () => {
-  assert.match(master(), /PHASES 0–11 AND 6A COMPLETE \/ PHASE 12 IN PROGRESS/);
+test('canonical planning files record accepted Phases 0-13 with the owner-evidence frontier', () => {
+  assert.match(master(), /PHASES 0–13 AND 6A COMPLETE/);
+  assert.match(master(), /\| 12 \|[^\n]+\| COMPLETE \|/);
+  assert.match(master(), /\| 13 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 7 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 8 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 9 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 10 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 11 \|[^\n]+\| COMPLETE \|/);
   const current = state();
-  assert.equal(current.delivery.phase, '12');
-  assert.equal(current.delivery.status, 'in_progress');
+  assert.ok(['12', '14', '15', '16'].includes(current.delivery.phase), `unexpected frontier phase ${current.delivery.phase}`);
   assertPostureConsistency();
 });
 

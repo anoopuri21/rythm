@@ -1,6 +1,6 @@
 # Manual Execution Plan — Phase 12 MVP Safety, Authorization, Payment/Order and Privacy Blockers
 
-**Status:** IN PROGRESS — Auto Mode reactivated by owner command on 31 August 2026; Chunks 1–3 closed; Chunk 4 qualification and the AS-H011 legal-text decision remain
+**Status:** COMPLETE — accepted by Agent 0 on 1 September 2026 with all four chunks closed and owner runtime evidence bound to the branch; AS-H011 stays a standing pre-launch rule (unknown legal/return/warranty behavior remains disabled)
 **Canonical phase:** 12
 **Branch:** `rhythm-uat`
 **Execution mode:** Auto Mode autonomous execution; deployment, Phase 18 and Agent 10 remain separately gated
@@ -64,7 +64,7 @@ Production values must come exclusively from the environment on the host (cPanel
 
 ### Chunk 4 — independent Phase 12 qualification
 
-**Status:** IN PROGRESS — Arena-side part COMPLETE 31 August 2026 (full static/automation suite, Agent 0 independent review, redacted evidence pack at `tasks/PHASE_12_QUALIFICATION_EVIDENCE.md`, contract `tests/automation/phase12-qualification.test.mjs`); the PHP/Composer **owner-side runtime** suites, exact MySQL 8.4.3 evidence, rendered four-viewport/axe/keyboard UAT and the AS-H011 legal wording decision remain open as AS-H012/AS-H011; Phase 12 is marked `COMPLETE` only after those report green and Agent 0 accepts the bound evidence
+**Status:** COMPLETE — closed 1 September 2026. Arena-side gates (full static/automation suite, Agent 0 independent review, redacted evidence pack at `tasks/PHASE_12_QUALIFICATION_EVIDENCE.md`, contract `tests/automation/phase12-qualification.test.mjs`) plus all **owner-side runtime** evidence accepted: PHP focused 112/384 and full 396/1,704/0-fail suites, `migrate:status` all-Ran on exact MySQL 8.4.3 (MySQL Community Server), clean composer/npm audits, and the rendered four-viewport pass with 0 console errors, keyboard/focus YES and axe critical/serious 0. During qualification the owner caught two homepage render defects (marquee/recent-purchase card) that traced to a stale local frontend build and were resolved by rebuild plus the `BrandFactory` fixture fix. AS-H011 remains a standing pre-launch rule for enabling legal/return/warranty content; with every such behavior disabled, it does not block Phase 12.
 
 - Run applicable static/automation suites, PHP/Composer checks in the disposable external QA copy and owner-side runtime/UAT gates.
 - Require independent review and a redacted evidence pack.
