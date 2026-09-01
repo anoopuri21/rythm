@@ -28,9 +28,10 @@ const assertPostureConsistency = () => {
 };
 
 test('canonical planning files record accepted Phases 0-13 with the owner-evidence frontier', () => {
-  assert.match(master(), /PHASES 0–13 AND 6A COMPLETE/);
+  assert.match(master(), /PHASES 0–14 AND 6A COMPLETE/);
   assert.match(master(), /\| 12 \|[^\n]+\| COMPLETE \|/);
   assert.match(master(), /\| 13 \|[^\n]+\| COMPLETE \|/);
+  assert.match(master(), /\| 14 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 7 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 8 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 9 \|[^\n]+\| COMPLETE \|/);

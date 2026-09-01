@@ -35,7 +35,7 @@
 | 11 | Customer experience, search and merchandising | E6 plus approved residual E3 enhancements | COMPLETE |
 | 12 | MVP core safety: authorization, privacy/payment/order blockers, basic security and approved content boundaries | Launch-blocking subset of E8 plus cross-cutting gates | COMPLETE |
 | 13 | Practical storefront, cart and checkout performance smoke checks | Launch-blocking subset of E9 | COMPLETE |
-| 14 | Minimum operations: environment, SSL, backup/restore, logs, queue/cron and rollback | Launch-blocking subset of E10 | PENDING |
+| 14 | Minimum operations: environment, SSL, backup/restore, logs, queue/cron and rollback | Launch-blocking subset of E10 | COMPLETE |
 | 15 | cPanel/shared-host release package and migration checklist | Launch-blocking subset of E11 | PENDING |
 | 16 | Focused client UAT: browse, search, cart, checkout, payment, order, invoice and admin essentials | Launch-blocking subset of E12 | PENDING |
 | 17 | Final evidence review and explicit go/no-go decision | Required release gates across all workstreams | PENDING |
