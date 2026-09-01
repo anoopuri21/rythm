@@ -7,7 +7,7 @@
 **Overall status:** PHASES 0–17 AND 6A COMPLETE / MVP LAUNCH TRACK EVIDENCE COMPLETE / PHASE 17 CONDITIONAL GO RECORDED 1 SEP 2026 / AUTO MODE PAUSED / PHASE 18 DEPLOYMENT INACTIVE — AWAITS EXPLICIT OWNER COMMAND / NOT LIVE YET (4 PRE-LIVE OWNER ITEMS OPEN)
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **MVP launch plan:** `tasks/MVP_LAUNCH_PLAN.md`
-**Auto Mode:** PAUSED — all gate-independent MVP-track work complete (31 Aug 2026); awaiting owner evidence/decisions (AS-H011, AS-H012, Phase 15 package, Phase 16 UAT); Phase 18/deployment excluded
+**Auto Mode:** PAUSED — MVP evidence complete; owner authorized a manual, Agent-guided **demo deployment** on 1 Sep 2026 (PR #27 merge → cPanel steps); the 4 pre-live items stay deferred until client approval
 
 ---
 
@@ -79,7 +79,7 @@ No existing feature is inherited as COMPLETE. Phase 0 must classify every module
 | 15 | Agent 0 + owner | MVP shared-host release package and migration/runbook preparation | COMPLETE | Accepted 1 Sep 2026: owner built `rythme-release-candidate.zip` (22,025,972 bytes) via git archive at the tracked HEAD; release checklist §4 (vendor/build produced at package/deploy time) and the migration-gate contract stand |
 | 16 | Agent 0 + owner | MVP critical-journey UAT and release-candidate freeze | COMPLETE | Accepted 1 Sep 2026: owner-reported **23/23 steps PASS, 0 FAIL** via `tasks/PHASE_16_OWNER_UAT_SCRIPT.md` — browse/search/product/cart/checkout, Razorpay test payment successful, paid order visible in account and admin, cancel/invoice/account journeys pass, 0 console errors on payment/checkout, four viewports covered |
 | 17 | Agent 0 | Short go/no-go evidence review; no deployment action | COMPLETE | Decision recorded 1 Sep 2026 — **CONDITIONAL GO**: all MVP evidence gates pass; live launch stays conditioned on 4 owner pre-live items (Razorpay live keys + production webhook, AS-H011 legal wording for any legally-sensitive content, catalogue content/media rights clearance, host HTTPS/TLS verification). Phase 18 stays inactive until the explicit deployment command |
-| 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | INACTIVE | Activated only by explicit deployment command after Phase 17 acceptance |
+| 18 | Agent 10 | Shared-hosting deployment, launch and stabilization | OWNER-GUIDED DEMO DEPLOYMENT | Owner authorized demo deployment on 1 Sep 2026 after Phase 17 conditional GO; PR #27 (arena→main) opened for merging both branches; Razorpay stays in TEST mode, returns/tax/legal content stay disabled, catalogue-rights note deferred by owner until client approval. Deploy steps are executed manually by the owner on cPanel with Agent guidance; automated deployment/agent tooling remains unused |
 
 ---
 

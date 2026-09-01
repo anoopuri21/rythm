@@ -16,16 +16,16 @@
     "working_tree_clean": false
   },
   "delivery": {
-    "phase": "17",
-    "chunk": "conditional-go-recorded",
-    "task": "MVP launch-track evidence complete; conditional GO recorded; live launch awaits the explicit deployment command after the 4 pre-live owner items",
-    "status": "complete"
+    "phase": "18",
+    "chunk": "owner-guided-demo-deployment",
+    "task": "Owner merges PR #27 into main, then follows the guided cPanel demo-deployment steps; Agent prepares/verifies but does not perform remote production actions",
+    "status": "in_progress"
   },
   "execution": {
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner Evidence #6 Part A accepted (1 September 2026): Phase 16 UAT script 23/23 PASS, 0 FAIL; Razorpay test payment successful; paid order visible to customer and admin; cancel/invoice/account journeys pass; 0 console errors on payment/checkout. Phases 15 and 16 marked COMPLETE; Phase 17 review recorded a CONDITIONAL GO with four named pre-live owner items; Phase 18 remains inactive."
+    "last_verified_action": "Owner authorized demo deployment on 1 September 2026; PR #27 (arena/01a058de-rythm -> main) created and reported MERGEABLE/CLEAN. Branch check proved remote rhythm-uat is fully contained in the session branch (0 unique commits)."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "1de82a6dd5066e7be09e2491273912982ac229ce09da44dec1cdff28998a0757",
-    "created_at": "2026-09-01T05:13:23.979Z"
+    "id": "0a5a86bc67bee9f15c3d7b5b4517fbb82898fe0015ba9695960a6d11dc2e6dcd",
+    "created_at": "2026-09-01T06:06:58.961Z"
   },
   "decisions": [
     {
@@ -127,6 +127,12 @@
     {
       "id": "AS-D014",
       "summary": "Phase 17 decision is CONDITIONAL GO: the release candidate passed all MVP evidence gates, but live launch requires four owner actions first (live payment keys, legal wording, content rights, host HTTPS). Deployment needs the owner's explicit Phase 18 command.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D015",
+      "summary": "Owner deferred the 4 pre-live items and authorized a demo deployment on 1 September 2026: Razorpay stays in test mode, legally-sensitive features stay disabled, catalogue rights noted as demo-only until client approval; owner executes cPanel steps manually with Agent guidance.",
       "confidence": "high",
       "reversible": true
     }
@@ -804,8 +810,8 @@
     }
   ],
   "next_action": {
-    "id": "PHASE-18-OWNER-ACTIVATION-DECISION",
-    "description": "Owner decides on deployment: resolve the four pre-live items (Razorpay live keys/webhook, AS-H011 legal wording, catalogue content rights, host HTTPS) and then issue an explicit deployment command to activate Phase 18/Agent 10.",
+    "id": "OWNER-MERGE-PR-27-AND-DEPLOY",
+    "description": "Owner: (0) push any local-only rhythm-uat changes if they exist, (1) merge PR #27 into main on GitHub, (2) follow the guided cPanel demo deployment steps (upload/extract package, MySQL import, .env with test-mode keys, webroot to public/, migrate --force, cron entry), (3) share the demo URL for smoke verification.",
     "requires_human": true
   }
 }

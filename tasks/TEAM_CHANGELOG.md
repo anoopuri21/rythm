@@ -1033,3 +1033,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Phases 15 & 16 marked COMPLETE** — release-candidate zip (22,025,972 bytes) built from the tracked HEAD; critical-journey UAT green end to end.
 - **Phase 17 decision: CONDITIONAL GO** — every mandatory MVP evidence gate passed and is bound to the review timeline. Live launch is explicitly conditioned on 4 owner items: (1) Razorpay live keys + production webhook, (2) AS-H011 legal wording for any legally-sensitive content (all unknown values stay disabled), (3) catalogue content/media rights clearance, (4) host HTTPS/TLS verification during deployment.
 - **Phase 18/Agent 10** — remain inactive; deployment requires the owner's explicit command after the pre-live items close.
+
+## 1 September 2026 — Owner authorizes guided DEMO deployment; PR #27 opened for main
+
+- **Owner decision** — The 4 pre-live items (Razorpay live keys, AS-H011 legal wording, catalogue content rights, host-side HTTPS) are deferred until after client approval; the application will be deployed to the server as a **client demo** now, with Razorpay in TEST mode and returns/tax/legal content remaining disabled/unpublished.
+- **Branch reconciliation verified** — `origin/main` already contains all of `rhythm-uat` via PR #26, and `arena/01a058de-rythm` adds all MVP-track work on top; remote `rhythm-uat` has 0 unique commits, so one PR covers both branches. If the owner has LOCAL-only rhythm-uat changes, they must push them before deploying.
+- **PR #27** — "Release candidate: MVP launch track complete (Phases 0–17)" opened from `arena/01a058de-rythm` into `main`; GitHub reports MERGEABLE/CLEAN. Owner merges it (Agent does not write to `main`).
+- **Phase 18 row** — moved from INACTIVE to owner-guided demo deployment; automated deployment tooling and the deployment-enabled authorization flag remain OFF.
