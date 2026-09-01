@@ -1,16 +1,16 @@
 # Performance Budget
 
 **Target:** stable Laravel 12 storefront on shared hosting with 500+ products.  
-**Measured build:** 29 August 2026, Vite production build.
+**Measured build:** 31 August 2026, Vite production build (re-measured after the homepage UI additions; all rows remain inside budget). Previous snapshot: 29 August 2026.
 
 ## Browser budgets
 
 | Resource/metric | Budget | Current build evidence |
 |---|---:|---|
-| Global application JS | ≤ 15 KB gzip | 2.03 KB gzip |
+| Global application JS | ≤ 15 KB gzip | 2.87 KB gzip |
 | Carousel JS, only on pages containing `.swiper` | ≤ 35 KB gzip | 29.34 KB gzip |
 | Motion JS, homepage only | ≤ 60 KB gzip | 53.27 KB gzip |
-| Global CSS | ≤ 30 KB gzip | 26.20 KB gzip |
+| Global CSS | ≤ 30 KB gzip | 27.93 KB gzip |
 | Carousel CSS, conditional | ≤ 4 KB gzip | 2.35 KB gzip |
 | Product-card image | ≤ 100 KB typical | 480×480 WebP conversion, quality 82 |
 | Product-gallery image | ≤ 250 KB typical | max 1200×1200 WebP, quality 84 |
