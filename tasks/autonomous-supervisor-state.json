@@ -11,8 +11,8 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "d7433c9dfc0f5af57049417d79e03c31a5f6f8e9",
-    "remote_head": "d7433c9dfc0f5af57049417d79e03c31a5f6f8e9",
+    "local_head": "969548b4f37f24ff9594b71c43fd9a815cf944d6",
+    "remote_head": "969548b4f37f24ff9594b71c43fd9a815cf944d6",
     "working_tree_clean": false
   },
   "delivery": {
@@ -25,7 +25,7 @@
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Owner Evidence #5 accepted (1 September 2026): schedule:run invoked the bounded queue worker successfully on Laragon PHP 8.3.30; rhythm_db exported to SQL and restored into a scratch database with product/order counts matching exactly (20/20, 1/1). Phase 14 marked COMPLETE; host HTTPS/TLS verification rides with the release checklist at package/deploy time."
+    "last_verified_action": "Owner Evidence #6 Part B accepted: rythme-release-candidate.zip (22,025,972 bytes) built via git archive from tracked HEAD on the owner machine. Part A (Phase 16 UAT script results) is awaited."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "31ef7aa83c4283736c414351d2fa6bac27778cdc7d149f246cbc5987a67ff52f",
-    "created_at": "2026-09-01T05:02:21.853Z"
+    "id": "fdf87e3c4d33b01150478f4d0555a01f0444cfefcfc99648c8f3fe5a80c57d3f",
+    "created_at": "2026-09-01T05:06:46.368Z"
   },
   "decisions": [
     {
@@ -777,6 +777,12 @@
       "outcome": "passed",
       "evidence": "Owner-reported 1 September 2026: schedule:run DONE; SQL export/import round-trip into rhythm_restore_test; live vs restored counts match (products 20/20, orders 1/1).",
       "verified_at": "2026-09-01T05:02:21.853Z"
+    },
+    {
+      "name": "Phase 15 owner release-package build (Evidence 6B of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported 1 September 2026: rythme-release-candidate.zip, 22,025,972 bytes, git archive of tracked tree at session HEAD; vendor/build artifacts are intentionally excluded and produced at package/deploy time via release checklist section 4.",
+      "verified_at": "2026-09-01T05:06:46.368Z"
     }
   ],
   "next_action": {

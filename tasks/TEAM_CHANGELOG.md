@@ -1021,3 +1021,8 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Scheduler/queue** — bounded `queue:work` invocation ran clean via `schedule:run` on the owner machine (same command the cPanel cron will invoke).
 - **Phase 14 marked COMPLETE** — tracker, canonical sequence and readiness gates updated; host HTTPS/TLS/production secrets verification is carried into the Phase 15/16 host steps via release checklist §3 (cannot be proven on localhost).
 - **Frontier** — only Evidence #6 remains: Phase 16 owner UAT script run + Phase 15 release package; then Phase 17 go/no-go review.
+
+## 1 September 2026 — Evidence #6 Part B: release package built
+
+- **Owner-reported** — `rythme-release-candidate.zip` (22,025,972 bytes ≈ 22 MB) created via `git archive` from the tracked tree at the session HEAD on the owner machine; the file stays local to the owner machine and is not committed.
+- **Part A pending** — Phase 16 UAT script results (23 numbered journeys) awaited; on their pass plus Agents' review, Phase 15/16 close and Phase 17 go/no-go begins.
