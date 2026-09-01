@@ -62,6 +62,7 @@
     <a href="#main-content" class="skip-link">Skip to content</a>
     <div class="scroll-progress" aria-hidden="true"><span></span></div>
 
+    @include('components.top-bar')
     @include('components.navbar')
 
     <main id="main-content" tabindex="-1">
@@ -74,6 +75,9 @@
 
     {{-- Global footer (5-column, DB-driven) --}}
     <x-footer />
+
+    {{-- Front-end-only purchase-card design preview; no database/admin control. --}}
+    @include('components.recent-purchase-card')
 
     {{-- Cart slide-over drawer (Livewire) --}}
     <livewire:cart-drawer />

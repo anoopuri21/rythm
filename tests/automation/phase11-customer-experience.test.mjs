@@ -101,16 +101,19 @@ test('Phase 12 customer writes have scoped abuse limits', () => {
     /account\/profile[\s\S]{0,140}throttle:10,1/,
     /account\/password[\s\S]{0,140}throttle:5,1/,
     /account\/addresses[\s\S]{0,160}throttle:10,1/,
-    /orders\/\{order\}\/cancel[\s\S]{0,140}throttle:5,1/,
+    /orders\/\{order\}\/retry-payment[\s\S]{0,140}auth[\s\S]{0,80}throttle:3,1/,
+    /orders\/\{order\}\/cancel[\s\S]{0,140}auth[\s\S]{0,80}throttle:5,1/,
     /Route::post\('\/logout'[\s\S]{0,100}auth[\s\S]{0,100}throttle:10,1/,
   ]) assert.match(routes, route);
 });
 
-test('Phase 12 cart, order and wishlist boundaries reject mismatched or inactive records', () => {
+test('Phase 12 cart, order, wishlist and checkout boundaries reject mismatched records', () => {
   const cart = read('app/Services/CartService.php');
   const orders = read('app/Services/OrderService.php');
   const wishlists = read('app/Services/WishlistService.php');
+  const checkout = read('app/Livewire/CheckoutWizard.php');
   const cartFeature = read('tests/Feature/CartTest.php');
+  const checkoutFeature = read('tests/Feature/CheckoutTest.php');
 
   assert.match(cart, /\$variant->product_id/);
   assert.match(cart, /! \$variant->is_active/);
@@ -119,7 +122,11 @@ test('Phase 12 cart, order and wishlist boundaries reject mismatched or inactive
   assert.match(orders, /\$item->variant === null/);
   assert.match(orders, /\$item->variant->product_id/);
   assert.match(wishlists, /Product::query\(\)->active\(\)->whereKey\(\$productId\)->exists\(\)/);
+  assert.match(checkout, /public function selectAddress\(int \$addressId, AddressService \$addresses\)/);
+  assert.match(checkout, /forUser\(\(int\) auth\(\)->id\(\)\)->contains\('id', \$addressId\)/);
+  assert.match(checkout, /public function applyCoupon\(CouponService \$coupons\): void\s*\{\s*abort_unless\(auth\(\)->check\(\), 403\);/);
   assert.match(cartFeature, /test_cart_rejects_a_variant_belonging_to_another_product/);
+  assert.match(checkoutFeature, /test_checkout_rejects_another_customers_address_before_place_order/);
 });
 
 test('Phase 11 stock notifications use the central delivery ledger and mail only', () => {

@@ -4,28 +4,28 @@
     "name": "Rythme / Rhythm Exports",
     "repository": "anoopuri21/rythm"
   },
-  "lifecycle": "executing",
+  "lifecycle": "paused",
   "authorization": {
     "through_phase": "17",
     "deployment_enabled": false
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "d418a51f15f47ea6878c3c1577cb105ecdbfabeb",
-    "remote_head": "d418a51f15f47ea6878c3c1577cb105ecdbfabeb",
+    "local_head": "f7c5a873b5b8dcf5387fa34769253b60ef5534c5",
+    "remote_head": "f7c5a873b5b8dcf5387fa34769253b60ef5534c5",
     "working_tree_clean": true
   },
   "delivery": {
     "phase": "12",
-    "chunk": "phase-12-chunk-1-safe-authorization-and-input-boundary-remediation",
-    "task": "Phase 12 security, privacy, compliance and accessibility hardening",
+    "chunk": "homepage-minor-ui-ux-plan",
+    "task": "Homepage top bar, truthful offer loop and privacy-safe recent-purchase card",
     "status": "in_progress"
   },
   "execution": {
-    "action_class": "read_only",
+    "action_class": "idempotent_write",
     "attempt": 1,
-    "max_attempts": 3,
-    "last_verified_action": "Phase 12 Chunk 1 read-only authorization/action-surface audit completed: public/customer mutations, Livewire writes and 23 Filament resources were reviewed; explicit policies/MFA/strict authorization and remaining CSP/HSTS/provider/upload/privacy review items were recorded. No further write was inferred from the audit."
+    "max_attempts": 1,
+    "last_verified_action": "Owner requested an immediate hold of Auto Mode and asked for a plan before code execution for homepage UI/UX changes. The plan records top bar, truthful 10–50% offer loop, privacy-safe recent-purchase card, required owner content inputs and responsive/test gates."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "f3e407f571b667ae7a3b4c1a06c3fbd1ac7c4b520df4d8b44b6a760f2a8a4869",
-    "created_at": "2026-08-30T11:52:12.035Z"
+    "id": "c30c24a8b002c3479bc6c340872b0e4da2cf946a90d510206fe78d22eb4446eb",
+    "created_at": "2026-08-30T12:50:24.201Z"
   },
   "decisions": [
     {
@@ -73,6 +73,12 @@
     {
       "id": "AS-D005",
       "summary": "Harden customer input boundaries by requiring product-owned active variants for cart/order operations and active products for new wishlist writes.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D006",
+      "summary": "Pause Auto Mode at owner request and handle homepage UI/UX changes as a manual plan-first task; do not infer contact details or expose real customer purchase data.",
       "confidence": "high",
       "reversible": true
     }
@@ -133,8 +139,8 @@
     },
     {
       "id": "AS-H010",
-      "status": "closed",
-      "summary": "Owner explicitly issued ACTIVATE AUTO MODE on 30 August 2026; Phase 12 is authorized within the Phase 17 horizon. Phase 18/deployment remains separately gated."
+      "status": "open",
+      "summary": "Owner requested a hold of Auto Mode for a manual homepage UI/UX plan-first task; implementation awaits required content/privacy choices."
     }
   ],
   "gate_results": [
@@ -641,11 +647,17 @@
       "outcome": "passed",
       "evidence": "docs/phase12-authorization-matrix.md; TEAM_CHANGELOG.md; 23 Filament resources reviewed; route/Livewire action inventory; commit d418a51 pushed to rhythm-uat.",
       "verified_at": "2026-08-30T11:52:12.035Z"
+    },
+    {
+      "name": "Homepage UI/UX plan-first hold",
+      "outcome": "passed",
+      "evidence": "tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md; Auto Mode config disabled; protocol/tracker/runbook/changelog reconciled; owner inputs remain human-gated.",
+      "verified_at": "2026-08-30T12:50:24.201Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-12-CHUNK-1-CONTINUE-AUTHORIZATION-AND-INPUT-BOUNDARY-REVIEW",
-    "description": "Continue evidence-backed Phase 12 authorization/input-boundary review, then address the CSP/HSTS/provider callback and upload-control items that can be safely verified without credentials or production access.",
-    "requires_human": false
+    "id": "HOMEPAGE-UI-UX-MINOR-CHANGES-OWNER-INPUTS",
+    "description": "Confirm exact phone/email/social URLs, privacy-safe last-purchase scope and whether the card price is item price or order total; then implement the approved homepage plan while Auto Mode remains paused.",
+    "requires_human": true
   }
 }

@@ -844,3 +844,67 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Read-only audit continued** — Reviewed the public/customer route mutations, Livewire write actions, 23 Filament resource classes, strict authorization/MFA configuration and explicit model-policy registration.
 - **Evidence recorded** — The authorization matrix now records the 23-resource inventory and the intentional `AdminAuditLog` explicit-policy exception.
 - **Findings retained conservatively** — CSP strictness, HSTS/trusted-proxy behavior, provider callback runtime cases, upload malware/retention policy and privacy/legal decisions remain open review/runtime gates; no unsupported security-complete claim was made.
+
+
+## 30 August 2026 — Auto Mode held for homepage UI/UX plan
+
+- **Owner hold received** — The owner requested `continuecontinuehold karo abhi`; Auto Mode is paused and ask-first/manual execution is authoritative for the homepage task.
+- **Plan-first requirement recorded** — `tasks/HOMEPAGE_UI_UX_MINOR_CHANGES_PLAN.md` defines top bar, truthful offer loop, authenticated recent-purchase card, responsive behavior, privacy rules and test gates before code changes.
+- **Open owner inputs** — Exact phone/email/social URLs, the privacy-safe “last buy” data scope and whether card price means item price or order total must be confirmed before implementation.
+- **Safety boundary retained** — No customer social proof, unsupported offers, invented contact details, production action or destructive UAT operation will be inferred.
+
+## 31 August 2026 — Homepage minor UI/UX implementation and Arena verification
+
+- **Configuration-driven shell added** — The optional top bar now reads phone, email and social URLs from `config/rythme.php` / environment values and hides missing values; non-HTTPS social URLs are not rendered.
+- **Truthful offer presentation added** — A post-hero looping strip uses the existing bounded `bestDeals` product data and renders only discounts from 10% through 50%; hover/focus pauses it and reduced-motion disables animation.
+- **Demo preview boundary retained** — The site-wide recent-purchase component contains five synthetic front-end-only cards, shows unit price, rotates every 10 seconds with fade transitions, labels itself `Demo preview`, and persists browser dismissal without Admin/customer/order data.
+- **Scope retained** — No real contact values, customer names, purchases, order totals, production social proof or autonomous/deployment work were introduced. Runtime/browser/PHP/MySQL qualification remains open.
+- **Arena verification** — The targeted homepage contract passed **4/4** and the Vite production build passed. Full Node automation passed **114/116**; two existing supervisor assertions still expect an executing lifecycle even though the owner-approved Auto Mode state is paused, so they remain outside this homepage scope.
+
+## 31 August 2026 — Homepage offer pop-up clarification and implementation
+
+- **Owner clarification received** — Use an existing homepage `bestDeals` product and its actual stored 10–50% discount for the pop-up.
+- **Display rule recorded** — The pop-up is included only in the homepage view, stays visible until its close button is used, and is suppressed for 24 hours after close using a versioned browser timestamp.
+- **Truthfulness boundary retained** — If no eligible existing offer is available, the pop-up does not render; no discount, scarcity, countdown or customer data is fabricated.
+- **Popup verification** — The targeted homepage contract passed **5/5** and the Vite production build passed after adding the popup; full Node automation is **115/117** with the same two pre-existing paused-versus-executing supervisor expectation failures.
+
+## 31 August 2026 — Homepage UI verification and performance polish
+
+- **Popup loading polished** — The offer image now uses lazy loading with low fetch priority so it does not compete with the hero for initial rendering; fixed dimensions remain declared to avoid layout shift.
+- **Interaction polish added** — Popup close is idempotent, restores prior focus when possible, and the recent-purchase rotation stops while the tab is hidden to avoid unnecessary background work.
+- **Reduced-motion polish retained** — Marquee compositor hints are released when motion is reduced, while the popup and recent-card transitions remain disabled as appropriate.
+
+## 31 August 2026 — Manual Phase 12 action-boundary continuation
+
+- **Owner resume scope recorded** — Manual Phase 12 application development resumed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.
+- **Order mutation routes hardened** — Customer payment-retry and cancellation POST routes now require the explicit `auth` middleware in addition to their existing throttles; controller ownership checks remain defense in depth.
+- **Regression/documentation contract updated** — Static automation and the Phase 12 authorization/threat-model records now require the explicit route boundary. PHP/runtime qualification remains owner-side.
+
+## 31 August 2026 — Manual Phase 12 security-configuration continuation
+
+- **Order mutation boundary retained** — The manually resumed hardening pass keeps cancel/retry-payment routes explicitly authenticated and throttled.
+- **CSP surface reduced conservatively** — Unused Google/CDN script origins were removed and `frame-ancestors 'self'` was added; existing inline Alpine/Livewire allowances remain because runtime compatibility evidence for nonce migration is not available in Arena.
+- **Scope boundary retained** — No Auto Mode activation, deployment, Phase 18/Agent 10 work, credential change, production operation or destructive UAT operation was performed.
+
+## 31 August 2026 — Manual Phase 12 order-link privacy hardening
+
+- **Read-only order links bounded** — Customer-facing order invoices and Filament-generated invoice links now use temporary 15-minute signed URLs; authenticated owners retain their direct access path.
+- **Regression contract added** — Static security automation now rejects permanent invoice links and requires the bounded signed route in both customer and admin views.
+- **Scope retained** — No customer/order records, payment state, credentials or persistent UAT data were changed; owner PHP/runtime verification remains required.
+
+## 31 August 2026 — MVP launch-track simplification
+
+- **Enterprise roadmap → short practical MVP path** — The owner requested that remaining work be reduced to the minimum needed for a functional client-facing e-commerce demo and a safe eventual launch.
+- **Canonical phases 12–17 streamlined** — Phase 12 now covers only core security, authorization, privacy and payment/order blockers; Phase 13 practical performance smoke; Phase 14 minimum operations; Phase 15 cPanel/shared-host release packaging; Phase 16 focused client UAT; Phase 17 evidence review and go/no-go.
+- **Phase 18 remains separately inactive** — Deployment still requires an explicit owner activation after Phase 17 acceptance; Auto Mode and Agent 10 remain paused/inactive.
+- **Future backlog created** — Advanced scalability/resilience, full observability, broad CI/CD, full penetration testing, extended compatibility/accessibility work, analytics/marketing and unapproved legal/privacy workflows are deferred unless a real launch blocker appears.
+- **Mandatory gates preserved** — Payment/order/inventory correctness, authorization, owner-approved legal/tax/privacy behavior, backup/restore, rollback, owner runtime/UAT and go/no-go evidence cannot be deferred or bypassed.
+- **Documents updated** — `tasks/MVP_LAUNCH_PLAN.md`, `tasks/MASTER_PROJECT_TRACKER.md`, `tasks/CANONICAL_PHASE_SEQUENCE.md`, `docs/task-priority.md`, `tasks/OWNER_SIDE_PHASEWISE_EXECUTION_RUNBOOK.md` and the current Phase 12 plan now reflect the shortened track. No production-readiness claim is made.
+
+## 31 August 2026 — Manual Phase 12 checkout ownership continuation
+
+- **Checkout state boundary tightened** — `CheckoutWizard::selectAddress` now verifies the address belongs to the authenticated customer before advancing to payment; invalid selection resets to the address step with a safe message.
+- **Authenticated coupon action enforced** — `CheckoutWizard::applyCoupon` now has an explicit authentication guard in addition to the protected checkout route.
+- **Regression/documentation added** — A focused PHP test and static Phase 12 contract cover cross-customer address rejection; the authorization matrix and threat model record the new boundary.
+- **Arena checks passed** — Phase 11 customer-experience automation **7/7** and security automation **10/10** passed; PHP runtime tests remain owner-side because PHP/Composer are unavailable in Arena.
+- **Scope retained** — No order, payment, address, customer or persistent UAT data was changed; Auto Mode, deployment, Phase 18 and Agent 10 remain paused/inactive.

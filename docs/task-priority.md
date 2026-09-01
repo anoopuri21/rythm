@@ -1,93 +1,96 @@
 # Rythme Prioritized Backlog
 
-**Audit date:** 29 August 2026  
-**Ordering rule:** safety/data correctness first, then canonical Phases 10–17. Phase 18 remains inactive.
+**Updated:** 31 August 2026
+**Delivery objective:** working client-facing e-commerce demo and safe launch path with the least necessary scope
+**Canonical sequence:** `tasks/CANONICAL_PHASE_SEQUENCE.md`
+**Short plan:** `tasks/MVP_LAUNCH_PLAN.md`
+**Auto Mode / deployment:** paused / inactive
 
-## P0 — immediate blockers
+## P0 — do now: Phase 12 launch blockers
 
-1. **Correct the active database** — Owner sets `DB_DATABASE=rhythm_db`, clears optimized config/cache, restarts PHP/Herd if required, verifies effective database and `migrate:status`. Never migrate `maverick_academy` for this app.
-2. **Qualify homepage discovery candidate** — Run focused homepage/category/admin tests, full regression, and desktop/mobile rendering for Popular Categories, latest active arrivals, explicitly marked Trending and truthful Best Deals.
-3. **Preserve clean financial state** — For paid cancellations, Finance processes the existing pending refund once; processing/unknown outcomes are reconciled, not retried.
+1. Close only critical safety issues affecting authentication, authorization, customer ownership, cart, checkout, payment callbacks/webhooks, order totals, inventory or customer-data exposure.
+2. Verify basic production-safe controls: CSRF, throttling, security headers, secret handling, dependency findings, debug state and approved content boundaries.
+3. Run the focused and full available checks, then obtain owner-side PHP/Laravel, exact MySQL 8, browser/accessibility and runtime evidence where Arena cannot execute them.
+4. Keep payment, refund, tax, return, warranty, privacy and legal decisions human-approved. Do not invent values or enable disabled workflows.
+5. Record only evidence-backed fixes, commit/push them to `rhythm-uat`, and keep the workspace clean.
 
-## P1 — canonical Phase 10
+## P1 — minimum launch path
 
-1. Build least-privilege Filament shipment create/allocate/transition operations on `FulfillmentService`.
-2. Add customer-safe partial-shipment timeline and approved transactional events without exposing internal references unnecessarily.
-3. Build configurable, disabled-by-default return/RMA reasons, eligibility and state machine.
-4. Connect approved returns to the existing refund workflow without conflating logistical and provider outcomes.
-5. Add optional product HSN/tax classification and immutable order-line tax snapshots.
-6. Add invoice/credit-note identity framework only after professional numbering/tax approval.
-7. Run MySQL migration, authorization, state-machine, rendered and full regression gates.
+### Phase 12 — core safety, authorization and payment/order correctness
 
-## P1 — canonical Phase 11
+- Route/action authorization and ownership boundaries.
+- Payment initiation/finalization/webhook idempotency, order totals and inventory integrity.
+- Basic security headers, CSRF/throttling, secret/debug checks and customer-data privacy blockers.
+- Approved legal/tax/content boundaries only.
 
-1. Measure and improve MySQL shared-host search across realistic catalogue volume.
-2. Add weighted SKU/name/category/brand/attribute matching and bounded typo tolerance where feasible.
-3. Complete category/brand/attribute facets and truthful empty/error states.
-4. Add recently viewed and admin-managed related/complementary merchandising.
-5. Add consent-safe back-in-stock subscriptions; exclude unapproved price-drop/abandoned-cart promises.
-6. Perform mobile conversion, SEO and responsive qualification.
+**Gate:** no unresolved critical/high blocker; focused checks and required owner/runtime checks pass.
 
-## P1 — release gates, Phases 12–17
+### Phase 13 — practical performance smoke
 
-### Phase 12: security/privacy/compliance/accessibility
+- Production frontend build.
+- Homepage, catalogue/search, product, cart and checkout rendering.
+- Bounded query/N+1 and obvious console, overflow or page-error checks.
+- Agreed viewport smoke checks, without starting large-scale load testing.
 
-- Route/action authorization and IDOR matrix; OWASP/Laravel review.
-- CSP/cookies/proxies/HTTPS/HSTS/debug hardening.
-- Secret/dependency scan and rotation procedure.
-- PII retention/export/deletion; approved legal/privacy/cookie content.
-- WCAG 2.2 AA and independent penetration test closure.
+**Gate:** no material storefront/cart/checkout performance or rendering regression.
 
-### Phase 13: performance/resilience
+### Phase 14 — minimum operations
 
-- Define measurable SLOs and profile critical storefront/admin queries.
-- Eliminate material N+1s; verify MySQL indexes/explain plans.
-- Responsive image conversions and frontend bundle/CWV budgets.
-- Load/concurrency/outage tests for browse/cart/checkout/payment/queue.
+- Production environment values, external secrets, HTTPS/TLS and debug-off verification.
+- Database/media backup and one isolated restore proof.
+- Shared-host logs, queue/cron, storage/media access and a short rollback path.
 
-### Phase 14: observability/backups/operations
+**Gate:** owner can restore and roll back safely without destructive commands against persistent data.
 
-- Correlation IDs, structured redacted logs, error monitoring and metrics.
-- Payment/refund/queue/notification/stock alerts and dashboards.
-- Encrypted off-site backups, retention and successful restore drill.
-- Incident severity/on-call and payment/DB/queue/secret runbooks.
+### Phase 15 — cPanel/shared-host release package
 
-### Phase 15: CI/CD/shared-host release
+- Versioned release artifact and commit evidence.
+- Environment checklist with secrets kept outside the repository.
+- Safe forward migrations, storage/media and scheduler/queue steps.
+- Migration, smoke-test and rollback checklist.
 
-- CI tests/style/static analysis/build/audit/secret scan.
-- Reproducible release artifact and version evidence.
-- Safe migration, backup, cPanel scheduler/queue, storage-link and rollback drill.
-- Staging smoke tests; production secrets remain external.
+**Gate:** package is reproducible and usable by the owner on the target shared host.
 
-### Phase 16: full QA/release candidate
+### Phase 16 — focused client UAT
 
-- Critical E2E journeys, duplicate/slow/refresh cases and admin regression.
-- Supported browser/mobile matrix, accessibility and SEO validation.
-- Payment, email, fulfillment, invoice/tax and returns owner UAT.
-- Freeze candidate with zero blocker/critical/high-risk unresolved defects.
+- Browse, search, product/variant, cart, checkout and test payment.
+- Order status, invoice, account and essential admin catalogue/order actions.
+- Four viewports: 1440×900, 768×1024, 390×844 and 360×800.
+- Record broken journeys, console errors, horizontal overflow, accessibility blockers and payment/order/inventory outcomes.
 
-### Phase 17: production readiness decision
+**Gate:** no release-blocking defect; owner evidence is attached and the candidate is frozen.
 
-- Independently verify every gate and evidence artifact.
-- Require clean pushed state, no critical blocker and explicit Agent 0 sign-off.
-- Produce go/no-go decision; do not deploy.
+### Phase 17 — evidence review and go/no-go
 
-## P2 — targeted technical debt
+- Review security, payment/order, database, performance smoke, operations, release-package and UAT evidence.
+- Confirm legal/content decisions and backup/restore/rollback evidence.
+- Record `GO`, `NO-GO` or `BLOCKED` with unresolved risks and required owner action.
+- Do not deploy from this phase.
 
-1. Batch Popular Category representative-image loading if profiling confirms cache-rebuild N+1 cost.
-2. Lazy-load route-specific Swiper/GSAP/Lenis modules if bundle measurements justify it.
-3. Remove broad legacy `admin` alias after account migration/recovery proof.
-4. Add media format/dimension governance and orphan cleanup.
-5. Reconcile older planning-document statuses with the master tracker without changing canonical authority.
+**Gate:** explicit Agent 0 decision and owner approval; this does not activate Phase 18.
 
-## P3 — explicitly deferred/unapproved
+### Phase 18 — deployment
 
-- SMS/WhatsApp providers and marketing automation.
-- Gift cards/store credit, abandoned-cart campaigns and price-drop promises.
-- Persistent external search daemon, Redis, object storage or carrier integration unless separately approved.
-- Invented GST/HSN/shipping/return/warranty/legal content.
-- Phase 18 deployment, Agent 10 and real financial writes without explicit human authorization.
+Remain `INACTIVE`. Deployment requires a separate explicit owner activation after Phase 17 acceptance. Agent 10 remains inactive. No live payment/refund action or production change is implied.
 
-## Completion mapping
+## P2 — future backlog; must not block the MVP track
 
-Each backlog item requires: bounded plan, implementation, focused tests, full regression, relevant MySQL/build/browser/audit evidence, documentation, Agent 0 acceptance, commit/push/hash and clean workspace. External credentials and professional decisions remain human gates rather than implementation guesses.
+- Full penetration testing, advanced threat modelling and CSP nonce/strict-dynamic migration.
+- Detailed account export/deletion, retention/anonymization and consent tooling after legal/product decisions are supplied.
+- Large-scale load/concurrency testing, Redis/CDN/object storage, external search and advanced resilience/circuit breakers.
+- Full observability dashboards, multi-region disaster recovery, broad CI/CD automation and zero-downtime deployment.
+- Extended browser/device matrix, visual-regression infrastructure and non-blocking accessibility polish.
+- Analytics/marketing automation, SMS/WhatsApp, abandoned-cart/price-drop campaigns, gift cards and other growth features.
+- Additional enterprise integrations or workflow completeness not required by the critical client journeys.
+
+## Never defer or bypass
+
+- Payment/order/inventory correctness and financial reconciliation truth.
+- Authorization, customer-data isolation and critical security remediation.
+- Owner-approved legal/tax/return/warranty/privacy decisions required by enabled behavior.
+- HTTPS, production configuration, backup/restore and rollback evidence.
+- Focused owner UAT, evidence review and explicit go/no-go decision.
+
+## Completion rule
+
+Every MVP phase needs a bounded plan, focused verification, relevant owner-side evidence, documentation, Agent 0 acceptance and a clean pushed commit where code changed. Absence of Arena runtime access is a pending owner gate, not evidence of success.

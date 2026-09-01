@@ -100,10 +100,174 @@ function initNewsletter() {
     });
 }
 
+function initOfferPopup() {
+    const popup = document.querySelector('[data-offer-popup]');
+    if (!popup || popup.dataset.initialized === 'true') return;
+
+    popup.dataset.initialized = 'true';
+    const closeButton = popup.querySelector('[data-offer-popup-close]');
+    const dialog = popup.querySelector('.offer-popup__dialog');
+    const storageKey = popup.dataset.offerPopupStorageKey || 'rythme-offer-popup-closed-at-v1';
+    const dayInMilliseconds = 24 * 60 * 60 * 1000;
+
+    if (!closeButton || !dialog) return;
+
+    try {
+        const closedAt = Number(window.localStorage.getItem(storageKey));
+        if (Number.isFinite(closedAt) && closedAt > 0 && Date.now() - closedAt < dayInMilliseconds) {
+            popup.remove();
+            return;
+        }
+    } catch {
+        // Show the offer when browser storage is unavailable; close remains page-local.
+    }
+
+    popup.classList.remove('is-pending');
+    popup.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('offer-popup-open');
+    const previouslyFocused = document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+        ? document.activeElement
+        : null;
+
+    const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusables = [...dialog.querySelectorAll(focusableSelector)];
+    let closing = false;
+    const close = () => {
+        if (closing) return;
+        closing = true;
+
+        try {
+            window.localStorage.setItem(storageKey, String(Date.now()));
+        } catch {
+            // The popup still closes for the current page when storage is blocked.
+        }
+
+        popup.classList.add('is-closing');
+        popup.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('offer-popup-open');
+        previouslyFocused?.focus({ preventScroll: true });
+        window.setTimeout(() => popup.remove(), 220);
+    };
+
+    closeButton.addEventListener('click', close);
+    popup.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            close();
+            return;
+        }
+
+        if (event.key !== 'Tab' || focusables.length < 2) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
+
+    closeButton.focus({ preventScroll: true });
+}
+
+function initRecentPurchasePreview() {
+    const preview = document.querySelector('[data-recent-purchase-demo]');
+    if (!preview || preview.dataset.initialized === 'true') return;
+
+    preview.dataset.initialized = 'true';
+    const storageKey = 'rythme-recent-purchase-preview-dismissed-v1';
+    const closeButton = preview.querySelector('[data-recent-purchase-close]');
+    const cards = [...preview.querySelectorAll('[data-recent-purchase-card]')];
+
+    if (!closeButton || cards.length === 0) return;
+
+    try {
+        if (window.localStorage.getItem(storageKey) === '1') {
+            preview.remove();
+            return;
+        }
+    } catch {
+        // Continue with an in-page dismissal if browser storage is unavailable.
+    }
+
+    let active = 0;
+    let timer = null;
+    let paused = false;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+    const showCard = (index) => {
+        active = (index + cards.length) % cards.length;
+        cards.forEach((card, cardIndex) => {
+            const isActive = cardIndex === active;
+            card.classList.toggle('is-active', isActive);
+            card.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
+    };
+
+    const stopTimer = () => {
+        if (timer !== null) {
+            window.clearInterval(timer);
+            timer = null;
+        }
+    };
+
+    const startTimer = () => {
+        stopTimer();
+        if (paused || reducedMotion || document.hidden || cards.length < 2) return;
+        timer = window.setInterval(() => showCard(active + 1), 10000);
+    };
+
+    const handleVisibilityChange = () => {
+        if (document.hidden) stopTimer();
+        else startTimer();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const dismiss = () => {
+        stopTimer();
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        try {
+            window.localStorage.setItem(storageKey, '1');
+        } catch {
+            // The current page is still hidden when persistent storage is blocked.
+        }
+        preview.classList.add('is-dismissed');
+        window.setTimeout(() => preview.remove(), 260);
+    };
+
+    closeButton.addEventListener('click', dismiss);
+    preview.addEventListener('mouseenter', () => {
+        paused = true;
+        stopTimer();
+    });
+    preview.addEventListener('mouseleave', () => {
+        paused = false;
+        startTimer();
+    });
+    preview.addEventListener('focusin', () => {
+        paused = true;
+        stopTimer();
+    });
+    preview.addEventListener('focusout', (event) => {
+        if (!preview.contains(event.relatedTarget)) {
+            paused = false;
+            startTimer();
+        }
+    });
+
+    showCard(0);
+    startTimer();
+}
+
 export function initUi() {
     initNavbar();
     initCountdowns();
     initNewsletter();
+    initOfferPopup();
+    initRecentPurchasePreview();
     initScrollTop();
 }
 

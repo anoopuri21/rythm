@@ -9,6 +9,7 @@
 
 @section('content')
     @include('home._hero', ['heroMode' => $heroMode, 'homepage' => $homepage])
+    @include('home._offer-marquee', ['homepage' => $homepage])
     @include('home._usp-strip')
     @include('home._categories', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._new-arrivals', ['homeSections' => $homeSections, 'homepage' => $homepage])
@@ -21,4 +22,5 @@
     @include('home._recently-launched', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._brands', ['homeSections' => $homeSections, 'homepage' => $homepage])
     @include('home._confidence', ['homepage' => $homepage])
+    @include('home._offer-popup', ['homepage' => $homepage])
 @endsection
