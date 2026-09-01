@@ -931,3 +931,10 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Disabled-defaults locked** — No account deletion/export/erasure route exists; `returns_enabled` and `tax_rules_enabled` remain default-disabled until approved wording arrives.
 - **Human gate AS-H011 recorded** — Owner/professional legal, tax, return, warranty and privacy wording decisions remain required before any such behavior or text is enabled or published.
 - **Contract added** — `tests/automation/privacy-phase12-chunk3.test.mjs` (7 tests) locks the image/label/landmark checks, deletion-route absence, disabled defaults and the privacy-map human-gate list.
+
+## 31 August 2026 — Phase 12 Arena-side qualification and Auto Mode pause at owner gates
+
+- **Chunk 4 (Arena part) COMPLETE** — Agent 0's independent review of the consolidated session diff confirmed zero production-code changes and no weakened regression contract; the full Node automation suite and the production build pass with only the environment-mapped Arena session-branch literal failing.
+- **Redacted evidence pack published** — `tasks/PHASE_12_QUALIFICATION_EVIDENCE.md` records every Arena-side gate result and binds the exact owner-side actions (PHP focused/full suites in the disposable QA copy, MySQL 8.4.3 `migrate:status`, four-viewport rendered/axe/keyboard pass, dependency audits) plus the AS-H011 legal wording decision.
+- **Auto Mode PAUSED at genuine blockers** — Protocol blockers 3.6/3.7 apply (PHP/Composer/MySQL unavailable in Arena; legal/privacy wording is an owner decision). Human gates AS-H011 and AS-H012 are open; Phase 12 remains IN PROGRESS and NOT PRODUCTION-READY.
+- **Contract added** — `tests/automation/phase12-qualification.test.mjs` (5 tests) locks the IN PROGRESS posture, the evidence-pack contents, the open human gates and the zero-critical-blocker rule; the Phase 10 qualification test now expects the paused owner-gate state.

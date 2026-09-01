@@ -4,7 +4,7 @@
     "name": "Rythme / Rhythm Exports",
     "repository": "anoopuri21/rythm"
   },
-  "lifecycle": "executing",
+  "lifecycle": "paused",
   "authorization": {
     "through_phase": "17",
     "deployment_enabled": false
@@ -17,15 +17,15 @@
   },
   "delivery": {
     "phase": "12",
-    "chunk": "phase12-chunk4-qualification",
-    "task": "Phase 12 independent qualification: static/automation suites and Agent 0 review in Arena, owner PHP/MySQL runtime and rendered UAT gates human-side",
+    "chunk": "phase12-owner-qualification-gates",
+    "task": "Phase 12 Chunks 1-3 and Arena-side Chunk 4 closed; completion awaits owner PHP/MySQL runtime, rendered UAT and AS-H011 legal-text decisions",
     "status": "in_progress"
   },
   "execution": {
-    "action_class": "idempotent_write",
+    "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 12 Chunk 3 closed: privacy data map confirmed against enabled flows, Blade-aware static accessibility sweep clean (alt coverage, icon-button names, skip link/landmark), deletion/export routes absent, returns/tax disabled defaults locked, privacy-phase12-chunk3.test.mjs (7 tests) added, and the legal/tax/return/warranty/privacy wording decision recorded as human gate AS-H011."
+    "last_verified_action": "Phase 12 Arena-side qualification closed: Agent 0 independent review of the session diff found zero production-code changes and no weakened contract; full Node automation passed except the environment-mapped Arena session-branch literal; production build passed; redacted evidence pack tasks/PHASE_12_QUALIFICATION_EVIDENCE.md recorded. Auto Mode paused at genuine blockers 6 and 7: PHP/Composer/MySQL are unavailable in Arena and the legal/privacy wording decision belongs to the owner."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "d37cd8f28ee58fb6d890a9f705687c0d5b6744924fe4acf03fe55948be0fab14",
-    "created_at": "2026-09-01T01:44:47.698Z"
+    "id": "2878800646c2bd026d821a9e48099f4b97b6990e8136f076c48c78fce39d29d0",
+    "created_at": "2026-09-01T01:49:41.948Z"
   },
   "decisions": [
     {
@@ -97,6 +97,12 @@
     {
       "id": "AS-D009",
       "summary": "Close Phase 12 Chunk 3 on static evidence only: the accessibility acceptance rule still requires rendered four-viewport, keyboard and axe evidence, which stays with Chunk 4 owner-side qualification rather than being claimed from Arena.",
+      "confidence": "high",
+      "reversible": true
+    },
+    {
+      "id": "AS-D010",
+      "summary": "Pause Auto Mode at the Phase 12 owner runtime/UAT gates (protocol blockers 6 and 7) after closing the Arena-side qualification; resume only on owner evidence or a new ACTIVATE AUTO MODE command.",
       "confidence": "high",
       "reversible": true
     }
@@ -164,6 +170,11 @@
       "id": "AS-H011",
       "status": "open",
       "summary": "Owner/legal professional must approve exact Terms, Privacy, Shipping, Returns, Warranty, Cancellation wording plus retention/deletion/consent rules before any such behavior or text is enabled; unknown behavior stays disabled."
+    },
+    {
+      "id": "AS-H012",
+      "status": "open",
+      "summary": "Owner must run the Phase 12 PHP/MySQL/rendered-UAT qualification listed in tasks/PHASE_12_QUALIFICATION_EVIDENCE.md section 3 and report the redacted results."
     }
   ],
   "gate_results": [
@@ -688,11 +699,17 @@
       "outcome": "passed",
       "evidence": "docs/phase12-privacy-data-map.md; resources/views Blade-aware sweep (0 missing alt, 0 unlabeled icon buttons, skip link/main landmark intact); routes/web.php (no deletion/export routes); app/Services/SiteSettingsService.php + OrderService.php (returns/tax disabled defaults); tests/automation/privacy-phase12-chunk3.test.mjs (7 tests)",
       "verified_at": "2026-09-01T01:44:47.676Z"
+    },
+    {
+      "name": "Phase 12 Chunk 4 Arena-side qualification and independent review",
+      "outcome": "passed",
+      "evidence": "tasks/PHASE_12_QUALIFICATION_EVIDENCE.md; tests/automation/phase12-qualification.test.mjs; consolidated diff 4614855..HEAD reviewed (docs/tests/state only); npm run test:automation; npm run build (passed in the same session before packaging-only edits)",
+      "verified_at": "2026-09-01T01:49:41.948Z"
     }
   ],
   "next_action": {
-    "id": "PHASE-12-CHUNK-4-QUALIFICATION",
-    "description": "Arena-side part of Chunk 4: run the full static/automation suite, perform the Agent 0 independent review of Phase 12 chunks 1-3 and assemble the redacted evidence pack; owner PHP/MySQL runtime and rendered UAT gates follow.",
-    "requires_human": false
+    "id": "PHASE-12-OWNER-RUNTIME-QUALIFICATION",
+    "description": "Owner-side Phase 12 qualification from tasks/PHASE_12_QUALIFICATION_EVIDENCE.md section 3: PHP focused/full suites in the disposable QA copy, migrate:status on the MySQL 8.4.3 UAT database, four-viewport rendered/axe/keyboard pass, composer/npm audits, and the AS-H011 legal wording decision. Then Agent 0 reviews the bound evidence and decides Phase 12 COMPLETE.",
+    "requires_human": true
   }
 }

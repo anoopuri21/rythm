@@ -4,10 +4,10 @@
 **Established:** 25 August 2026  
 **Repository strategy:** Audit and qualify the existing repository  
 **Current operational priority:** Short MVP launch track — close launch blockers, owner UAT, release packaging; defer non-essential enterprise work
-**Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 IN PROGRESS / MVP LAUNCH TRACK ACTIVE / AUTO MODE ACTIVE (31 Aug 2026 owner command) / NOT PRODUCTION-READY
+**Overall status:** PHASES 0–11 AND 6A COMPLETE / PHASE 12 IN PROGRESS (Chunks 1–3 + Arena-side Chunk 4 done; owner runtime/UAT + legal gates pending) / MVP LAUNCH TRACK ACTIVE / AUTO MODE PAUSED AT OWNER GATES / NOT PRODUCTION-READY
 **Audit report:** `tasks/PHASE_0_STATUS_AUDIT.md`  
 **MVP launch plan:** `tasks/MVP_LAUNCH_PLAN.md`
-**Auto Mode:** ACTIVE — owner issued `ACTIVATE AUTO MODE` on 31 August 2026; Phase 18/deployment excluded
+**Auto Mode:** PAUSED AT GENUINE BLOCKERS — Phase 12 owner runtime/UAT evidence (AS-H012) and legal wording decision (AS-H011) pending; Phase 18/deployment excluded
 
 ---
 

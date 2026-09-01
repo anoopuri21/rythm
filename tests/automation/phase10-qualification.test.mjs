@@ -17,8 +17,8 @@ test('canonical planning files record accepted Phase 11 and active Phase 12', ()
   assert.match(sequence, /\| 11 \|[^\n]+\| COMPLETE \|/);
   assert.equal(state.delivery.phase, '12');
   assert.equal(state.delivery.status, 'in_progress');
-  assert.equal(state.next_action.requires_human, false);
-  assert.equal(state.lifecycle, 'executing');
+  assert.equal(state.next_action.requires_human, true);
+  assert.equal(state.lifecycle, 'paused');
   assert.equal(state.authorization.deployment_enabled, false);
 });
 

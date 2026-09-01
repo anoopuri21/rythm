@@ -1,8 +1,8 @@
 # Rythme Enterprise E-commerce — Autonomous Auto-Mode Protocol
 
 **Owner:** Agent 0 — Project Lead
-**Status:** ACTIVE — owner issued `ACTIVATE AUTO MODE` on 31 August 2026; canonical Phase 12 continues autonomously
-**Autonomous Supervisor:** ACTIVE; Phase 18/deployment remains excluded and separately gated
+**Status:** PAUSED AT GENUINE BLOCKER — Phase 12 Chunks 1–3 and Arena-side Chunk 4 qualification closed on 31 August 2026; owner PHP/MySQL/rendered-UAT evidence and the AS-H011 legal wording decision are required to finish Phase 12
+**Autonomous Supervisor:** PAUSED at protocol blockers 3.6/3.7; a new `ACTIVATE AUTO MODE` or the owner evidence resumes work; Phase 18/deployment remains excluded and separately gated
 **Activation command:** `ACTIVATE AUTO MODE`
 **Pause command:** `PAUSE AUTO MODE`
 
@@ -150,8 +150,8 @@ No specialist may self-approve final completion. Agent 0 retains completion auth
 ## 9. Current Auto Mode State
 
 - **Registered:** Yes
-- **Active:** Yes — owner issued `ACTIVATE AUTO MODE` on 31 August 2026, lifting the 30 August manual homepage UI/UX hold whose content choices were already recorded.
-- **Autonomous Supervisor:** ACTIVE on canonical Phase 12; Phase 18 remains excluded and Agent 10 inactive.
+- **Active:** No (paused at genuine blockers) — the 31 August 2026 `ACTIVATE AUTO MODE` execution closed Phase 12 Chunks 1–3 and the Arena-side Chunk 4 review, then paused where only the owner can supply evidence: PHP/MySQL runtime UAT and the AS-H011 legal/privacy wording decision (protocol blockers 3.6/3.7).
+- **Autonomous Supervisor:** PAUSED at the owner gates; reactivation resumes Phase 12 qualification or Phase 13; Phase 18 remains excluded and Agent 10 inactive.
 - **Completed phases:** Canonical delivery Phases 0–11 and Phase 6A (`COMPLETE`).
 - **Current priority:** Manual homepage UI/UX changes — plan first, then implement after required content/privacy decisions.
 - **Phase 6 acceptance:** Owner confirmed exact-MySQL import and Filament product visibility/editability; Agent 0 marked Phase 6 `COMPLETE` on 26 August 2026.

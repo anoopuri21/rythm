@@ -64,6 +64,8 @@ Production values must come exclusively from the environment on the host (cPanel
 
 ### Chunk 4 — independent Phase 12 qualification
 
+**Status:** IN PROGRESS — Arena-side part COMPLETE 31 August 2026 (full static/automation suite, Agent 0 independent review, redacted evidence pack at `tasks/PHASE_12_QUALIFICATION_EVIDENCE.md`, contract `tests/automation/phase12-qualification.test.mjs`); the PHP/Composer **owner-side runtime** suites, exact MySQL 8.4.3 evidence, rendered four-viewport/axe/keyboard UAT and the AS-H011 legal wording decision remain open as AS-H012/AS-H011; Phase 12 is marked `COMPLETE` only after those report green and Agent 0 accepts the bound evidence
+
 - Run applicable static/automation suites, PHP/Composer checks in the disposable external QA copy and owner-side runtime/UAT gates.
 - Require independent review and a redacted evidence pack.
 - Mark Phase 12 `COMPLETE` only after no unresolved critical/high blocker, required privacy/legal traceability, critical accessibility evidence and payment/order/authorization gates pass. Full penetration testing and advanced hardening are not MVP prerequisites.
