@@ -40,6 +40,21 @@ php artisan serve                     # http://127.0.0.1:8000
 > `public/build/` is gitignored — **`npm run build` compulsory hai** fresh clone pe,
 > warna page bina CSS ke dikhega ("Vite manifest not found").
 
+## Deploy (MilesWeb / cPanel shared hosting)
+
+Step-by-step, non-technical guide: **[docs/DEPLOY_MILESWEB.md](docs/DEPLOY_MILESWEB.md)**
+
+```bash
+# server (cPanel SSH / Terminal) pe:
+cd ~ && git clone https://github.com/anoopuri21/rythm.git app && cd app
+cp .env.staging.example .env    # values bharo
+bash scripts/deploy-cpanel.sh setup     # pehli baar
+bash scripts/deploy-cpanel.sh update    # har update
+```
+
+> `public/build/` ab repo me committed hai (shared hosting pe npm nahi hota).
+> Local dev me code badlo to `npm run build` chala ke commit karna zaruri hai.
+
 ## Technology requirements
 
 - **PHP 8.3.30+** (composer.json: `"php": "^8.3"`; lock resolved for 8.3.30 — PHP 8.4 bhi chalta hai)

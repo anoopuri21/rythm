@@ -1,0 +1,50 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-DuNXatwv.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BBzVwS06.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/modules/carousels.js",
+      "resources/js/modules/motion.js",
+      "resources/js/modules/cinema.js",
+      "resources/js/modules/categories-pin.js"
+    ]
+  },
+  "resources/js/modules/carousels.js": {
+    "file": "assets/carousels--kyheXOe.js",
+    "name": "carousels",
+    "src": "resources/js/modules/carousels.js",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/carousels-CZJHgC-P.css"
+    ]
+  },
+  "resources/js/modules/categories-pin.js": {
+    "file": "assets/categories-pin-Gf6y6Ui9.js",
+    "name": "categories-pin",
+    "src": "resources/js/modules/categories-pin.js",
+    "isDynamicEntry": true
+  },
+  "resources/js/modules/cinema.js": {
+    "file": "assets/cinema-Dd8gE5mD.js",
+    "name": "cinema",
+    "src": "resources/js/modules/cinema.js",
+    "isDynamicEntry": true
+  },
+  "resources/js/modules/motion.js": {
+    "file": "assets/motion-BtRfBQEK.js",
+    "name": "motion",
+    "src": "resources/js/modules/motion.js",
+    "isDynamicEntry": true
+  }
+}
