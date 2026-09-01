@@ -74,13 +74,21 @@ class Settings extends Page implements HasForms
                         TextInput::make('contact_email')->email(),
                         TextInput::make('contact_phone'),
                         TextInput::make('address_line'),
+                        TextInput::make('whatsapp_number')
+                            ->label('WhatsApp number')
+                            ->helperText('Shown as the floating WhatsApp button on every page. Include the country code, e.g. +91 98765 43210. Leave empty to hide the button.'),
+                        TextInput::make('whatsapp_message')
+                            ->label('WhatsApp pre-filled message')
+                            ->helperText('Optional text pre-filled in the customer\'s chat window.'),
                     ])->columns(1),
                 Section::make('Social links')
+                    ->description('Shown as icons on the right of the top bar. Leave a field empty and its icon is not displayed.')
                     ->schema([
-                        TextInput::make('social_instagram')->url(),
-                        TextInput::make('social_youtube')->url(),
-                        TextInput::make('social_facebook')->url(),
-                        TextInput::make('social_x')->url(),
+                        TextInput::make('social_instagram')->label('Instagram URL')->url()->placeholder('https://instagram.com/yourpage'),
+                        TextInput::make('social_youtube')->label('YouTube URL')->url()->placeholder('https://youtube.com/@yourchannel'),
+                        TextInput::make('social_facebook')->label('Facebook URL')->url()->placeholder('https://facebook.com/yourpage'),
+                        TextInput::make('social_x')->label('X (Twitter) URL')->url()->placeholder('https://x.com/yourhandle'),
+                        TextInput::make('social_linkedin')->label('LinkedIn URL')->url()->placeholder('https://linkedin.com/company/yourcompany'),
                     ])->columns(2),
             ])
             ->statePath('data');

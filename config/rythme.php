@@ -12,7 +12,8 @@ return [
     'brand_short' => 'RHYTHM',
     'logo_url' => env('RYTHME_LOGO_URL', 'https://rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'),
 
-    // Optional site-shell contact/social values. Empty values stay hidden.
+    // Fallbacks only — the live values are managed in the admin panel
+    // (Filament → Settings). See App\Services\SiteSettingsService.
     'contact_phone' => env('RYTHME_CONTACT_PHONE', ''),
     'contact_email' => env('RYTHME_CONTACT_EMAIL', ''),
     'social_links' => [
