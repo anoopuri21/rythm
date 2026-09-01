@@ -41,7 +41,7 @@ test('canonical planning files record accepted Phases 0-13 with the owner-eviden
   assert.match(sequence(), /\| 10 \|[^\n]+\| COMPLETE \|/);
   assert.match(sequence(), /\| 11 \|[^\n]+\| COMPLETE \|/);
   const current = state();
-  assert.ok(['12', '14', '15', '16', '17'].includes(current.delivery.phase), `unexpected frontier phase ${current.delivery.phase}`);
+  assert.ok(['12', '14', '15', '16', '17', '18'].includes(current.delivery.phase), `unexpected frontier phase ${current.delivery.phase}`);
   assertPostureConsistency();
 });
 

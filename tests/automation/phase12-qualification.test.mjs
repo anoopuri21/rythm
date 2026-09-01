@@ -37,7 +37,7 @@ await test('the evidence pack binds the remaining owner-side and legal human gat
 
 await test('supervisor keeps the standing legal gate open with deployment disabled', () => {
     const config = JSON.parse(read('automation/config.json'));
-    assert.ok(['12', '14', '15', '16', '17'].includes(state.delivery.phase), `unexpected frontier phase ${state.delivery.phase}`);
+    assert.ok(['12', '14', '15', '16', '17', '18'].includes(state.delivery.phase), `unexpected frontier phase ${state.delivery.phase}`);
     assert.equal(state.authorization.deployment_enabled, false);
     // Sanctioned postures: paused (config disabled, awaiting a human) or an
     // active posture (config enabled) while independent Arena-side work runs.
