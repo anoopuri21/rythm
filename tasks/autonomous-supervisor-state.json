@@ -11,9 +11,9 @@
   },
   "git": {
     "branch": "rhythm-uat",
-    "local_head": "2b237e45e570998c202cfd1cf3360d672954fff4",
-    "remote_head": "2b237e45e570998c202cfd1cf3360d672954fff4",
-    "working_tree_clean": true
+    "local_head": "b946775f43082a0a97f225f1573a24615a0cf18a",
+    "remote_head": "b946775f43082a0a97f225f1573a24615a0cf18a",
+    "working_tree_clean": false
   },
   "delivery": {
     "phase": "12",
@@ -25,7 +25,7 @@
     "action_class": "read_only",
     "attempt": 1,
     "max_attempts": 1,
-    "last_verified_action": "Phase 15 contract (release-phase15.test.mjs, 7 tests) and Phase 16 owner UAT script (tasks/PHASE_16_OWNER_UAT_SCRIPT.md, 23 numbered steps, contract 4 tests) completed. Auto Mode paused: no gate-independent work remains on the MVP track; pending items are owner package build, owner UAT execution, AS-H011 legal wording and AS-H012 runtime qualification."
+    "last_verified_action": "Owner Evidence #1 (AS-H012 PHP portion) accepted: focused 112/384 and full 396/1704/0-fail reported on arena/01a058de-rythm at b946775 after the BrandFactory fixture fix. Remaining for AS-H012: MySQL 8.4.3 migrate:status, rendered viewport/axe pass, dependency audits."
   },
   "agents": {
     "accountable": "Agent 0",
@@ -42,8 +42,8 @@
     ]
   },
   "checkpoint": {
-    "id": "cad817e27c90ab861d97e68dd135e256c04596781dfef312f977f28aa1f9ef89",
-    "created_at": "2026-09-01T02:55:19.391Z"
+    "id": "d7677ab96b713470086511f959970a0a316cdaf1047882cb6ce8a2799f64b4bf",
+    "created_at": "2026-09-01T04:13:07.946Z"
   },
   "decisions": [
     {
@@ -741,6 +741,12 @@
       "outcome": "passed",
       "evidence": "tasks/PHASE_16_OWNER_UAT_SCRIPT.md; tests/automation/phase16-uat-script.test.mjs (4 tests)",
       "verified_at": "2026-09-01T02:55:19.391Z"
+    },
+    {
+      "name": "Phase 12 owner PHP runtime qualification (Evidence 1 of 6)",
+      "outcome": "passed",
+      "evidence": "Owner-reported on 1 September 2026 at b946775: focused suite 112 passed / 384 assertions; full suite 396 passed / 1,704 assertions / 0 failed. Arena cannot run PHP; this portion is owner-reported evidence.",
+      "verified_at": "2026-09-01T04:13:07.946Z"
     }
   ],
   "next_action": {

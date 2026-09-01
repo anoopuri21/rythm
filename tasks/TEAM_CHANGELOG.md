@@ -971,3 +971,9 @@ This document is maintained by Agent 0 (Project Lead). It records approved chang
 - **Root cause (diagnosed)** — `BrandFactory` was the only factory without a unique slug suffix; its 8-name pool overlaps the seeded brands, so any test running after `$this->seed()` could collide (≈7/8 per factory brand). CategoryFactory/ProductFactory already carry the suffix convention. Test-infrastructure defect only; no production code or behavior is affected.
 - **Safe reversible correction (Phase 12 manual scope)** — `BrandFactory` slug now `Str::slug($name) . '-' . Str::random(4)`; the 4 in-repo `Brand::factory()` callers were reviewed (explicit-slug or slug-agnostic), so no assertion depends on the bare slug.
 - **Next** — owner re-pulls and re-runs the full suite; acceptance of Evidence #1 waits for that green result.
+
+## 1 September 2026 — Owner Evidence #1 ACCEPTED: PHP runtime suites green
+
+- **Focused Phase 12 suite** — owner-reported 112 passed / 384 assertions on the qualification set (Checkout, Coupon, Auth, SecurityHeaders, OrderTracking, PaymentRetry, Account).
+- **Full suite after the BrandFactory fix** — owner-reported **396 passed / 1,704 assertions / 0 failed** at commit `b946775` on `arena/01a058de-rythm`.
+- **AS-H012 partial** — the PHP-runtime portion of the Phase 12 owner gate is now satisfied; `migrate:status` on MySQL 8.4.3, rendered viewport/axe pass and dependency audits remain before AS-H012 closes.
