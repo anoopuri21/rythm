@@ -15,7 +15,7 @@
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full"
          role="dialog" aria-modal="true" aria-label="Shopping cart"
-         class="fixed inset-y-0 right-0 z-[90] flex w-[92%] max-w-md flex-col bg-paper shadow-2xl">
+         class="fixed inset-y-0 right-0 z-[999] flex w-[92%] max-w-md flex-col bg-paper shadow-2xl">
 
         {{-- Header --}}
         <div class="flex items-center justify-between border-b border-ink/10 px-6 py-5">
