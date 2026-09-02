@@ -111,15 +111,25 @@ class ProductResource extends Resource
                                     ->defaultItems(0)
                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                                     ->schema([
-                                        Grid::make(5)->schema([
+                                        Grid::make(6)->schema([
                                             TextInput::make('name')->required()->label('Variant name'),
                                             TextInput::make('sku')->required()->unique(ignoreRecord: true),
                                             TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
                                                 ->label('Price override (optional)'),
                                             TextInput::make('stock')->numeric()->default(0)->minValue(0),
                                             Toggle::make('is_active')->default(true),
+                                            SpatieMediaLibraryFileUpload::make('variant_images')
+                                                ->label('Variant Images')
+                                                ->collection('variant_gallery')
+                                                ->multiple()
+                                                ->image()
+                                                ->maxFiles(6)
+                                                ->maxSize(5120)
+                                                ->helperText('Max 6 images per variant')
+                                                ->columnSpanFull(),
                                         ]),
-                                    ]),
+                                    ])
+                                    ->columns(1),
                             ]),
                         Section::make('Media')
                             ->description('Product images — Bajaao product shots per image rules.')

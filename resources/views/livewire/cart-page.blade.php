@@ -30,6 +30,17 @@
             {{-- Items --}}
             <div>
                 @foreach($items as $item)
+                    @php
+                        // Check if this item is now out of stock
+                        $isOutOfStock = false;
+                        if ($item->product_variant_id !== null && $item->variant) {
+                            $isOutOfStock = $item->variant->stock <= 0 || !$item->variant->is_active;
+                        } elseif ($item->product) {
+                            $isOutOfStock = $item->product->stock <= 0 || !$item->product->is_active;
+                        }
+                    @endphp
+
+                    @if(!$isOutOfStock)
                     <div class="flex gap-4 border-b border-ink/10 py-6 sm:gap-6" wire:key="page-item-{{ $item->id }}">
                         <a href="/product/{{ $item->product->slug }}" class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl border border-ink/10 bg-white p-2 sm:h-32 sm:w-32">
                             @if($item->product->thumbnailImage())
@@ -71,8 +82,21 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 @endforeach
 
+                @if($items->isEmpty())
+                    <div class="flex flex-col items-center rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-16 text-center">
+                        <p class="text-5xl" aria-hidden="true">🛒</p>
+                        <h2 class="mt-6 font-playfair text-2xl font-bold text-ink">Some items became unavailable</h2>
+                        <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
+                            Some items in your cart are now out of stock and have been removed. Please review your cart.
+                        </p>
+                        <a href="{{ route('shop.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                            Continue shopping <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                @else
                 <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
                     <a href="{{ route('shop.index') }}" class="text-link text-sm">
                         <span aria-hidden="true">←</span> Continue shopping
@@ -82,6 +106,7 @@
                         Clear cart
                     </button>
                 </div>
+                @endif
             </div>
 
             {{-- Price details (Flipkart-style sticky) --}}

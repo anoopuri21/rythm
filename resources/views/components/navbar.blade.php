@@ -25,7 +25,7 @@
 
             <a href="{{ route('home') }}" class="nav__logo" aria-label="{{ $brand }} home">
                 <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434"
-                     class="nav__logo-img" onerror="this.onerror=null;this.src='{{ asset('images/logo-rythme.svg') }}';">
+                     class="nav__logo-img h-10 sm:h-12 md:h-14" onerror="this.onerror=null;this.src='{{ asset('images/logo-rythme.svg') }}';">
                 <span class="nav__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>
 
@@ -155,16 +155,16 @@
     </div>
 
     {{-- ===== MOBILE DRAWER (left off-canvas, Menu/Categories tabs) ===== --}}
-    <div x-cloak x-show="mobileMenu" x-transition.opacity.duration.250ms class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm lg:hidden"
+    <div x-cloak x-show="mobileMenu" x-transition.opacity.duration.250ms class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-md lg:hidden"
          @click="mobileMenu = false; $nextTick(() => $refs.mobileMenuTrigger.focus())" aria-hidden="true"></div>
     <aside id="mobile-menu" x-cloak x-show="mobileMenu" x-trap.inert.noscroll="mobileMenu"
            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
            role="dialog" aria-modal="true" aria-label="Mobile navigation"
-           class="drawer fixed inset-y-0 left-0 z-[70] flex w-[86%] max-w-sm flex-col bg-paper shadow-2xl lg:hidden">
-        <div class="drawer__head">
+           class="drawer fixed inset-y-0 left-0 z-[70] flex w-[86%] max-w-sm flex-col bg-white/95 backdrop-blur-xl shadow-2xl lg:hidden border-r border-ink/10">
+        <div class="drawer__head bg-gradient-to-r from-paper to-white">
             <a href="{{ route('home') }}" class="flex items-center gap-2.5" @click="mobileMenu = false">
-                <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-8 w-auto"
+                <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                 <span class="drawer__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>
@@ -173,7 +173,7 @@
         </div>
 
         {{-- Tabs: Menu | Categories --}}
-        <div class="drawer__tabs" role="tablist" aria-label="Drawer sections">
+        <div class="drawer__tabs bg-white/80 backdrop-blur-sm" role="tablist" aria-label="Drawer sections">
             <button id="drawer-menu-tab" type="button" role="tab" aria-controls="drawer-menu-panel"
                     :tabindex="mobileTab === 'menu' ? 0 : -1" :aria-selected="mobileTab === 'menu'"
                     :class="mobileTab === 'menu' && 'is-active'" @click="mobileTab = 'menu'">Menu</button>
@@ -182,7 +182,7 @@
                     :class="mobileTab === 'cats' && 'is-active'" @click="mobileTab = 'cats'">Categories</button>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-5 py-4">
+        <div class="flex-1 overflow-y-auto px-5 py-4 bg-gradient-to-b from-white/50 to-paper/30">
             {{-- MENU TAB --}}
             <div id="drawer-menu-panel" role="tabpanel" aria-labelledby="drawer-menu-tab"
                  x-show="mobileTab === 'menu'">
@@ -232,7 +232,7 @@
             </div>
         </div>
 
-        <div class="border-t border-ink/5 px-6 py-4">
+        <div class="border-t border-ink/10 bg-white/80 px-6 py-4 backdrop-blur-sm">
             @auth
                 <p class="mb-2 truncate px-2 text-xs font-semibold text-ink/50">{{ auth()->user()->name }}</p>
                 <form method="POST" action="{{ route('logout') }}">
