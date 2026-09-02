@@ -211,9 +211,13 @@ case "${1:-}" in
   update)
     require_env
     say "Maintenance mode ON"; "$PHP_BIN" artisan down --retry=60 || true
+    # Safety net: agar beech me koi bhi step fail ho jaye (jaise route:cache),
+    # to site ko 503 maintenance mode me phansa mat chhodo — wapas ON karo.
+    trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
     install_deps; check_assets; storage_perms; db_check; migrate; optimize
     maybe_sync_public
+    trap - ERR
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up
     health
     say "UPDATE COMPLETE 🎉" ;;

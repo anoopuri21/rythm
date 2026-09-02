@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationNoticeController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
@@ -23,9 +24,6 @@ use App\Http\Controllers\ReturnRequestController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WishlistController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -80,16 +78,12 @@ Route::post('/logout', LogoutController::class)
 // Email verification (Laravel built-in)
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', VerificationNoticeController::class)->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request): RedirectResponse {
-        $request->fulfill();
-
-        return redirect()->route('account.index')->with('status', 'Email verified!');
-    })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('/email/verification-notification', function (Request $request): RedirectResponse {
-        $request->user()->sendEmailVerificationNotification();
-
-        return back()->with('status', 'Verification link sent!');
-    })->middleware('throttle:6,1')->name('verification.send');
+    Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [VerifyEmailController::class, 'send'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
 });
 
 // Checkout — LOGIN FORCED (guest cart auto-merges on login)
