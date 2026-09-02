@@ -16,7 +16,7 @@
     </p>
 
     {{-- Variant selector --}}
-    @if($product->variants->isNotEmpty())
+    @if($variantsWithColor->isNotEmpty())
         <fieldset class="mt-6">
             <legend class="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-muted">
                 Options — <span class="text-ink">{{ $variant?->name ?? 'Select' }}</span>
@@ -26,17 +26,14 @@
                     @php
                         $hasColor = !empty($v['color_hex']);
                         $isSelected = $variantId === $v['id'];
-                        $isOutOfStock = $v['stock'] <= 0 || !$v['is_active'];
                     @endphp
                     <button type="button"
                             wire:click="selectVariant({{ $v['id'] }})"
-                            @if($isOutOfStock) disabled @endif
                             class="relative rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-brand/30
-                            {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}
-                            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : '' }}"
+                            {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}"
                             style="{{ $hasColor ? 'padding: 4px;' : '' }}"
-                            title="{{ $v['name'] }}{{ $isOutOfStock ? ' (Out of stock)' : '' }}"
-                            aria-label="{{ $v['name'] }}{{ $isOutOfStock ? ' - Out of stock' : '' }}">
+                            title="{{ $v['name'] }}"
+                            aria-label="{{ $v['name'] }}">
                         @if($hasColor)
                             {{-- Color circle for variants with color attribute --}}
                             <span class="block rounded-full border border-black/10"
@@ -48,18 +45,10 @@
                                     </svg>
                                 </span>
                             @endif
-                            @if($isOutOfStock)
-                                <span class="absolute inset-0 flex items-center justify-center">
-                                    <span class="h-[2px] w-8 rotate-45 bg-red-600"></span>
-                                </span>
-                            @endif
                         @else
                             {{-- Text button for variants without color --}}
                             <span class="block px-4 py-2 text-sm font-semibold {{ $isSelected ? 'text-white' : 'text-ink' }}">
                                 {{ $v['name'] }}
-                                @if($isOutOfStock)
-                                    <span class="ml-1 text-[10px] font-bold uppercase opacity-70">· Out</span>
-                                @endif
                             </span>
                         @endif
                     </button>
