@@ -41,18 +41,28 @@ final class CartService
 
     /**
      * @return Collection<int, CartItem> items with product/brand/media loaded
+     *         Only returns items that are in stock (product or variant stock > 0)
      */
     public function items(): Collection
     {
         return $this->getOrCreateCart()
             ->items()
             ->with(['product.brand', 'product.media', 'variant'])
-            ->get();
+            ->get()
+            ->filter(function (CartItem $item): bool {
+                // Check if product variant is out of stock
+                if ($item->product_variant_id !== null && $item->variant !== null) {
+                    return $item->variant->stock > 0;
+                }
+                // Check if main product is out of stock
+                return $item->product->stock > 0;
+            })
+            ->values();
     }
 
     public function count(): int
     {
-        return (int) $this->getOrCreateCart()->items()->sum('qty');
+        return (int) $this->items()->sum('qty');
     }
 
     /** @return array{subtotal: float, count: int} */
@@ -64,6 +74,46 @@ final class CartService
             'subtotal' => (float) $items->sum(fn (CartItem $item): float => (float) $item->unit_price * $item->qty),
             'count' => (int) $items->sum('qty'),
         ];
+    }
+
+    /**
+     * Get all cart items including out-of-stock items.
+     * Used for validation and cleanup purposes.
+     * @return Collection<int, CartItem>
+     */
+    public function allItems(): Collection
+    {
+        return $this->getOrCreateCart()
+            ->items()
+            ->with(['product.brand', 'product.media', 'variant'])
+            ->get();
+    }
+
+    /**
+     * Remove all out-of-stock items from cart.
+     * Called during checkout validation.
+     */
+    public function removeOutOfStockItems(): int
+    {
+        $outOfStockCount = 0;
+
+        $items = $this->allItems();
+        foreach ($items as $item) {
+            $hasStock = false;
+
+            if ($item->product_variant_id !== null && $item->variant !== null) {
+                $hasStock = $item->variant->stock > 0 && $item->variant->is_active;
+            } elseif ($item->product !== null) {
+                $hasStock = $item->product->stock > 0 && $item->product->is_active;
+            }
+
+            if (! $hasStock) {
+                $item->delete();
+                $outOfStockCount++;
+            }
+        }
+
+        return $outOfStockCount;
     }
 
     /**

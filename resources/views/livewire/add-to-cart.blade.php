@@ -21,16 +21,46 @@
             <legend class="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-muted">
                 Options — <span class="text-ink">{{ $variant?->name ?? 'Select' }}</span>
             </legend>
-            <div class="flex flex-wrap gap-2">
-                @foreach($product->variants as $v)
+            <div class="flex flex-wrap gap-3">
+                @foreach($variantsWithColor as $v)
+                    @php
+                        $hasColor = !empty($v['color_hex']);
+                        $isSelected = $variantId === $v['id'];
+                        $isOutOfStock = $v['stock'] <= 0 || !$v['is_active'];
+                    @endphp
                     <button type="button"
-                            wire:click="selectVariant({{ $v->id }})"
-                            :disabled="false"
-                            class="rounded-full border px-4 py-2 text-sm font-semibold transition
-                            {{ $variantId === $v->id ? 'border-brand bg-brand text-white shadow-sm' : 'border-ink/15 bg-white text-ink hover:border-brand/50' }}">
-                        {{ $v->name }}
-                        @if($v->stock <= 0)
-                            <span class="ml-1 text-[10px] font-bold uppercase opacity-70">· Out</span>
+                            wire:click="selectVariant({{ $v['id'] }})"
+                            @if($isOutOfStock) disabled @endif
+                            class="relative rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-brand/30
+                            {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}
+                            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : '' }}"
+                            style="{{ $hasColor ? 'padding: 4px;' : '' }}"
+                            title="{{ $v['name'] }}{{ $isOutOfStock ? ' (Out of stock)' : '' }}"
+                            aria-label="{{ $v['name'] }}{{ $isOutOfStock ? ' - Out of stock' : '' }}">
+                        @if($hasColor)
+                            {{-- Color circle for variants with color attribute --}}
+                            <span class="block rounded-full border border-black/10"
+                                  style="width: 36px; height: 36px; background-color: {{ $v['color_hex'] }};"></span>
+                            @if($isSelected)
+                                <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[8px] font-bold text-white">
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </span>
+                            @endif
+                            @if($isOutOfStock)
+                                <span class="absolute inset-0 flex items-center justify-center">
+                                    <span class="h-[2px] w-8 rotate-45 bg-red-600"></span>
+                                </span>
+                            @endif
+                        @else
+                            {{-- Text button for variants without color --}}
+                            <span class="block px-4 py-2 text-sm font-semibold {{ $isSelected ? 'text-white' : 'text-ink' }}">
+                                {{ $v['name'] }}
+                                @if($isOutOfStock)
+                                    <span class="ml-1 text-[10px] font-bold uppercase opacity-70">· Out</span>
+                                @endif
+                            </span>
                         @endif
                     </button>
                 @endforeach

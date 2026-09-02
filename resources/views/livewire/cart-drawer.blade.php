@@ -38,6 +38,17 @@
         {{-- Items --}}
         <div class="flex-1 overflow-y-auto px-6 py-5">
             @forelse($items as $item)
+                @php
+                    // Check if this item is now out of stock
+                    $isOutOfStock = false;
+                    if ($item->product_variant_id !== null && $item->variant) {
+                        $isOutOfStock = $item->variant->stock <= 0 || !$item->variant->is_active;
+                    } elseif ($item->product) {
+                        $isOutOfStock = $item->product->stock <= 0 || !$item->product->is_active;
+                    }
+                @endphp
+
+                @if(!$isOutOfStock)
                 <div class="flex gap-4 border-b border-ink/5 py-5 first:pt-0" wire:key="drawer-item-{{ $item->id }}">
                     <a href="/product/{{ $item->product->slug }}" class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-white p-2">
                         @if($item->product->thumbnailImage())
@@ -68,6 +79,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             @empty
                 <div class="flex flex-col items-center py-16 text-center">
                     <p class="text-5xl" aria-hidden="true">🛒</p>

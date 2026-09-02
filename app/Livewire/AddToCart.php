@@ -32,9 +32,14 @@ final class AddToCart extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load(['variants' => fn ($q) => $q
-            ->where('is_active', true)
-            ->orderBy('id'), 'brand', 'media']);
+        $this->product = $product->load([
+            'variants' => fn ($q) => $q
+                ->where('is_active', true)
+                ->orderBy('id'),
+            'variants.attributeValues.attribute',
+            'brand',
+            'media',
+        ]);
 
         if ($product->variants->isNotEmpty()) {
             $this->variantId = $product->variants->first()->id;
@@ -131,11 +136,38 @@ final class AddToCart extends Component
             ? (float) ($variant->price_override !== null ? $this->product->compare_at_price ?? 0 : 0)
             : (float) ($this->product->compare_at_price ?? 0);
 
+        // Prepare variant data with color info for the UI
+        $variantsWithColor = $this->product->variants->map(function ($v) {
+            // Check if variant has a color attribute value
+            $colorHex = null;
+            $colorName = null;
+
+            if ($v->relationLoaded('attributeValues')) {
+                foreach ($v->attributeValues as $attrValue) {
+                    if ($attrValue->attribute?->type === 'color' && $attrValue->color_hex) {
+                        $colorHex = $attrValue->color_hex;
+                        $colorName = $attrValue->value;
+                        break;
+                    }
+                }
+            }
+
+            return [
+                'id' => $v->id,
+                'name' => $v->name,
+                'stock' => $v->stock,
+                'is_active' => $v->is_active,
+                'color_hex' => $colorHex,
+                'color_name' => $colorName,
+            ];
+        });
+
         return view('livewire.add-to-cart', [
             'variant' => $variant,
             'stock' => $stock,
             'price' => $price,
             'compareAt' => $compareAt,
+            'variantsWithColor' => $variantsWithColor,
         ]);
     }
 }
