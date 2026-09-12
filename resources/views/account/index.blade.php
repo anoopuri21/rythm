@@ -294,10 +294,17 @@
                         <h3 class="font-semibold text-ink">Track an order</h3>
                         <p class="mt-2 text-sm leading-6 text-muted">View the latest recorded order status securely.</p>
                     </a>
-                    <a href="/returns" class="ui-card ui-card--interactive p-6">
-                        <h3 class="font-semibold text-ink">Return or refund help</h3>
-                        <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
-                    </a>
+                    @if($returnsHelpHref = \App\Support\PublicContent::pageHref('returns'))
+                        <a href="{{ $returnsHelpHref }}" class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Return or refund help</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
+                        </a>
+                    @elseif(\App\Support\PublicContent::returnsEnabled())
+                        <a href="{{ route('contact') }}" class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Return or refund help</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Contact support about an eligible return from your order page.</p>
+                        </a>
+                    @endif
                 </div>
             </section>
 

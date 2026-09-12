@@ -35,6 +35,7 @@ use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
+use App\Observers\PageObserver;
 use App\Observers\ProductHomepageObserver;
 use App\Policies\AuditPolicy;
 use App\Policies\CataloguePolicy;
@@ -103,7 +104,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Product::observe(ProductHomepageObserver::class);
-
+        Page::observe(PageObserver::class);
 
         foreach ([
             Product::class,

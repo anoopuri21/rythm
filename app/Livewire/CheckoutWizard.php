@@ -343,7 +343,15 @@ final class CheckoutWizard extends Component
 
     private function taxFor(float $discountedSubtotal, SiteSettingsService $settings): float
     {
+        // Match OrderService: tax is never applied until the client enables rules.
+        if ($settings->get('tax_rules_enabled', '0') !== '1') {
+            return 0.0;
+        }
+
         $rate = $settings->getFloat('tax_rate', 0.0);
+        if ($rate <= 0.0) {
+            return 0.0;
+        }
 
         return round($discountedSubtotal * ($rate / 100), 2);
     }

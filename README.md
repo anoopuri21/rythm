@@ -99,11 +99,28 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 
 ## Project docs
 
-- `docs/AGENT_RULES_STRICT.md` — non-negotiable rules (tech, images, content, workflow)
-- `docs/architecture/00-project-architecture-overview.md` — architecture + roadmap
+### Always-read (AI + humans — start here)
+
+| File | Purpose |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Layers, domain, services, routes |
+| [`docs/RULES.md`](docs/RULES.md) | Binding product/tech/security/AI rules |
+| [`docs/PHASES.md`](docs/PHASES.md) | Delivery status 0–18 + launch gates |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Tokens, UI patterns, a11y |
+| [`docs/MEMORY.md`](docs/MEMORY.md) | Living session brain — update every change |
+| [`docs/PRD.md`](docs/PRD.md) | Full product requirements (single-brand ecommerce) |
+| [`docs/PRODUCTION_PRIORITY_PLAN.md`](docs/PRODUCTION_PRIORITY_PLAN.md) | Current production priorities W1–W5 |
+| [`docs/CLIENT_HANDOVER_DETAILS.md`](docs/CLIENT_HANDOVER_DETAILS.md) | Optional client-filled settings/policies |
+| [`docs/RAZORPAY_SETUP_GUIDE.md`](docs/RAZORPAY_SETUP_GUIDE.md) | Razorpay test → live setup |
+
+### Deeper reference
+
+- `docs/architecture-overview.md` — current-state inventory
+- `docs/architecture/*` — commerce / design-system deep dives
 - `docs/WINDOWS_SETUP.md` — Windows clone→run guide
-- `docs/NEXT_SESSION_CONTEXT.md` — agent handover context
-- `tasks/tasks.json` — task board (source of truth)
+- `tasks/MASTER_PROJECT_TRACKER.md` — delivery authority
+- `tasks/CANONICAL_PHASE_SEQUENCE.md` — phase sequence
+- `tasks/tasks.json` — legacy task board
 
 ## Roadmap (tasks/tasks.json)
 

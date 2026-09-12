@@ -84,24 +84,54 @@
                 </nav>
             @endif
 
-            {{-- Customer care — dynamic pages --}}
+            {{-- Customer care — only link policies the client has published --}}
+            @php
+                $careLinks = collect([
+                    ['href' => '/contact', 'label' => 'Contact us', 'always' => true],
+                    ['slug' => 'shipping', 'label' => 'Shipping'],
+                    ['slug' => 'returns', 'label' => 'Returns'],
+                    ['slug' => 'warranty', 'label' => 'Warranty'],
+                    ['slug' => 'faqs', 'label' => 'FAQs'],
+                ])->map(function (array $link): ?array {
+                    if (! empty($link['always'])) {
+                        return ['href' => $link['href'], 'label' => $link['label']];
+                    }
+                    $href = \App\Support\PublicContent::pageHref((string) ($link['slug'] ?? ''));
+
+                    return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                })->filter()->values();
+            @endphp
             <nav aria-labelledby="footer-care">
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
-                    <li><span class="text-sm text-white/45">Policy information is published after approval.</span></li>
+                    @foreach($careLinks as $link)
+                        <li><a href="{{ $link['href'] }}" class="footer-link text-sm text-white/60">{{ $link['label'] }}</a></li>
+                    @endforeach
                 </ul>
             </nav>
 
-            {{-- Company --}}
-            <nav aria-labelledby="footer-company">
-                <h3 id="footer-company" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Company</h3>
-                <ul class="mt-6 space-y-3.5">
-                    <li><a href="/about" class="footer-link text-sm text-white/60">Our story</a></li>
-                    <li><a href="/terms" class="footer-link text-sm text-white/60">Terms &amp; conditions</a></li>
-                    <li><a href="/privacy" class="footer-link text-sm text-white/60">Privacy policy</a></li>
-                </ul>
-            </nav>
+            {{-- Company — hide unpublished CMS pages --}}
+            @php
+                $companyLinks = collect([
+                    ['slug' => 'about', 'label' => 'Our story'],
+                    ['slug' => 'terms', 'label' => 'Terms & conditions'],
+                    ['slug' => 'privacy', 'label' => 'Privacy policy'],
+                ])->map(function (array $link): ?array {
+                    $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                    return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                })->filter()->values();
+            @endphp
+            @if($companyLinks->isNotEmpty())
+                <nav aria-labelledby="footer-company">
+                    <h3 id="footer-company" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Company</h3>
+                    <ul class="mt-6 space-y-3.5">
+                        @foreach($companyLinks as $link)
+                            <li><a href="{{ $link['href'] }}" class="footer-link text-sm text-white/60">{{ $link['label'] }}</a></li>
+                        @endforeach
+                    </ul>
+                </nav>
+            @endif
 
             {{-- Help --}}
             <nav aria-labelledby="footer-help">

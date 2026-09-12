@@ -136,10 +136,21 @@
                             <span class="text-[11px] font-semibold leading-tight text-ink">Gateway payment options</span>
                         </div>
                     </div>
+                    @php
+                        $policyLinks = collect([
+                            ['slug' => 'shipping', 'label' => 'Shipping information'],
+                            ['slug' => 'returns', 'label' => 'Returns and refund requests'],
+                            ['slug' => 'privacy', 'label' => 'Payment and privacy safety'],
+                        ])->map(function (array $link): ?array {
+                            $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                            return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                        })->filter()->values();
+                    @endphp
                     <nav class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted" aria-label="Purchase policies">
-                        <a href="/shipping" class="underline underline-offset-4 hover:text-brand">Shipping information</a>
-                        <a href="/returns" class="underline underline-offset-4 hover:text-brand">Returns and refund requests</a>
-                        <a href="/privacy" class="underline underline-offset-4 hover:text-brand">Payment and privacy safety</a>
+                        @foreach($policyLinks as $link)
+                            <a href="{{ $link['href'] }}" class="underline underline-offset-4 hover:text-brand">{{ $link['label'] }}</a>
+                        @endforeach
                         <a href="{{ route('orders.lookup') }}" class="underline underline-offset-4 hover:text-brand">Track an order</a>
                     </nav>
                 </div>
@@ -205,7 +216,9 @@
                             <p class="section-kicker mb-3">Buying with confidence</p>
                             <h2 id="product-faq-title" class="text-2xl font-bold text-ink sm:text-3xl">Frequently asked questions</h2>
                         </div>
-                        <a href="/faqs" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                        @if($faqsPageHref = \App\Support\PublicContent::pageHref('faqs'))
+                            <a href="{{ $faqsPageHref }}" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                        @endif
                     </div>
                     <div class="divide-y divide-ink/10">
                         @foreach($productFaqs as $faq)

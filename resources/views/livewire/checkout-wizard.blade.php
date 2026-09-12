@@ -207,12 +207,25 @@
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Payment details are handled by the configured gateway; order totals are verified by the application.
                         </p>
-                        <nav class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted" aria-label="Checkout policies">
-                            <a href="/shipping" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Shipping</a>
-                            <a href="/returns" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Returns &amp; refunds</a>
-                            <a href="/terms" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Terms</a>
-                            <a href="/privacy" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Privacy</a>
-                        </nav>
+                        @php
+                            $checkoutPolicyLinks = collect([
+                                ['slug' => 'shipping', 'label' => 'Shipping'],
+                                ['slug' => 'returns', 'label' => 'Returns & refunds'],
+                                ['slug' => 'terms', 'label' => 'Terms'],
+                                ['slug' => 'privacy', 'label' => 'Privacy'],
+                            ])->map(function (array $link): ?array {
+                                $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                                return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                            })->filter()->values();
+                        @endphp
+                        @if($checkoutPolicyLinks->isNotEmpty())
+                            <nav class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted" aria-label="Checkout policies">
+                                @foreach($checkoutPolicyLinks as $link)
+                                    <a href="{{ $link['href'] }}" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">{{ $link['label'] }}</a>
+                                @endforeach
+                            </nav>
+                        @endif
                     </div>
                 </section>
             @endif
@@ -275,10 +288,17 @@
                             <dd class="font-semibold text-brand">−₹{{ number_format($couponDiscount) }}</dd>
                         </div>
                     @endif
-                    <div class="flex items-center justify-between">
-                        <dt class="text-ink/70">Shipping</dt>
-                        <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
-                    </div>
+                    @if($shippingFee > 0)
+                        <div class="flex items-center justify-between">
+                            <dt class="text-ink/70">Shipping</dt>
+                            <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
+                        </div>
+                    @else
+                        <div class="flex items-center justify-between">
+                            <dt class="text-ink/70">Shipping</dt>
+                            <dd class="font-semibold text-ink">Free</dd>
+                        </div>
+                    @endif
                     @if($tax > 0)
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Tax</dt>

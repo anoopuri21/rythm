@@ -22,11 +22,13 @@ final class SiteSettingsService
         'tax_rate' => '0',           // optional approved default rate
         'returns_enabled' => '0',    // disabled until an approved business policy is configured
         'return_window_days' => '0', // no eligibility window is assumed
-        'contact_email' => 'support@rythme.store',
-        'contact_phone' => '+91 98765 43210',
+        // Contact stays empty until the client saves real values in Admin → Settings.
+        // Empty values must not render on the storefront (top bar / WhatsApp float).
+        'contact_email' => '',
+        'contact_phone' => '',
         'whatsapp_number' => '',
-        'whatsapp_message' => 'Hi Rhythm Exports! I have a question about your instruments.',
-        'address_line' => '42, Music Lane, Karol Bagh, New Delhi 110005',
+        'whatsapp_message' => '',
+        'address_line' => '',
         // Social links stay empty until an admin saves a real profile URL,
         // so no placeholder icon is ever shown in the top bar.
         'social_instagram' => '',
