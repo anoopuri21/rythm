@@ -61,9 +61,14 @@ class AdminStorefrontAuthIsolationTest extends TestCase
     {
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
 
-        // Authenticated only on admin guard — storefront middleware uses web.
-        $this->actingAsAdmin($admin)
-            ->get(route('account.index'))
+        // Staff on admin guard only; default guard remains web (empty).
+        $this->actingAsAdmin($admin);
+
+        $this->assertTrue(Auth::guard('admin')->check());
+        $this->assertFalse(Auth::guard('web')->check());
+        $this->assertSame('web', Auth::getDefaultDriver());
+
+        $this->get(route('account.index'))
             ->assertRedirect(route('login'));
     }
 
