@@ -16,14 +16,25 @@
 
     @if($items->isEmpty())
         <div class="mt-10 flex flex-col items-center rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-24 text-center">
-            <p class="text-6xl" aria-hidden="true">🎸</p>
+            <p class="text-6xl" aria-hidden="true">🛒</p>
             <h2 class="mt-6 font-playfair text-2xl font-bold text-ink">Your cart is empty</h2>
             <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
-                Every great sound starts somewhere. Explore the collection and find your instrument.
+                Add instruments from the shop to review quantities and continue to checkout. Guest carts are kept until you log in; checkout requires an account.
             </p>
-            <a href="{{ route('shop.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
-                Start shopping <span aria-hidden="true">→</span>
-            </a>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                    Browse the shop <span aria-hidden="true">→</span>
+                </a>
+                @auth
+                    <a href="{{ route('wishlist.index') }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-7 py-3 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        Open wishlist
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full border border-ink/15 px-7 py-3 text-sm font-semibold text-ink transition hover:border-brand hover:text-brand">
+                        Sign in
+                    </a>
+                @endauth
+            </div>
         </div>
     @else
         <div class="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-12">
@@ -120,8 +131,9 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Shipping and tax</dt>
-                            <dd class="font-semibold text-ink">Calculated at checkout</dd>
+                            <dd class="font-semibold text-ink">At checkout</dd>
                         </div>
+                        <p class="text-[11px] leading-4 text-muted">Final shipping and tax follow store settings. Zero or disabled tax is not shown as a charge.</p>
                         <div class="flex items-center justify-between border-t border-ink/10 pt-3.5">
                             <dt class="font-bold text-ink">Cart subtotal</dt>
                             <dd class="text-2xl font-bold text-ink">₹{{ number_format($totals['subtotal']) }}</dd>
@@ -133,10 +145,18 @@
                         Prices, availability and final totals are rechecked at checkout.
                     </p>
 
-                    <a href="{{ route('checkout.index') }}"
-                       class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
-                        Proceed to checkout
-                    </a>
+                    @auth
+                        <a href="{{ route('checkout.index') }}"
+                           class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
+                            Proceed to checkout
+                        </a>
+                    @else
+                        <a href="{{ route('login', ['intended' => route('checkout.index')]) }}"
+                           class="mt-6 block w-full rounded-full bg-brand py-4 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
+                            Sign in to checkout
+                        </a>
+                        <p class="mt-2 text-center text-[11px] text-muted">Your cart stays with this browser; after login it merges into your account.</p>
+                    @endauth
 
                     <div class="mt-6 grid grid-cols-3 gap-3 border-t border-ink/10 pt-5 text-center">
                         <div class="flex flex-col items-center gap-1">

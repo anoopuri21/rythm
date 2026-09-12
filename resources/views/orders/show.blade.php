@@ -42,13 +42,19 @@
             @endif
 
             @if(auth()->check() && auth()->id() === $order->user_id && $order->status === 'pending' && in_array($order->payment_status, ['unpaid', 'failed'], true))
-                <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-6">
-                    @csrf
-                    <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
-                        Retry payment
-                    </button>
-                    <p class="mt-2 text-xs text-muted">A maximum of three payment attempts is allowed. Completed payments cannot be retried.</p>
-                </form>
+                <div class="mt-6 rounded-2xl border border-brand/20 bg-brand/5 p-5">
+                    <p class="text-sm font-semibold text-ink">Payment not completed</p>
+                    <p class="mt-1 text-xs leading-5 text-muted">
+                        No charge is final until the gateway confirms payment. You can retry a limited number of times. If the window does not open, check your connection and try again.
+                    </p>
+                    <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-4">
+                        @csrf
+                        <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
+                            Retry payment
+                        </button>
+                    </form>
+                    <p class="mt-2 text-xs text-muted">Maximum three attempts. Paid orders cannot be retried.</p>
+                </div>
             @endif
 
             {{-- Cancel (owner, pending/confirmed) --}}

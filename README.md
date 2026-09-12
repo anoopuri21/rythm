@@ -113,6 +113,7 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 | [`docs/CLIENT_HANDOVER_DETAILS.md`](docs/CLIENT_HANDOVER_DETAILS.md) | Optional client-filled settings/policies |
 | [`docs/RAZORPAY_SETUP_GUIDE.md`](docs/RAZORPAY_SETUP_GUIDE.md) | Razorpay test → live setup |
 | [`docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`](docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md) | Staff: publish products flowlessly |
+| [`docs/BUY_PATH_SMOKE_CHECKLIST.md`](docs/BUY_PATH_SMOKE_CHECKLIST.md) | Cart → pay smoke checklist |
 
 ### Deeper reference
 

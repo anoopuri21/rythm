@@ -14,37 +14,45 @@
 
     @if($products->isEmpty())
         <div class="mt-10 flex flex-col items-center rounded-3xl border border-dashed border-ink/15 bg-white px-6 py-24 text-center">
-            <p class="text-6xl" aria-hidden="true">💛</p>
-            <h2 class="mt-6 font-playfair text-2xl font-bold text-ink">Nothing saved yet</h2>
+            <p class="text-6xl" aria-hidden="true">♡</p>
+            <h2 class="mt-6 font-playfair text-2xl font-bold text-ink">Your wishlist is empty</h2>
             <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
-                Tap the heart on any instrument you love and it will wait for you here.
+                Save products with the heart icon while browsing. Wishlist requires a signed-in account. Move items to cart when you are ready to buy (options are chosen on the product page).
             </p>
             <a href="{{ route('shop.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
                 Browse the shop <span aria-hidden="true">→</span>
             </a>
         </div>
     @else
-        <p class="mt-6 text-sm text-muted">{{ $products->count() }} {{ Str::plural('instrument', $products->count()) }} saved</p>
+        <p class="mt-6 text-sm text-muted">{{ $products->count() }} {{ Str::plural('product', $products->count()) }} saved · wishlist is product-level (pick a variant on the product page before checkout)</p>
 
         <div class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3">
             @foreach($products as $product)
+                @php
+                    $canBuy = method_exists($product, 'hasAvailableStock')
+                        ? $product->hasAvailableStock()
+                        : ((int) $product->stock > 0 && $product->is_active);
+                @endphp
                 <article class="group flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:shadow-[0_24px_50px_rgba(10,10,10,0.12)] sm:p-4" wire:key="wl-product-{{ $product->id }}">
                     <div class="relative aspect-square overflow-hidden rounded-xl bg-paper-dark">
                         @if($product->thumbnailImage())
                             <img src="{{ $product->thumbnailImage() }}" alt="{{ $product->name }}" class="h-full w-full object-contain transition duration-700 group-hover:scale-105" loading="lazy">
                         @else
                             <div class="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-paper-dark via-paper to-paper-dark p-6 text-center">
-                                <svg class="h-10 w-10 text-brand/25" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" /></svg>
+                                <svg class="h-10 w-10 text-brand/25" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" /></svg>
                                 <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-muted">{{ $product->brand?->name }}</p>
                             </div>
                         @endif
                         @if($product->discountPercent() > 0)
                             <span class="absolute left-3 top-3 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">{{ $product->discountPercent() }}% off</span>
                         @endif
+                        @unless($canBuy)
+                            <span class="absolute bottom-3 left-3 rounded-full bg-ink/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">Out of stock</span>
+                        @endunless
                         <button type="button" wire:click="remove({{ $product->id }})"
                                 class="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-brand shadow-sm transition hover:bg-brand hover:text-white"
                                 aria-label="Remove {{ $product->name }} from wishlist">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
 
@@ -61,11 +69,18 @@
                                 <span class="text-xs text-muted line-through">₹{{ number_format((float) $product->compare_at_price) }}</span>
                             @endif
                         </div>
-                        <button type="button" wire:click="moveToCart({{ $product->id }})"
-                                class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-brand">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                            Move to cart
-                        </button>
+                        @if($canBuy)
+                            <button type="button" wire:click="moveToCart({{ $product->id }})"
+                                    class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-brand">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                Move to cart
+                            </button>
+                        @else
+                            <a href="{{ route('product.show', $product) }}"
+                               class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 py-2.5 text-xs font-bold uppercase tracking-wider text-ink transition hover:border-brand hover:text-brand">
+                                View product
+                            </a>
+                        @endif
                     </div>
                 </article>
             @endforeach

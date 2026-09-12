@@ -12,8 +12,14 @@ use Illuminate\View\View;
 
 final class LoginController extends Controller
 {
-    public function show(): View
+    public function show(\Illuminate\Http\Request $request): View
     {
+        // Allow cart/checkout CTAs to pass ?intended=/checkout so guests return after login.
+        $intended = $request->query('intended');
+        if (is_string($intended) && $intended !== '' && str_starts_with($intended, '/') && ! str_starts_with($intended, '//')) {
+            $request->session()->put('url.intended', $intended);
+        }
+
         return view('auth.login');
     }
 

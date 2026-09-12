@@ -84,8 +84,8 @@
                 <div class="flex flex-col items-center py-16 text-center">
                     <p class="text-5xl" aria-hidden="true">🛒</p>
                     <h3 class="mt-5 font-playfair text-xl font-bold text-ink">Your cart is empty</h3>
-                    <p class="mt-2 max-w-[240px] text-sm text-muted">Fill it with something that makes a sound you love.</p>
-                    <a href="/shop" @click="$wire.close()" class="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                    <p class="mt-2 max-w-[260px] text-sm leading-6 text-muted">Add a product from the shop, then return here to check totals and checkout.</p>
+                    <a href="{{ route('shop.index') }}" @click="$wire.close()" class="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
                         Browse the shop
                     </a>
                 </div>
@@ -103,9 +103,15 @@
                 <a href="{{ route('cart.index') }}" class="mb-2.5 block w-full rounded-full bg-ink py-3.5 text-center text-sm font-bold text-white transition hover:bg-ink-soft">
                     View full cart
                 </a>
-                <a href="{{ route('checkout.index') }}" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
-                    Proceed to checkout
-                </a>
+                @auth
+                    <a href="{{ route('checkout.index') }}" @click="$wire.close()" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
+                        Proceed to checkout
+                    </a>
+                @else
+                    <a href="{{ route('login', ['intended' => route('checkout.index')]) }}" @click="$wire.close()" class="block w-full rounded-full bg-brand py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark">
+                        Sign in to checkout
+                    </a>
+                @endauth
             </div>
         @endif
     </div>

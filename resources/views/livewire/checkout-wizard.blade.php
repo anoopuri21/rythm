@@ -168,44 +168,48 @@
                             <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Payment
                         </h2>
-                        <p class="mt-2 text-sm text-muted">
-                            @if($razorpayConfigured)
-                                You will be redirected to Razorpay's secure checkout (UPI, cards, netbanking, wallets).
-                            @else
-                                Test mode — no payment gateway keys are configured, so payment is simulated.
-                            @endif
-                        </p>
+                        <p class="mt-2 text-sm text-muted">{{ $paymentMessage }}</p>
 
-                        {{-- Razorpay script (only when configured) --}}
                         @if($razorpayConfigured)
                             <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('services.razorpay.key_id') }}" defer></script>
-                        @endif
-
-                        @if($razorpayConfigured)
                             <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                The payment methods available for this order will be displayed by Razorpay.
+                                Methods shown in the payment window come from Razorpay for this order amount.
+                            </p>
+                        @elseif($paymentMode === 'fake')
+                            <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950" role="status">
+                                Development simulation only — not for customer or staging go-live. Production must set real keys and keep <code class="text-xs">RAZORPAY_ALLOW_FAKE_PAYMENTS=false</code>.
                             </p>
                         @else
-                            <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                Local test mode uses the fake gateway and does not create a real charge.
+                            <p class="mt-6 rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm font-semibold text-brand" role="alert">
+                                Checkout is paused until payment keys are configured. Your address selection is kept; nothing has been charged.
                             </p>
                         @endif
 
-                        <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
-                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-                                aria-label="Pay ₹{{ number_format($grandTotal) }}">
+                        <button type="button"
+                                wire:click="placeOrder"
+                                wire:loading.attr="disabled"
+                                wire:target="placeOrder,confirmPayment"
+                                @disabled(! $paymentCanCheckout)
+                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition disabled:cursor-not-allowed disabled:opacity-50 {{ $paymentCanCheckout ? 'bg-brand hover:bg-brand-dark' : 'bg-ink/40' }}"
+                                aria-label="{{ $payButtonLabel }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
-                                Pay ₹{{ number_format($grandTotal) }} securely
+                                {{ $payButtonLabel }}
                             </span>
                             <span wire:loading wire:target="placeOrder,confirmPayment" class="inline-flex items-center gap-2">
-                                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                                 Processing…
                             </span>
                         </button>
 
+                        @if($paymentError)
+                            <p class="mt-4 text-center text-xs text-muted">
+                                If payment failed, you can try again here, or open the order later and use <strong class="font-semibold text-ink">Retry payment</strong> (limited attempts).
+                            </p>
+                        @endif
+
                         <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Payment details are handled by the configured gateway; order totals are verified by the application.
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            Order totals are calculated on the server. Card/UPI details never touch this store’s servers.
                         </p>
                         @php
                             $checkoutPolicyLinks = collect([

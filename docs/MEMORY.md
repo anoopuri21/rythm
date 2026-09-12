@@ -79,6 +79,22 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — C4 buy-path smoothness (W2)
+- Change-id: `c4-buy-path`
+- Trigger: owner-ask
+- Scope paths: `PaymentAvailability.php`, `CheckoutWizard.php`, cart/wishlist/checkout/order views, `LoginController.php`, `BuyPathSmoothnessTest.php`, `BUY_PATH_SMOKE_CHECKLIST.md`
+- Type tags: [x] code [x] test [x] commerce [x] docs-only
+- Checklist:
+  - [x] A1–A2 scoped C4
+  - [x] A3–A5 payment guard via PaymentAvailability + resolve()
+  - [x] A6 tests authored (run on PHP host)
+  - [x] A9–A10 no live keys
+  - [x] A11 next = C5 demo purge
+  - [x] A14 plan board updated
+  - [x] A15 owner summary
+- Status: COMPLETE (code)
+- Notes: Wishlist remains product-level (documented in UI). Fake pay only local/tests.
+
 ### 2026-09-12 — Fix PublicContent nav test + C3 admin upload flowless
 - Change-id: `c1-nav-fix-c3-upload`
 - Trigger: owner-ask (failing test + start C3)
@@ -343,7 +359,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 **Production priority programme:** `docs/PRODUCTION_PRIORITY_PLAN.md` (W1–W5).  
 **Client optional details:** `docs/CLIENT_HANDOVER_DETAILS.md` — empty/OFF = hidden, no blockers.  
 **Razorpay owner guide:** `docs/RAZORPAY_SETUP_GUIDE.md`.  
-**Eng chunks:** C1+C2 pushed · C3 admin upload **code landed** (nav about fix) → **next C4** buy-path → C5 no-demo. Run `PublicContentVisibilityTest`, `VariantDepthTest`, `AdminProductUploadFlowTest`.
+**Eng chunks:** C1–C4 code complete → **next C5** demo/placeholder purge. Run `PublicContentVisibilityTest`, `VariantDepthTest`, `AdminProductUploadFlowTest`, `BuyPathSmoothnessTest`.
 
 ---
 

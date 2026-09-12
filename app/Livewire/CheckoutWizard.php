@@ -13,6 +13,7 @@ use App\Services\CartService;
 use App\Services\CouponService;
 use App\Services\OrderService;
 use App\Services\SiteSettingsService;
+use App\Support\PaymentAvailability;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -191,6 +192,10 @@ final class CheckoutWizard extends Component
                 throw new RuntimeException('Please choose a delivery address.');
             }
 
+            if (! PaymentAvailability::canCheckout()) {
+                throw new RuntimeException(PaymentAvailability::customerMessage());
+            }
+
             // Fail closed before creating/reserving an order when no approved
             // payment gateway is available for this environment.
             $gateway = RazorpayGateway::resolve();
@@ -226,8 +231,11 @@ final class CheckoutWizard extends Component
 
             $this->gatewayOrderId = $gatewayOrderId;
 
-            // Fake gateway (no keys configured) — simulate immediate success.
+            // Allowed fake gateway only (local/tests) — simulate immediate success.
             if (! RazorpayGateway::isConfigured()) {
+                if (! PaymentAvailability::fakeAllowed()) {
+                    throw new RuntimeException(PaymentAvailability::customerMessage());
+                }
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
             } else {
                 $this->dispatch('razorpay-open', options: [
@@ -318,14 +326,20 @@ final class CheckoutWizard extends Component
         $shippingFee = $this->shippingFeeFor($totals['subtotal'], $settings);
         $tax = $this->taxFor($discounted, $settings);
 
+        $grandTotal = round($discounted + $shippingFee + $tax, 2);
+
         return view('livewire.checkout-wizard', [
             'addresses' => $addresses->forUser(auth()->id()),
             'cartItems' => $cartItems,
             'totals' => $totals,
             'shippingFee' => $shippingFee,
             'tax' => $tax,
-            'grandTotal' => round($discounted + $shippingFee + $tax, 2),
-            'razorpayConfigured' => RazorpayGateway::isConfigured(),
+            'grandTotal' => $grandTotal,
+            'razorpayConfigured' => PaymentAvailability::razorpayConfigured(),
+            'paymentCanCheckout' => PaymentAvailability::canCheckout(),
+            'paymentMode' => PaymentAvailability::mode(),
+            'paymentMessage' => PaymentAvailability::customerMessage(),
+            'payButtonLabel' => PaymentAvailability::payButtonLabel($grandTotal),
         ]);
     }
 
