@@ -114,7 +114,9 @@
                                   aria-label="{{ $reviewSummary['avg'] }} out of 5 stars">
                                 {{ number_format($reviewSummary['avg'], 1) }} <span aria-hidden="true">★</span>
                             </span>
-                            <a href="#customer-reviews" class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand">
+                            <a href="#customer-reviews"
+                               class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand"
+                               onclick="document.getElementById('tab-reviews')?.click()">
                                 {{ $reviewSummary['count'] }} verified {{ Str::plural('review', $reviewSummary['count']) }}
                             </a>
                         @else
@@ -160,33 +162,112 @@
                         @foreach($policyLinks as $link)
                             <a href="{{ $link['href'] }}" class="underline underline-offset-4 hover:text-brand">{{ $link['label'] }}</a>
                         @endforeach
-                        <a href="{{ route('orders.lookup') }}" class="underline underline-offset-4 hover:text-brand">Track an order</a>
                     </nav>
                 </div>
             </div>
 
-            {{-- ===== TABS: Description / Specs ===== --}}
-            <div class="mt-16" x-data="{ tab: 'description' }">
-                <div class="flex gap-2 border-b border-ink/10" role="tablist" aria-label="Product information">
-                    <button type="button" role="tab" :aria-selected="tab === 'description' ? 'true' : 'false'"
+            {{-- ===== TABS: Description / Specs / Reviews ===== --}}
+            @php
+                $hasDescription = filled(trim(strip_tags((string) $product->description)));
+                $defaultTab = $hasDescription ? 'description' : 'specs';
+            @endphp
+            <div class="mt-16"
+                 x-data="{
+                    tab: @js($defaultTab),
+                    descExpanded: false,
+                    descNeedsToggle: false,
+                    init() {
+                        if (window.location.hash === '#customer-reviews') {
+                            this.tab = 'reviews';
+                        }
+                        this.$nextTick(() => this.measureDescription());
+                    },
+                    measureDescription() {
+                        const el = this.$refs.descBody;
+                        if (!el) {
+                            this.descNeedsToggle = false;
+                            return;
+                        }
+                        // ~12rem clamp (~192px); only offer toggle when content overflows.
+                        this.descNeedsToggle = el.scrollHeight > 200;
+                    },
+                    openReviews() {
+                        this.tab = 'reviews';
+                    }
+                 }"
+                 @hashchange.window="if (window.location.hash === '#customer-reviews') tab = 'reviews'">
+                <div class="flex flex-wrap gap-2 border-b border-ink/10" role="tablist" aria-label="Product information">
+                    <button type="button" role="tab" id="tab-description"
+                            :aria-selected="tab === 'description' ? 'true' : 'false'"
+                            :tabindex="tab === 'description' ? 0 : -1"
                             @click="tab = 'description'"
-                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition {{ $product->description ? '' : 'pointer-events-none opacity-40' }}"
+                            @keydown.right.prevent="$refs.tabSpecs?.focus(); tab = 'specs'"
+                            x-ref="tabDescription"
+                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition {{ $hasDescription ? '' : 'pointer-events-none opacity-40' }}"
                             :class="tab === 'description' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
                         Description
                     </button>
-                    <button type="button" role="tab" :aria-selected="tab === 'specs' ? 'true' : 'false'"
+                    <button type="button" role="tab" id="tab-specs"
+                            :aria-selected="tab === 'specs' ? 'true' : 'false'"
+                            :tabindex="tab === 'specs' ? 0 : -1"
                             @click="tab = 'specs'"
+                            x-ref="tabSpecs"
                             class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition"
                             :class="tab === 'specs' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
                         Specifications
                     </button>
+                    <button type="button" role="tab" id="tab-reviews"
+                            :aria-selected="tab === 'reviews' ? 'true' : 'false'"
+                            :tabindex="tab === 'reviews' ? 0 : -1"
+                            @click="tab = 'reviews'"
+                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition"
+                            :class="tab === 'reviews' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
+                        Customer reviews
+                        @if(($reviewSummary['count'] ?? 0) > 0)
+                            <span class="ml-1 font-semibold text-muted">({{ $reviewSummary['count'] }})</span>
+                        @endif
+                    </button>
                 </div>
 
-                <div x-show="tab === 'description'" x-transition.opacity.duration.200 class="prose-sm max-w-3xl py-8 leading-7 text-ink/80">
-                    {!! $product->description !!}
+                {{-- Description (show more / less when long) --}}
+                <div x-show="tab === 'description'"
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-description"
+                     class="max-w-3xl py-8">
+                    @if($hasDescription)
+                        <div class="relative">
+                            <div x-ref="descBody"
+                                 class="prose-sm leading-7 text-ink/80 overflow-hidden transition-[max-height] duration-300"
+                                 :class="descNeedsToggle && !descExpanded ? 'max-h-48' : ''"
+                                 :style="descNeedsToggle && !descExpanded ? 'max-height: 12rem' : null">
+                                {!! $product->description !!}
+                            </div>
+                            <div x-show="descNeedsToggle && !descExpanded"
+                                 x-cloak
+                                 class="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-paper to-transparent"
+                                 aria-hidden="true"></div>
+                        </div>
+                        <button type="button"
+                                x-show="descNeedsToggle"
+                                x-cloak
+                                class="mt-4 text-sm font-bold text-brand underline underline-offset-4 hover:text-brand-dark"
+                                @click="descExpanded = !descExpanded"
+                                :aria-expanded="descExpanded ? 'true' : 'false'">
+                            <span x-text="descExpanded ? 'Show less' : 'Show more'"></span>
+                        </button>
+                    @else
+                        <p class="text-sm text-muted">No description has been published for this product yet.</p>
+                    @endif
                 </div>
 
-                <div x-show="tab === 'specs'" x-cloak x-transition.opacity.duration.200 class="max-w-3xl py-8">
+                {{-- Specifications --}}
+                <div x-show="tab === 'specs'"
+                     x-cloak
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-specs"
+                     class="max-w-3xl py-8">
                     <dl class="divide-y divide-ink/10 rounded-2xl border border-ink/10 bg-white">
                         <div class="flex items-center justify-between gap-6 px-6 py-4">
                             <dt class="text-sm text-muted">SKU</dt>
@@ -210,10 +291,17 @@
                         </div>
                     </dl>
                 </div>
-            </div>
 
-            {{-- ===== VERIFIED REVIEWS ===== --}}
-            <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
+                {{-- Customer reviews (Livewire stays mounted via x-show, not x-if) --}}
+                <div x-show="tab === 'reviews'"
+                     x-cloak
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-reviews"
+                     class="py-8">
+                    <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
+                </div>
+            </div>
 
             @if($productFaqs->isNotEmpty())
                 <section class="mt-16 max-w-4xl" aria-labelledby="product-faq-title">

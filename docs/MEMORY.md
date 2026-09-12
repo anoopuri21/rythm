@@ -79,6 +79,14 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — PDP tabs (reviews) + description toggle + track-order placement
+- Change-id: `pdp-tabs-track`
+- Trigger: owner-ask
+- Scope: product/show tabs, review-section chrome, footer track link, AccountController hasTrackableOrder
+- Out of scope: review rules, /track-order route itself, order show tracking timeline
+- Status: COMPLETE (code)
+- Plan: `docs/C_PDP_TABS_TRACK_PLAN.md`
+
 ### 2026-09-12 — Remove Product Q&A end-to-end
 - Change-id: `remove-product-qa`
 - Trigger: owner-ask (PDP Q&A not needed)

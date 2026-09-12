@@ -137,10 +137,10 @@
             <nav aria-labelledby="footer-help">
                 <h3 id="footer-help" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Help</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/track-order" class="footer-link text-sm text-white/60">Track your order</a></li>
-                    <li><a href="/cart" class="footer-link text-sm text-white/60">View cart</a></li>
-                    <li><a href="/wishlist" class="footer-link text-sm text-white/60">Wishlist</a></li>
-                    <li><a href="/login" class="footer-link text-sm text-white/60">My account</a></li>
+                    {{-- Track order is only surfaced from an order detail page / account when a confirmed order exists. --}}
+                    <li><a href="{{ route('cart.index') }}" class="footer-link text-sm text-white/60">View cart</a></li>
+                    <li><a href="{{ route('wishlist.index') }}" class="footer-link text-sm text-white/60">Wishlist</a></li>
+                    <li><a href="{{ route('login') }}" class="footer-link text-sm text-white/60">My account</a></li>
                 </ul>
             </nav>
         </div>

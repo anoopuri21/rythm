@@ -290,10 +290,15 @@
                         <h3 class="font-semibold text-ink">Contact the team</h3>
                         <p class="mt-2 text-sm leading-6 text-muted">Send a product, account or service question.</p>
                     </a>
-                    <a href="{{ route('orders.lookup') }}" class="ui-card ui-card--interactive p-6">
-                        <h3 class="font-semibold text-ink">Track an order</h3>
-                        <p class="mt-2 text-sm leading-6 text-muted">View the latest recorded order status securely.</p>
-                    </a>
+                    @if(! empty($hasTrackableOrder))
+                        {{-- Only after a confirmed (or later) order exists — open account orders, not a cold lookup from marketing chrome. --}}
+                        <a href="#account-panel-orders"
+                           @click.prevent="tab = 'orders'; window.location.hash = 'orders'"
+                           class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Track an order</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Open your orders to see status and shipment tracking on each order page.</p>
+                        </a>
+                    @endif
                     @if($returnsHelpHref = \App\Support\PublicContent::pageHref('returns'))
                         <a href="{{ $returnsHelpHref }}" class="ui-card ui-card--interactive p-6">
                             <h3 class="font-semibold text-ink">Return or refund help</h3>

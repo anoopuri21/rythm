@@ -51,7 +51,9 @@ class PublicContentVisibilityTest extends TestCase
             ->assertDontSee('href="/shipping"', false)
             ->assertDontSee('href="/returns"', false)
             ->assertDontSee('href="/faqs"', false)
-            ->assertSee(route('orders.lookup'), false);
+            // Track order is not a product-page CTA (order detail / account only).
+            ->assertDontSee(route('orders.lookup'), false)
+            ->assertDontSee('Track an order', false);
     }
 
     public function test_footer_and_nav_omit_inactive_company_links_when_missing(): void

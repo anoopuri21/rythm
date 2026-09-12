@@ -37,13 +37,27 @@ final class AccountController extends Controller
             ->where('user_id', $user->id)
             ->pending();
 
+        $ordersQuery = Order::query()
+            ->where('user_id', $user->id)
+            ->withCount('items')
+            ->orderByDesc('placed_at')
+            ->orderByDesc('id');
+
+        // Track CTA only when the customer already has a confirmed (or later) order.
+        $trackableStatuses = [
+            Order::STATUS_CONFIRMED,
+            Order::STATUS_PROCESSING,
+            Order::STATUS_SHIPPED,
+            Order::STATUS_DELIVERED,
+        ];
+        $hasTrackableOrder = Order::query()
+            ->where('user_id', $user->id)
+            ->whereIn('status', $trackableStatuses)
+            ->exists();
+
         return view('account.index', [
-            'orders' => Order::query()
-                ->where('user_id', $user->id)
-                ->withCount('items')
-                ->orderByDesc('placed_at')
-                ->orderByDesc('id')
-                ->paginate(10),
+            'orders' => $ordersQuery->paginate(10),
+            'hasTrackableOrder' => $hasTrackableOrder,
             'wishlistCount' => $wishlists->countFor($user->id),
             'addresses' => $addresses->forUser($user->id),
             'stockAlertCount' => (clone $stockAlertQuery)->count(),
