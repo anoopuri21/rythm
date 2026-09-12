@@ -83,6 +83,18 @@ class AdminOpsTest extends TestCase
         $this->actingAs($this->admin)->get('/admin')->assertOk();
     }
 
+    public function test_latest_orders_widget_query_eager_loads_user(): void
+    {
+        // Regression: preventLazyLoading + $record->user on dashboard crashed without with('user').
+        $source = file_get_contents(base_path('app/Filament/Widgets/LatestOrdersWidget.php'));
+        $this->assertNotFalse($source);
+        $this->assertStringContainsString("with(['user:id,name'])", $source);
+
+        $orderSource = file_get_contents(base_path('app/Filament/Resources/OrderResource.php'));
+        $this->assertNotFalse($orderSource);
+        $this->assertStringContainsString("with(['user:id,name'])", $orderSource);
+    }
+
     public function test_stats_widget_computes_revenue(): void
     {
         Order::factory()->create([

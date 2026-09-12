@@ -403,6 +403,12 @@ class OrderResource extends Resource
             });
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        // Customer name column + view header use $record->user; preventLazyLoading is enabled.
+        return parent::getEloquentQuery()->with(['user:id,name']);
+    }
+
     public static function getRelations(): array
     {
         return [];
