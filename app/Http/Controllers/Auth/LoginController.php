@@ -25,9 +25,11 @@ final class LoginController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->validated();
+        // Only email + password are auth credentials. `remember` is a checkbox flag —
+        // if it is left inside validated() Auth::attempt treats it as a users.remember column.
+        $credentials = $request->safe()->only(['email', 'password']);
 
-        if (! Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email', 'remember'))
                 ->withErrors(['email' => 'These credentials do not match our records.']);
