@@ -85,17 +85,15 @@ test('Phase 11 stock requests require verified consent and a bounded command', (
 
 test('Phase 12 customer writes have scoped abuse limits', () => {
   const review = read('app/Livewire/ReviewSection.php');
-  const question = read('app/Livewire/ProductQuestionSection.php');
   const routes = read('routes/web.php');
 
-  for (const component of [review, question]) {
-    assert.match(component, /use Illuminate\\Support\\Facades\\RateLimiter/);
-    assert.match(component, /RateLimiter::tooManyAttempts/);
-    assert.match(component, /RateLimiter::hit\(\$key, 60\)/);
-    assert.match(component, /Too many (review|question) attempts/);
-    assert.match(component, /user:\'\.auth\(\)->id\(\)/);
-    assert.match(component, /product:\'\.\$this->product->getKey\(\)/);
-  }
+  // Product Q&A removed — rate limits apply to verified reviews only.
+  assert.match(review, /use Illuminate\\Support\\Facades\\RateLimiter/);
+  assert.match(review, /RateLimiter::tooManyAttempts/);
+  assert.match(review, /RateLimiter::hit\(\$key, 60\)/);
+  assert.match(review, /Too many review attempts/);
+  assert.match(review, /user:\'\.auth\(\)->id\(\)/);
+  assert.match(review, /product:\'\.\$this->product->getKey\(\)/);
 
   for (const route of [
     /account\/profile[\s\S]{0,140}throttle:10,1/,

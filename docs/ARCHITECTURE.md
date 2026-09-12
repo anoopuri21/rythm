@@ -86,7 +86,7 @@ tasks/                  phase tracker, plans, evidence (delivery authority)
 | **Inventory** | InventoryMovement ledger | **`InventoryService` only** |
 | **Fulfillment** | Shipment, ShipmentItem, ShipmentEvent | `FulfillmentService` → sync via OrderService |
 | **Returns** | ReturnRequest*, ReturnReason | `ReturnRequestService` |
-| **Customer** | User, Wishlist, Review, ProductQuestion, Contact, Newsletter, BackInStock | respective services |
+| **Customer** | User, Wishlist, Review, Contact, Newsletter, BackInStock | respective services |
 | **Notify** | CommerceEvent, NotificationDelivery, Preference | CommerceNotification* services |
 | **Content** | Homepage*, HeroSlide, Faq, Page, SeoEntry, SiteSetting | Homepage/Seo/Settings services |
 | **Admin gov** | AdminAuditLog, staff roles on User | `AdminAuditService` + policies |
@@ -139,7 +139,7 @@ Admin: Filament `/admin` only (no public REST admin API).
 
 ## 7. Service catalogue (call these, not controllers)
 
-`CartService` · `WishlistService` · `AddressService` · `CouponService` · `OrderService` · `OrderStateMachine` · `InventoryService` · `ProductQueryService` · `CategoryService` · `BrandService` · `PaymentEventService` · `PaymentRetryService` · `RefundService` · `FulfillmentService` · `ReturnRequestService` · `CommerceNotificationService` · `NotificationRetryService` · `NotificationReconciliationService` · `NotificationPreferenceService` · `HomepageDataService` · `SeoService` · `SiteSettingsService` · `ReviewService` · `ProductQuestionService` · `ContactService` · `CatalogueAcquisitionService` · `CatalogueImportService` · `CataloguePublicationReviewService` · `ImportedProductActivationService` · `CatalogueExpansionManifestService` · `AdminAuditService` · `BackInStockSubscriptionService` · `FinancialReconciliationService`
+`CartService` · `WishlistService` · `AddressService` · `CouponService` · `OrderService` · `OrderStateMachine` · `InventoryService` · `ProductQueryService` · `CategoryService` · `BrandService` · `PaymentEventService` · `PaymentRetryService` · `RefundService` · `FulfillmentService` · `ReturnRequestService` · `CommerceNotificationService` · `NotificationRetryService` · `NotificationReconciliationService` · `NotificationPreferenceService` · `HomepageDataService` · `SeoService` · `SiteSettingsService` · `ReviewService` · `ContactService` · `CatalogueAcquisitionService` · `CatalogueImportService` · `CataloguePublicationReviewService` · `ImportedProductActivationService` · `CatalogueExpansionManifestService` · `AdminAuditService` · `BackInStockSubscriptionService` · `FinancialReconciliationService`
 
 ---
 

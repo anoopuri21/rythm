@@ -109,11 +109,6 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return $this->hasMany(Review::class);
     }
 
-    public function productQuestions(): HasMany
-    {
-        return $this->hasMany(ProductQuestion::class);
-    }
-
     public function inventoryMovements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class, 'actor_id');

@@ -19,7 +19,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
-use App\Models\ProductQuestion;
+
 use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
@@ -82,7 +82,6 @@ final class AdminAccess
         NotificationDelivery::class => ['view' => self::NOTIFICATIONS_VIEW, 'manage' => self::NOTIFICATIONS_VIEW],
         User::class => ['view' => self::CUSTOMERS_VIEW, 'manage' => self::STAFF_MANAGE],
         Review::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
-        ProductQuestion::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         ContactMessage::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         Coupon::class => ['view' => self::MARKETING_MANAGE, 'manage' => self::MARKETING_MANAGE],
         NewsletterSubscriber::class => ['view' => self::MARKETING_MANAGE, 'manage' => self::MARKETING_MANAGE],

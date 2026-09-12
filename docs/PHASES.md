@@ -33,7 +33,7 @@
 | **2** | MySQL schema + domain architecture | COMPLETE |
 | **3** | Homepage + Shop frontend qualification | COMPLETE |
 | **4** | Accounts, cart, wishlist, checkout, orders | COMPLETE |
-| **5** | Reviews, product Q&A, coupons | COMPLETE |
+| **5** | Reviews, coupons (product Q&A later **removed**) | COMPLETE |
 | **6** | Catalogue acquisition/import pipeline | COMPLETE |
 | **6A** | Multi-category catalogue + HP/Shop expansion | COMPLETE |
 | **7** | Admin RBAC, staff, auditability | COMPLETE |

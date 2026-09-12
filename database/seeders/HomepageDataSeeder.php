@@ -52,11 +52,11 @@ class HomepageDataSeeder extends Seeder
             ['section_key' => 'usp', 'title' => 'Protected checkout', 'content' => 'Payment state and inventory transitions are verified on the server.', 'sort_order' => 2],
             ['section_key' => 'usp', 'title' => 'Order tracking', 'content' => 'Customers can follow recorded order-status updates through protected access.', 'sort_order' => 3],
             ['section_key' => 'usp', 'title' => 'Verified reviews', 'content' => 'Only paid, delivered purchases can submit moderated reviews.', 'sort_order' => 4],
-            ['section_key' => 'usp', 'title' => 'Product Q&A', 'content' => 'Customer questions and staff answers are moderated before publication.', 'sort_order' => 5],
+            ['section_key' => 'usp', 'title' => 'Verified reviews', 'content' => 'Verified-purchase reviews are moderated before they appear on product pages.', 'sort_order' => 5],
             // ── Capability labels (no unsupported business metrics) ──
             ['section_key' => 'number', 'title' => 'Curated', 'content' => 'Instrument catalogue', 'sort_order' => 0],
             ['section_key' => 'number', 'title' => 'Verified', 'content' => 'Checkout totals', 'sort_order' => 1],
-            ['section_key' => 'number', 'title' => 'Moderated', 'content' => 'Reviews and Q&A', 'sort_order' => 2],
+            ['section_key' => 'number', 'title' => 'Moderated', 'content' => 'Verified reviews', 'sort_order' => 2],
             ['section_key' => 'number', 'title' => 'Protected', 'content' => 'Order tracking', 'sort_order' => 3],
             // ── Stories ──
             ['section_key' => 'story', 'title' => 'First guitar, right way', 'content' => 'How to choose your first acoustic without breaking the bank.', 'sort_order' => 0],
@@ -67,7 +67,7 @@ class HomepageDataSeeder extends Seeder
             // ── Verified platform rows ──
             ['section_key' => 'comparison', 'title' => 'Current catalogue pricing', 'subtitle' => 'Server-derived', 'content' => 'Rythme', 'sort_order' => 0],
             ['section_key' => 'comparison', 'title' => 'Verified-purchase reviews', 'subtitle' => 'Moderated', 'content' => 'Rythme', 'sort_order' => 1],
-            ['section_key' => 'comparison', 'title' => 'Product questions', 'subtitle' => 'Staff answers', 'content' => 'Rythme', 'sort_order' => 2],
+            ['section_key' => 'comparison', 'title' => 'Verified-purchase reviews', 'subtitle' => 'Moderated', 'content' => 'Rythme', 'sort_order' => 2],
             ['section_key' => 'comparison', 'title' => 'Protected order tracking', 'subtitle' => 'Signed or account access', 'content' => 'Rythme', 'sort_order' => 3],
             // ── Promos (3 big banners — reference style) ──
             ['section_key' => 'promo', 'title' => 'Enjoy studio-grade sound', 'subtitle' => 'Pro audio, simplified', 'content' => '/category/pro-audio', 'sort_order' => 0],
@@ -87,7 +87,7 @@ class HomepageDataSeeder extends Seeder
     {
         $faqs = [
             ['question' => 'How are shipping charges calculated?', 'answer' => 'Any configured shipping charge is calculated from server settings and shown during checkout before payment.'],
-            ['question' => 'How can I ask about an instrument?', 'answer' => 'Signed-in customers can submit a product question. Staff answers appear only after moderation and approval.'],
+            ['question' => 'How can I ask about an instrument?', 'answer' => 'Use the contact form or the product support link on the product page. The store team replies when available.'],
             ['question' => 'Who can submit a product review?', 'answer' => 'A customer with a paid, delivered order containing the product can submit one review for moderation.'],
             ['question' => 'Which payment methods can I use?', 'answer' => 'The configured payment provider shows the methods available for the specific checkout attempt.'],
             ['question' => 'How do I check warranty information?', 'answer' => 'Review product or manufacturer documentation and contact the store with the order number for product-specific assistance.'],

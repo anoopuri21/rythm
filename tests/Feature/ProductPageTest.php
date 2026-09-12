@@ -34,7 +34,7 @@ class ProductPageTest extends TestCase
             ->assertSee('Add to Cart')
             ->assertSee($product->sku)
             ->assertSee('Shipping at checkout')
-            ->assertSee('Questions &amp; answers', escape: false)
+            ->assertDontSee('Questions &amp; answers', escape: false)
             ->assertDontSee('1-Year Warranty')
             ->assertDontSee('4.8')
             ->assertSee('You may also like');

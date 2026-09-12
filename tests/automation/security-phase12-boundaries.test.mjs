@@ -12,7 +12,6 @@ const checkoutWizard = read('app/Livewire/CheckoutWizard.php');
 const wishlistButton = read('app/Livewire/WishlistButton.php');
 const wishlistPage = read('app/Livewire/WishlistPage.php');
 const reviewSection = read('app/Livewire/ReviewSection.php');
-const questionSection = read('app/Livewire/ProductQuestionSection.php');
 const addToCart = read('app/Livewire/AddToCart.php');
 const orderController = read('app/Http/Controllers/OrderController.php');
 const notificationController = read('app/Http/Controllers/NotificationController.php');
@@ -45,7 +44,6 @@ await test('customer Livewire writes resolve the authenticated user before mutat
     assert.match(wishlistButton, /if \(\$user === null\) \{\s*\$this->redirect\(route\('login'\)\)/);
     assert.match(wishlistPage, /public function moveToCart[\s\S]*?\$user === null[\s\S]*?redirect\(route\('login'\)\)/);
     assert.match(reviewSection, /public function submit[\s\S]*?auth\(\)->guest\(\)[\s\S]*?guardRateLimit/);
-    assert.match(questionSection, /public function submit[\s\S]*?auth\(\)->guest\(\)[\s\S]*?guardRateLimit/);
     assert.match(addToCart, /requestStockNotification[\s\S]*?! \$user instanceof User/);
 });
 

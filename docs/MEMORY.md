@@ -79,6 +79,15 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — Remove Product Q&A end-to-end
+- Change-id: `remove-product-qa`
+- Trigger: owner-ask (PDP Q&A not needed)
+- Scope: PDP Livewire, Filament ProductQuestionResource, model/service, relations, AdminAccess, audit observer, drop migration, tests/automation, about/seed copy
+- Out of scope: Reviews, FAQ CMS, contact, checkout
+- Type tags: [x] code [x] test [x] storefront [x] admin [x] docs-only
+- Status: COMPLETE (code)
+- Notes: `php artisan migrate` drops `product_questions`. Plan: `docs/C_REMOVE_PRODUCT_QA_PLAN.md`.
+
 ### 2026-09-12 — C6 Razorpay test checkout (owner keys on prod domain)
 - Change-id: `c6-razorpay-test`
 - Trigger: owner-ask (real account, test mode, keys not generated, prod host)

@@ -34,22 +34,22 @@ class PageSeeder extends Seeder
                 'slug' => 'about',
                 'title' => 'About Rhythm Exports',
                 'template' => 'about',
-                'content' => '<p>Rhythm Exports is a musical-instrument storefront for browsing catalogue information, managing a customer account and placing orders.</p><p>The application provides server-verified checkout totals, protected order access, verified-purchase reviews and moderated product questions.</p>',
+                'content' => '<p>Rhythm Exports is a musical-instrument storefront for browsing catalogue information, managing a customer account and placing orders.</p><p>The application provides server-verified checkout totals, protected order access and moderated verified-purchase reviews.</p>',
                 'settings' => [
                     'hero_kicker' => 'Our story',
                     'stats' => [
                         ['value' => 'Curated', 'label' => 'Instrument catalogue'],
                         ['value' => 'Verified', 'label' => 'Checkout totals'],
-                        ['value' => 'Moderated', 'label' => 'Reviews & Q&A'],
+                        ['value' => 'Moderated', 'label' => 'Verified reviews'],
                         ['value' => 'Protected', 'label' => 'Order tracking'],
                     ],
                     'promise_kicker' => 'Our promise',
                     'promise_heading' => 'A clearer way to explore musical instruments',
-                    'promise_text' => 'Rhythm Exports presents catalogue details, availability and checkout totals through the storefront. Product questions and verified-purchase reviews are moderated before they appear publicly.',
+                    'promise_text' => 'Rhythm Exports presents catalogue details, availability and checkout totals through the storefront. Verified-purchase reviews are moderated before they appear publicly.',
                     'promise_points' => [
                         'Category, brand, price and specification filters',
                         'Server-verified checkout totals',
-                        'Moderated product questions and staff answers',
+                        'Moderated verified-purchase reviews',
                         'Protected order tracking and invoice access',
                     ],
                     'cta_label' => 'Explore the collection',
@@ -60,7 +60,7 @@ class PageSeeder extends Seeder
                     'values' => [
                         ['icon' => '🎸', 'title' => 'Honest catalogue', 'text' => 'Specifications, availability and pricing are presented exactly as recorded — no inflated claims.'],
                         ['icon' => '🛡️', 'title' => 'Protected orders', 'text' => 'Order tracking, invoices and returns stay behind protected, verified access.'],
-                        ['icon' => '💬', 'title' => 'Real answers', 'text' => 'Product questions and reviews are moderated so shoppers see genuine, useful information.'],
+                        ['icon' => '💬', 'title' => 'Real answers', 'text' => 'Verified-purchase reviews are moderated so shoppers see genuine, useful information.'],
                     ],
                 ],
                 'seo' => [
@@ -145,11 +145,11 @@ class PageSeeder extends Seeder
                 'slug' => 'faqs',
                 'title' => 'Frequently Asked Questions',
                 'template' => 'generic',
-                'content' => '<h2>How are shipping charges shown?</h2><p>Any configured shipping charge is calculated and displayed during checkout.</p><h2>Which payment methods are available?</h2><p>The configured payment provider displays the methods available for the specific checkout attempt.</p><h2>How can I ask about a product?</h2><p>Signed-in customers can submit a product question. Approved staff answers are published after moderation.</p><h2>How can I track an order?</h2><p>Use the protected account order page or the signed guest tracking journey.</p>',
+                'content' => '<h2>How are shipping charges shown?</h2><p>Any configured shipping charge is calculated and displayed during checkout.</p><h2>Which payment methods are available?</h2><p>The configured payment provider displays the methods available for the specific checkout attempt.</p><h2>How can I ask about a product?</h2><p>Use the contact form or the product support link on the product page. The store team replies when available.</p><h2>How can I track an order?</h2><p>Use the protected account order page or the signed guest tracking journey.</p>',
                 'seo' => [
                     'meta_title' => 'FAQs — Rhythm Exports',
-                    'meta_description' => 'Answers about checkout totals, payment options, product questions and protected order tracking.',
-                    'meta_keywords' => 'faq, help, shipping, payment, product questions, order tracking',
+                    'meta_description' => 'Answers about checkout totals, payment options, reviews and protected order tracking.',
+                    'meta_keywords' => 'faq, help, shipping, payment, reviews, order tracking',
                 ],
             ],
             [

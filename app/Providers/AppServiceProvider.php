@@ -26,7 +26,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
-use App\Models\ProductQuestion;
+
 use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
@@ -85,7 +85,6 @@ class AppServiceProvider extends ServiceProvider
             Order::class => OrderPolicy::class,
             User::class => CustomerPolicy::class,
             Review::class => InteractionPolicy::class,
-            ProductQuestion::class => InteractionPolicy::class,
             ContactMessage::class => InteractionPolicy::class,
             Coupon::class => MarketingPolicy::class,
             NewsletterSubscriber::class => MarketingPolicy::class,
@@ -126,7 +125,6 @@ class AppServiceProvider extends ServiceProvider
             SiteSetting::class,
             User::class,
             Review::class,
-            ProductQuestion::class,
             ProductMerchandisingRule::class,
             ContactMessage::class,
         ] as $auditedModel) {

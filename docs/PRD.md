@@ -307,7 +307,7 @@ Architecture is a **modular monolith**: one deployable Laravel app with clear la
 | `User` | Customer or staff (role field); MFA for staff |
 | `Wishlist` | Unique user↔product |
 | `Review` | Moderated, verified-purchase gated public ratings |
-| `ProductQuestion` | Moderated Q&A |
+| ~~`ProductQuestion`~~ | **Removed** — storefront/admin product Q&A retired; use Contact for product help |
 | `ContactMessage` | Support intake (not RMA) |
 | `NewsletterSubscriber` | Marketing opt-in |
 | `BackInStockSubscription` | Explicit-consent stock alerts (ops gated) |
@@ -400,7 +400,7 @@ Architecture is a **modular monolith**: one deployable Laravel app with clear la
 | ID | Requirement | Priority |
 |---|---|---|
 | TR-01 | Reviews: verified purchase, moderation, rating aggregate | P0 |
-| TR-02 | Product Q&A moderated | P1 |
+| TR-02 | ~~Product Q&A moderated~~ **REMOVED** (contact + reviews remain) | — |
 | TR-03 | Contact form throttled + honeypot patterns where applicable | P0 |
 | TR-04 | Newsletter subscribe throttled | P0 |
 | TR-05 | Back-in-stock explicit consent; notify only when ops command scheduled | P1 |
@@ -646,7 +646,7 @@ Rules:
 | `ReturnRequestService` | RMA lifecycle |
 | `CommerceNotificationService` + retry/reconcile/preferences | Notification pipeline |
 | `HomepageDataService` / `SeoService` / `SiteSettingsService` | Content & config |
-| `ReviewService` / `ProductQuestionService` / `ContactService` | Engagement |
+| `ReviewService` / `ContactService` | Engagement |
 | `Catalogue* / ImportedProductActivationService` | Import → review → activate |
 | `AdminAuditService` | Audit writes |
 | `BackInStockSubscriptionService` | Stock alert subscriptions |

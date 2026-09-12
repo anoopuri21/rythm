@@ -215,9 +215,6 @@
             {{-- ===== VERIFIED REVIEWS ===== --}}
             <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
 
-            {{-- ===== PRODUCT Q&A ===== --}}
-            <livewire:product-question-section :product="$product" :key="'questions-' . $product->id" />
-
             @if($productFaqs->isNotEmpty())
                 <section class="mt-16 max-w-4xl" aria-labelledby="product-faq-title">
                     <div class="mb-6 flex items-end justify-between gap-4">
