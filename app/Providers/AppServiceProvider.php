@@ -6,10 +6,12 @@ namespace App\Providers;
 
 use App\Events\BackInStockNotificationRequested;
 use App\Events\CommerceNotificationRequested;
+use App\Listeners\ApplyConfiguredMailFrom;
 use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Listeners\MarkNotificationDeliveryFailed;
 use App\Listeners\MarkNotificationDeliverySent;
+use App\Services\MailSenderSettingsService;
 use App\Models\AdminAuditLog;
 use App\Models\Brand;
 use App\Models\Category;
@@ -54,6 +56,7 @@ use App\Services\CategoryService;
 use App\Support\AdminAccess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
@@ -169,5 +172,15 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
         Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
         Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);
+        Event::listen(MessageSending::class, ApplyConfiguredMailFrom::class);
+
+        // Prefer verified Admin → Settings sender over bare MAIL_FROM_* when set.
+        try {
+            $mailSender = app(MailSenderSettingsService::class);
+            $mailSender->captureBootstrapFrom();
+            $mailSender->applyToConfig();
+        } catch (\Throwable) {
+            // Settings table may not exist during early migrate.
+        }
     }
 }

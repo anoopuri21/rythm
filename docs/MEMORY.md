@@ -79,6 +79,19 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — Admin Settings: verifiable outbound sender email
+- Change-id: `admin-mail-from-settings`
+- Trigger: owner-ask (sender email from admin Settings, must verify)
+- Scope paths: `MailSenderSettingsService`, `SiteSettingsService` keys, Filament Settings section, `VerifyMailFromAddressMail`, `MailFromVerifyController`, `ApplyConfiguredMailFrom`, route `mail-from.verify`, `tests/Feature/MailSenderSettingsTest.php`
+- Type tags: [x] code [x] test [x] admin [x] docs-only
+- Checklist:
+  - [x] Live From only after signed mailbox confirm (24h)
+  - [x] Clear → fall back to env `MAIL_FROM_*` (bootstrap captured once)
+  - [x] SMTP remains `.env` only
+  - [x] Resend verification header action when pending
+- Status: COMPLETE (code)
+- Notes: Host should run `php artisan test --filter=MailSenderSettings`
+
 ### 2026-09-12 — Admin vs storefront auth isolation
 - Change-id: `admin-web-guard-isolation`
 - Trigger: owner-ask (admin login leaking into website account)
@@ -328,6 +341,7 @@ Work may be reported **done** to the owner only when:
 | **Order transitions** | `OrderService` + `OrderStateMachine` | 2026-09-12 |
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
+| **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
 | **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)

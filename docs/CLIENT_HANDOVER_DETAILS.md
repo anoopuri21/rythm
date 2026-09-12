@@ -34,8 +34,11 @@ Path: **Admin panel → Settings** (name may show as “Settings”).
 | Address line | `Address line` | empty | Hide address block |
 | WhatsApp number / message | WhatsApp fields | empty | Hide WhatsApp button |
 | Instagram / YouTube / Facebook / X / LinkedIn | Social URL fields | empty | Hide that icon only |
+| Outbound sender email + display name | `Sender email address` / `Sender display name` | empty or not yet verified | Customer mail uses server `.env` `MAIL_FROM_*` until the mailbox confirms a signed link (24h) |
 
 **You decide when to turn tax/returns ON** — usually after CA/lawyer approval.
+
+**Outbound sender:** enter a real mailbox you control → Save → open the verification email on that inbox → only then does the store send From that address. SMTP still lives in `.env` (not Admin).
 
 ---
 
@@ -127,6 +130,7 @@ The site must run, accept configuration later, and sell when **you** put product
 - [ ] Staff admin login + MFA working  
 - [ ] Settings: contact methods I want public  
 - [ ] Settings: shipping/tax/returns left OFF until approved **or** filled correctly  
+- [ ] Settings: outbound sender email verified (or leave blank to use server MAIL_FROM)  
 - [ ] Categories + brands created  
 - [ ] First real products + images (+ variants if needed)  
 - [ ] Razorpay **test** keys on staging  
