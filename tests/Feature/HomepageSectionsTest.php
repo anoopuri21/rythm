@@ -182,7 +182,9 @@ class HomepageSectionsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('brand-mm', escape: false);
+            ->assertSee('brand-mm', escape: false)
+            ->assertSee('brand-swiper', escape: false)
+            ->assertSee('brand-card', escape: false);
     }
 
     public function test_homepage_has_self_canonical_and_index_policy(): void

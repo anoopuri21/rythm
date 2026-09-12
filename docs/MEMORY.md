@@ -79,6 +79,13 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — Homepage Popular Brands slider
+- Change-id: `homepage-brands-slider`
+- Trigger: owner-ask (list → scroll/slide, professional, fully responsive)
+- Scope: `_brands.blade.php`, brand-mm CSS, `carousels.js` brand Swiper, `HomepageDataService::popularBrands` (+ logos/counts), BrandObserver flush, built assets
+- Status: COMPLETE (code)
+- Notes: Logo tiles when Admin uploads brand logo; monogram fallback; arrows ≥768px; swipe peek mobile
+
 ### 2026-09-12 — Admin Settings: verifiable outbound sender email
 - Change-id: `admin-mail-from-settings`
 - Trigger: owner-ask (sender email from admin Settings, must verify)
