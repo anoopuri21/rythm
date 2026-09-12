@@ -115,6 +115,8 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 | [`docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`](docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md) | Staff: publish products flowlessly |
 | [`docs/BUY_PATH_SMOKE_CHECKLIST.md`](docs/BUY_PATH_SMOKE_CHECKLIST.md) | Cart → pay smoke checklist |
 | [`docs/SEED_DATA_POLICY.md`](docs/SEED_DATA_POLICY.md) | Never seed production; demo catalogue is local-only |
+| [`docs/C6_RAZORPAY_TEST_CHECKOUT.md`](docs/C6_RAZORPAY_TEST_CHECKOUT.md) | Owner: Test keys on real domain + full pay smoke |
+| `php artisan razorpay:verify` | Config readiness (no secrets printed); add `--ping` for API auth |
 
 ### Deeper reference
 

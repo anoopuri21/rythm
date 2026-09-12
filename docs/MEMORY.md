@@ -79,6 +79,21 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — C6 Razorpay test checkout (owner keys on prod domain)
+- Change-id: `c6-razorpay-test`
+- Trigger: owner-ask (real account, test mode, keys not generated, prod host)
+- Scope paths: `VerifyRazorpayConfig.php`, `docs/C6_RAZORPAY_TEST_CHECKOUT.md`, `RazorpayVerifyCommandTest.php`
+- Type tags: [x] code [x] test [x] docs-only [x] commerce
+- Checklist:
+  - [x] A1–A2 C6 scoped — test keys only, no live
+  - [x] A3 verify command (no secret echo)
+  - [x] A6 tests for command
+  - [x] A9–A10 no keys in repo
+  - [ ] A11 owner: generate keys → .env → webhook → smoke (owner host)
+  - [x] A14 plan board C6 IN PROGRESS
+- Status: OWNER ACTION REQUIRED (code+docs ready)
+- Notes: Live = C7 only. Never paste secrets in chat.
+
 ### 2026-09-12 — C4 checkout stock message fix + C5 demo purge (W4)
 - Change-id: `c4-stock-fix-c5-purge`
 - Trigger: owner-ask (CheckoutTest fail + C5 start)
@@ -374,7 +389,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 **Production priority programme:** `docs/PRODUCTION_PRIORITY_PLAN.md` (W1–W5).  
 **Client optional details:** `docs/CLIENT_HANDOVER_DETAILS.md` — empty/OFF = hidden, no blockers.  
 **Razorpay owner guide:** `docs/RAZORPAY_SETUP_GUIDE.md`.  
-**Eng chunks:** C1–C5 code complete → **next C6/C7 owner-only** (live pay). Run `CheckoutTest` (stock OOS), `BuyPathSmoothnessTest`, `DemoContentPurgeTest`, `AboutContactTest`, `AdminOpsTest`.
+**Eng chunks:** C1–C5 complete · **C6** code+runbook ready — owner puts `rzp_test_` keys on prod `.env`, runs `php artisan razorpay:verify --ping`, full smoke. **C7 live blocked**. Run `RazorpayVerifyCommandTest` + prior suite on PHP host.
 
 ---
 

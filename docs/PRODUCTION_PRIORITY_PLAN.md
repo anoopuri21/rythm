@@ -211,6 +211,8 @@ Parallel OK: C1 ∥ early C2 docs; C3 after C2 solid.
 | C3 Admin upload flowless | **COMPLETE (code)** | `docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md` |
 | C4 Buy-path smoothness | **COMPLETE (code)** | `docs/BUY_PATH_SMOKE_CHECKLIST.md` · `PaymentAvailability` |
 | C5 Demo/placeholder purge | **COMPLETE (code)** | `docs/SEED_DATA_POLICY.md` · `DemoContentPurgeTest` |
+| C6 Razorpay test on domain | **IN PROGRESS (owner)** | `docs/C6_RAZORPAY_TEST_CHECKOUT.md` · `php artisan razorpay:verify` |
+| C7 Live keys | **BLOCKED** | Explicit owner go-live only |
 
 Update this table when chunks merge; mirror summary in `MEMORY.md`.
 

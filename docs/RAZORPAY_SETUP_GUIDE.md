@@ -17,6 +17,10 @@
 
 ## B. Test mode setup (do this first)
 
+**Production domain + Test keys is OK and recommended** before Live (C6).  
+Detailed owner checklist: **`docs/C6_RAZORPAY_TEST_CHECKOUT.md`**.  
+Server check (no secrets printed): `php artisan razorpay:verify` and `php artisan razorpay:verify --ping`.
+
 ### Step 1 — Open Test mode
 
 1. Log in to Razorpay Dashboard.  
