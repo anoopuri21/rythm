@@ -110,16 +110,16 @@ class AdminGovernanceTest extends TestCase
     public function test_direct_admin_routes_hide_unassigned_modules(): void
     {
         $catalogue = $this->staff(User::ROLE_CATALOGUE_MANAGER);
-        $this->actingAs($catalogue)->get('/admin/products')->assertOk();
-        $this->actingAs($catalogue)->get('/admin/orders')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/settings')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/admin-audit-logs')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/staff')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/products')->assertOk();
+        $this->actingAsAdmin($catalogue)->get('/admin/orders')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/settings')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/admin-audit-logs')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/staff')->assertForbidden();
 
         $superAdmin = $this->staff(User::ROLE_SUPER_ADMIN);
-        $this->actingAs($superAdmin)->get('/admin/admin-audit-logs')->assertOk();
-        $this->actingAs($superAdmin)->get('/admin/staff')->assertOk();
-        $this->actingAs($superAdmin)->get('/admin/settings')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/admin-audit-logs')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/staff')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/settings')->assertOk();
     }
 
     public function test_final_super_admin_cannot_be_demoted(): void
@@ -170,7 +170,7 @@ class AdminGovernanceTest extends TestCase
     {
         $actor = $this->staff(User::ROLE_SUPER_ADMIN);
         $product = Product::factory()->create(['price' => 100, 'stock' => 4]);
-        $this->actingAs($actor);
+        $this->actingAsAdmin($actor);
 
         $product->update(['price' => 120, 'stock' => 3, 'name' => 'Audited product name']);
         $audit = AdminAuditLog::sole();

@@ -88,7 +88,7 @@ class HomepageCategoryRowAdminTest extends TestCase
     {
         $marketing = User::factory()->create(['role' => User::ROLE_MARKETING]);
 
-        $this->actingAs($marketing)
+        $this->actingAsAdmin($marketing)
             ->get('/admin/homepage-category-rows')
             ->assertOk()
             ->assertSee('Category rows');

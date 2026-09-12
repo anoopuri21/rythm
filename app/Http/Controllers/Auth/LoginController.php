@@ -29,7 +29,8 @@ final class LoginController extends Controller
         // if it is left inside validated() Auth::attempt treats it as a users.remember column.
         $credentials = $request->safe()->only(['email', 'password']);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Explicit web guard — never touch the Filament admin session.
+        if (! Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email', 'remember'))
                 ->withErrors(['email' => 'These credentials do not match our records.']);

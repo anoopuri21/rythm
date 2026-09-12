@@ -198,10 +198,10 @@ class FulfillmentDomainTest extends TestCase
         $support = User::factory()->create(['role' => User::ROLE_SUPPORT]);
         $catalogue = User::factory()->create(['role' => User::ROLE_CATALOGUE_MANAGER]);
 
-        $this->actingAs($support)->get('/admin/shipments')->assertOk();
-        $this->actingAs($support)->get('/admin/shipments/'.$shipment->id)->assertOk();
-        $this->actingAs($catalogue)->get('/admin/shipments')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/shipments/'.$shipment->id)->assertForbidden();
+        $this->actingAsAdmin($support)->get('/admin/shipments')->assertOk();
+        $this->actingAsAdmin($support)->get('/admin/shipments/'.$shipment->id)->assertOk();
+        $this->actingAsAdmin($catalogue)->get('/admin/shipments')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/shipments/'.$shipment->id)->assertForbidden();
     }
 
     private function deliver(Shipment $shipment, FulfillmentService $service, User $actor): Shipment

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -20,5 +22,14 @@ abstract class TestCase extends BaseTestCase
         $_ENV['APP_BASE_PATH'] = dirname(__DIR__);
 
         parent::setUp();
+    }
+
+    /**
+     * Authenticate as Filament staff on the isolated admin guard
+     * (does not set the storefront web guard).
+     */
+    protected function actingAsAdmin(Authenticatable $user): static
+    {
+        return $this->actingAs($user, 'admin');
     }
 }

@@ -245,12 +245,12 @@ class OrderTrackingTest extends TestCase
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
         $order = $this->makeOrder();
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/orders')
             ->assertOk()
             ->assertSee($order->order_number);
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/orders/'.$order->id)
             ->assertOk()
             ->assertSee('Status history');
@@ -263,7 +263,7 @@ class OrderTrackingTest extends TestCase
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
         $order = $this->makeOrder(Order::STATUS_CONFIRMED);
 
-        $this->actingAs($admin)->get('/admin/orders/'.$order->id)->assertOk();
+        $this->actingAsAdmin($admin)->get('/admin/orders/'.$order->id)->assertOk();
 
         // Service level change (resource action wraps this)
         app(OrderService::class)->changeStatus($order, Order::STATUS_PROCESSING);
@@ -274,7 +274,7 @@ class OrderTrackingTest extends TestCase
     {
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/orders/create')
             ->assertNotFound();
     }

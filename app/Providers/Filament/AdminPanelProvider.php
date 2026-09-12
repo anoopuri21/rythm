@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\LatestOrdersWidget;
 use App\Filament\Widgets\StatsOverviewWidget;
+use App\Http\Middleware\UseAdminAuthGuard;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,6 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            // Separate session guard from storefront "web" so /admin login
+            // does not authenticate /account, checkout, wishlist, etc.
+            ->authGuard('admin')
             ->login()
             ->profile()
             ->multiFactorAuthentication(
@@ -58,6 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                // Resolve auth() / policies against the admin guard for the whole panel.
+                UseAdminAuthGuard::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,

@@ -230,7 +230,7 @@ class ReviewTest extends TestCase
             'status' => Review::STATUS_PENDING,
         ]);
 
-        $this->actingAs($admin);
+        $this->actingAsAdmin($admin);
         $review->update([
             'status' => Review::STATUS_APPROVED,
             'merchant_reply' => 'Approved by the store team.',
@@ -250,7 +250,7 @@ class ReviewTest extends TestCase
         $product = Product::first();
         Review::create(['product_id' => $product->id, 'user_id' => $this->user->id, 'rating' => 5, 'comment' => 'Pending', 'is_approved' => false]);
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/reviews')
             ->assertOk()
             ->assertSee('Pending');

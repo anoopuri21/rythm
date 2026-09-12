@@ -27,7 +27,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_customers_resource_renders(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/customers')
             ->assertOk()
             ->assertSee('test@example.com');
@@ -42,7 +42,7 @@ class AdminOpsTest extends TestCase
             'status' => 'new',
         ]);
 
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/contact-messages')
             ->assertOk()
             ->assertSee('anoop@example.com')
@@ -66,7 +66,7 @@ class AdminOpsTest extends TestCase
     {
         NewsletterSubscriber::create(['email' => 'sub@example.com', 'subscribed_at' => now()]);
 
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/newsletter-subscribers')
             ->assertOk()
             ->assertSee('sub@example.com');
@@ -80,7 +80,7 @@ class AdminOpsTest extends TestCase
         $this->assertContains('StatsOverviewWidget', $widgets);
         $this->assertContains('LatestOrdersWidget', $widgets);
 
-        $this->actingAs($this->admin)->get('/admin')->assertOk();
+        $this->actingAsAdmin($this->admin)->get('/admin')->assertOk();
     }
 
     public function test_latest_orders_widget_query_eager_loads_user(): void
@@ -110,7 +110,7 @@ class AdminOpsTest extends TestCase
 
     public function test_settings_page_saves_and_caches(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/settings')
             ->assertOk()
             ->assertSee('Shipping flat fee');
@@ -138,7 +138,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_hero_slides_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/hero-slides')
             ->assertOk()
             ->assertSee('Premium gear.');
@@ -146,7 +146,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_homepage_blocks_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/homepage-blocks')
             ->assertOk()
             ->assertSee('Server-verified totals')
@@ -155,7 +155,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_faqs_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/faqs')
             ->assertOk()
             ->assertSee('How are shipping charges calculated?');
@@ -163,7 +163,7 @@ class AdminOpsTest extends TestCase
 
     public function test_products_show_trending_and_rank_columns(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/products')
             ->assertOk()
             ->assertSee('Trending')

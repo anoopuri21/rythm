@@ -70,7 +70,7 @@ class CatalogueImportTest extends TestCase
             'publication_reviewed_at' => null,
         ]);
         $this->get('/product/test-guitar')->assertNotFound();
-        $this->actingAs(User::factory()->admin()->create())
+        $this->actingAsAdmin(User::factory()->admin()->create())
             ->get('/admin/products')
             ->assertOk()
             ->assertSee('Test Guitar');
@@ -151,7 +151,7 @@ class CatalogueImportTest extends TestCase
         $product = Product::sole();
         $actor = User::factory()->create();
         $actor->forceFill(['role' => User::ROLE_CATALOGUE_MANAGER])->save();
-        $this->actingAs($actor);
+        $this->actingAsAdmin($actor);
 
         try {
             $product->update(['is_active' => true]);

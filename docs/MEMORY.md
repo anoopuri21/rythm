@@ -79,6 +79,15 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — Admin vs storefront auth isolation
+- Change-id: `admin-web-guard-isolation`
+- Trigger: owner-ask (admin login leaking into website account)
+- Finding: shared default `web` guard → admin session = storefront login
+- Fix: `auth` guard `admin` + Filament `authGuard('admin')` + `UseAdminAuthGuard`; storefront login/logout/register stay on `web`
+- Tests: `AdminStorefrontAuthIsolationTest`; admin feature tests `actingAsAdmin`
+- Plan: `docs/C_ADMIN_STOREFRONT_AUTH_ISOLATION_PLAN.md`
+- Status: COMPLETE (code)
+
 ### 2026-09-12 — PDP tabs (reviews) + description toggle + track-order placement
 - Change-id: `pdp-tabs-track`
 - Trigger: owner-ask

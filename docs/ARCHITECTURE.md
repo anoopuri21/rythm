@@ -16,7 +16,7 @@
 | PHP / Laravel | 8.3+ / **13.24.0** |
 | Storefront | Blade + Livewire 4 + Alpine + Tailwind 4 + Vite 7 |
 | Motion | GSAP · Lenis · Swiper · CountUp |
-| Admin | Filament panel `@ /admin` |
+| Admin | Filament panel `@ /admin` (auth guard `admin`, isolated from storefront `web`) |
 | Media | Spatie Media Library |
 | Pay | Razorpay via `PaymentGateway` + `FakePaymentGateway` |
 | DB | SQLite local/tests · **MySQL 8+ prod** |
