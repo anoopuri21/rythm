@@ -16,6 +16,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -103,36 +105,57 @@ class ProductResource extends Resource
                                     ->numeric()->minValue(0)->maxValue(100)->suffix('%'),
                             ]),
                         Section::make('Variants')
-                            ->description('Optional — finishes, sizes or configurations.')
+                            ->description('Optional sellable options — each row has its own price, stock, colour, specs and images. Leave empty for simple single-SKU products.')
                             ->collapsible()
                             ->schema([
                                 Repeater::make('variants')
                                     ->relationship()
                                     ->defaultItems(0)
                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
+                                    ->mutateRelationshipDataBeforeFillUsing(fn (array $data): array => self::expandVariantFormData($data))
+                                    ->mutateRelationshipDataBeforeCreateUsing(fn (array $data): array => self::collapseVariantFormData($data))
+                                    ->mutateRelationshipDataBeforeSaveUsing(fn (array $data): array => self::collapseVariantFormData($data))
                                     ->schema([
                                         Grid::make(6)->schema([
-                                            TextInput::make('name')->required()->label('Variant name'),
+                                            TextInput::make('name')->required()->label('Variant name')
+                                                ->helperText('e.g. Sunburst · 6-string'),
                                             TextInput::make('sku')->required()->unique(ignoreRecord: true),
                                             TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
-                                                ->label('Price override (optional)'),
-                                            TextInput::make('stock')->numeric()->default(0)->minValue(0),
+                                                ->label('Price override (optional)')
+                                                ->helperText('Blank = use product base price'),
+                                            TextInput::make('stock')->numeric()->default(0)->minValue(0)
+                                                ->helperText('Stock for this option only'),
                                             Toggle::make('is_active')->default(true),
+                                            TextInput::make('color_name')->label('Color name')
+                                                ->maxLength(80)
+                                                ->dehydrated(false)
+                                                ->helperText('Shown on storefront swatches'),
+                                            ColorPicker::make('color_hex')->label('Color swatch')
+                                                ->hex()
+                                                ->dehydrated(false),
+                                            KeyValue::make('specs')
+                                                ->label('Other specs')
+                                                ->keyLabel('Spec')
+                                                ->valueLabel('Value')
+                                                ->reorderable()
+                                                ->dehydrated(false)
+                                                ->helperText('e.g. Finish → Gloss, Scale → 25.5″ (optional)')
+                                                ->columnSpanFull(),
                                             SpatieMediaLibraryFileUpload::make('variant_images')
-                                                ->label('Variant Images')
+                                                ->label('Variant images')
                                                 ->collection('variant_gallery')
                                                 ->multiple()
                                                 ->image()
                                                 ->maxFiles(6)
                                                 ->maxSize(5120)
-                                                ->helperText('Max 6 images per variant')
+                                                ->helperText('Max 6 images — storefront swaps gallery when this option is selected. Falls back to product gallery if empty.')
                                                 ->columnSpanFull(),
                                         ]),
                                     ])
                                     ->columns(1),
                             ]),
                         Section::make('Media')
-                            ->description('Product images — Bajaao product shots per image rules.')
+                            ->description('Default product gallery (used when a variant has no images of its own).')
                             ->collapsible()
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('gallery')
@@ -244,6 +267,74 @@ class ProductResource extends Resource
                 ->minLength(5)
                 ->maxLength(500),
         ];
+    }
+
+    /**
+     * Expand options JSON into admin-only colour/spec fields for the variant repeater.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private static function expandVariantFormData(array $data): array
+    {
+        $options = $data['options'] ?? [];
+        if (is_string($options)) {
+            $decoded = json_decode($options, true);
+            $options = is_array($decoded) ? $decoded : [];
+        }
+        if (! is_array($options)) {
+            $options = [];
+        }
+
+        $data['color_name'] = isset($options['color']) && is_string($options['color']) ? $options['color'] : null;
+        $hex = $options['color_hex'] ?? null;
+        $data['color_hex'] = is_string($hex) && preg_match('/^#([A-Fa-f0-9]{6})$/', $hex) === 1 ? $hex : null;
+
+        $specs = $options;
+        unset($specs['color'], $specs['color_hex']);
+        $data['specs'] = $specs;
+
+        return $data;
+    }
+
+    /**
+     * Collapse admin colour/spec fields back into options JSON before variant save.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private static function collapseVariantFormData(array $data): array
+    {
+        $options = [];
+
+        $colorName = trim((string) ($data['color_name'] ?? ''));
+        if ($colorName !== '') {
+            $options['color'] = $colorName;
+        }
+
+        $hex = trim((string) ($data['color_hex'] ?? ''));
+        if ($hex !== '' && preg_match('/^#([A-Fa-f0-9]{6})$/', $hex) === 1) {
+            $options['color_hex'] = strtoupper($hex);
+        }
+
+        $specs = $data['specs'] ?? [];
+        if (is_array($specs)) {
+            foreach ($specs as $key => $value) {
+                $key = trim((string) $key);
+                if ($key === '' || in_array($key, ['color', 'color_hex'], true)) {
+                    continue;
+                }
+                if ($value === null || $value === '') {
+                    continue;
+                }
+                $options[$key] = is_scalar($value) ? (string) $value : $value;
+            }
+        }
+
+        unset($data['color_name'], $data['color_hex'], $data['specs']);
+        $data['options'] = $options === [] ? null : $options;
+
+        return $data;
     }
 
     public static function getPages(): array

@@ -79,6 +79,24 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — C2 multi-variant depth (W3)
+- Change-id: `c2-variant-depth`
+- Trigger: owner-ask (verify C1, push, plan C2, execute)
+- Scope paths: `ProductVariant.php`, `ProductResource.php`, `AddToCart.php`, PDP/cart/checkout blades, `tests/Feature/VariantDepthTest.php`, `docs/C2_VARIANT_DEPTH_PLAN.md`
+- Type tags: [x] code [x] test [x] admin [x] docs-only
+- Checklist:
+  - [x] A1–A2 scoped to C2 after C1 push
+  - [x] A3 services unchanged for money; variant effectivePrice used
+  - [x] A4 no client totals
+  - [x] A6 tests authored `VariantDepthTest` — PHP unavailable in sandbox (not executed)
+  - [x] A7 n/a build
+  - [x] A9–A10 safe
+  - [x] A11 next = C3 admin upload polish
+  - [x] A14 plan status updated
+  - [x] A15 owner summary prepared
+- Status: PARTIAL (code complete; test run blocked — no PHP)
+- C1 push: `471c653` → `origin/arena/01a09498-rythm`
+
 ### 2026-09-12 — C1 W5 hide-when-empty (first eng chunk)
 - Change-id: `c1-public-content-visibility`
 - Trigger: owner-ask (best-first actionable)
@@ -309,7 +327,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 **Production priority programme:** `docs/PRODUCTION_PRIORITY_PLAN.md` (W1–W5).  
 **Client optional details:** `docs/CLIENT_HANDOVER_DETAILS.md` — empty/OFF = hidden, no blockers.  
 **Razorpay owner guide:** `docs/RAZORPAY_SETUP_GUIDE.md`.  
-**Eng chunks:** C1 hide-when-empty **code landed** (run tests on PHP host) → **next C2** variant depth → C3 admin polish → C4 buy-path → C5 no-demo purge.
+**Eng chunks:** C1 **pushed** `471c653` · C2 variant depth **code landed** → **next C3** admin upload flowless → C4 buy-path → C5 no-demo purge. Run `PublicContentVisibilityTest` + `VariantDepthTest` on PHP host.
 
 ---
 

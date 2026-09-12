@@ -202,11 +202,12 @@ Parallel OK: C1 ∥ early C2 docs; C3 after C2 solid.
 |---|---|---|
 | W1 Upload flowless | **PLANNED** | Base CRUD exists; polish pending |
 | W2 Buy path + Razorpay guide | **PLANNED** | Engine done; guide shipped; smoothness pending |
-| W3 Multi-variant depth | **PLANNED** | Model strong; admin/PDP depth pending |
-| W4 No demo/placeholder | **PLANNED** | Audit + purge pending |
-| W5 Client details / hide empty | **IN PROGRESS (C1 partial)** | `PublicContent` helper; PDP/checkout/footer/account links gated; checkout tax gated to `tax_rules_enabled` |
+| W3 Multi-variant depth | **IN PROGRESS → C2 code landed** | Admin color/specs; helpers; PDP gallery swap; cart labels; `VariantDepthTest` |
+| W4 No demo/placeholder | **PLANNED** | Audit + purge pending (contact defaults cleared in C1) |
+| W5 Client details / hide empty | **C1 COMPLETE (code)** | `PublicContent`; links gated; tax gated; empty contact defaults |
 | C0 Docs | **COMPLETE** | Plan + handover + Razorpay guide |
-| C1 Hide-when-empty | **PARTIAL → code landed 2026-09-12** | Tests: `PublicContentVisibilityTest` |
+| C1 Hide-when-empty | **COMPLETE (code)** | Pushed `471c653`; run tests on PHP host |
+| C2 Variant depth | **COMPLETE (code)** | See `docs/C2_VARIANT_DEPTH_PLAN.md`; run `VariantDepthTest` |
 
 Update this table when chunks merge; mirror summary in `MEMORY.md`.
 

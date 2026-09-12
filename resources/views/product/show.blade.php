@@ -48,12 +48,23 @@
 
             {{-- Hero grid: gallery | buy box --}}
             <div class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
-                {{-- ===== GALLERY ===== --}}
-                <div x-data="{ active: 0, images: {{ json_encode($product->galleryImages() ?: [null]) }} }">
+                {{-- ===== GALLERY (swaps when Livewire dispatches rythme-variant-updated) ===== --}}
+                <div
+                    x-data="{
+                        active: 0,
+                        images: {{ json_encode($product->galleryImages() ?: [null]) }},
+                        setImages(list) {
+                            const next = (Array.isArray(list) && list.length) ? list : {{ json_encode($product->galleryImages() ?: [null]) }};
+                            this.images = next;
+                            this.active = 0;
+                        }
+                    }"
+                    x-on:rythme-variant-updated.window="setImages($event.detail.images ?? $event.detail[0]?.images ?? $event.detail)"
+                >
                     <div class="relative aspect-square overflow-hidden rounded-3xl border border-ink/10 bg-white">
-                        <template x-for="(img, i) in images" :key="i">
+                        <template x-for="(img, i) in images" :key="i + '-' + (img || 'empty')">
                             <div x-show="active === i" x-transition.opacity.duration.300 class="absolute inset-0 flex items-center justify-center p-8 sm:p-12">
-                                <img x-show="img" :src="img" :alt="$el.closest('div').parentElement?.dataset?.name ?? '{{ $product->name }}'"
+                                <img x-show="img" :src="img" alt="{{ $product->name }}"
                                      class="h-full w-full object-contain"
                                      :loading="i === 0 ? 'eager' : 'lazy'"
                                      :fetchpriority="i === 0 ? 'high' : 'low'" decoding="async">
@@ -63,7 +74,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" />
                                     </svg>
                                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-muted">{{ $product->brand?->name ?? 'Rythme' }}</p>
-                                    <p class="px-10 text-center text-sm text-muted">Product photo arriving soon — admin media library se upload hoti hi yahan dikhegi.</p>
+                                    <p class="px-10 text-center text-sm text-muted">Add product or variant photos in admin to show them here.</p>
                                 </div>
                             </div>
                         </template>
@@ -73,19 +84,17 @@
                         @endif
                     </div>
 
-                    {{-- Thumbnails --}}
-                    @if(count($product->galleryImages()) > 1)
-                        <div class="mt-4 flex gap-3 overflow-x-auto pb-1">
-                            @foreach($product->galleryImages() as $i => $img)
-                                <button type="button" @click="active = {{ $i }}"
-                                        class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition {{ $loop->first ? 'border-brand' : 'border-ink/10 hover:border-brand/40' }}"
-                                        :class="active === {{ $i }} ? 'border-brand' : 'border-ink/10'"
-                                        aria-label="View image {{ $i + 1 }}">
-                                    <img src="{{ $img }}" alt="{{ $product->name }} — image {{ $i + 1 }}" class="h-full w-full object-cover" loading="lazy">
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
+                    {{-- Thumbnails (reactive to variant images) --}}
+                    <div class="mt-4 flex gap-3 overflow-x-auto pb-1" x-show="images.filter(Boolean).length > 1" x-cloak>
+                        <template x-for="(img, i) in images" :key="'thumb-' + i + '-' + (img || 'x')">
+                            <button type="button" x-show="img" @click="active = i"
+                                    class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition"
+                                    :class="active === i ? 'border-brand' : 'border-ink/10 hover:border-brand/40'"
+                                    :aria-label="'View image ' + (i + 1)">
+                                <img :src="img" :alt="'{{ $product->name }} — image ' + (i + 1)" class="h-full w-full object-cover" loading="lazy">
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
                 {{-- ===== BUY BOX ===== --}}

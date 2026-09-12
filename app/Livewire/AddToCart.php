@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\BackInStockSubscriptionService;
 use App\Services\CartService;
@@ -32,19 +33,13 @@ final class AddToCart extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load([
-            'variants' => fn ($q) => $q
-                ->where('is_active', true)
-                ->where('stock', '>', 0)
-                ->orderBy('id'),
-            'variants.attributeValues.attribute',
-            'brand',
-            'media',
-        ]);
+        $this->product = $this->loadProductGraph($product);
 
-        if ($product->variants->isNotEmpty()) {
-            $this->variantId = $product->variants->first()->id;
+        if ($this->product->variants->isNotEmpty()) {
+            $this->variantId = $this->product->variants->first()->id;
         }
+
+        $this->dispatchVariantGallery();
     }
 
     public function selectVariant(int $variantId): void
@@ -56,6 +51,7 @@ final class AddToCart extends Component
         $this->notifyConsent = false;
         $this->notifySuccess = false;
         $this->notifyError = null;
+        $this->dispatchVariantGallery();
     }
 
     public function setQty(int $qty): void
@@ -127,14 +123,7 @@ final class AddToCart extends Component
 
     public function render(): View
     {
-        // Re-load variants to get latest stock (in case stock changed after page load)
-        $this->product->load([
-            'variants' => fn ($q) => $q
-                ->where('is_active', true)
-                ->where('stock', '>', 0)
-                ->orderBy('id'),
-            'variants.attributeValues.attribute',
-        ]);
+        $this->product = $this->loadProductGraph($this->product);
 
         // If selected variant is no longer available, auto-select first available
         if ($this->variantId !== null) {
@@ -152,37 +141,22 @@ final class AddToCart extends Component
 
         $stock = $variant !== null ? $variant->stock : $this->product->stock;
         $price = $variant !== null ? (float) $variant->effectivePrice($this->product) : (float) $this->product->price;
-        $compareAt = $variant !== null
-            ? (float) ($variant->price_override !== null ? $this->product->compare_at_price ?? 0 : 0)
-            : (float) ($this->product->compare_at_price ?? 0);
+        $compareAt = (float) ($this->product->compare_at_price ?? 0);
 
-        // Prepare variant data with color info for the UI - only in-stock variants
-        $variantsWithColor = $this->product->variants
-            ->filter(fn ($v) => $v->stock > 0 && $v->is_active)
-            ->map(function ($v) {
-                // Check if variant has a color attribute value
-                $colorHex = null;
-                $colorName = null;
-
-                if ($v->relationLoaded('attributeValues')) {
-                    foreach ($v->attributeValues as $attrValue) {
-                        if ($attrValue->attribute?->type === 'color' && $attrValue->color_hex) {
-                            $colorHex = $attrValue->color_hex;
-                            $colorName = $attrValue->value;
-                            break;
-                        }
-                    }
-                }
-
-                return [
-                    'id' => $v->id,
-                    'name' => $v->name,
-                    'stock' => $v->stock,
-                    'is_active' => $v->is_active,
-                    'color_hex' => $colorHex,
-                    'color_name' => $colorName,
-                ];
-            })
+        $variantsForUi = $this->product->variants
+            ->filter(fn (ProductVariant $v): bool => $v->stock > 0 && $v->is_active)
+            ->map(fn (ProductVariant $v): array => [
+                'id' => $v->id,
+                'name' => $v->name,
+                'stock' => $v->stock,
+                'is_active' => $v->is_active,
+                'price' => (float) $v->effectivePrice($this->product),
+                'color_hex' => $v->colorHex(),
+                'color_name' => $v->colorName(),
+                'summary' => $v->optionSummary(),
+                'images' => $v->galleryUrls(),
+                'specs' => $v->specList(),
+            ])
             ->values();
 
         return view('livewire.add-to-cart', [
@@ -190,7 +164,49 @@ final class AddToCart extends Component
             'stock' => $stock,
             'price' => $price,
             'compareAt' => $compareAt,
-            'variantsWithColor' => $variantsWithColor,
+            'variantsWithColor' => $variantsForUi,
+            'variantSpecs' => $variant?->specList() ?? [],
+            'galleryImages' => $this->galleryFor($variant),
         ]);
+    }
+
+    private function loadProductGraph(Product $product): Product
+    {
+        return $product->load([
+            'variants' => fn ($q) => $q
+                ->where('is_active', true)
+                ->where('stock', '>', 0)
+                ->orderBy('id'),
+            'variants.attributeValues.attribute',
+            'variants.media',
+            'brand',
+            'media',
+        ]);
+    }
+
+    /**
+     * @return list<string|null>
+     */
+    private function galleryFor(?ProductVariant $variant): array
+    {
+        if ($variant !== null) {
+            $urls = $variant->galleryUrls();
+            if ($urls !== []) {
+                return $urls;
+            }
+        }
+
+        $productGallery = $this->product->galleryImages();
+
+        return $productGallery !== [] ? $productGallery : [null];
+    }
+
+    private function dispatchVariantGallery(): void
+    {
+        $variant = $this->variantId !== null
+            ? $this->product->variants->firstWhere('id', $this->variantId)
+            : null;
+
+        $this->dispatch('rythme-variant-updated', images: $this->galleryFor($variant));
     }
 }

@@ -56,6 +56,102 @@ class ProductVariant extends Model implements HasMedia
         return $this->price_override ?? (string) $product->price;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function optionsMap(): array
+    {
+        $options = $this->options;
+
+        return is_array($options) ? $options : [];
+    }
+
+    /**
+     * Display colour from attribute pivot (preferred) or options JSON.
+     */
+    public function colorHex(): ?string
+    {
+        if ($this->relationLoaded('attributeValues')) {
+            foreach ($this->attributeValues as $attrValue) {
+                if ($attrValue->attribute?->type === 'color' && filled($attrValue->color_hex)) {
+                    return (string) $attrValue->color_hex;
+                }
+            }
+        }
+
+        $hex = $this->optionsMap()['color_hex'] ?? null;
+        if (is_string($hex) && preg_match('/^#([A-Fa-f0-9]{6})$/', $hex) === 1) {
+            return $hex;
+        }
+
+        return null;
+    }
+
+    public function colorName(): ?string
+    {
+        if ($this->relationLoaded('attributeValues')) {
+            foreach ($this->attributeValues as $attrValue) {
+                if ($attrValue->attribute?->type === 'color' && filled($attrValue->value)) {
+                    return (string) $attrValue->value;
+                }
+            }
+        }
+
+        $name = $this->optionsMap()['color'] ?? null;
+
+        return is_string($name) && $name !== '' ? $name : null;
+    }
+
+    /**
+     * Specs for PDP (excludes reserved colour keys).
+     *
+     * @return array<string, string>
+     */
+    public function specList(): array
+    {
+        $specs = [];
+        foreach ($this->optionsMap() as $key => $value) {
+            if (! is_string($key) || in_array($key, ['color', 'color_hex'], true)) {
+                continue;
+            }
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $specs[$key] = is_scalar($value) ? (string) $value : json_encode($value);
+        }
+
+        return $specs;
+    }
+
+    /**
+     * Short line for cart/checkout (e.g. "Sunburst · Gloss").
+     */
+    public function optionSummary(): string
+    {
+        $parts = array_filter([
+            $this->colorName(),
+            ...array_values($this->specList()),
+        ], fn ($part): bool => is_string($part) && $part !== '');
+
+        if ($parts === []) {
+            return (string) $this->name;
+        }
+
+        return implode(' · ', array_unique($parts));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function galleryUrls(): array
+    {
+        return $this->getMedia('variant_gallery')
+            ->map(fn (Media $media): string => $media->getUrl())
+            ->filter()
+            ->values()
+            ->all();
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('variant_gallery')

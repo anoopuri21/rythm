@@ -67,7 +67,7 @@
                             </button>
                         </div>
                         @if($item->variant)
-                            <p class="mt-0.5 text-xs text-muted">{{ $item->variant->name }} · {{ $item->variant->sku }}</p>
+                            <p class="mt-0.5 text-xs text-muted">{{ $item->variant->optionSummary() }} · {{ $item->variant->sku }}</p>
                         @endif
                         <div class="mt-auto flex items-center justify-between pt-2">
                             <div class="flex items-center rounded-full border border-ink/15 bg-white">

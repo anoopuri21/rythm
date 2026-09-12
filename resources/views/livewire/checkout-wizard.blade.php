@@ -248,7 +248,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-semibold text-ink">{{ $item->product->name }}</p>
-                                @if($item->variant)<p class="text-xs text-muted">{{ $item->variant->name }}</p>@endif
+                                @if($item->variant)<p class="text-xs text-muted">{{ $item->variant->optionSummary() }}</p>@endif
                             </div>
                             <p class="text-sm font-bold text-ink">₹{{ number_format((float) $item->unit_price * $item->qty) }}</p>
                         </div>

@@ -56,7 +56,7 @@
                                         {{ $item->product->name }}
                                     </a>
                                     @if($item->variant)
-                                        <p class="mt-1 text-xs text-muted">{{ $item->variant->name }} · SKU {{ $item->variant->sku }}</p>
+                                        <p class="mt-1 text-xs text-muted">{{ $item->variant->optionSummary() }} · SKU {{ $item->variant->sku }}</p>
                                     @else
                                         <p class="mt-1 text-xs text-muted">SKU {{ $item->product->sku }}</p>
                                     @endif
