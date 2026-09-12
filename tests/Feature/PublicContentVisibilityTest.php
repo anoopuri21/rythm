@@ -54,11 +54,16 @@ class PublicContentVisibilityTest extends TestCase
             ->assertSee(route('orders.lookup'), false);
     }
 
-    public function test_footer_omits_withheld_and_inactive_company_links_when_missing(): void
+    public function test_footer_and_nav_omit_inactive_company_links_when_missing(): void
     {
-        // Deactivate optional company pages — links must disappear, page still 200.
+        // Deactivate optional company pages — footer + navbar must not link them.
         Page::query()->whereIn('slug', ['about', 'terms', 'privacy'])->update(['is_active' => false]);
         PublicContent::forgetPageCache();
+        Cache::flush();
+
+        $this->assertNull(PublicContent::pageHref('about'));
+        $this->assertNull(PublicContent::pageHref('terms'));
+        $this->assertNull(PublicContent::pageHref('privacy'));
 
         $this->get('/')
             ->assertOk()

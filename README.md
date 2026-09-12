@@ -112,6 +112,7 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 | [`docs/PRODUCTION_PRIORITY_PLAN.md`](docs/PRODUCTION_PRIORITY_PLAN.md) | Current production priorities W1–W5 |
 | [`docs/CLIENT_HANDOVER_DETAILS.md`](docs/CLIENT_HANDOVER_DETAILS.md) | Optional client-filled settings/policies |
 | [`docs/RAZORPAY_SETUP_GUIDE.md`](docs/RAZORPAY_SETUP_GUIDE.md) | Razorpay test → live setup |
+| [`docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`](docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md) | Staff: publish products flowlessly |
 
 ### Deeper reference
 

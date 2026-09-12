@@ -79,6 +79,22 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — Fix PublicContent nav test + C3 admin upload flowless
+- Change-id: `c1-nav-fix-c3-upload`
+- Trigger: owner-ask (failing test + start C3)
+- Scope paths: `navbar.blade.php`, `PublicContentVisibilityTest.php`, `ProductResource.php`, `EditProduct.php`, `ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`, `AdminProductUploadFlowTest.php`
+- Type tags: [x] code [x] test [x] admin [x] docs-only
+- Checklist:
+  - [x] A1 five always-read
+  - [x] A2 scoped fix + C3 only
+  - [x] A6 tests updated/authored — run on owner PHP host
+  - [x] A9–A10 safe
+  - [x] A11 next = C4 buy-path
+  - [x] A14 plan board updated
+  - [x] A15 owner summary
+- Root cause: navbar hardcoded `/about` bypassed PublicContent footer gate
+- Status: COMPLETE (code); verify with PublicContentVisibilityTest + AdminProductUploadFlowTest
+
 ### 2026-09-12 — C2 multi-variant depth (W3)
 - Change-id: `c2-variant-depth`
 - Trigger: owner-ask (verify C1, push, plan C2, execute)
@@ -327,7 +343,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 **Production priority programme:** `docs/PRODUCTION_PRIORITY_PLAN.md` (W1–W5).  
 **Client optional details:** `docs/CLIENT_HANDOVER_DETAILS.md` — empty/OFF = hidden, no blockers.  
 **Razorpay owner guide:** `docs/RAZORPAY_SETUP_GUIDE.md`.  
-**Eng chunks:** C1 **pushed** `471c653` · C2 variant depth **code landed** → **next C3** admin upload flowless → C4 buy-path → C5 no-demo purge. Run `PublicContentVisibilityTest` + `VariantDepthTest` on PHP host.
+**Eng chunks:** C1+C2 pushed · C3 admin upload **code landed** (nav about fix) → **next C4** buy-path → C5 no-demo. Run `PublicContentVisibilityTest`, `VariantDepthTest`, `AdminProductUploadFlowTest`.
 
 ---
 

@@ -128,12 +128,14 @@
                 </div>
             </div>
 
-            {{-- Main menu --}}
+            {{-- Main menu — CMS pages only when public (not withheld + active) --}}
             <nav class="nav__menu" aria-label="Main navigation">
                 <a href="{{ route('home') }}" class="nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}">Home</a>
                 <a href="/shop" class="nav__link">Shop</a>
                 <a href="/shop?on_sale=1" class="nav__link">Deals</a>
-                <a href="/about" class="nav__link">Our Story</a>
+                @if($aboutHref = \App\Support\PublicContent::pageHref('about'))
+                    <a href="{{ $aboutHref }}" class="nav__link">Our Story</a>
+                @endif
                 <a href="/contact" class="nav__link">Contact</a>
             </nav>
 
@@ -196,7 +198,9 @@
                 <a href="{{ route('home') }}" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Home</a>
                 <a href="/shop" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Shop</a>
                 <a href="/shop?on_sale=1" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Deals</a>
-                <a href="/about" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Our Story</a>
+                @if($aboutHref = \App\Support\PublicContent::pageHref('about'))
+                    <a href="{{ $aboutHref }}" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Our Story</a>
+                @endif
                 <a href="/contact" @click="mobileMenu = false" class="block rounded-xl px-4 py-3 text-sm font-semibold text-ink transition hover:bg-ink/5">Contact</a>
 
                 <div class="mt-4 border-t border-ink/10 pt-4">

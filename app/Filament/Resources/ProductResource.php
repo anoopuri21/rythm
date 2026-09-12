@@ -6,6 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Components\SeoFields;
 use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use App\Services\ImportedProductActivationService;
 use App\Support\AdminAccess;
@@ -35,11 +37,13 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
@@ -66,33 +70,82 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-shopping-bag')
                     ->schema([
                         Section::make('Product details')
+                            ->description('Fill required fields top-to-bottom, then Variants → Media → SEO. Save once — use “View on storefront” after save.')
                             ->columns(2)
                             ->schema([
-                                TextInput::make('name')->required()->maxLength(255)->columnSpanFull(),
+                                TextInput::make('name')->required()->maxLength(255)->columnSpanFull()
+                                    ->helperText('Customer-facing title (single H1 on the product page).'),
                                 TextInput::make('slug')->required()->maxLength(255)
-                                    ->helperText('Leave blank to auto-generate from name.'),
+                                    ->helperText('URL path under /product/{slug}. Keep stable after publish.'),
                                 TextInput::make('sku')->required()->maxLength(50)
-                                    ->unique(ignoreRecord: true),
+                                    ->unique(ignoreRecord: true)
+                                    ->helperText('Unique stock-keeping code for this base product.'),
                                 Select::make('category_id')->relationship('category', 'name')
-                                    ->searchable()->preload(),
+                                    ->searchable()->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')->required()->maxLength(120),
+                                        TextInput::make('slug')->maxLength(140)
+                                            ->helperText('Optional — auto from name if blank.'),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $name = trim((string) ($data['name'] ?? ''));
+                                        $slug = trim((string) ($data['slug'] ?? ''));
+                                        if ($slug === '') {
+                                            $slug = Str::slug($name);
+                                        }
+                                        $category = Category::query()->create([
+                                            'name' => $name,
+                                            'slug' => $slug !== '' ? $slug : Str::lower(Str::random(8)),
+                                            'is_active' => true,
+                                            'sort_order' => 0,
+                                        ]);
+
+                                        return (int) $category->id;
+                                    })
+                                    ->helperText('Required for shop filters. Create inline if missing.'),
                                 Select::make('brand_id')->relationship('brand', 'name')
-                                    ->searchable()->preload(),
-                                TextInput::make('price')->numeric()->required()->minValue(0)->prefix('₹'),
+                                    ->searchable()->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')->required()->maxLength(120),
+                                        TextInput::make('slug')->maxLength(140)
+                                            ->helperText('Optional — auto from name if blank.'),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $name = trim((string) ($data['name'] ?? ''));
+                                        $slug = trim((string) ($data['slug'] ?? ''));
+                                        if ($slug === '') {
+                                            $slug = Str::slug($name);
+                                        }
+                                        $brand = Brand::query()->create([
+                                            'name' => $name,
+                                            'slug' => $slug !== '' ? $slug : Str::lower(Str::random(8)),
+                                            'is_active' => true,
+                                            'sort_order' => 0,
+                                        ]);
+
+                                        return (int) $brand->id;
+                                    })
+                                    ->helperText('Manufacturer label only (not a marketplace seller).'),
+                                TextInput::make('price')->numeric()->required()->minValue(0)->prefix('₹')
+                                    ->helperText('Base selling price (variants may override).'),
                                 TextInput::make('compare_at_price')->numeric()->minValue(0)->prefix('₹')
-                                    ->helperText('MRP — shown as strikethrough on the storefront'),
-                                TextInput::make('stock')->numeric()->required()->default(0)->minValue(0),
+                                    ->helperText('Optional MRP — strikethrough when higher than selling price.'),
+                                TextInput::make('stock')->numeric()->required()->default(0)->minValue(0)
+                                    ->helperText('Used when the product has no active variants. With variants, each option has its own stock.'),
                                 TextInput::make('low_stock_threshold')->numeric()->default(5)->minValue(0),
                                 Toggle::make('is_active')
                                     ->default(true)
                                     ->disabled(fn (?Product $record): bool => $record?->importSource !== null)
-                                    ->helperText('Imported products use the reviewed activation action after real stock is entered.'),
+                                    ->helperText('Off = hidden from shop. Imported rows use Approve & activate instead.'),
                                 Toggle::make('is_featured'),
                                 Toggle::make('is_trending')->label('Trending (homepage carousel)'),
                                 TextInput::make('featured_rank')->numeric()->minValue(0)
                                     ->label('Featured rank')
-                                    ->helperText('Order in homepage Best Sellers (0 = first).'),
-                                Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull(),
-                                RichEditor::make('description')->maxLength(100000)->columnSpanFull(),
+                                    ->helperText('Lower number appears first in homepage Best Sellers (0 = first).'),
+                                Textarea::make('short_description')->rows(2)->maxLength(500)->columnSpanFull()
+                                    ->helperText('One or two lines under the title / for cards.'),
+                                RichEditor::make('description')->maxLength(100000)->columnSpanFull()
+                                    ->helperText('Full product story — original copy only.'),
                             ]),
                         Section::make('Optional tax classification')
                             ->description('Leave blank unless approved product classification and rate values are available.')
@@ -202,11 +255,33 @@ class ProductResource extends Resource
             ->filters([
                 SelectFilter::make('category')->relationship('category', 'name')->searchable(),
                 SelectFilter::make('brand')->relationship('brand', 'name')->searchable(),
-                TernaryFilter::make('is_active'),
+                TernaryFilter::make('is_active')->label('Published'),
                 TernaryFilter::make('is_featured'),
                 TernaryFilter::make('is_trending'),
+                Filter::make('out_of_stock')
+                    ->label('Out of stock (base)')
+                    ->query(fn (Builder $query): Builder => $query->where('stock', '<=', 0)),
+                Filter::make('has_variants')
+                    ->label('Has variants')
+                    ->query(fn (Builder $query): Builder => $query->whereHas('variants')),
+                Filter::make('no_gallery')
+                    ->label('Missing gallery image')
+                    ->query(fn (Builder $query): Builder => $query->whereDoesntHave(
+                        'media',
+                        fn (Builder $media): Builder => $media->where('collection_name', 'gallery'),
+                    )),
+                Filter::make('imported_pending')
+                    ->label('Imported — pending activation')
+                    ->query(fn (Builder $query): Builder => $query
+                        ->where('is_active', false)
+                        ->whereHas('importSource')),
             ])
             ->actions([
+                Action::make('view_storefront')
+                    ->label('View')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->url(fn (Product $record): string => route('product.show', $record), shouldOpenInNewTab: true)
+                    ->visible(fn (Product $record): bool => filled($record->slug) && $record->is_active),
                 Action::make('approve_activate_import')
                     ->label('Approve & activate')
                     ->icon('heroicon-o-shield-check')
