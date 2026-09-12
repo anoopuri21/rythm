@@ -120,7 +120,8 @@ class AdminOpsTest extends TestCase
         $service = app(SiteSettingsService::class);
 
         $this->assertSame('0', $service->get('shipping_flat_fee'));
-        $this->assertSame('support@rythme.store', $service->get('contact_email'));
+        // Empty until client saves real contact details (C5 production posture).
+        $this->assertSame('', (string) $service->get('contact_email'));
     }
 
     public function test_admin_hero_slides_resource(): void

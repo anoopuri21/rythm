@@ -203,13 +203,14 @@ Parallel OK: C1 ∥ early C2 docs; C3 after C2 solid.
 | W1 Upload flowless | **C3 COMPLETE (code)** | Preview, filters, category/brand quick-create, runbook |
 | W2 Buy path + Razorpay guide | **C4 COMPLETE (code)** | PaymentAvailability; empty states; guest checkout CTA; smoke checklist |
 | W3 Multi-variant depth | **C2 COMPLETE (code)** | Admin color/specs; PDP gallery swap; `VariantDepthTest` |
-| W4 No demo/placeholder | **PLANNED** | Audit + purge pending (contact defaults cleared in C1) |
+| W4 No demo/placeholder | **C5 COMPLETE (code)** | Recent-buy demo purged; contact seed empty; seed policy doc |
 | W5 Client details / hide empty | **C1 COMPLETE** | `PublicContent`; footer+**navbar** gated; tax gated |
 | C0 Docs | **COMPLETE** | Plan + handover + Razorpay guide |
 | C1 Hide-when-empty | **COMPLETE** | Navbar about fix 2026-09-12 |
 | C2 Variant depth | **COMPLETE (code)** | `docs/C2_VARIANT_DEPTH_PLAN.md` |
 | C3 Admin upload flowless | **COMPLETE (code)** | `docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md` |
 | C4 Buy-path smoothness | **COMPLETE (code)** | `docs/BUY_PATH_SMOKE_CHECKLIST.md` · `PaymentAvailability` |
+| C5 Demo/placeholder purge | **COMPLETE (code)** | `docs/SEED_DATA_POLICY.md` · `DemoContentPurgeTest` |
 
 Update this table when chunks merge; mirror summary in `MEMORY.md`.
 

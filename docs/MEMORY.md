@@ -79,6 +79,21 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-12 — C4 checkout stock message fix + C5 demo purge (W4)
+- Change-id: `c4-stock-fix-c5-purge`
+- Trigger: owner-ask (CheckoutTest fail + C5 start)
+- Scope paths: `CheckoutWizard.php` (OOS before empty-cart), contact/home/layout, PageSeeder, seed policy, DemoContentPurgeTest
+- Type tags: [x] code [x] test [x] storefront [x] docs-only
+- Checklist:
+  - [x] Fix placeOrder: allItems + stock message (not empty cart when OOS)
+  - [x] Purge recent-purchase synthetic demo
+  - [x] Contact seed/cards: no fake phone/email/showroom
+  - [x] Homepage promo/category banners gated on real data
+  - [x] Seed policy + AdminOps default email empty
+  - [x] Tests authored (run on PHP host)
+- Status: COMPLETE (code)
+- Notes: Next = C6/C7 owner-only (live pay). No Phase 18.
+
 ### 2026-09-12 — C4 buy-path smoothness (W2)
 - Change-id: `c4-buy-path`
 - Trigger: owner-ask
@@ -359,7 +374,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 **Production priority programme:** `docs/PRODUCTION_PRIORITY_PLAN.md` (W1–W5).  
 **Client optional details:** `docs/CLIENT_HANDOVER_DETAILS.md` — empty/OFF = hidden, no blockers.  
 **Razorpay owner guide:** `docs/RAZORPAY_SETUP_GUIDE.md`.  
-**Eng chunks:** C1–C4 code complete → **next C5** demo/placeholder purge. Run `PublicContentVisibilityTest`, `VariantDepthTest`, `AdminProductUploadFlowTest`, `BuyPathSmoothnessTest`.
+**Eng chunks:** C1–C5 code complete → **next C6/C7 owner-only** (live pay). Run `CheckoutTest` (stock OOS), `BuyPathSmoothnessTest`, `DemoContentPurgeTest`, `AboutContactTest`, `AdminOpsTest`.
 
 ---
 

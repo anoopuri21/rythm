@@ -180,10 +180,32 @@ final class CheckoutWizard extends Component
 
             $this->guardRateLimit('place-order', 5, 60);
             $cartModel = $cart->getOrCreateCart();
-            $totals = $cart->totals();
 
-            if ($totals['count'] === 0) {
+            // Validate against ALL cart rows (including OOS). CartService::items()/totals()
+            // hide zero-stock lines for display — placeOrder must still surface stock errors
+            // instead of a misleading "Your cart is empty."
+            $rawItems = $cart->allItems();
+
+            if ($rawItems->isEmpty()) {
                 throw new RuntimeException('Your cart is empty.');
+            }
+
+            foreach ($rawItems as $item) {
+                if ($item->product === null || ! $item->product->is_active) {
+                    throw new RuntimeException('A product in your cart is no longer available.');
+                }
+
+                if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active || (int) $item->variant->product_id !== (int) $item->product_id)) {
+                    throw new RuntimeException("{$item->product->name} option is no longer available.");
+                }
+
+                $availableStock = $item->product_variant_id !== null
+                    ? (int) $item->variant->stock
+                    : (int) $item->product->stock;
+
+                if ($availableStock < $item->qty) {
+                    throw new RuntimeException("Not enough stock for {$item->product->name}.");
+                }
             }
 
             $address = $addresses->forUser($user->id)->firstWhere('id', $this->addressId);

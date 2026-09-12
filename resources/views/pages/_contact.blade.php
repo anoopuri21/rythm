@@ -5,24 +5,18 @@
 
     $kicker = $s['contact_kicker'] ?? "We're listening";
 
+    // Only admin-managed cards — never invent phone/email/address placeholders (C5).
     $cards = collect($s['cards'] ?? [])
         ->filter(fn ($row) => filled($row['title'] ?? null))
         ->values();
-    if ($cards->isEmpty()) {
-        $cards = collect([
-            ['icon' => '🎧', 'title' => 'Support & orders', 'line1' => 'support@rythme.store', 'line2' => '+91 98765 43210', 'line3' => 'Mon–Sat, 10am–7pm IST'],
-            ['icon' => '🏠', 'title' => 'Showroom', 'line1' => '42, Music Lane, Karol Bagh', 'line2' => 'New Delhi, Delhi 110005', 'line3' => 'Walk-ins welcome'],
-            ['icon' => '🤝', 'title' => 'Partnerships', 'line1' => 'partners@rythme.store', 'line2' => 'Brands, dealers, teachers', 'line3' => 'Reply within 2 days'],
-        ]);
-    }
 
     // Falls back to the global admin setting (Filament → Settings).
     $globalSettings = app(\App\Services\SiteSettingsService::class);
-    $whatsappEnabled = (bool) ($s['whatsapp_enabled'] ?? true);
+    $whatsappEnabled = (bool) ($s['whatsapp_enabled'] ?? false);
     $whatsappNumber = ($s['whatsapp_number'] ?? null) ?: ($globalSettings->get('whatsapp_number') ?? '');
     $whatsappDigits = preg_replace('/\D+/', '', (string) $whatsappNumber);
     $whatsappTitle = $s['whatsapp_title'] ?? 'Prefer WhatsApp?';
-    $whatsappText = $s['whatsapp_text'] ?? 'Message us photos of your gear — we love a good setup question.';
+    $whatsappText = $s['whatsapp_text'] ?? 'Send a message about your order or an instrument — the store replies when available.';
     $whatsappButton = $s['whatsapp_button'] ?? 'Chat on WhatsApp';
 
     // Only trusted Google Maps embed URLs are rendered inside the iframe.
@@ -64,35 +58,35 @@
                         <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Your name</span>
                         <input type="text" name="name" value="{{ old('name') }}" required autocomplete="name"
                                class="h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                               placeholder="Anoop Puri">
+                               placeholder="Your full name">
                         @error('name') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                     </label>
                     <label class="block">
                         <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Email</span>
                         <input type="email" name="email" value="{{ old('email') }}" required autocomplete="email"
                                class="h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                               placeholder="you@example.com">
+                               placeholder="name@email.com">
                         @error('email') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                     </label>
                     <label class="block">
                         <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Phone (optional)</span>
                         <input type="tel" name="phone" value="{{ old('phone') }}" autocomplete="tel"
                                class="h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                               placeholder="98765 43210">
+                               placeholder="10-digit mobile">
                         @error('phone') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                     </label>
                     <label class="block">
                         <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Subject (optional)</span>
                         <input type="text" name="subject" value="{{ old('subject') }}"
                                class="h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                               placeholder="Order help, setup advice…">
+                               placeholder="Order, product, or general">
                     </label>
                     <input type="text" name="company" value="" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true">
                     <label class="block sm:col-span-2">
                         <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Message</span>
                         <textarea name="message" rows="6" required
                                   class="w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                                  placeholder="Tell us how we can help…">{{ old('message') }}</textarea>
+                                  placeholder="How can the store help?">{{ old('message') }}</textarea>
                         @error('message') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                     </label>
                     <div class="sm:col-span-2">
@@ -105,7 +99,7 @@
 
             {{-- Info — admin managed --}}
             <aside class="space-y-5">
-                @foreach($cards as $card)
+                @forelse($cards as $card)
                     <div class="flex gap-4 rounded-3xl border border-ink/10 bg-white p-6">
                         @if(filled($card['icon'] ?? null))
                             <span class="text-2xl" aria-hidden="true">{{ $card['icon'] }}</span>
@@ -123,7 +117,12 @@
                             @endif
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="rounded-3xl border border-dashed border-ink/15 bg-white p-6 text-sm leading-6 text-muted">
+                        <p class="font-semibold text-ink">Contact details coming soon</p>
+                        <p class="mt-2">Use the form to reach the store. Phone, address and WhatsApp appear here once the owner publishes them in admin.</p>
+                    </div>
+                @endforelse
 
                 @if($whatsappEnabled && $whatsappDigits !== '')
                     <div class="rounded-3xl bg-ink p-6 text-white">

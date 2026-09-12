@@ -167,9 +167,9 @@ class PageResource extends Resource
                                     ->schema([
                                         TextInput::make('icon')->label('Emoji')->maxLength(16)->placeholder('🎧'),
                                         TextInput::make('title')->label('Title')->required()->maxLength(80)->placeholder('Support & orders'),
-                                        TextInput::make('line1')->label('Line 1 (highlighted)')->maxLength(120)->placeholder('support@rythme.store'),
-                                        TextInput::make('line2')->label('Line 2')->maxLength(120)->placeholder('+91 98765 43210'),
-                                        TextInput::make('line3')->label('Line 3 (small)')->maxLength(120)->placeholder('Mon–Sat, 10am–7pm IST'),
+                                        TextInput::make('line1')->label('Line 1 (highlighted)')->maxLength(120)->placeholder('Email or primary contact'),
+                                        TextInput::make('line2')->label('Line 2')->maxLength(120)->placeholder('Phone or secondary line'),
+                                        TextInput::make('line3')->label('Line 3 (small)')->maxLength(120)->placeholder('Hours or note'),
                                     ])
                                     ->columns(2)
                                     ->maxItems(5)
@@ -182,12 +182,13 @@ class PageResource extends Resource
                             ->schema([
                                 Toggle::make('settings.whatsapp_enabled')
                                     ->label('Show WhatsApp block')
-                                    ->default(true),
+                                    ->default(false)
+                                    ->helperText('Off until a real store WhatsApp number is set.'),
                                 TextInput::make('settings.whatsapp_number')
                                     ->label('WhatsApp number')
-                                    ->placeholder('+91 98765 43210')
+                                    ->placeholder('Include country code, digits only preferred')
                                     ->maxLength(30)
-                                    ->helperText('Used to build the wa.me chat link.'),
+                                    ->helperText('Used to build the wa.me chat link. Leave empty to hide the block.'),
                                 TextInput::make('settings.whatsapp_title')->label('Title')->placeholder('Prefer WhatsApp?')->maxLength(80),
                                 Textarea::make('settings.whatsapp_text')->label('Text')->rows(2)->maxLength(300),
                                 TextInput::make('settings.whatsapp_button')->label('Button label')->placeholder('Chat on WhatsApp')->maxLength(60),

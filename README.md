@@ -114,6 +114,7 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 | [`docs/RAZORPAY_SETUP_GUIDE.md`](docs/RAZORPAY_SETUP_GUIDE.md) | Razorpay test → live setup |
 | [`docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`](docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md) | Staff: publish products flowlessly |
 | [`docs/BUY_PATH_SMOKE_CHECKLIST.md`](docs/BUY_PATH_SMOKE_CHECKLIST.md) | Cart → pay smoke checklist |
+| [`docs/SEED_DATA_POLICY.md`](docs/SEED_DATA_POLICY.md) | Never seed production; demo catalogue is local-only |
 
 ### Deeper reference
 

@@ -82,13 +82,13 @@
                             <div class="mt-5 grid gap-4 sm:grid-cols-2">
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Full name</span>
-                                    <input type="text" wire:model="name" placeholder="Anoop Puri"
+                                    <input type="text" wire:model="name" placeholder="Full name"
                                            class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
                                     @error('name') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Phone</span>
-                                    <input type="tel" wire:model="phone" placeholder="98765 43210"
+                                    <input type="tel" wire:model="phone" placeholder="10-digit mobile"
                                            class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
                                     @error('phone') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>

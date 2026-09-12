@@ -1,8 +1,8 @@
 # Homepage Minor UI/UX Changes — Plan First
 
-**Status:** IMPLEMENTED — static/build gates complete; owner runtime/browser qualification and two existing hold-state automation expectations remain open
+**Status:** IMPLEMENTED — top bar + offer marquee + offer popup remain. **C5 (2026-09-12):** synthetic recent-purchase demo **purged** for production posture (no fabricated social proof).
 **Auto Mode:** PAUSED by owner hold
-**Branch:** `rhythm-uat`
+**Branch:** `arena/01a09498-rythm`
 **Scope:** Homepage/site-shell UI only; no Phase 12 autonomous continuation during this task
 
 ## Requested outcome
@@ -17,11 +17,8 @@
 - Phone number, email address and social URLs must come from owner-provided values or approved environment/configuration; no contact details or social profiles will be invented.
 - Offer percentages must be calculated from existing product `compare_at_price` and `price` data. No fake discount, scarcity or unsupported offer copy will be added. Products outside the 10–50% range will be excluded from the ticker.
 - The offer pop-up will reuse one eligible existing `bestDeals` product and its stored pricing; if no 10–50% eligible offer exists, the pop-up will not render. It is homepage-only, remains open until closed, and a versioned browser timestamp suppresses it for 24 hours after close.
-- The bottom-left cards are explicitly synthetic front-end demo data, not real customer social proof. Each card will carry a visible `Demo preview` label so fabricated names/purchases cannot be mistaken for production evidence.
-- The demo carousel will contain five cards, fade between cards every 10 seconds, run on every page and have no Admin/database control.
-- The card will use the purchased product unit price in the design payload; no addresses, phone numbers, email addresses, order numbers or payment details will appear.
-- Dismissal will use a versioned browser key with no sensitive data stored in localStorage; after close it will remain hidden until the user clears site storage or the component version changes.
-- The close button will be keyboard-accessible, labelled and announceable. The offer ticker will pause on hover/focus and respect `prefers-reduced-motion`. They both remain clearly front-end presentation features.
+- ~~Synthetic recent-purchase carousel~~ **REMOVED in C5** — production storefront must not show fabricated buyers. Real consented signals may return later behind an admin flag only.
+- Offer ticker still pauses on hover/focus and respects `prefers-reduced-motion`.
 
 ## Implementation sequence
 
@@ -54,13 +51,10 @@
 - Keep the dialog open until the close button is used; Escape is an accessible equivalent close action and backdrop clicks do not dismiss it.
 - Store only a close timestamp in a versioned browser key and suppress the pop-up for 24 hours after that timestamp.
 
-### Step 4 — Front-end demo recent-purchase card
+### Step 4 — Front-end demo recent-purchase card — **C5 PURGED**
 
-- Add a dedicated `resources/views/components/recent-purchase-card.blade.php` with five synthetic cards containing product name, unit price, demo user name and short detail.
-- Include a visible `Demo preview` label; do not query the database, create Admin controls or imply real customer activity.
-- Render the component globally from `resources/views/layouts/app.blade.php`.
-- Add accessible close control and versioned localStorage dismissal persistence.
-- Fade to the next card every 10 seconds; pause the timer on hover/focus and reduce motion for users who request it.
+- Component emptied; layout include removed; `initRecentPurchasePreview` removed from `ui.js`.
+- Do not reintroduce fabricated purchase names without owner consent + real data source.
 
 ### Step 5 — Styling, behavior and responsive QA
 

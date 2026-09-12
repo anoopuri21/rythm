@@ -14,8 +14,7 @@
 
 <article {{ $attributes->class(['product-card ui-card ui-card--interactive group flex h-full flex-col overflow-hidden', 'ui-card--dark text-white' => $dark, 'text-rythme-black' => !$dark]) }}>
     <div @class(['ui-media ui-media--product ui-media--contain relative', 'ui-media--dark' => $dark])>
-        {{-- Image: Bajaao real product photo (project rule: product images from Bajaao) --}}
-        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }} — real product photo from Bajaao" width="1024" height="1024" class="h-full w-full object-contain p-6 transition duration-700 group-hover:scale-105" loading="lazy" decoding="async">
+        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" width="1024" height="1024" class="h-full w-full object-contain p-6 transition duration-700 group-hover:scale-105" loading="lazy" decoding="async">
         @if(isset($product['badge']))
             <x-ui.badge :variant="$badgeVariant" class="absolute left-4 top-4">{{ $product['badge'] }}</x-ui.badge>
         @endif

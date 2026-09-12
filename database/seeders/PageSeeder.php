@@ -76,16 +76,13 @@ class PageSeeder extends Seeder
                 'template' => 'contact',
                 'content' => '<p>Setup advice, order questions, warranty help - our team plays the same instruments we sell. Write to us and you will hear back within 24 hours.</p>',
                 'settings' => [
+                    // No fake phone/email/address — owner fills cards in Admin → Pages (C5).
                     'contact_kicker' => "We're listening",
-                    'cards' => [
-                        ['icon' => '🎧', 'title' => 'Support & orders', 'line1' => 'support@rythme.store', 'line2' => '+91 98765 43210', 'line3' => 'Mon–Sat, 10am–7pm IST'],
-                        ['icon' => '🏠', 'title' => 'Showroom', 'line1' => '42, Music Lane, Karol Bagh', 'line2' => 'New Delhi, Delhi 110005', 'line3' => 'Walk-ins welcome'],
-                        ['icon' => '🤝', 'title' => 'Partnerships', 'line1' => 'partners@rythme.store', 'line2' => 'Brands, dealers, teachers', 'line3' => 'Reply within 2 days'],
-                    ],
-                    'whatsapp_enabled' => true,
-                    'whatsapp_number' => '+91 98765 43210',
+                    'cards' => [],
+                    'whatsapp_enabled' => false,
+                    'whatsapp_number' => '',
                     'whatsapp_title' => 'Prefer WhatsApp?',
-                    'whatsapp_text' => 'Message us photos of your gear — we love a good setup question.',
+                    'whatsapp_text' => 'Send a message about your order or an instrument — the store replies when available.',
                     'whatsapp_button' => 'Chat on WhatsApp',
                     'map_embed_url' => null,
                 ],

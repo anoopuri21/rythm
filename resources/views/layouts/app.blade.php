@@ -80,7 +80,7 @@
     <x-footer />
 
     {{-- Front-end-only purchase-card design preview; no database/admin control. --}}
-    @include('components.recent-purchase-card')
+    {{-- recent-purchase demo widget removed (C5 / W4) --}}
 
     {{-- Cart slide-over drawer (Livewire) --}}
     <livewire:cart-drawer />
