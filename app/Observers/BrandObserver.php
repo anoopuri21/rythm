@@ -13,15 +13,18 @@ final class BrandObserver
     public function saved(Brand $brand): void
     {
         Cache::forget(BrandService::CACHE_KEY);
+        HomepageDataObserver::flush();
     }
 
     public function deleted(Brand $brand): void
     {
         Cache::forget(BrandService::CACHE_KEY);
+        HomepageDataObserver::flush();
     }
 
     public function restored(Brand $brand): void
     {
         Cache::forget(BrandService::CACHE_KEY);
+        HomepageDataObserver::flush();
     }
 }

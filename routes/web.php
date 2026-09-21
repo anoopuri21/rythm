@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MailFromVerifyController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
@@ -40,6 +41,11 @@ Route::get('/contact', [PageController::class, 'show'])
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
+
+// Admin-configured outbound From address confirmation (signed, 24h).
+Route::get('/mail/from/verify', MailFromVerifyController::class)
+    ->middleware(['signed', 'throttle:20,1'])
+    ->name('mail-from.verify');
 
 // Wishlist — auth only
 Route::middleware('auth')->group(function () {

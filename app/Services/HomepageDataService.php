@@ -41,12 +41,15 @@ final class HomepageDataService
      *   bestDeals: Collection<int, Product>,
      *   categoryRows: Collection<int, array{row:HomepageCategoryRow,category:Category,products:Collection<int,Product>}>,
      *   popularCategories: Collection<int, array{name:string, slug:string, count:int, image:?string}>,
+     *   brands: Collection<int, array{name:string, slug:string, count:int, logo:?string}>,
+     *   brandNames: Collection<int, string>,
      * }
      */
     public function all(): array
     {
         return Cache::remember(HomepageDataObserver::CACHE_KEY, 3600, function (): array {
             $categoryRows = $this->categoryRows();
+            $brands = $this->popularBrands();
 
             return [
                 'heroSlides' => HeroSlide::query()->where('is_active', true)->orderBy('sort_order')->get(),
@@ -85,11 +88,41 @@ final class HomepageDataService
                     'casio-ct-s300-portable-keyboard',
                     'numark-mixtrack-pro-fx',
                 ]),
-                'brandNames' => Brand::query()->orderBy('name')->limit(16)->pluck('name'),
+                'brands' => $brands,
+                // Legacy name list for any older includes; prefer `brands`.
+                'brandNames' => $brands->pluck('name'),
                 'categoryRows' => $categoryRows,
                 'popularCategories' => $this->popularCategories($categoryRows->pluck('category')),
             ];
         });
+    }
+
+    /**
+     * Active brands for the homepage slider (logos when uploaded in Admin).
+     *
+     * @return Collection<int, array{name:string, slug:string, count:int, logo:?string}>
+     */
+    private function popularBrands(): Collection
+    {
+        return Brand::query()
+            ->where('is_active', true)
+            ->with('media')
+            ->withCount(['products' => fn ($query) => $query->where('is_active', true)])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->limit(16)
+            ->get()
+            ->map(function (Brand $brand): array {
+                $logo = $brand->getFirstMediaUrl('logo');
+
+                return [
+                    'name' => $brand->name,
+                    'slug' => $brand->slug,
+                    'count' => (int) $brand->products_count,
+                    'logo' => $logo !== '' ? $logo : null,
+                ];
+            })
+            ->values();
     }
 
     /**

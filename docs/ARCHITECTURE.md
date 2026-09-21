@@ -139,7 +139,7 @@ Admin: Filament `/admin` only (no public REST admin API).
 
 ## 7. Service catalogue (call these, not controllers)
 
-`CartService` · `WishlistService` · `AddressService` · `CouponService` · `OrderService` · `OrderStateMachine` · `InventoryService` · `ProductQueryService` · `CategoryService` · `BrandService` · `PaymentEventService` · `PaymentRetryService` · `RefundService` · `FulfillmentService` · `ReturnRequestService` · `CommerceNotificationService` · `NotificationRetryService` · `NotificationReconciliationService` · `NotificationPreferenceService` · `HomepageDataService` · `SeoService` · `SiteSettingsService` · `ReviewService` · `ContactService` · `CatalogueAcquisitionService` · `CatalogueImportService` · `CataloguePublicationReviewService` · `ImportedProductActivationService` · `CatalogueExpansionManifestService` · `AdminAuditService` · `BackInStockSubscriptionService` · `FinancialReconciliationService`
+`CartService` · `WishlistService` · `AddressService` · `CouponService` · `OrderService` · `OrderStateMachine` · `InventoryService` · `ProductQueryService` · `CategoryService` · `BrandService` · `PaymentEventService` · `PaymentRetryService` · `RefundService` · `FulfillmentService` · `ReturnRequestService` · `CommerceNotificationService` · `NotificationRetryService` · `NotificationReconciliationService` · `NotificationPreferenceService` · `HomepageDataService` · `SeoService` · `SiteSettingsService` · `MailSenderSettingsService` · `ReviewService` · `ContactService` · `CatalogueAcquisitionService` · `CatalogueImportService` · `CataloguePublicationReviewService` · `ImportedProductActivationService` · `CatalogueExpansionManifestService` · `AdminAuditService` · `BackInStockSubscriptionService` · `FinancialReconciliationService`
 
 ---
 
@@ -161,6 +161,7 @@ Admin: Filament `/admin` only (no public REST admin API).
 - Image resolve: MediaLibrary → `public/images/products/{slug}.jpg` → fallback.  
 - Seeds = demo only, not production stock/legal consent.  
 - `config/rythme.php` + Site Settings for brand/contact/shipping fallbacks.  
+- Outbound mail **From**: `MailSenderSettingsService` — admin-set address is live only after signed `/mail/from/verify`; otherwise `MAIL_FROM_*`. SMTP/API stays in `.env`.  
 - `withheld_public_pages`: shipping, returns, warranty, faqs until owner legal OK.
 
 ---

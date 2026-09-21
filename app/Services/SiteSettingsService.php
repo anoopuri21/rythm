@@ -40,6 +40,13 @@ final class SiteSettingsService
         'social_facebook' => '',
         'social_x' => '',
         'social_linkedin' => '',
+        // Outbound mail From (Admin → Settings). Live address requires verification.
+        'mail_from_address' => '',
+        'mail_from_name' => '',
+        'mail_from_verified_at' => '',
+        'mail_from_pending_address' => '',
+        'mail_from_pending_token' => '',
+        'mail_from_pending_sent_at' => '',
     ];
 
     /** @return array<string, string> */
@@ -76,6 +83,34 @@ final class SiteSettingsService
             SiteSetting::updateOrCreate(['key' => $key], ['value' => (string) $value]);
         }
 
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    public function put(string $key, string $value): void
+    {
+        SiteSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /** @param  array<string, string>  $pairs */
+    public function putMany(array $pairs): void
+    {
+        foreach ($pairs as $key => $value) {
+            SiteSetting::updateOrCreate(['key' => $key], ['value' => (string) $value]);
+        }
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    public function forget(string $key): void
+    {
+        SiteSetting::where('key', $key)->delete();
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /** @param  list<string>  $keys */
+    public function forgetMany(array $keys): void
+    {
+        SiteSetting::whereIn('key', $keys)->delete();
         Cache::forget(self::CACHE_KEY);
     }
 }
