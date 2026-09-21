@@ -44,9 +44,8 @@ class InfraTest extends TestCase
             ->assertSee(route('shop.index'), escape: false)
             ->assertSee('/about', escape: false)
             ->assertSee('/product/yamaha-f310-acoustic-guitar', escape: false)
-            ->assertDontSee('/shipping', escape: false)
-            ->assertDontSee('/returns', escape: false)
-            ->assertDontSee('/warranty', escape: false);
+            ->assertSee('/shipping', escape: false)
+            ->assertSee('/returns', escape: false);
     }
 
     public function test_robots_txt_renders(): void
@@ -62,7 +61,7 @@ class InfraTest extends TestCase
     {
         $this->get('/definitely-not-a-page')
             ->assertNotFound()
-            ->assertSee('This note fell off the page');
+            ->assertSee('This address is not available');
     }
 
     public function test_gst_and_shipping_settings_apply_to_totals(): void

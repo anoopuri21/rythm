@@ -84,6 +84,44 @@ export function initCarousels(reducedMotion) {
         });
     }
 
+    // Popular brands — horizontal logo / monogram slider
+    const brands = document.querySelector('.brand-swiper');
+    if (brands) {
+        const brandRoot = brands.closest('.brand-mm__carousel') || brands.parentElement;
+        new Swiper(brands, {
+            modules: commonModules,
+            speed: reducedMotion ? 0 : 650,
+            spaceBetween: 12,
+            slidesPerView: 2.15,
+            watchOverflow: true,
+            grabCursor: true,
+            loop: brands.querySelectorAll('.swiper-slide').length > 6,
+            autoplay: reducedMotion ? false : {
+                delay: 4200,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
+            navigation: {
+                nextEl: brandRoot?.querySelector('.brand-next') || '.brand-next',
+                prevEl: brandRoot?.querySelector('.brand-prev') || '.brand-prev',
+            },
+            pagination: {
+                el: brandRoot?.querySelector('.brand-mm__pagination') || null,
+                clickable: true,
+            },
+            keyboard: { enabled: true, onlyInViewport: true },
+            a11y: { enabled: true },
+            breakpoints: {
+                480: { slidesPerView: 2.6, spaceBetween: 12 },
+                640: { slidesPerView: 3.2, spaceBetween: 14 },
+                768: { slidesPerView: 4, spaceBetween: 14 },
+                1024: { slidesPerView: 5, spaceBetween: 16 },
+                1280: { slidesPerView: 6, spaceBetween: 16 },
+                1536: { slidesPerView: 7, spaceBetween: 18 },
+            },
+        });
+    }
+
     const testimonials = document.querySelector('.testimonial-swiper');    if (testimonials) {
         new Swiper(testimonials, {
             modules: commonModules,

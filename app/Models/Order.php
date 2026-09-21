@@ -124,6 +124,21 @@ class Order extends Model
         return $this->hasMany(ReturnRequest::class);
     }
 
+    /** @return array{enabled: bool, cgst: float, sgst: float, igst: float, tax: float} */
+    public function gstTotals(): array
+    {
+        $items = $this->items;
+        $enabled = $items->contains(fn (OrderItem $item): bool => (bool) $item->tax_calculation_enabled_snapshot);
+
+        return [
+            'enabled' => $enabled,
+            'cgst' => round((float) $items->sum(fn (OrderItem $item): float => (float) ($item->cgst_amount_snapshot ?? 0)), 2),
+            'sgst' => round((float) $items->sum(fn (OrderItem $item): float => (float) ($item->sgst_amount_snapshot ?? 0)), 2),
+            'igst' => round((float) $items->sum(fn (OrderItem $item): float => (float) ($item->igst_amount_snapshot ?? 0)), 2),
+            'tax' => round((float) $this->tax, 2),
+        ];
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;

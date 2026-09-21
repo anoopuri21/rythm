@@ -79,7 +79,7 @@ final class OrderController extends Controller
     /**
      * Printable invoice — plain, print-friendly HTML from order snapshots.
      */
-    public function invoice(Request $request, Order $order): View
+    public function invoice(Request $request, Order $order, SiteSettingsService $settings): View
     {
         $this->authorizeView($request, $order);
 
@@ -90,7 +90,10 @@ final class OrderController extends Controller
             'robots' => 'noindex, follow',
         ]);
 
-        return view('orders.invoice', ['order' => $order]);
+        return view('orders.invoice', [
+            'order' => $order,
+            'settings' => $settings,
+        ]);
     }
 
     public function retryPayment(
@@ -118,7 +121,7 @@ final class OrderController extends Controller
             return view('orders.retry-payment', [
                 'order' => $order,
                 'options' => [
-                    'key' => (string) config('services.razorpay.key_id'),
+                    'key' => app(\App\Services\PaymentSettingsService::class)->publicKeyId(),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),

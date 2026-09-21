@@ -12,21 +12,21 @@
         $stats = collect([
             ['value' => 'Curated', 'label' => 'Instrument catalogue'],
             ['value' => 'Verified', 'label' => 'Checkout totals'],
-            ['value' => 'Moderated', 'label' => 'Reviews & Q&A'],
+            ['value' => 'Moderated', 'label' => 'Verified reviews'],
             ['value' => 'Protected', 'label' => 'Order tracking'],
         ]);
     }
 
     $promiseKicker = $s['promise_kicker'] ?? 'Our promise';
     $promiseHeading = $s['promise_heading'] ?? 'A clearer way to explore musical instruments';
-    $promiseText = $s['promise_text'] ?? 'Rhythm Exports presents catalogue details, availability and checkout totals through the storefront. Product questions and verified-purchase reviews are moderated before they appear publicly.';
+    $promiseText = $s['promise_text'] ?? 'Rhythm Exports presents catalogue details, availability and checkout totals through the storefront. Verified-purchase reviews are moderated before they appear publicly.';
 
     $points = collect($s['promise_points'] ?? [])->filter(fn ($p) => filled($p))->values();
     if ($points->isEmpty()) {
         $points = collect([
             'Category, brand, price and specification filters',
             'Server-verified checkout totals',
-            'Moderated product questions and staff answers',
+            'Moderated verified-purchase reviews',
             'Protected order tracking and invoice access',
         ]);
     }

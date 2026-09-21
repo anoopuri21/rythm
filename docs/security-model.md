@@ -8,6 +8,7 @@ Rythme treats the browser, Livewire properties, route parameters, uploaded files
 
 - The storefront uses Laravel authentication, email verification where required, CSRF middleware, and owner-scoped queries.
 - `/admin` is an authenticated Filament boundary. `User::canAccessPanel()` accepts staff roles only. MFA is required outside tests.
+- **Auth isolation:** Filament uses session guard `admin`; storefront uses `web`. Staff login at `/admin` does **not** authenticate `/account`, checkout, or wishlist (and customer login does not open the panel). Same `users` table; separate session auth keys. See `docs/C_ADMIN_STOREFRONT_AUTH_ISOLATION_PLAN.md`.
 - Filament strict authorization is enabled. Model policies deny operations unless `AdminAccess` grants the required permission.
 - Staff access management is separately restricted to `staff.manage`; destructive staff deletion is disabled. MFA reset and role changes require a reason and are audited.
 - Order views require the owning account or a short-lived signed guest link. Order cancellation and payment retry require the owning authenticated account.
@@ -52,6 +53,7 @@ Production requirements:
 - HTTPS end to end and correctly configured trusted proxies;
 - `SESSION_DRIVER=database`, `SESSION_HTTP_ONLY=true`, `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax` (or stricter after checkout compatibility testing), and a narrow cookie domain;
 - a unique protected `APP_KEY`, `APP_DEBUG=false`, and short operational session lifetime;
+- storefront logout clears only the `web` guard; full session invalidate runs when no `admin` session remains;
 - configuration cache rebuilt after environment changes.
 
 Laravel CSRF protection remains enabled for browser routes and Livewire. Only Razorpay callback/webhook endpoints are excepted because Razorpay cannot possess the application CSRF token; those endpoints instead require provider signatures and local payment correlation. The browser callback is not sufficient by itself: the gateway API must independently report a captured payment.

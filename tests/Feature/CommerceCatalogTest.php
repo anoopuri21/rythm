@@ -81,17 +81,17 @@ class CommerceCatalogTest extends TestCase
         $this->seed();
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/products')
             ->assertOk()
             ->assertSee('Yamaha F310 Acoustic Guitar');
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/categories')
             ->assertOk()
             ->assertSee('Guitars');
 
-        $this->actingAs($admin)
+        $this->actingAsAdmin($admin)
             ->get('/admin/brands')
             ->assertOk()
             ->assertSee('Fender');

@@ -207,8 +207,7 @@
                         </label>
                         <label class="block">
                             <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">State</span>
-                            <input type="text" name="state" value="{{ old('state') }}" required
-                                   class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                            <x-state-select :value="old('state')" />
                             @error('state') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                         </label>
                         <label class="block">
@@ -290,14 +289,26 @@
                         <h3 class="font-semibold text-ink">Contact the team</h3>
                         <p class="mt-2 text-sm leading-6 text-muted">Send a product, account or service question.</p>
                     </a>
-                    <a href="{{ route('orders.lookup') }}" class="ui-card ui-card--interactive p-6">
-                        <h3 class="font-semibold text-ink">Track an order</h3>
-                        <p class="mt-2 text-sm leading-6 text-muted">View the latest recorded order status securely.</p>
-                    </a>
-                    <a href="/returns" class="ui-card ui-card--interactive p-6">
-                        <h3 class="font-semibold text-ink">Return or refund help</h3>
-                        <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
-                    </a>
+                    @if(! empty($hasTrackableOrder))
+                        {{-- Only after a confirmed (or later) order exists — open account orders, not a cold lookup from marketing chrome. --}}
+                        <a href="#account-panel-orders"
+                           @click.prevent="tab = 'orders'; window.location.hash = 'orders'"
+                           class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Track an order</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Open your orders to see status and shipment tracking on each order page.</p>
+                        </a>
+                    @endif
+                    @if($returnsHelpHref = \App\Support\PublicContent::pageHref('returns'))
+                        <a href="{{ $returnsHelpHref }}" class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Return or refund help</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Review eligibility guidance before submitting a request.</p>
+                        </a>
+                    @elseif(\App\Support\PublicContent::returnsEnabled())
+                        <a href="{{ route('contact') }}" class="ui-card ui-card--interactive p-6">
+                            <h3 class="font-semibold text-ink">Return or refund help</h3>
+                            <p class="mt-2 text-sm leading-6 text-muted">Contact support about an eligible return from your order page.</p>
+                        </a>
+                    @endif
                 </div>
             </section>
 

@@ -34,10 +34,27 @@ class ProductPageTest extends TestCase
             ->assertSee('Add to Cart')
             ->assertSee($product->sku)
             ->assertSee('Shipping at checkout')
-            ->assertSee('Questions &amp; answers', escape: false)
+            ->assertSee('Description', false)
+            ->assertSee('Specifications', false)
+            ->assertSee('Customer reviews', false)
+            ->assertSee('id="customer-reviews"', false)
+            ->assertSee('Show more', false) // Alpine toggle label present in markup
+            ->assertDontSee('Track an order', false)
+            ->assertDontSee('Questions &amp; answers', escape: false)
             ->assertDontSee('1-Year Warranty')
             ->assertDontSee('4.8')
             ->assertSee('You may also like');
+    }
+
+    public function test_product_page_does_not_surface_guest_order_tracking(): void
+    {
+        $product = Product::where('slug', 'yamaha-f310-acoustic-guitar')->firstOrFail();
+
+        $this->get(route('product.show', $product))
+            ->assertOk()
+            ->assertDontSee(route('orders.lookup'), false)
+            ->assertDontSee('/track-order', false)
+            ->assertDontSee('Track an order', false);
     }
 
     public function test_product_page_has_single_h1_and_meta(): void

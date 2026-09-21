@@ -68,11 +68,16 @@ class AdminGovernanceTest extends TestCase
             AdminAccess::FINANCE_VIEW, AdminAccess::FINANCE_MANAGE,
             AdminAccess::SETTINGS_MANAGE, AdminAccess::STAFF_MANAGE,
             AdminAccess::AUDIT_VIEW, AdminAccess::NOTIFICATIONS_VIEW,
+            AdminAccess::PAYMENTS_MANAGE,
         ];
         $all = $permissions;
+        $adminWithoutPayments = array_values(array_filter(
+            $permissions,
+            fn (string $permission): bool => $permission !== AdminAccess::PAYMENTS_MANAGE,
+        ));
         $expected = [
             User::ROLE_SUPER_ADMIN => $all,
-            User::ROLE_ADMIN => $all,
+            User::ROLE_ADMIN => $adminWithoutPayments,
             User::ROLE_CATALOGUE_MANAGER => [AdminAccess::CATALOGUE_VIEW, AdminAccess::CATALOGUE_MANAGE],
             User::ROLE_ORDER_MANAGER => [AdminAccess::ORDERS_VIEW, AdminAccess::ORDERS_MANAGE, AdminAccess::CUSTOMERS_VIEW, AdminAccess::CATALOGUE_VIEW],
             User::ROLE_SUPPORT => [AdminAccess::ORDERS_VIEW, AdminAccess::CUSTOMERS_VIEW, AdminAccess::INTERACTIONS_MANAGE, AdminAccess::CATALOGUE_VIEW, AdminAccess::NOTIFICATIONS_VIEW],
@@ -110,16 +115,22 @@ class AdminGovernanceTest extends TestCase
     public function test_direct_admin_routes_hide_unassigned_modules(): void
     {
         $catalogue = $this->staff(User::ROLE_CATALOGUE_MANAGER);
-        $this->actingAs($catalogue)->get('/admin/products')->assertOk();
-        $this->actingAs($catalogue)->get('/admin/orders')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/settings')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/admin-audit-logs')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/staff')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/products')->assertOk();
+        $this->actingAsAdmin($catalogue)->get('/admin/orders')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/settings')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/admin-audit-logs')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/staff')->assertForbidden();
 
         $superAdmin = $this->staff(User::ROLE_SUPER_ADMIN);
-        $this->actingAs($superAdmin)->get('/admin/admin-audit-logs')->assertOk();
-        $this->actingAs($superAdmin)->get('/admin/staff')->assertOk();
-        $this->actingAs($superAdmin)->get('/admin/settings')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/admin-audit-logs')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/staff')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/settings')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/razorpay-settings')->assertOk();
+        $this->actingAsAdmin($catalogue)->get('/admin/razorpay-settings')->assertForbidden();
+        $legacyAdmin = $this->staff(User::ROLE_ADMIN);
+        $this->actingAsAdmin($legacyAdmin)->get('/admin/razorpay-settings')->assertForbidden();
+        $finance = $this->staff(User::ROLE_FINANCE);
+        $this->actingAsAdmin($finance)->get('/admin/razorpay-settings')->assertForbidden();
     }
 
     public function test_final_super_admin_cannot_be_demoted(): void
@@ -170,7 +181,7 @@ class AdminGovernanceTest extends TestCase
     {
         $actor = $this->staff(User::ROLE_SUPER_ADMIN);
         $product = Product::factory()->create(['price' => 100, 'stock' => 4]);
-        $this->actingAs($actor);
+        $this->actingAsAdmin($actor);
 
         $product->update(['price' => 120, 'stock' => 3, 'name' => 'Audited product name']);
         $audit = AdminAuditLog::sole();

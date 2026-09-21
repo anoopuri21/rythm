@@ -309,6 +309,6 @@ class CouponTest extends TestCase
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
         Coupon::factory()->create(['code' => 'ADMIN10']);
 
-        $this->actingAs($admin)->get('/admin/coupons')->assertOk()->assertSee('ADMIN10');
+        $this->actingAsAdmin($admin)->get('/admin/coupons')->assertOk()->assertSee('ADMIN10');
     }
 }

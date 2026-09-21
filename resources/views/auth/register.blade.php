@@ -19,7 +19,7 @@
                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Full name</span>
                     <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
                            class="h-12 w-full rounded-xl border border-ink/15 bg-white px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
-                           placeholder="Anoop Puri">
+                           placeholder="Your full name">
                     @error('name') <span class="mt-1.5 block text-xs font-semibold text-brand">{{ $message }}</span> @enderror
                 </label>
 

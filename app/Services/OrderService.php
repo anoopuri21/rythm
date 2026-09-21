@@ -31,6 +31,7 @@ final class OrderService
         private readonly RefundService $refunds,
         private readonly InventoryService $inventory,
         private readonly OrderStateMachine $states,
+        private readonly GstCalculator $gst,
     ) {}
 
     public function createFromCheckout(Cart $cart, CheckoutData $data, int $userId): Order
@@ -95,13 +96,14 @@ final class OrderService
                 }
 
                 $shippingFee = $this->shippingFeeFor($subtotal);
-                $taxSnapshots = $this->taxSnapshotsFor(
+                $taxResult = $this->gst->snapshotsFor(
                     $items,
                     $unitPrices,
                     $discount,
-                    $data->shippingAddress,
+                    isset($data->shippingAddress['state']) ? trim((string) $data->shippingAddress['state']) : null,
                 );
-                $tax = round((float) collect($taxSnapshots)->sum('tax_amount_snapshot'), 2);
+                $taxSnapshots = $taxResult['snapshots'];
+                $tax = round((float) $taxResult['quote']->total, 2);
                 $total = max(0.0, round($subtotal - $discount + $shippingFee + $tax, 2));
 
                 $order = Order::create([
@@ -509,60 +511,4 @@ final class OrderService
         return $freeAbove > 0 && $subtotal >= $freeAbove ? 0.0 : $flat;
     }
 
-    /**
-     * Build immutable line-level tax evidence without assuming a jurisdictional rule.
-     *
-     * @param  \Illuminate\Support\Collection<int, \App\Models\CartItem>  $items
-     * @param  array<int, float>  $unitPrices
-     * @param  array<string, mixed>  $shippingAddress
-     * @return array<int, array<string, mixed>>
-     */
-    private function taxSnapshotsFor($items, array $unitPrices, float $discount, array $shippingAddress): array
-    {
-        $enabled = $this->settings->get('tax_rules_enabled', '0') === '1';
-        $globalRate = $this->settings->getFloat('tax_rate', 0.0);
-        if ($enabled && ($globalRate < 0 || $globalRate > 100)) {
-            throw new RuntimeException('Configured default tax rate must be between 0 and 100.');
-        }
-        $subtotalCents = (int) round($items->sum(
-            fn ($item): float => $unitPrices[$item->id] * $item->qty,
-        ) * 100);
-        $discountCentsTotal = min($subtotalCents, max(0, (int) round($discount * 100)));
-        $remainingDiscountCents = $discountCentsTotal;
-        $snapshots = [];
-        $lastIndex = $items->count() - 1;
-
-        foreach ($items->values() as $index => $item) {
-            $grossCents = (int) round($unitPrices[$item->id] * $item->qty * 100);
-            $discountCents = $index === $lastIndex
-                ? $remainingDiscountCents
-                : min($remainingDiscountCents, (int) round(
-                    $subtotalCents > 0 ? $discountCentsTotal * ($grossCents / $subtotalCents) : 0,
-                ));
-            $remainingDiscountCents -= $discountCents;
-            $taxableCents = max(0, $grossCents - $discountCents);
-            $configuredRate = $item->product->tax_rate === null
-                ? $globalRate
-                : (float) $item->product->tax_rate;
-            if ($enabled && ($configuredRate < 0 || $configuredRate > 100)) {
-                throw new RuntimeException('Configured product tax rate must be between 0 and 100.');
-            }
-            $appliedRate = $enabled ? $configuredRate : null;
-            $taxCents = $appliedRate === null ? 0 : (int) round($taxableCents * ($appliedRate / 100));
-
-            $snapshots[$item->id] = [
-                'hsn_code_snapshot' => $item->product->hsn_code,
-                'tax_classification_snapshot' => $item->product->tax_classification,
-                'tax_rate_snapshot' => $appliedRate,
-                'taxable_amount_snapshot' => $enabled ? $taxableCents / 100 : null,
-                'tax_amount_snapshot' => $taxCents / 100,
-                'tax_calculation_enabled_snapshot' => $enabled,
-                'tax_destination_region_snapshot' => $enabled
-                    ? (isset($shippingAddress['state']) ? trim((string) $shippingAddress['state']) : null)
-                    : null,
-            ];
-        }
-
-        return $snapshots;
-    }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Support\IndiaStates;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class StoreAddressRequest extends FormRequest
 {
@@ -21,7 +23,7 @@ final class StoreAddressRequest extends FormRequest
             'line1' => ['required', 'string', 'max:255'],
             'line2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
-            'state' => ['required', 'string', 'max:100'],
+            'state' => ['required', 'string', Rule::in(IndiaStates::NAMES)],
             'pincode' => ['required', 'string', 'regex:/^[0-9]{6}$/'],
             'is_default' => ['sometimes', 'boolean'],
         ];

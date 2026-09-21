@@ -12,10 +12,10 @@
         <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
         <div class="relative mx-auto grid max-w-[1520px] items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
             <div>
-                <p class="section-kicker text-gold-light">The Rhythm Exports promise</p>
-                <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Ready to find <em class="text-gold-light">your sound?</em></h2>
+                <p class="section-kicker text-gold-light">Ready when you are</p>
+                <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Find <em class="text-gold-light">your sound</em></h2>
                 <p class="mt-4 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
-                    Explore the catalogue or contact the Rhythm Exports team with a product or order question.
+                    Browse the shop or send us a product or order question.
                 </p>
                 <div class="mt-8 flex flex-wrap items-center gap-4">
                     <a href="/shop" class="btn-gold btn-shine">Browse instruments <span aria-hidden="true">→</span></a>
@@ -24,20 +24,20 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
-                    <p class="text-base font-bold text-gold-light">Catalogue filters</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Narrow instruments by category, brand, price, stock and available specifications.</p>
+                    <p class="text-base font-bold text-gold-light">Filters</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Shop by category, brand, price and stock.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
-                    <p class="text-base font-bold text-gold-light">Verified totals</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Checkout totals are recalculated from current catalogue data.</p>
+                    <p class="text-base font-bold text-gold-light">Clear totals</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Prices and GST are confirmed at checkout.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
                     <p class="text-base font-bold text-gold-light">Wishlist</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Save products to a customer account for later consideration.</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Save items to look at later.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
                     <p class="text-base font-bold text-gold-light">Order tracking</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Follow recorded order-status updates through protected access.</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Follow your order from your account.</p>
                 </div>
             </div>
         </div>
@@ -84,33 +84,64 @@
                 </nav>
             @endif
 
-            {{-- Customer care — dynamic pages --}}
+            {{-- Customer care — only link policies the client has published --}}
+            @php
+                $careLinks = collect([
+                    ['href' => '/contact', 'label' => 'Contact us', 'always' => true],
+                    ['slug' => 'shipping', 'label' => 'Shipping'],
+                    ['slug' => 'refund', 'label' => 'Refunds'],
+                    ['slug' => 'returns', 'label' => 'Returns'],
+                    ['slug' => 'warranty', 'label' => 'Warranty'],
+                    ['slug' => 'faqs', 'label' => 'FAQs'],
+                ])->map(function (array $link): ?array {
+                    if (! empty($link['always'])) {
+                        return ['href' => $link['href'], 'label' => $link['label']];
+                    }
+                    $href = \App\Support\PublicContent::pageHref((string) ($link['slug'] ?? ''));
+
+                    return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                })->filter()->values();
+            @endphp
             <nav aria-labelledby="footer-care">
                 <h3 id="footer-care" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Customer care</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/contact" class="footer-link text-sm text-white/60">Contact us</a></li>
-                    <li><span class="text-sm text-white/45">Policy information is published after approval.</span></li>
+                    @foreach($careLinks as $link)
+                        <li><a href="{{ $link['href'] }}" class="footer-link text-sm text-white/60">{{ $link['label'] }}</a></li>
+                    @endforeach
                 </ul>
             </nav>
 
-            {{-- Company --}}
-            <nav aria-labelledby="footer-company">
-                <h3 id="footer-company" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Company</h3>
-                <ul class="mt-6 space-y-3.5">
-                    <li><a href="/about" class="footer-link text-sm text-white/60">Our story</a></li>
-                    <li><a href="/terms" class="footer-link text-sm text-white/60">Terms &amp; conditions</a></li>
-                    <li><a href="/privacy" class="footer-link text-sm text-white/60">Privacy policy</a></li>
-                </ul>
-            </nav>
+            {{-- Company — hide unpublished CMS pages --}}
+            @php
+                $companyLinks = collect([
+                    ['slug' => 'about', 'label' => 'Our story'],
+                    ['slug' => 'terms', 'label' => 'Terms & conditions'],
+                    ['slug' => 'privacy', 'label' => 'Privacy policy'],
+                ])->map(function (array $link): ?array {
+                    $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                    return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                })->filter()->values();
+            @endphp
+            @if($companyLinks->isNotEmpty())
+                <nav aria-labelledby="footer-company">
+                    <h3 id="footer-company" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Company</h3>
+                    <ul class="mt-6 space-y-3.5">
+                        @foreach($companyLinks as $link)
+                            <li><a href="{{ $link['href'] }}" class="footer-link text-sm text-white/60">{{ $link['label'] }}</a></li>
+                        @endforeach
+                    </ul>
+                </nav>
+            @endif
 
             {{-- Help --}}
             <nav aria-labelledby="footer-help">
                 <h3 id="footer-help" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Help</h3>
                 <ul class="mt-6 space-y-3.5">
-                    <li><a href="/track-order" class="footer-link text-sm text-white/60">Track your order</a></li>
-                    <li><a href="/cart" class="footer-link text-sm text-white/60">View cart</a></li>
-                    <li><a href="/wishlist" class="footer-link text-sm text-white/60">Wishlist</a></li>
-                    <li><a href="/login" class="footer-link text-sm text-white/60">My account</a></li>
+                    {{-- Track order is only surfaced from an order detail page / account when a confirmed order exists. --}}
+                    <li><a href="{{ route('cart.index') }}" class="footer-link text-sm text-white/60">View cart</a></li>
+                    <li><a href="{{ route('wishlist.index') }}" class="footer-link text-sm text-white/60">Wishlist</a></li>
+                    <li><a href="{{ route('login') }}" class="footer-link text-sm text-white/60">My account</a></li>
                 </ul>
             </nav>
         </div>
@@ -120,7 +151,7 @@
     <div class="border-t border-white/10">
         <div class="mx-auto flex max-w-[1520px] flex-col gap-5 px-5 py-7 text-[11px] text-white/60 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p>© {{ date('Y') }} {{ $brand }}. All rights reserved.</p>
-            <p class="inline-flex items-center gap-2"><span class="text-gold">●</span> Server-verified checkout totals</p>
+            <p class="inline-flex items-center gap-2"><span class="text-gold">●</span> Pay with Razorpay</p>
         </div>
     </div>
 

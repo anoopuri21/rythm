@@ -29,7 +29,7 @@ final class RegisterController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
         return redirect()->route('verification.notice');

@@ -79,7 +79,7 @@ class AdminFormSchemaSmokeTest extends TestCase
         foreach ($this->resourceClasses() as $class) {
             $url = $class::getUrl();
 
-            $status = $this->actingAs($admin)->get($url)->getStatusCode();
+            $status = $this->actingAsAdmin($admin)->get($url)->getStatusCode();
 
             // 200 = renders (table schema builds); 403 = access intentionally
             // restricted for this role — anything else is a crash.
@@ -106,7 +106,7 @@ class AdminFormSchemaSmokeTest extends TestCase
     {
         $admin = User::where('email', 'admin@rythme.test')->firstOrFail();
 
-        \Livewire\Livewire::actingAs($admin)
+        \Livewire\Livewire::actingAs($admin, 'admin')
             ->test(\App\Filament\Resources\CouponResource\Pages\ManageCoupons::class)
             ->callAction(
                 \Filament\Actions\Testing\TestAction::make('create'),

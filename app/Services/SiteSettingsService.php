@@ -18,15 +18,21 @@ final class SiteSettingsService
     public const DEFAULTS = [
         'shipping_flat_fee' => '0',
         'shipping_free_above' => '0',
-        'tax_rules_enabled' => '0', // disabled until professional approval
-        'tax_rate' => '0',           // optional approved default rate
-        'returns_enabled' => '0',    // disabled until an approved business policy is configured
-        'return_window_days' => '0', // no eligibility window is assumed
-        'contact_email' => 'support@rythme.store',
-        'contact_phone' => '+91 98765 43210',
+        'tax_rules_enabled' => '0',
+        'tax_rate' => '0',
+        'origin_state' => '',
+        'origin_gstin' => '',
+        'business_legal_name' => '',
+        'business_address' => '',
+        'returns_enabled' => '0',
+        'return_window_days' => '0',
+        // Contact stays empty until the client saves real values in Admin → Settings.
+        // Empty values must not render on the storefront (top bar / WhatsApp float).
+        'contact_email' => '',
+        'contact_phone' => '',
         'whatsapp_number' => '',
-        'whatsapp_message' => 'Hi Rhythm Exports! I have a question about your instruments.',
-        'address_line' => '42, Music Lane, Karol Bagh, New Delhi 110005',
+        'whatsapp_message' => '',
+        'address_line' => '',
         // Social links stay empty until an admin saves a real profile URL,
         // so no placeholder icon is ever shown in the top bar.
         'social_instagram' => '',
@@ -34,6 +40,13 @@ final class SiteSettingsService
         'social_facebook' => '',
         'social_x' => '',
         'social_linkedin' => '',
+        // Outbound mail From (Admin → Settings). Live address requires verification.
+        'mail_from_address' => '',
+        'mail_from_name' => '',
+        'mail_from_verified_at' => '',
+        'mail_from_pending_address' => '',
+        'mail_from_pending_token' => '',
+        'mail_from_pending_sent_at' => '',
     ];
 
     /** @return array<string, string> */
@@ -70,6 +83,34 @@ final class SiteSettingsService
             SiteSetting::updateOrCreate(['key' => $key], ['value' => (string) $value]);
         }
 
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    public function put(string $key, string $value): void
+    {
+        SiteSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /** @param  array<string, string>  $pairs */
+    public function putMany(array $pairs): void
+    {
+        foreach ($pairs as $key => $value) {
+            SiteSetting::updateOrCreate(['key' => $key], ['value' => (string) $value]);
+        }
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    public function forget(string $key): void
+    {
+        SiteSetting::where('key', $key)->delete();
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    /** @param  list<string>  $keys */
+    public function forgetMany(array $keys): void
+    {
+        SiteSetting::whereIn('key', $keys)->delete();
         Cache::forget(self::CACHE_KEY);
     }
 }

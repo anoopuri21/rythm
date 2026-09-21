@@ -48,12 +48,23 @@
 
             {{-- Hero grid: gallery | buy box --}}
             <div class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
-                {{-- ===== GALLERY ===== --}}
-                <div x-data="{ active: 0, images: {{ json_encode($product->galleryImages() ?: [null]) }} }">
+                {{-- ===== GALLERY (swaps when Livewire dispatches rythme-variant-updated) ===== --}}
+                <div
+                    x-data="{
+                        active: 0,
+                        images: {{ json_encode($product->galleryImages() ?: [null]) }},
+                        setImages(list) {
+                            const next = (Array.isArray(list) && list.length) ? list : {{ json_encode($product->galleryImages() ?: [null]) }};
+                            this.images = next;
+                            this.active = 0;
+                        }
+                    }"
+                    x-on:rythme-variant-updated.window="setImages($event.detail.images ?? $event.detail[0]?.images ?? $event.detail)"
+                >
                     <div class="relative aspect-square overflow-hidden rounded-3xl border border-ink/10 bg-white">
-                        <template x-for="(img, i) in images" :key="i">
+                        <template x-for="(img, i) in images" :key="i + '-' + (img || 'empty')">
                             <div x-show="active === i" x-transition.opacity.duration.300 class="absolute inset-0 flex items-center justify-center p-8 sm:p-12">
-                                <img x-show="img" :src="img" :alt="$el.closest('div').parentElement?.dataset?.name ?? '{{ $product->name }}'"
+                                <img x-show="img" :src="img" alt="{{ $product->name }}"
                                      class="h-full w-full object-contain"
                                      :loading="i === 0 ? 'eager' : 'lazy'"
                                      :fetchpriority="i === 0 ? 'high' : 'low'" decoding="async">
@@ -63,7 +74,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" />
                                     </svg>
                                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-muted">{{ $product->brand?->name ?? 'Rythme' }}</p>
-                                    <p class="px-10 text-center text-sm text-muted">Product photo arriving soon — admin media library se upload hoti hi yahan dikhegi.</p>
+                                    <p class="px-10 text-center text-sm text-muted">Photo coming soon.</p>
                                 </div>
                             </div>
                         </template>
@@ -73,19 +84,17 @@
                         @endif
                     </div>
 
-                    {{-- Thumbnails --}}
-                    @if(count($product->galleryImages()) > 1)
-                        <div class="mt-4 flex gap-3 overflow-x-auto pb-1">
-                            @foreach($product->galleryImages() as $i => $img)
-                                <button type="button" @click="active = {{ $i }}"
-                                        class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition {{ $loop->first ? 'border-brand' : 'border-ink/10 hover:border-brand/40' }}"
-                                        :class="active === {{ $i }} ? 'border-brand' : 'border-ink/10'"
-                                        aria-label="View image {{ $i + 1 }}">
-                                    <img src="{{ $img }}" alt="{{ $product->name }} — image {{ $i + 1 }}" class="h-full w-full object-cover" loading="lazy">
-                                </button>
-                            @endforeach
-                        </div>
-                    @endif
+                    {{-- Thumbnails (reactive to variant images) --}}
+                    <div class="mt-4 flex gap-3 overflow-x-auto pb-1" x-show="images.filter(Boolean).length > 1" x-cloak>
+                        <template x-for="(img, i) in images" :key="'thumb-' + i + '-' + (img || 'x')">
+                            <button type="button" x-show="img" @click="active = i"
+                                    class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition"
+                                    :class="active === i ? 'border-brand' : 'border-ink/10 hover:border-brand/40'"
+                                    :aria-label="'View image ' + (i + 1)">
+                                <img :src="img" :alt="'{{ $product->name }} — image ' + (i + 1)" class="h-full w-full object-cover" loading="lazy">
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
                 {{-- ===== BUY BOX ===== --}}
@@ -105,7 +114,9 @@
                                   aria-label="{{ $reviewSummary['avg'] }} out of 5 stars">
                                 {{ number_format($reviewSummary['avg'], 1) }} <span aria-hidden="true">★</span>
                             </span>
-                            <a href="#customer-reviews" class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand">
+                            <a href="#customer-reviews"
+                               class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand"
+                               onclick="document.getElementById('tab-reviews')?.click()">
                                 {{ $reviewSummary['count'] }} verified {{ Str::plural('review', $reviewSummary['count']) }}
                             </a>
                         @else
@@ -136,37 +147,127 @@
                             <span class="text-[11px] font-semibold leading-tight text-ink">Gateway payment options</span>
                         </div>
                     </div>
+                    @php
+                        $policyLinks = collect([
+                            ['slug' => 'shipping', 'label' => 'Shipping information'],
+                            ['slug' => 'returns', 'label' => 'Returns and refund requests'],
+                            ['slug' => 'privacy', 'label' => 'Payment and privacy safety'],
+                        ])->map(function (array $link): ?array {
+                            $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                            return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                        })->filter()->values();
+                    @endphp
                     <nav class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted" aria-label="Purchase policies">
-                        <a href="/shipping" class="underline underline-offset-4 hover:text-brand">Shipping information</a>
-                        <a href="/returns" class="underline underline-offset-4 hover:text-brand">Returns and refund requests</a>
-                        <a href="/privacy" class="underline underline-offset-4 hover:text-brand">Payment and privacy safety</a>
-                        <a href="{{ route('orders.lookup') }}" class="underline underline-offset-4 hover:text-brand">Track an order</a>
+                        @foreach($policyLinks as $link)
+                            <a href="{{ $link['href'] }}" class="underline underline-offset-4 hover:text-brand">{{ $link['label'] }}</a>
+                        @endforeach
                     </nav>
                 </div>
             </div>
 
-            {{-- ===== TABS: Description / Specs ===== --}}
-            <div class="mt-16" x-data="{ tab: 'description' }">
-                <div class="flex gap-2 border-b border-ink/10" role="tablist" aria-label="Product information">
-                    <button type="button" role="tab" :aria-selected="tab === 'description' ? 'true' : 'false'"
+            {{-- ===== TABS: Description / Specs / Reviews ===== --}}
+            @php
+                $hasDescription = filled(trim(strip_tags((string) $product->description)));
+                $defaultTab = $hasDescription ? 'description' : 'specs';
+            @endphp
+            <div class="mt-16"
+                 x-data="{
+                    tab: @js($defaultTab),
+                    descExpanded: false,
+                    descNeedsToggle: false,
+                    init() {
+                        if (window.location.hash === '#customer-reviews') {
+                            this.tab = 'reviews';
+                        }
+                        this.$nextTick(() => this.measureDescription());
+                    },
+                    measureDescription() {
+                        const el = this.$refs.descBody;
+                        if (!el) {
+                            this.descNeedsToggle = false;
+                            return;
+                        }
+                        // ~12rem clamp (~192px); only offer toggle when content overflows.
+                        this.descNeedsToggle = el.scrollHeight > 200;
+                    },
+                    openReviews() {
+                        this.tab = 'reviews';
+                    }
+                 }"
+                 @hashchange.window="if (window.location.hash === '#customer-reviews') tab = 'reviews'">
+                <div class="flex flex-wrap gap-2 border-b border-ink/10" role="tablist" aria-label="Product information">
+                    <button type="button" role="tab" id="tab-description"
+                            :aria-selected="tab === 'description' ? 'true' : 'false'"
+                            :tabindex="tab === 'description' ? 0 : -1"
                             @click="tab = 'description'"
-                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition {{ $product->description ? '' : 'pointer-events-none opacity-40' }}"
+                            @keydown.right.prevent="$refs.tabSpecs?.focus(); tab = 'specs'"
+                            x-ref="tabDescription"
+                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition {{ $hasDescription ? '' : 'pointer-events-none opacity-40' }}"
                             :class="tab === 'description' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
                         Description
                     </button>
-                    <button type="button" role="tab" :aria-selected="tab === 'specs' ? 'true' : 'false'"
+                    <button type="button" role="tab" id="tab-specs"
+                            :aria-selected="tab === 'specs' ? 'true' : 'false'"
+                            :tabindex="tab === 'specs' ? 0 : -1"
                             @click="tab = 'specs'"
+                            x-ref="tabSpecs"
                             class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition"
                             :class="tab === 'specs' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
                         Specifications
                     </button>
+                    <button type="button" role="tab" id="tab-reviews"
+                            :aria-selected="tab === 'reviews' ? 'true' : 'false'"
+                            :tabindex="tab === 'reviews' ? 0 : -1"
+                            @click="tab = 'reviews'"
+                            class="-mb-px border-b-2 px-5 py-3 text-sm font-bold transition"
+                            :class="tab === 'reviews' ? 'border-brand text-brand' : 'border-transparent text-muted hover:text-ink'">
+                        Customer reviews
+                        @if(($reviewSummary['count'] ?? 0) > 0)
+                            <span class="ml-1 font-semibold text-muted">({{ $reviewSummary['count'] }})</span>
+                        @endif
+                    </button>
                 </div>
 
-                <div x-show="tab === 'description'" x-transition.opacity.duration.200 class="prose-sm max-w-3xl py-8 leading-7 text-ink/80">
-                    {!! $product->description !!}
+                {{-- Description (show more / less when long) --}}
+                <div x-show="tab === 'description'"
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-description"
+                     class="max-w-3xl py-8">
+                    @if($hasDescription)
+                        <div class="relative">
+                            <div x-ref="descBody"
+                                 class="prose-sm leading-7 text-ink/80 overflow-hidden transition-[max-height] duration-300"
+                                 :class="descNeedsToggle && !descExpanded ? 'max-h-48' : ''"
+                                 :style="descNeedsToggle && !descExpanded ? 'max-height: 12rem' : null">
+                                {!! $product->description !!}
+                            </div>
+                            <div x-show="descNeedsToggle && !descExpanded"
+                                 x-cloak
+                                 class="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-paper to-transparent"
+                                 aria-hidden="true"></div>
+                        </div>
+                        <button type="button"
+                                x-show="descNeedsToggle"
+                                x-cloak
+                                class="mt-4 text-sm font-bold text-brand underline underline-offset-4 hover:text-brand-dark"
+                                @click="descExpanded = !descExpanded"
+                                :aria-expanded="descExpanded ? 'true' : 'false'">
+                            <span x-text="descExpanded ? 'Show less' : 'Show more'"></span>
+                        </button>
+                    @else
+                        <p class="text-sm text-muted">No description has been published for this product yet.</p>
+                    @endif
                 </div>
 
-                <div x-show="tab === 'specs'" x-cloak x-transition.opacity.duration.200 class="max-w-3xl py-8">
+                {{-- Specifications --}}
+                <div x-show="tab === 'specs'"
+                     x-cloak
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-specs"
+                     class="max-w-3xl py-8">
                     <dl class="divide-y divide-ink/10 rounded-2xl border border-ink/10 bg-white">
                         <div class="flex items-center justify-between gap-6 px-6 py-4">
                             <dt class="text-sm text-muted">SKU</dt>
@@ -190,13 +291,17 @@
                         </div>
                     </dl>
                 </div>
+
+                {{-- Customer reviews (Livewire stays mounted via x-show, not x-if) --}}
+                <div x-show="tab === 'reviews'"
+                     x-cloak
+                     x-transition.opacity.duration.200
+                     role="tabpanel"
+                     aria-labelledby="tab-reviews"
+                     class="py-8">
+                    <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
+                </div>
             </div>
-
-            {{-- ===== VERIFIED REVIEWS ===== --}}
-            <livewire:review-section :product="$product" :key="'rev-' . $product->id" />
-
-            {{-- ===== PRODUCT Q&A ===== --}}
-            <livewire:product-question-section :product="$product" :key="'questions-' . $product->id" />
 
             @if($productFaqs->isNotEmpty())
                 <section class="mt-16 max-w-4xl" aria-labelledby="product-faq-title">
@@ -205,7 +310,9 @@
                             <p class="section-kicker mb-3">Buying with confidence</p>
                             <h2 id="product-faq-title" class="text-2xl font-bold text-ink sm:text-3xl">Frequently asked questions</h2>
                         </div>
-                        <a href="/faqs" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                        @if($faqsPageHref = \App\Support\PublicContent::pageHref('faqs'))
+                            <a href="{{ $faqsPageHref }}" class="text-link text-sm">All FAQs <span aria-hidden="true">→</span></a>
+                        @endif
                     </div>
                     <div class="divide-y divide-ink/10">
                         @foreach($productFaqs as $faq)

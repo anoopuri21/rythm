@@ -27,7 +27,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_customers_resource_renders(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/customers')
             ->assertOk()
             ->assertSee('test@example.com');
@@ -42,7 +42,7 @@ class AdminOpsTest extends TestCase
             'status' => 'new',
         ]);
 
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/contact-messages')
             ->assertOk()
             ->assertSee('anoop@example.com')
@@ -66,7 +66,7 @@ class AdminOpsTest extends TestCase
     {
         NewsletterSubscriber::create(['email' => 'sub@example.com', 'subscribed_at' => now()]);
 
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/newsletter-subscribers')
             ->assertOk()
             ->assertSee('sub@example.com');
@@ -80,7 +80,19 @@ class AdminOpsTest extends TestCase
         $this->assertContains('StatsOverviewWidget', $widgets);
         $this->assertContains('LatestOrdersWidget', $widgets);
 
-        $this->actingAs($this->admin)->get('/admin')->assertOk();
+        $this->actingAsAdmin($this->admin)->get('/admin')->assertOk();
+    }
+
+    public function test_latest_orders_widget_query_eager_loads_user(): void
+    {
+        // Regression: preventLazyLoading + $record->user on dashboard crashed without with('user').
+        $source = file_get_contents(base_path('app/Filament/Widgets/LatestOrdersWidget.php'));
+        $this->assertNotFalse($source);
+        $this->assertStringContainsString("with(['user:id,name'])", $source);
+
+        $orderSource = file_get_contents(base_path('app/Filament/Resources/OrderResource.php'));
+        $this->assertNotFalse($orderSource);
+        $this->assertStringContainsString("with(['user:id,name'])", $orderSource);
     }
 
     public function test_stats_widget_computes_revenue(): void
@@ -98,10 +110,10 @@ class AdminOpsTest extends TestCase
 
     public function test_settings_page_saves_and_caches(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/settings')
             ->assertOk()
-            ->assertSee('Shipping flat fee');
+            ->assertSee('Shipping fee');
 
         $service = app(SiteSettingsService::class);
         $service->saveAll([
@@ -120,12 +132,13 @@ class AdminOpsTest extends TestCase
         $service = app(SiteSettingsService::class);
 
         $this->assertSame('0', $service->get('shipping_flat_fee'));
-        $this->assertSame('support@rythme.store', $service->get('contact_email'));
+        // Empty until client saves real contact details (C5 production posture).
+        $this->assertSame('', (string) $service->get('contact_email'));
     }
 
     public function test_admin_hero_slides_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/hero-slides')
             ->assertOk()
             ->assertSee('Premium gear.');
@@ -133,7 +146,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_homepage_blocks_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/homepage-blocks')
             ->assertOk()
             ->assertSee('Server-verified totals')
@@ -142,7 +155,7 @@ class AdminOpsTest extends TestCase
 
     public function test_admin_faqs_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/faqs')
             ->assertOk()
             ->assertSee('How are shipping charges calculated?');
@@ -150,7 +163,7 @@ class AdminOpsTest extends TestCase
 
     public function test_products_show_trending_and_rank_columns(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/products')
             ->assertOk()
             ->assertSee('Trending')

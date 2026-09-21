@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Table('order_items')]
-#[Fillable(['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'hsn_code_snapshot', 'tax_classification_snapshot', 'tax_rate_snapshot', 'taxable_amount_snapshot', 'tax_amount_snapshot', 'tax_calculation_enabled_snapshot', 'tax_destination_region_snapshot', 'options', 'unit_price', 'qty', 'total'])]
+#[Fillable(['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'hsn_code_snapshot', 'tax_classification_snapshot', 'tax_rate_snapshot', 'taxable_amount_snapshot', 'tax_amount_snapshot', 'cgst_amount_snapshot', 'sgst_amount_snapshot', 'igst_amount_snapshot', 'gst_supply_type_snapshot', 'tax_calculation_enabled_snapshot', 'tax_destination_region_snapshot', 'tax_origin_region_snapshot', 'options', 'unit_price', 'qty', 'total'])]
 class OrderItem extends Model
 {
     use HasFactory;
@@ -25,6 +25,9 @@ class OrderItem extends Model
         'tax_rate_snapshot' => 'decimal:4',
         'taxable_amount_snapshot' => 'decimal:2',
         'tax_amount_snapshot' => 'decimal:2',
+        'cgst_amount_snapshot' => 'decimal:2',
+        'sgst_amount_snapshot' => 'decimal:2',
+        'igst_amount_snapshot' => 'decimal:2',
         'tax_calculation_enabled_snapshot' => 'boolean',
         'qty' => 'integer',
         'total' => 'decimal:2',
@@ -39,8 +42,13 @@ class OrderItem extends Model
                 'tax_rate_snapshot',
                 'taxable_amount_snapshot',
                 'tax_amount_snapshot',
+                'cgst_amount_snapshot',
+                'sgst_amount_snapshot',
+                'igst_amount_snapshot',
+                'gst_supply_type_snapshot',
                 'tax_calculation_enabled_snapshot',
                 'tax_destination_region_snapshot',
+                'tax_origin_region_snapshot',
             ];
 
             if ($item->isDirty($snapshots)) {

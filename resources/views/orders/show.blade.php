@@ -42,13 +42,19 @@
             @endif
 
             @if(auth()->check() && auth()->id() === $order->user_id && $order->status === 'pending' && in_array($order->payment_status, ['unpaid', 'failed'], true))
-                <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-6">
-                    @csrf
-                    <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
-                        Retry payment
-                    </button>
-                    <p class="mt-2 text-xs text-muted">A maximum of three payment attempts is allowed. Completed payments cannot be retried.</p>
-                </form>
+                <div class="mt-6 rounded-2xl border border-brand/20 bg-brand/5 p-5">
+                    <p class="text-sm font-semibold text-ink">Payment not completed</p>
+                    <p class="mt-1 text-xs leading-5 text-muted">
+                        No charge is final until the gateway confirms payment. You can retry a limited number of times. If the window does not open, check your connection and try again.
+                    </p>
+                    <form method="POST" action="{{ route('orders.retry-payment', $order) }}" class="mt-4">
+                        @csrf
+                        <button type="submit" class="rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
+                            Retry payment
+                        </button>
+                    </form>
+                    <p class="mt-2 text-xs text-muted">Maximum three attempts. Paid orders cannot be retried.</p>
+                </div>
             @endif
 
             {{-- Cancel (owner, pending/confirmed) --}}
@@ -202,14 +208,17 @@
                     </ul>
 
                     <dl class="mt-4 space-y-2.5 border-t border-ink/10 pt-5 text-sm">
+                        @php $gst = $order->gstTotals(); @endphp
                         <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal, 2) }}</dd></div>
-                        <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
+                        @if((float) $order->shipping_fee > 0)
+                            <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
+                        @else
+                            <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">Free</dd></div>
+                        @endif
                         @if((float) $order->discount > 0)
                             <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount, 2) }}</dd></div>
                         @endif
-                        @if((float) $order->tax > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Tax</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->tax, 2) }}</dd></div>
-                        @endif
+                        <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" />
                         <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</dd></div>
                     </dl>
                 </section>

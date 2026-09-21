@@ -28,7 +28,7 @@ class HomepageSectionSeeder extends Seeder
             ['stories', 'The Rythme journal', 'Ideas for a life', 'lived in music.', 'Practice tips, gear guides and stories from the Rythme community.', 9],
             ['testimonials', 'Verified customer feedback', 'Approved reviews,', 'from delivered orders.', 'Only moderated reviews tied to paid, delivered purchases may appear publicly.', 10],
             ['comparison', 'Verified capabilities', 'How the', 'storefront works.', 'Server-derived totals, moderated interactions and protected order access.', 11],
-            ['ugc', 'Product help', 'Ask it.', 'Get a staff answer.', 'Signed-in customers can submit product questions for moderation.', 12],
+            ['ugc', 'Product help', 'Need advice?', 'Contact the store.', 'Use the contact form for product or order questions — the team replies when available.', 12],
             ['faq', 'Good to know', 'Questions,', 'answered.', 'Storefront guidance without invented shipping, warranty, payment or return promises.', 13],
         ];
 

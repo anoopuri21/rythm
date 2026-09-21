@@ -12,7 +12,7 @@
         @endif
     </div>
     <p class="mt-1.5 text-xs leading-5 text-muted">
-        Displayed price is revalidated at checkout. Shipping, tax and available payment methods are shown before payment.
+        GST and shipping are added at checkout.
     </p>
 
     {{-- Variant selector --}}
@@ -21,6 +21,13 @@
             <legend class="mb-2.5 text-xs font-bold uppercase tracking-[0.18em] text-muted">
                 Options — <span class="text-ink">{{ $variant?->name ?? 'Select' }}</span>
             </legend>
+            @if($variant)
+                <p class="mb-3 text-xs text-muted">
+                    {{ $variant->optionSummary() }}
+                    · ₹{{ number_format($price) }}
+                    · {{ $stock }} in stock
+                </p>
+            @endif
             <div class="flex flex-wrap gap-3">
                 @foreach($variantsWithColor as $v)
                     @php
@@ -30,24 +37,24 @@
                     <button type="button"
                             wire:click="selectVariant({{ $v['id'] }})"
                             class="relative rounded-full border-2 transition-all focus:outline-none focus:ring-2 focus:ring-brand/30
-                            {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}"
+                            {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}
+                            {{ $hasColor ? '' : ($isSelected ? 'bg-brand text-white' : 'bg-paper') }}"
                             style="{{ $hasColor ? 'padding: 4px;' : '' }}"
-                            title="{{ $v['name'] }}"
-                            aria-label="{{ $v['name'] }}">
+                            title="{{ $v['summary'] }} — ₹{{ number_format($v['price']) }}"
+                            aria-label="{{ $v['name'] }}"
+                            aria-pressed="{{ $isSelected ? 'true' : 'false' }}">
                         @if($hasColor)
-                            {{-- Color circle for variants with color attribute --}}
                             <span class="block rounded-full border border-black/10"
                                   style="width: 36px; height: 36px; background-color: {{ $v['color_hex'] }};"></span>
                             @if($isSelected)
                                 <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[8px] font-bold text-white">
-                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </span>
                             @endif
                         @else
-                            {{-- Text button for variants without color --}}
-                            <span class="block px-4 py-2 text-sm font-semibold {{ $isSelected ? 'text-white' : 'text-ink' }}">
+                            <span class="block px-4 py-2 text-sm font-semibold">
                                 {{ $v['name'] }}
                             </span>
                         @endif
@@ -55,6 +62,17 @@
                 @endforeach
             </div>
         </fieldset>
+    @endif
+
+    @if(!empty($variantSpecs))
+        <dl class="mt-5 grid gap-2 rounded-2xl border border-ink/10 bg-paper/60 px-4 py-3 text-xs sm:grid-cols-2">
+            @foreach($variantSpecs as $specKey => $specValue)
+                <div class="flex items-baseline justify-between gap-3">
+                    <dt class="font-semibold uppercase tracking-wide text-muted">{{ $specKey }}</dt>
+                    <dd class="font-semibold text-ink">{{ $specValue }}</dd>
+                </div>
+            @endforeach
+        </dl>
     @endif
 
     {{-- Qty + stock --}}

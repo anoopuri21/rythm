@@ -31,7 +31,9 @@ class AboutContactTest extends TestCase
             ->assertOk()
             ->assertViewIs('pages.show')
             ->assertSee('Contact Rhythm Exports')
-            ->assertSee('Send message');
+            ->assertSee('Send message')
+            ->assertDontSee('98765 43210')
+            ->assertDontSee('support@rythme.store');
     }
 
     public function test_about_page_renders_admin_managed_design_settings(): void

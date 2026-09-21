@@ -27,7 +27,14 @@ class LatestOrdersWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(Order::query()->withCount('items')->orderByDesc('created_at')->limit(8))
+            // Eager-load customer: Model::preventLazyLoading() is on in local/dev.
+            ->query(
+                Order::query()
+                    ->with(['user:id,name'])
+                    ->withCount('items')
+                    ->orderByDesc('created_at')
+                    ->limit(8)
+            )
             ->columns([
                 TextColumn::make('order_number')->weight('bold')->fontFamily('mono'),
                 TextColumn::make('customer')->state(fn (Order $record): string => $record->user?->name ?? ($record->shipping_address['name'] ?? '—')),

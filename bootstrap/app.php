@@ -24,5 +24,31 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
+            }
+
+            $status = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface
+                ? $e->getStatusCode()
+                : 500;
+
+            $message = match (true) {
+                $status === 403 => 'You do not have access to this.',
+                $status === 404 => 'We could not find that.',
+                $status === 429 => 'Too many tries. Wait a moment and try again.',
+                $status >= 500 && ! config('app.debug') => 'Something went wrong. Please try again.',
+                default => null,
+            };
+
+            if ($message === null) {
+                return null;
+            }
+
+            return response()->json(['message' => $message], $status);
+        });
     })->create();

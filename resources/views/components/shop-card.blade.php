@@ -20,7 +20,7 @@
                  class="h-full w-full object-contain transition duration-700 group-hover:scale-105"
                  loading="lazy" decoding="async">
         @else
-            {{-- Elegant placeholder until real Bajaao product shots are uploaded via admin --}}
+            {{-- Neutral image placeholder until product gallery is uploaded in admin --}}
             <div class="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-paper-dark via-paper to-paper-dark p-6 text-center">
                 <svg class="h-12 w-12 text-brand/25 transition group-hover:scale-110 group-hover:text-brand/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" />

@@ -40,7 +40,14 @@ return [
     */
 
     'guards' => [
+        // Storefront customers (and guest session cart merge on login).
         'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+        // Filament /admin only — separate session auth key so staff login
+        // does not authenticate the storefront as that user (and vice versa).
+        'admin' => [
             'driver' => 'session',
             'provider' => 'users',
         ],

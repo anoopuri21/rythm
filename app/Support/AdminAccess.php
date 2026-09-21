@@ -19,7 +19,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
-use App\Models\ProductQuestion;
+
 use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
@@ -57,10 +57,27 @@ final class AdminAccess
 
     public const NOTIFICATIONS_VIEW = 'notifications.view';
 
+    public const PAYMENTS_MANAGE = 'payments.manage';
+
     /** @var array<string, list<string>> */
     private const ROLE_PERMISSIONS = [
         User::ROLE_SUPER_ADMIN => ['*'],
-        User::ROLE_ADMIN => ['*'], // Controlled legacy alias until every owner account is migrated.
+        User::ROLE_ADMIN => [
+            self::CATALOGUE_VIEW,
+            self::CATALOGUE_MANAGE,
+            self::ORDERS_VIEW,
+            self::ORDERS_MANAGE,
+            self::CUSTOMERS_VIEW,
+            self::INTERACTIONS_MANAGE,
+            self::CONTENT_MANAGE,
+            self::MARKETING_MANAGE,
+            self::FINANCE_VIEW,
+            self::FINANCE_MANAGE,
+            self::SETTINGS_MANAGE,
+            self::STAFF_MANAGE,
+            self::AUDIT_VIEW,
+            self::NOTIFICATIONS_VIEW,
+        ],
         User::ROLE_CATALOGUE_MANAGER => [self::CATALOGUE_VIEW, self::CATALOGUE_MANAGE],
         User::ROLE_ORDER_MANAGER => [self::ORDERS_VIEW, self::ORDERS_MANAGE, self::CUSTOMERS_VIEW, self::CATALOGUE_VIEW],
         User::ROLE_SUPPORT => [self::ORDERS_VIEW, self::CUSTOMERS_VIEW, self::INTERACTIONS_MANAGE, self::CATALOGUE_VIEW, self::NOTIFICATIONS_VIEW],
@@ -82,7 +99,6 @@ final class AdminAccess
         NotificationDelivery::class => ['view' => self::NOTIFICATIONS_VIEW, 'manage' => self::NOTIFICATIONS_VIEW],
         User::class => ['view' => self::CUSTOMERS_VIEW, 'manage' => self::STAFF_MANAGE],
         Review::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
-        ProductQuestion::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         ContactMessage::class => ['view' => self::INTERACTIONS_MANAGE, 'manage' => self::INTERACTIONS_MANAGE],
         Coupon::class => ['view' => self::MARKETING_MANAGE, 'manage' => self::MARKETING_MANAGE],
         NewsletterSubscriber::class => ['view' => self::MARKETING_MANAGE, 'manage' => self::MARKETING_MANAGE],
@@ -110,6 +126,10 @@ final class AdminAccess
 
     public static function has(string $role, string $permission): bool
     {
+        if ($permission === self::PAYMENTS_MANAGE) {
+            return $role === User::ROLE_SUPER_ADMIN;
+        }
+
         $permissions = self::ROLE_PERMISSIONS[$role] ?? [];
 
         return in_array('*', $permissions, true) || in_array($permission, $permissions, true);

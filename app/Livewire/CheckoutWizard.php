@@ -11,12 +11,15 @@ use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
+use App\Services\GstCalculator;
 use App\Services\OrderService;
 use App\Services\SiteSettingsService;
+use App\Support\PaymentAvailability;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use RuntimeException;
 
@@ -83,7 +86,7 @@ final class CheckoutWizard extends Component
             'line1' => ['required', 'string', 'max:255'],
             'line2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
-            'state' => ['required', 'string', 'max:100'],
+            'state' => ['required', 'string', Rule::in(\App\Support\IndiaStates::NAMES)],
             'pincode' => ['required', 'string', 'regex:/^[0-9]{6}$/'],
         ];
     }
@@ -179,16 +182,42 @@ final class CheckoutWizard extends Component
 
             $this->guardRateLimit('place-order', 5, 60);
             $cartModel = $cart->getOrCreateCart();
-            $totals = $cart->totals();
 
-            if ($totals['count'] === 0) {
+            // Validate against ALL cart rows (including OOS). CartService::items()/totals()
+            // hide zero-stock lines for display — placeOrder must still surface stock errors
+            // instead of a misleading "Your cart is empty."
+            $rawItems = $cart->allItems();
+
+            if ($rawItems->isEmpty()) {
                 throw new RuntimeException('Your cart is empty.');
+            }
+
+            foreach ($rawItems as $item) {
+                if ($item->product === null || ! $item->product->is_active) {
+                    throw new RuntimeException('A product in your cart is no longer available.');
+                }
+
+                if ($item->product_variant_id !== null && ($item->variant === null || ! $item->variant->is_active || (int) $item->variant->product_id !== (int) $item->product_id)) {
+                    throw new RuntimeException("{$item->product->name} option is no longer available.");
+                }
+
+                $availableStock = $item->product_variant_id !== null
+                    ? (int) $item->variant->stock
+                    : (int) $item->product->stock;
+
+                if ($availableStock < $item->qty) {
+                    throw new RuntimeException("Not enough stock for {$item->product->name}.");
+                }
             }
 
             $address = $addresses->forUser($user->id)->firstWhere('id', $this->addressId);
 
             if ($address === null) {
                 throw new RuntimeException('Please choose a delivery address.');
+            }
+
+            if (! PaymentAvailability::canCheckout()) {
+                throw new RuntimeException(PaymentAvailability::customerMessage());
             }
 
             // Fail closed before creating/reserving an order when no approved
@@ -226,12 +255,15 @@ final class CheckoutWizard extends Component
 
             $this->gatewayOrderId = $gatewayOrderId;
 
-            // Fake gateway (no keys configured) — simulate immediate success.
+            // Allowed fake gateway only (local/tests) — simulate immediate success.
             if (! RazorpayGateway::isConfigured()) {
+                if (! PaymentAvailability::fakeAllowed()) {
+                    throw new RuntimeException(PaymentAvailability::customerMessage());
+                }
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
             } else {
                 $this->dispatch('razorpay-open', options: [
-                    'key' => (string) config('services.razorpay.key_id'),
+                    'key' => app(\App\Services\PaymentSettingsService::class)->publicKeyId(),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),
@@ -273,11 +305,27 @@ final class CheckoutWizard extends Component
             $order = Order::query()
                 ->whereKey($this->orderId)
                 ->where('user_id', auth()->id())
-                ->with('items.product')
+                ->with(['items.product', 'payments'])
                 ->first();
 
             if ($order === null) {
                 throw new RuntimeException('No pending order found.');
+            }
+
+            $payload = [
+                'razorpay_payment_id' => (string) ($payload['razorpay_payment_id'] ?? ''),
+                'razorpay_order_id' => (string) ($payload['razorpay_order_id'] ?? $this->gatewayOrderId ?? ''),
+                'razorpay_signature' => (string) ($payload['razorpay_signature'] ?? ''),
+                'status' => (string) ($payload['status'] ?? ''),
+            ];
+
+            if ($this->gatewayOrderId !== null && $this->gatewayOrderId !== '') {
+                $ownsGatewayOrder = $order->payments->contains(
+                    fn (Payment $payment): bool => hash_equals((string) $payment->gateway_order_id, (string) $this->gatewayOrderId),
+                );
+                if (! $ownsGatewayOrder) {
+                    throw new RuntimeException('This payment does not match your order.');
+                }
             }
 
             $gateway = RazorpayGateway::resolve();
@@ -305,7 +353,7 @@ final class CheckoutWizard extends Component
         }
     }
 
-    public function render(AddressService $addresses, CartService $cart, SiteSettingsService $settings): View
+    public function render(AddressService $addresses, CartService $cart, GstCalculator $gst): View
     {
         $cartItems = $cart->items();
         $totals = $cart->totals();
@@ -314,18 +362,35 @@ final class CheckoutWizard extends Component
             $this->step = 1;
         }
 
+        $savedAddresses = $addresses->forUser(auth()->id());
+        $destination = $savedAddresses->firstWhere('id', $this->addressId)?->state
+            ?? $savedAddresses->firstWhere('is_default', true)?->state;
+
+        $unitPrices = [];
+        foreach ($cartItems as $item) {
+            $unitPrices[$item->id] = (float) ($item->variant?->effectivePrice($item->product) ?? $item->product->price);
+        }
+
+        $gstResult = $gst->snapshotsFor($cartItems, $unitPrices, $this->couponDiscount, $destination);
+        $gstQuote = $gstResult['quote'];
         $discounted = max(0.0, $totals['subtotal'] - $this->couponDiscount);
-        $shippingFee = $this->shippingFeeFor($totals['subtotal'], $settings);
-        $tax = $this->taxFor($discounted, $settings);
+        $shippingFee = $this->shippingFeeFor($totals['subtotal'], app(SiteSettingsService::class));
+        $tax = $gstQuote->total;
+        $grandTotal = round($discounted + $shippingFee + $tax, 2);
 
         return view('livewire.checkout-wizard', [
-            'addresses' => $addresses->forUser(auth()->id()),
+            'addresses' => $savedAddresses,
             'cartItems' => $cartItems,
             'totals' => $totals,
             'shippingFee' => $shippingFee,
             'tax' => $tax,
-            'grandTotal' => round($discounted + $shippingFee + $tax, 2),
-            'razorpayConfigured' => RazorpayGateway::isConfigured(),
+            'gstQuote' => $gstQuote,
+            'grandTotal' => $grandTotal,
+            'razorpayConfigured' => PaymentAvailability::razorpayConfigured(),
+            'paymentCanCheckout' => PaymentAvailability::canCheckout(),
+            'paymentMode' => PaymentAvailability::mode(),
+            'paymentMessage' => PaymentAvailability::customerMessage(),
+            'payButtonLabel' => PaymentAvailability::payButtonLabel($grandTotal),
         ]);
     }
 
@@ -339,13 +404,6 @@ final class CheckoutWizard extends Component
         }
 
         return $flat;
-    }
-
-    private function taxFor(float $discountedSubtotal, SiteSettingsService $settings): float
-    {
-        $rate = $settings->getFloat('tax_rate', 0.0);
-
-        return round($discountedSubtotal * ($rate / 100), 2);
     }
 
     private function resetFormFields(): void

@@ -140,7 +140,7 @@ class DynamicCmsTest extends TestCase
 
     public function test_admin_can_manage_pages_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/pages')
             ->assertOk()
             ->assertSee('About Rhythm Exports');
@@ -150,7 +150,7 @@ class DynamicCmsTest extends TestCase
     {
         $about = Page::where('slug', 'about')->firstOrFail();
 
-        \Livewire\Livewire::actingAs($this->admin)
+        \Livewire\Livewire::actingAs($this->admin, 'admin')
             ->test(\App\Filament\Resources\PageResource\Pages\ManagePages::class)
             ->callAction(
                 \Filament\Actions\Testing\TestAction::make('edit')->table($about),
@@ -175,7 +175,7 @@ class DynamicCmsTest extends TestCase
     {
         $contact = Page::where('slug', 'contact')->firstOrFail();
 
-        \Livewire\Livewire::actingAs($this->admin)
+        \Livewire\Livewire::actingAs($this->admin, 'admin')
             ->test(\App\Filament\Resources\PageResource\Pages\ManagePages::class)
             ->callAction(
                 \Filament\Actions\Testing\TestAction::make('edit')->table($contact),

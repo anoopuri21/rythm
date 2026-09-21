@@ -25,7 +25,7 @@
     <h1 class="section-title">Almost there.</h1>
 
     {{-- Steps indicator --}}
-    <ol class="mt-8 flex items-center gap-3 text-xs font-bold sm:gap-4" aria-label="Checkout progress">
+    <ol class="mt-8 flex flex-wrap items-center gap-3 text-xs font-bold sm:gap-4" aria-label="Checkout progress">
         <li class="flex items-center gap-2 {{ $step >= 1 ? 'text-brand' : 'text-muted' }}">
             <span class="flex h-7 w-7 items-center justify-center rounded-full {{ $step >= 1 ? 'bg-brand text-white' : 'bg-ink/10 text-muted' }}">1</span>
             Address
@@ -82,13 +82,13 @@
                             <div class="mt-5 grid gap-4 sm:grid-cols-2">
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Full name</span>
-                                    <input type="text" wire:model="name" placeholder="Anoop Puri"
+                                    <input type="text" wire:model="name" placeholder="Full name"
                                            class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
                                     @error('name') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Phone</span>
-                                    <input type="tel" wire:model="phone" placeholder="98765 43210"
+                                    <input type="tel" wire:model="phone" placeholder="10-digit mobile"
                                            class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
                                     @error('phone') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>
@@ -111,8 +111,7 @@
                                 </label>
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">State</span>
-                                    <input type="text" wire:model="state" placeholder="Delhi"
-                                           class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                                    <x-state-select wire-model="state" :value="$state" />
                                     @error('state') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>
                                 <label class="block">
@@ -168,51 +167,68 @@
                             <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Payment
                         </h2>
-                        <p class="mt-2 text-sm text-muted">
-                            @if($razorpayConfigured)
-                                You will be redirected to Razorpay's secure checkout (UPI, cards, netbanking, wallets).
-                            @else
-                                Test mode — no payment gateway keys are configured, so payment is simulated.
-                            @endif
-                        </p>
-
-                        {{-- Razorpay script (only when configured) --}}
-                        @if($razorpayConfigured)
-                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('services.razorpay.key_id') }}" defer></script>
-                        @endif
+                        <p class="mt-2 text-sm text-muted">{{ $paymentMessage }}</p>
 
                         @if($razorpayConfigured)
+                            <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
                             <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                The payment methods available for this order will be displayed by Razorpay.
+                                Razorpay will show the payment methods for this amount.
+                            </p>
+                        @elseif($paymentMode === 'fake')
+                            <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950" role="status">
+                                Development only. Nothing is charged.
                             </p>
                         @else
-                            <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                Local test mode uses the fake gateway and does not create a real charge.
+                            <p class="mt-6 rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm font-semibold text-brand" role="alert">
+                                Payment is not ready. A Super Admin needs to add Razorpay keys. Nothing has been charged.
                             </p>
                         @endif
 
-                        <button type="button" wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder,confirmPayment"
-                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-                                aria-label="Pay ₹{{ number_format($grandTotal) }}">
+                        <button type="button"
+                                wire:click="placeOrder"
+                                wire:loading.attr="disabled"
+                                wire:target="placeOrder,confirmPayment"
+                                @disabled(! $paymentCanCheckout)
+                                class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white shadow-[0_12px_30px_rgba(17,17,17,0.25)] transition disabled:cursor-not-allowed disabled:opacity-50 {{ $paymentCanCheckout ? 'bg-brand hover:bg-brand-dark' : 'bg-ink/40' }}"
+                                aria-label="{{ $payButtonLabel }}">
                             <span wire:loading.remove wire:target="placeOrder,confirmPayment">
-                                Pay ₹{{ number_format($grandTotal) }} securely
+                                {{ $payButtonLabel }}
                             </span>
                             <span wire:loading wire:target="placeOrder,confirmPayment" class="inline-flex items-center gap-2">
-                                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                                <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                                 Processing…
                             </span>
                         </button>
 
+                        @if($paymentError)
+                            <p class="mt-4 text-center text-xs text-muted">
+                                If payment failed, you can try again here, or open the order later and use <strong class="font-semibold text-ink">Retry payment</strong> (limited attempts).
+                            </p>
+                        @endif
+
                         <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Payment details are handled by the configured gateway; order totals are verified by the application.
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            Order totals are calculated here. Card and UPI details stay with Razorpay.
                         </p>
-                        <nav class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted" aria-label="Checkout policies">
-                            <a href="/shipping" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Shipping</a>
-                            <a href="/returns" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Returns &amp; refunds</a>
-                            <a href="/terms" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Terms</a>
-                            <a href="/privacy" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">Privacy</a>
-                        </nav>
+                        @php
+                            $checkoutPolicyLinks = collect([
+                                ['slug' => 'shipping', 'label' => 'Shipping'],
+                                ['slug' => 'returns', 'label' => 'Returns & refunds'],
+                                ['slug' => 'terms', 'label' => 'Terms'],
+                                ['slug' => 'privacy', 'label' => 'Privacy'],
+                            ])->map(function (array $link): ?array {
+                                $href = \App\Support\PublicContent::pageHref($link['slug']);
+
+                                return $href === null ? null : ['href' => $href, 'label' => $link['label']];
+                            })->filter()->values();
+                        @endphp
+                        @if($checkoutPolicyLinks->isNotEmpty())
+                            <nav class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted" aria-label="Checkout policies">
+                                @foreach($checkoutPolicyLinks as $link)
+                                    <a href="{{ $link['href'] }}" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-brand">{{ $link['label'] }}</a>
+                                @endforeach
+                            </nav>
+                        @endif
                     </div>
                 </section>
             @endif
@@ -235,7 +251,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-semibold text-ink">{{ $item->product->name }}</p>
-                                @if($item->variant)<p class="text-xs text-muted">{{ $item->variant->name }}</p>@endif
+                                @if($item->variant)<p class="text-xs text-muted">{{ $item->variant->optionSummary() }}</p>@endif
                             </div>
                             <p class="text-sm font-bold text-ink">₹{{ number_format((float) $item->unit_price * $item->qty) }}</p>
                         </div>
@@ -275,15 +291,25 @@
                             <dd class="font-semibold text-brand">−₹{{ number_format($couponDiscount) }}</dd>
                         </div>
                     @endif
-                    <div class="flex items-center justify-between">
-                        <dt class="text-ink/70">Shipping</dt>
-                        <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
-                    </div>
-                    @if($tax > 0)
+                    @if($shippingFee > 0)
                         <div class="flex items-center justify-between">
-                            <dt class="text-ink/70">Tax</dt>
-                            <dd class="font-semibold text-ink">₹{{ number_format($tax, 2) }}</dd>
+                            <dt class="text-ink/70">Shipping</dt>
+                            <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
                         </div>
+                    @else
+                        <div class="flex items-center justify-between">
+                            <dt class="text-ink/70">Shipping</dt>
+                            <dd class="font-semibold text-ink">Free</dd>
+                        </div>
+                    @endif
+                    @if($tax > 0)
+                        <x-gst-lines
+                            :enabled="true"
+                            :cgst="$gstQuote->cgst"
+                            :sgst="$gstQuote->sgst"
+                            :igst="$gstQuote->igst"
+                            :tax="$tax"
+                        />
                     @endif
 
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">

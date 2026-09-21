@@ -1,8 +1,9 @@
-<section id="customer-reviews" class="mt-16 scroll-mt-28" aria-labelledby="customer-reviews-title">
+{{-- Nested under PDP tabs: lighter chrome so the tab label is the primary heading. --}}
+<section id="customer-reviews" class="scroll-mt-28" aria-labelledby="customer-reviews-title">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p class="section-kicker mb-3">Real voices</p>
-            <h2 id="customer-reviews-title" class="font-playfair text-2xl font-bold text-ink sm:text-3xl">Customer reviews</h2>
+            <h2 id="customer-reviews-title" class="sr-only">Customer reviews</h2>
+            <p class="text-sm text-muted">Verified purchases only — reviews appear after moderation.</p>
         </div>
         @if($summary['count'] > 0)
             <div class="flex items-center gap-3 rounded-2xl border border-ink/10 bg-white px-5 py-3">

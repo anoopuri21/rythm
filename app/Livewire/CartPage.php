@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\CartItem;
+use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\GstCalculator;
 use Illuminate\View\View;
 use Livewire\Component;
 use RuntimeException;
@@ -64,11 +66,43 @@ final class CartPage extends Component
             ->all();
     }
 
-    public function render(CartService $cart): View
+    public function render(CartService $cart, GstCalculator $gst, AddressService $addresses): View
     {
+        $items = $cart->items();
+        $totals = $cart->totals();
+        $destination = null;
+        if (auth()->check()) {
+            $destination = $addresses->forUser((int) auth()->id())->firstWhere('is_default', true)?->state
+                ?? $addresses->forUser((int) auth()->id())->first()?->state;
+        }
+
+        $unitPrices = [];
+        foreach ($items as $item) {
+            $unitPrices[$item->id] = (float) ($item->variant?->effectivePrice($item->product) ?? $item->product->price);
+        }
+
+        $gstQuote = $gst->snapshotsFor($items, $unitPrices, 0.0, $destination)['quote'];
+        $settings = app(\App\Services\SiteSettingsService::class);
+        $shippingFee = $this->shippingFeeFor((float) $totals['subtotal'], $settings);
+
         return view('livewire.cart-page', [
-            'items' => $cart->items(),
-            'totals' => $cart->totals(),
+            'items' => $items,
+            'totals' => $totals,
+            'gstQuote' => $gstQuote,
+            'shippingFee' => $shippingFee,
+            'grandTotal' => round((float) $totals['subtotal'] + $shippingFee + $gstQuote->total, 2),
         ]);
+    }
+
+    private function shippingFeeFor(float $subtotal, \App\Services\SiteSettingsService $settings): float
+    {
+        $flat = $settings->getFloat('shipping_flat_fee', 0.0);
+        $freeAbove = $settings->getFloat('shipping_free_above', 0.0);
+
+        if ($freeAbove > 0 && $subtotal >= $freeAbove) {
+            return 0.0;
+        }
+
+        return $flat;
     }
 }

@@ -18,7 +18,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
-use App\Models\ProductQuestion;
+
 use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
@@ -59,7 +59,6 @@ final class AdminAuditableObserver
         SiteSetting::class => ['value'],
         User::class => ['role'],
         Review::class => ['status', 'is_approved'],
-        ProductQuestion::class => ['status', 'answered_at'],
         ContactMessage::class => ['status'],
     ];
 
@@ -150,7 +149,7 @@ final class AdminAuditableObserver
 
     private function actor(): ?User
     {
-        $actor = auth()->user();
+        $actor = auth()->user() ?? auth('admin')->user();
 
         return $actor instanceof User && $actor->canAccessPanel(Filament::getPanel('admin')) ? $actor : null;
     }

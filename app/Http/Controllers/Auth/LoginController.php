@@ -12,16 +12,25 @@ use Illuminate\View\View;
 
 final class LoginController extends Controller
 {
-    public function show(): View
+    public function show(\Illuminate\Http\Request $request): View
     {
+        // Allow cart/checkout CTAs to pass ?intended=/checkout so guests return after login.
+        $intended = $request->query('intended');
+        if (is_string($intended) && $intended !== '' && str_starts_with($intended, '/') && ! str_starts_with($intended, '//')) {
+            $request->session()->put('url.intended', $intended);
+        }
+
         return view('auth.login');
     }
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->validated();
+        // Only email + password are auth credentials. `remember` is a checkbox flag —
+        // if it is left inside validated() Auth::attempt treats it as a users.remember column.
+        $credentials = $request->safe()->only(['email', 'password']);
 
-        if (! Auth::attempt($credentials, (bool) $request->boolean('remember'))) {
+        // Explicit web guard — never touch the Filament admin session.
+        if (! Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email', 'remember'))
                 ->withErrors(['email' => 'These credentials do not match our records.']);

@@ -32,7 +32,7 @@ class HomepageSectionsAdminTest extends TestCase
 
     public function test_admin_can_access_homepage_sections_resource(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAsAdmin($this->admin)
             ->get('/admin/homepage-sections')
             ->assertOk()
             ->assertSee('deals');

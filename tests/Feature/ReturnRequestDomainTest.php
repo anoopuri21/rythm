@@ -199,11 +199,11 @@ final class ReturnRequestDomainTest extends TestCase
         $catalogue = User::factory()->create(['role' => User::ROLE_CATALOGUE_MANAGER]);
         $superAdmin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
 
-        $this->actingAs($support)->get('/admin/return-requests')->assertOk();
-        $this->actingAs($support)->get('/admin/return-requests/'.$request->id)->assertOk();
-        $this->actingAs($support)->get('/admin/return-reasons')->assertForbidden();
-        $this->actingAs($catalogue)->get('/admin/return-requests')->assertForbidden();
-        $this->actingAs($superAdmin)->get('/admin/return-reasons')->assertOk();
+        $this->actingAsAdmin($support)->get('/admin/return-requests')->assertOk();
+        $this->actingAsAdmin($support)->get('/admin/return-requests/'.$request->id)->assertOk();
+        $this->actingAsAdmin($support)->get('/admin/return-reasons')->assertForbidden();
+        $this->actingAsAdmin($catalogue)->get('/admin/return-requests')->assertForbidden();
+        $this->actingAsAdmin($superAdmin)->get('/admin/return-reasons')->assertOk();
     }
 
     private function enableReturns(int $days = 30): void

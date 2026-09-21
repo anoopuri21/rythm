@@ -143,8 +143,8 @@ class NotificationOperationsTest extends TestCase
         $orderManager = User::factory()->create(['role' => User::ROLE_ORDER_MANAGER]);
         $this->delivery();
 
-        $this->actingAs($support)->get('/admin/notification-deliveries')->assertOk();
-        $this->actingAs($orderManager)->get('/admin/notification-deliveries')->assertForbidden();
+        $this->actingAsAdmin($support)->get('/admin/notification-deliveries')->assertOk();
+        $this->actingAsAdmin($orderManager)->get('/admin/notification-deliveries')->assertForbidden();
     }
 
     /** @return array{User, Order, NotificationDelivery} */

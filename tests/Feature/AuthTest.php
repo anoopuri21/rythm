@@ -68,6 +68,20 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_login_with_remember_does_not_query_users_remember_column(): void
+    {
+        $user = User::where('email', 'test@example.com')->firstOrFail();
+
+        // Regression: remember must be Auth::attempt 2nd arg only — not a credentials key.
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+            'remember' => '1',
+        ])->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
     public function test_login_rejects_wrong_credentials(): void
     {
         $this->post('/login', [

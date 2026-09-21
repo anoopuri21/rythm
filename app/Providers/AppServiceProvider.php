@@ -6,10 +6,12 @@ namespace App\Providers;
 
 use App\Events\BackInStockNotificationRequested;
 use App\Events\CommerceNotificationRequested;
+use App\Listeners\ApplyConfiguredMailFrom;
 use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Listeners\MarkNotificationDeliveryFailed;
 use App\Listeners\MarkNotificationDeliverySent;
+use App\Services\MailSenderSettingsService;
 use App\Models\AdminAuditLog;
 use App\Models\Brand;
 use App\Models\Category;
@@ -26,7 +28,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
-use App\Models\ProductQuestion;
+
 use App\Models\Refund;
 use App\Models\ReturnReason;
 use App\Models\ReturnRequest;
@@ -35,6 +37,7 @@ use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
+use App\Observers\PageObserver;
 use App\Observers\ProductHomepageObserver;
 use App\Policies\AuditPolicy;
 use App\Policies\CataloguePolicy;
@@ -50,9 +53,11 @@ use App\Policies\ReturnRequestPolicy;
 use App\Policies\ShipmentPolicy;
 use App\Services\CartService;
 use App\Services\CategoryService;
+use App\Services\PaymentSettingsService;
 use App\Support\AdminAccess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
@@ -84,7 +89,6 @@ class AppServiceProvider extends ServiceProvider
             Order::class => OrderPolicy::class,
             User::class => CustomerPolicy::class,
             Review::class => InteractionPolicy::class,
-            ProductQuestion::class => InteractionPolicy::class,
             ContactMessage::class => InteractionPolicy::class,
             Coupon::class => MarketingPolicy::class,
             NewsletterSubscriber::class => MarketingPolicy::class,
@@ -103,7 +107,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Product::observe(ProductHomepageObserver::class);
-
+        Page::observe(PageObserver::class);
 
         foreach ([
             Product::class,
@@ -125,7 +129,6 @@ class AppServiceProvider extends ServiceProvider
             SiteSetting::class,
             User::class,
             Review::class,
-            ProductQuestion::class,
             ProductMerchandisingRule::class,
             ContactMessage::class,
         ] as $auditedModel) {
@@ -170,5 +173,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
         Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
         Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);
+
+        app(PaymentSettingsService::class)->applyToConfig();
     }
 }
