@@ -117,7 +117,7 @@ class BuyPathSmoothnessTest extends TestCase
             ->call('selectAddress', $address->id)
             ->assertSet('step', 2)
             ->assertSee('Free')
-            ->assertSee('Simulate pay', false);
+            ->assertSee('Test pay', false);
     }
 
     public function test_wishlist_empty_copy_is_direct(): void

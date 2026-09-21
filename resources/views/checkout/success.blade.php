@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order Confirmed — Rythme Music Store')
+@section('title', 'Order confirmed — Rhythm Exports')
 @section('meta_description', 'Your order has been placed successfully.')
 
 @section('content')
@@ -13,10 +13,9 @@
             </div>
 
             <p class="section-kicker mb-4 mt-10 justify-center">Payment successful</p>
-            <h1 class="section-title">Thank you! Your order is confirmed.</h1>
+            <h1 class="section-title">Thank you. Your order is confirmed.</h1>
             <p class="mx-auto mt-6 max-w-lg text-base leading-7 text-muted">
-                A confirmation email is on its way. Your instruments are being packed
-                with care and will ship to your address shortly.
+                We sent a confirmation email. You can track this order from your account.
             </p>
 
             <div class="mt-10 rounded-3xl border border-ink/10 bg-white p-8 text-left">
@@ -44,9 +43,13 @@
                     @endforeach
                 </ul>
 
-                <div class="flex items-center justify-between border-t border-ink/10 pt-5">
-                    <p class="font-bold text-ink">Total paid</p>
-                    <p class="text-2xl font-bold text-ink">₹{{ number_format((float) $order->total) }}</p>
+                @php $gst = $order->gstTotals(); @endphp
+                <div class="space-y-2 border-t border-ink/10 pt-5 text-sm">
+                    <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" />
+                    <div class="flex items-center justify-between">
+                        <p class="font-bold text-ink">Total paid</p>
+                        <p class="text-2xl font-bold text-ink">₹{{ number_format((float) $order->total) }}</p>
+                    </div>
                 </div>
 
                 <div class="mt-6 rounded-2xl bg-paper-dark p-5 text-sm text-muted">

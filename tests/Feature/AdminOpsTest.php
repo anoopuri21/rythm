@@ -113,7 +113,7 @@ class AdminOpsTest extends TestCase
         $this->actingAsAdmin($this->admin)
             ->get('/admin/settings')
             ->assertOk()
-            ->assertSee('Shipping flat fee');
+            ->assertSee('Shipping fee');
 
         $service = app(SiteSettingsService::class);
         $service->saveAll([

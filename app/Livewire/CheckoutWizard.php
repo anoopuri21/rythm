@@ -11,6 +11,7 @@ use App\Payment\RazorpayGateway;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CouponService;
+use App\Services\GstCalculator;
 use App\Services\OrderService;
 use App\Services\SiteSettingsService;
 use App\Support\PaymentAvailability;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use RuntimeException;
 
@@ -84,7 +86,7 @@ final class CheckoutWizard extends Component
             'line1' => ['required', 'string', 'max:255'],
             'line2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
-            'state' => ['required', 'string', 'max:100'],
+            'state' => ['required', 'string', Rule::in(\App\Support\IndiaStates::NAMES)],
             'pincode' => ['required', 'string', 'regex:/^[0-9]{6}$/'],
         ];
     }
@@ -261,7 +263,7 @@ final class CheckoutWizard extends Component
                 $this->confirmPayment(['status' => 'captured'], $orders, $cart);
             } else {
                 $this->dispatch('razorpay-open', options: [
-                    'key' => (string) config('services.razorpay.key_id'),
+                    'key' => app(\App\Services\PaymentSettingsService::class)->publicKeyId(),
                     'amount' => (int) round((float) $order->total * 100),
                     'currency' => $order->currency,
                     'name' => config('app.name'),
@@ -303,11 +305,27 @@ final class CheckoutWizard extends Component
             $order = Order::query()
                 ->whereKey($this->orderId)
                 ->where('user_id', auth()->id())
-                ->with('items.product')
+                ->with(['items.product', 'payments'])
                 ->first();
 
             if ($order === null) {
                 throw new RuntimeException('No pending order found.');
+            }
+
+            $payload = [
+                'razorpay_payment_id' => (string) ($payload['razorpay_payment_id'] ?? ''),
+                'razorpay_order_id' => (string) ($payload['razorpay_order_id'] ?? $this->gatewayOrderId ?? ''),
+                'razorpay_signature' => (string) ($payload['razorpay_signature'] ?? ''),
+                'status' => (string) ($payload['status'] ?? ''),
+            ];
+
+            if ($this->gatewayOrderId !== null && $this->gatewayOrderId !== '') {
+                $ownsGatewayOrder = $order->payments->contains(
+                    fn (Payment $payment): bool => hash_equals((string) $payment->gateway_order_id, (string) $this->gatewayOrderId),
+                );
+                if (! $ownsGatewayOrder) {
+                    throw new RuntimeException('This payment does not match your order.');
+                }
             }
 
             $gateway = RazorpayGateway::resolve();
@@ -335,7 +353,7 @@ final class CheckoutWizard extends Component
         }
     }
 
-    public function render(AddressService $addresses, CartService $cart, SiteSettingsService $settings): View
+    public function render(AddressService $addresses, CartService $cart, GstCalculator $gst): View
     {
         $cartItems = $cart->items();
         $totals = $cart->totals();
@@ -344,18 +362,29 @@ final class CheckoutWizard extends Component
             $this->step = 1;
         }
 
-        $discounted = max(0.0, $totals['subtotal'] - $this->couponDiscount);
-        $shippingFee = $this->shippingFeeFor($totals['subtotal'], $settings);
-        $tax = $this->taxFor($discounted, $settings);
+        $savedAddresses = $addresses->forUser(auth()->id());
+        $destination = $savedAddresses->firstWhere('id', $this->addressId)?->state
+            ?? $savedAddresses->firstWhere('is_default', true)?->state;
 
+        $unitPrices = [];
+        foreach ($cartItems as $item) {
+            $unitPrices[$item->id] = (float) ($item->variant?->effectivePrice($item->product) ?? $item->product->price);
+        }
+
+        $gstResult = $gst->snapshotsFor($cartItems, $unitPrices, $this->couponDiscount, $destination);
+        $gstQuote = $gstResult['quote'];
+        $discounted = max(0.0, $totals['subtotal'] - $this->couponDiscount);
+        $shippingFee = $this->shippingFeeFor($totals['subtotal'], app(SiteSettingsService::class));
+        $tax = $gstQuote->total;
         $grandTotal = round($discounted + $shippingFee + $tax, 2);
 
         return view('livewire.checkout-wizard', [
-            'addresses' => $addresses->forUser(auth()->id()),
+            'addresses' => $savedAddresses,
             'cartItems' => $cartItems,
             'totals' => $totals,
             'shippingFee' => $shippingFee,
             'tax' => $tax,
+            'gstQuote' => $gstQuote,
             'grandTotal' => $grandTotal,
             'razorpayConfigured' => PaymentAvailability::razorpayConfigured(),
             'paymentCanCheckout' => PaymentAvailability::canCheckout(),
@@ -375,21 +404,6 @@ final class CheckoutWizard extends Component
         }
 
         return $flat;
-    }
-
-    private function taxFor(float $discountedSubtotal, SiteSettingsService $settings): float
-    {
-        // Match OrderService: tax is never applied until the client enables rules.
-        if ($settings->get('tax_rules_enabled', '0') !== '1') {
-            return 0.0;
-        }
-
-        $rate = $settings->getFloat('tax_rate', 0.0);
-        if ($rate <= 0.0) {
-            return 0.0;
-        }
-
-        return round($discountedSubtotal * ($rate / 100), 2);
     }
 
     private function resetFormFields(): void

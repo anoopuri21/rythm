@@ -51,6 +51,7 @@ use App\Policies\ReturnRequestPolicy;
 use App\Policies\ShipmentPolicy;
 use App\Services\CartService;
 use App\Services\CategoryService;
+use App\Services\PaymentSettingsService;
 use App\Support\AdminAccess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
@@ -169,5 +170,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(CommerceNotificationRequested::class, HandleCommerceNotification::class);
         Event::listen(NotificationSent::class, MarkNotificationDeliverySent::class);
         Event::listen(NotificationFailed::class, MarkNotificationDeliveryFailed::class);
+
+        app(PaymentSettingsService::class)->applyToConfig();
     }
 }

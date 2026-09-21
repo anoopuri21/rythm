@@ -12,7 +12,7 @@
         @endif
     </div>
     <p class="mt-1.5 text-xs leading-5 text-muted">
-        Displayed price is revalidated at checkout. Shipping, tax and available payment methods are shown before payment.
+        GST and shipping are added at checkout.
     </p>
 
     {{-- Variant selector --}}

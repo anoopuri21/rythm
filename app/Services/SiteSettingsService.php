@@ -18,10 +18,14 @@ final class SiteSettingsService
     public const DEFAULTS = [
         'shipping_flat_fee' => '0',
         'shipping_free_above' => '0',
-        'tax_rules_enabled' => '0', // disabled until professional approval
-        'tax_rate' => '0',           // optional approved default rate
-        'returns_enabled' => '0',    // disabled until an approved business policy is configured
-        'return_window_days' => '0', // no eligibility window is assumed
+        'tax_rules_enabled' => '0',
+        'tax_rate' => '0',
+        'origin_state' => '',
+        'origin_gstin' => '',
+        'business_legal_name' => '',
+        'business_address' => '',
+        'returns_enabled' => '0',
+        'return_window_days' => '0',
         // Contact stays empty until the client saves real values in Admin → Settings.
         // Empty values must not render on the storefront (top bar / WhatsApp float).
         'contact_email' => '',

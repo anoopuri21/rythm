@@ -112,7 +112,7 @@ class PageSeeder extends Seeder
                 'slug' => 'shipping',
                 'title' => 'Shipping & Delivery',
                 'template' => 'generic',
-                'content' => '<h2>Shipping charges</h2><p>Any configured shipping charge is calculated during checkout and recorded on the order before payment.</p><h2>Delivery information</h2><p>Serviceability, carrier and delivery estimates depend on the destination and fulfillment arrangement confirmed for the order.</p><h2>Order tracking</h2><p>Customers can follow recorded order-status updates from their account or through protected guest tracking.</p>',
+                'content' => '<h2>Charges</h2><p>Shipping is calculated at checkout. Free shipping applies when your order reaches the amount set in store settings.</p><h2>Delivery</h2><p>Delivery time depends on your PIN code and the carrier we use for that order.</p><h2>Tracking</h2><p>Once an order ships, you can follow it from your account.</p>',
                 'seo' => [
                     'meta_title' => 'Shipping & Delivery — Rhythm Exports',
                     'meta_description' => 'How shipping charges and recorded order-status tracking work at Rhythm Exports.',
@@ -123,18 +123,29 @@ class PageSeeder extends Seeder
                 'slug' => 'returns',
                 'title' => 'Returns & Refunds',
                 'template' => 'generic',
-                'content' => '<h2>Cancellation requests</h2><p>Eligible orders can be cancelled from the protected order page before fulfillment reaches a non-cancellable status.</p><h2>Paid cancellations</h2><p>When a captured-payment order is cancelled, the application records a pending refund request for staff processing. This does not claim that the payment provider has completed a refund.</p><h2>Post-delivery requests</h2><p>Contact the store with the order number and issue details. Eligibility and the available resolution depend on the approved business policy and recorded order condition.</p>',
+                'content' => '<h2>Cancel before dispatch</h2><p>You can cancel an unpaid or unshipped order from the order page.</p><h2>Refunds</h2><p>If a paid order is cancelled or approved for return, we process the refund to the original payment method after it is approved.</p><h2>After delivery</h2><p>Contact us with your order number and what went wrong. We will tell you what we can do.</p>',
                 'seo' => [
                     'meta_title' => 'Returns & Refunds — Rhythm Exports',
-                    'meta_description' => 'Cancellation, post-delivery request and pending-refund information for Rhythm Exports orders.',
+                    'meta_description' => 'How to cancel an order or ask for a refund at Rhythm Exports.',
                     'meta_keywords' => 'returns, refunds, exchange, music store returns',
+                ],
+            ],
+            [
+                'slug' => 'refund',
+                'title' => 'Refunds',
+                'template' => 'generic',
+                'content' => '<h2>How refunds work</h2><p>Refunds go back to the same payment method used at checkout, after we approve the request.</p><h2>Timing</h2><p>Banks and UPI apps can take a few working days to show the credit.</p>',
+                'seo' => [
+                    'meta_title' => 'Refunds — Rhythm Exports',
+                    'meta_description' => 'How Rhythm Exports refunds work.',
+                    'meta_keywords' => 'refunds, payment refund, rhythm exports',
                 ],
             ],
             [
                 'slug' => 'warranty',
                 'title' => 'Warranty',
                 'template' => 'generic',
-                'content' => '<h2>Warranty information</h2><p>No universal warranty term is asserted by this storefront. Coverage may vary by product, manufacturer and the documentation supplied with the order.</p><h2>Requesting assistance</h2><p>Contact the store with the order number, product details and a description of the issue so the recorded coverage and available next steps can be reviewed.</p>',
+                'content' => '<h2>Warranty</h2><p>Cover depends on the brand and the papers that come with the product. Ask us if you are unsure.</p>',
                 'seo' => [
                     'meta_title' => 'Warranty — Rhythm Exports',
                     'meta_description' => 'How to review product-specific warranty information and request assistance from Rhythm Exports.',
@@ -145,7 +156,7 @@ class PageSeeder extends Seeder
                 'slug' => 'faqs',
                 'title' => 'Frequently Asked Questions',
                 'template' => 'generic',
-                'content' => '<h2>How are shipping charges shown?</h2><p>Any configured shipping charge is calculated and displayed during checkout.</p><h2>Which payment methods are available?</h2><p>The configured payment provider displays the methods available for the specific checkout attempt.</p><h2>How can I ask about a product?</h2><p>Use the contact form or the product support link on the product page. The store team replies when available.</p><h2>How can I track an order?</h2><p>Use the protected account order page or the signed guest tracking journey.</p>',
+                'content' => '<h2>How is shipping shown?</h2><p>At checkout, based on store settings.</p><h2>How can I pay?</h2><p>Razorpay shows the methods available for your order.</p><h2>How do I ask about a product?</h2><p>Use the contact form or WhatsApp button.</p><h2>How do I track an order?</h2><p>Open the order in your account.</p>',
                 'seo' => [
                     'meta_title' => 'FAQs — Rhythm Exports',
                     'meta_description' => 'Answers about checkout totals, payment options, reviews and protected order tracking.',
@@ -156,7 +167,7 @@ class PageSeeder extends Seeder
                 'slug' => 'terms',
                 'title' => 'Terms & Conditions',
                 'template' => 'generic',
-                'content' => '<h2>Orders</h2><p>Product availability and checkout totals are revalidated on the server before an order is created.</p><h2>Payments</h2><p>The configured payment provider presents payment methods. The application records gateway identifiers and payment status for reconciliation.</p><h2>Cancellations</h2><p>Cancellation availability depends on the recorded order status. A paid cancellation creates a pending refund request for staff processing.</p><h2>Legal review</h2><p>Final commercial terms, liability language and governing-law provisions require owner and legal approval before production launch.</p>',
+                'content' => '<h2>Orders</h2><p>When you place an order you agree to pay the total shown at checkout. We re-check stock and prices before payment.</p><h2>Payments</h2><p>Payments are collected by Razorpay. We keep the payment reference, amount and status.</p><h2>Cancellations</h2><p>You can cancel an order until it is packed for shipping. Paid cancellations are refunded after we approve them.</p>',
                 'seo' => [
                     'meta_title' => 'Terms & Conditions — Rhythm Exports',
                     'meta_description' => 'Operational information about Rhythm Exports orders, payments and cancellations pending final legal approval.',
@@ -167,7 +178,7 @@ class PageSeeder extends Seeder
                 'slug' => 'privacy',
                 'title' => 'Privacy Policy',
                 'template' => 'generic',
-                'content' => '<h2>Account and order data</h2><p>The application records account identifiers, saved addresses, order address snapshots and order contact details needed for storefront and order workflows.</p><h2>Payments</h2><p>The configured payment provider presents payment input. The application stores gateway identifiers, amounts, currency and payment status for reconciliation.</p><h2>Customer requests</h2><p>Contact the store about account or order data. The final request-handling and retention procedure requires owner and legal approval before production launch.</p>',
+                'content' => '<h2>What we keep</h2><p>We store your name, email, phone, addresses and order history so we can fulfil and support orders.</p><h2>Payments</h2><p>Card and UPI details are entered on Razorpay. We store payment IDs, amounts and status, not card numbers.</p><h2>Questions</h2><p>Email us if you want a copy of your data or want an account closed.</p>',
                 'seo' => [
                     'meta_title' => 'Privacy Policy — Rhythm Exports',
                     'meta_description' => 'Operational information about account, order and payment-reference data pending final privacy approval.',

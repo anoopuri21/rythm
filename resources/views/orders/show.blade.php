@@ -208,21 +208,17 @@
                     </ul>
 
                     <dl class="mt-4 space-y-2.5 border-t border-ink/10 pt-5 text-sm">
+                        @php $gst = $order->gstTotals(); @endphp
                         <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal, 2) }}</dd></div>
                         @if((float) $order->shipping_fee > 0)
                             <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                         @else
                             <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">Free</dd></div>
                         @endif
-                        @if((float) ($order->tax ?? 0) > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Tax</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->tax, 2) }}</dd></div>
-                        @endif
                         @if((float) $order->discount > 0)
                             <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount, 2) }}</dd></div>
                         @endif
-                        @if((float) $order->tax > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Tax</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->tax, 2) }}</dd></div>
-                        @endif
+                        <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" />
                         <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</dd></div>
                     </dl>
                 </section>

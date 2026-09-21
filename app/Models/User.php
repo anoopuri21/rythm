@@ -79,6 +79,11 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === self::ROLE_SUPER_ADMIN;
+    }
+
     public function hasAdminPermission(string $permission): bool
     {
         return AdminAccess::has((string) $this->role, $permission);

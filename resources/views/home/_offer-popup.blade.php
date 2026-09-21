@@ -55,7 +55,7 @@
                 <p class="offer-popup__eyebrow">Selected offer</p>
                 <p class="offer-popup__discount">{{ $popupOffer['discount'] }}% off</p>
                 <h2 id="offer-popup-title" class="offer-popup__title">Make room for more music.</h2>
-                <p id="offer-popup-description" class="offer-popup__copy">A current product offer, calculated from its stored price and compare-at price.</p>
+                <p id="offer-popup-description" class="offer-popup__copy">A deal from the shop, based on the marked price.</p>
                 <p class="offer-popup__product">{{ $popupOffer['product']->name }}</p>
                 <p class="offer-popup__price">
                     <strong>₹{{ $popupOffer['price'] }}</strong>

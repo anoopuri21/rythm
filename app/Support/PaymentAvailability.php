@@ -55,9 +55,9 @@ final class PaymentAvailability
     public static function customerMessage(): string
     {
         return match (self::mode()) {
-            'razorpay' => 'You will complete payment in Razorpay’s secure window (UPI, cards, netbanking, wallets as offered by the gateway).',
-            'fake' => 'Local development only: no Razorpay keys are set, so payment is simulated and no real charge is created. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET for real test checkout.',
-            default => 'Online payment is not available right now. The store has not finished configuring the payment gateway. Your cart is saved — please try again later or contact the store.',
+            'razorpay' => 'Pay in the Razorpay window. UPI, cards and netbanking are offered there.',
+            'fake' => 'This is a local test checkout. Nothing is charged.',
+            default => 'Payment is not ready. Ask a Super Admin to add Razorpay keys in Admin → Razorpay. Your cart is saved.',
         };
     }
 
@@ -66,8 +66,8 @@ final class PaymentAvailability
         $amount = '₹'.number_format($grandTotal, 0);
 
         return match (self::mode()) {
-            'razorpay' => "Pay {$amount} securely",
-            'fake' => "Simulate pay {$amount} (dev only)",
+            'razorpay' => "Pay {$amount}",
+            'fake' => "Test pay {$amount}",
             default => 'Payment unavailable',
         };
     }

@@ -149,7 +149,7 @@ final class AdminAuditableObserver
 
     private function actor(): ?User
     {
-        $actor = auth()->user();
+        $actor = auth()->user() ?? auth('admin')->user();
 
         return $actor instanceof User && $actor->canAccessPanel(Filament::getPanel('admin')) ? $actor : null;
     }

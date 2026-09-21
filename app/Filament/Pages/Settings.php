@@ -7,6 +7,8 @@ namespace App\Filament\Pages;
 use App\Models\User;
 use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
+use App\Support\IndiaStates;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -46,28 +48,47 @@ class Settings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('Shipping & taxes')
+                Section::make('Shipping')
                     ->schema([
-                        TextInput::make('shipping_flat_fee')->label('Shipping flat fee (₹)')->numeric()->prefix('₹'),
+                        TextInput::make('shipping_flat_fee')->label('Shipping fee (₹)')->numeric()->prefix('₹'),
                         TextInput::make('shipping_free_above')->label('Free shipping above (₹)')->numeric()->prefix('₹'),
-                        Toggle::make('tax_rules_enabled')
-                            ->label('Enable configured tax calculation')
-                            ->helperText('Enable only after professional approval of rates and treatment.'),
-                        TextInput::make('tax_rate')
-                            ->label('Approved default tax rate (%)')
-                            ->numeric()->minValue(0)->maxValue(100)->suffix('%')
-                            ->helperText('No rate is assumed. Product-specific approved rates may override this value.'),
                     ])->columns(2),
-                Section::make('Return requests')
-                    ->description('Disabled by default. Enable only after the business has approved and published its return policy.')
+                Section::make('GST')
+                    ->description('Same-state orders use CGST + SGST. Other-state orders use IGST. A product GST rate, if set, overrides the default rate.')
                     ->schema([
-                        Toggle::make('returns_enabled')->label('Enable customer return requests'),
+                        Toggle::make('tax_rules_enabled')
+                            ->label('Charge GST on orders')
+                            ->helperText('Turn on after you have entered your GST rate and business state.'),
+                        TextInput::make('tax_rate')
+                            ->label('Default GST rate (%)')
+                            ->numeric()->minValue(0)->maxValue(100)->suffix('%')
+                            ->helperText('Used when a product has no GST rate of its own. Typical goods are 18%.'),
+                        Select::make('origin_state')
+                            ->label('Business state')
+                            ->options(IndiaStates::options())
+                            ->searchable()
+                            ->helperText('Compared with the customer delivery state to choose CGST+SGST or IGST.'),
+                        TextInput::make('origin_gstin')
+                            ->label('GSTIN')
+                            ->maxLength(15)
+                            ->helperText('Shown on invoices.'),
+                        TextInput::make('business_legal_name')
+                            ->label('Legal name on invoices')
+                            ->maxLength(160),
+                        TextInput::make('business_address')
+                            ->label('Address on invoices')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                    ])->columns(2),
+                Section::make('Returns')
+                    ->description('Customers can request a return only when this is on.')
+                    ->schema([
+                        Toggle::make('returns_enabled')->label('Allow return requests'),
                         TextInput::make('return_window_days')
-                            ->label('Eligibility window after recorded delivery (days)')
+                            ->label('Days after delivery to request a return')
                             ->integer()
                             ->minValue(1)
-                            ->maxValue(3650)
-                            ->helperText('No legal or business window is assumed. Enter only an approved value.'),
+                            ->maxValue(3650),
                     ])->columns(2),
                 Section::make('Contact & address')
                     ->schema([

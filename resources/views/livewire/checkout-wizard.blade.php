@@ -25,7 +25,7 @@
     <h1 class="section-title">Almost there.</h1>
 
     {{-- Steps indicator --}}
-    <ol class="mt-8 flex items-center gap-3 text-xs font-bold sm:gap-4" aria-label="Checkout progress">
+    <ol class="mt-8 flex flex-wrap items-center gap-3 text-xs font-bold sm:gap-4" aria-label="Checkout progress">
         <li class="flex items-center gap-2 {{ $step >= 1 ? 'text-brand' : 'text-muted' }}">
             <span class="flex h-7 w-7 items-center justify-center rounded-full {{ $step >= 1 ? 'bg-brand text-white' : 'bg-ink/10 text-muted' }}">1</span>
             Address
@@ -111,8 +111,7 @@
                                 </label>
                                 <label class="block">
                                     <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">State</span>
-                                    <input type="text" wire:model="state" placeholder="Delhi"
-                                           class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                                    <x-state-select wire-model="state" :value="$state" />
                                     @error('state') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                                 </label>
                                 <label class="block">
@@ -171,17 +170,17 @@
                         <p class="mt-2 text-sm text-muted">{{ $paymentMessage }}</p>
 
                         @if($razorpayConfigured)
-                            <script src="https://checkout.razorpay.com/v1/checkout.js" data-razorpay-key="{{ config('services.razorpay.key_id') }}" defer></script>
+                            <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
                             <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                Methods shown in the payment window come from Razorpay for this order amount.
+                                Razorpay will show the payment methods for this amount.
                             </p>
                         @elseif($paymentMode === 'fake')
                             <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950" role="status">
-                                Development simulation only — not for customer or staging go-live. Production must set real keys and keep <code class="text-xs">RAZORPAY_ALLOW_FAKE_PAYMENTS=false</code>.
+                                Development only. Nothing is charged.
                             </p>
                         @else
                             <p class="mt-6 rounded-xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm font-semibold text-brand" role="alert">
-                                Checkout is paused until payment keys are configured. Your address selection is kept; nothing has been charged.
+                                Payment is not ready. A Super Admin needs to add Razorpay keys. Nothing has been charged.
                             </p>
                         @endif
 
@@ -209,7 +208,7 @@
 
                         <p class="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Order totals are calculated on the server. Card/UPI details never touch this store’s servers.
+                            Order totals are calculated here. Card and UPI details stay with Razorpay.
                         </p>
                         @php
                             $checkoutPolicyLinks = collect([
@@ -304,10 +303,13 @@
                         </div>
                     @endif
                     @if($tax > 0)
-                        <div class="flex items-center justify-between">
-                            <dt class="text-ink/70">Tax</dt>
-                            <dd class="font-semibold text-ink">₹{{ number_format($tax, 2) }}</dd>
-                        </div>
+                        <x-gst-lines
+                            :enabled="true"
+                            :cgst="$gstQuote->cgst"
+                            :sgst="$gstQuote->sgst"
+                            :igst="$gstQuote->igst"
+                            :tax="$tax"
+                        />
                     @endif
 
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">

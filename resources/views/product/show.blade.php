@@ -74,7 +74,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3" />
                                     </svg>
                                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-muted">{{ $product->brand?->name ?? 'Rythme' }}</p>
-                                    <p class="px-10 text-center text-sm text-muted">Add product or variant photos in admin to show them here.</p>
+                                    <p class="px-10 text-center text-sm text-muted">Photo coming soon.</p>
                                 </div>
                             </div>
                         </template>

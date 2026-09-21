@@ -82,7 +82,9 @@ final class PaymentEventService
             return new PaymentResult(false, 'failed', message: 'Gateway order mismatch.');
         }
 
-        $expectedAmount = (int) round((float) $payment->amount * 100);
+        $payment->loadMissing('order');
+
+        $expectedAmount = (int) round((float) ($payment->order?->total ?? $payment->amount) * 100);
         if ((int) ($entity['amount'] ?? -1) !== $expectedAmount) {
             return new PaymentResult(false, 'failed', message: 'Payment amount mismatch.');
         }

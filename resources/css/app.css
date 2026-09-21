@@ -4067,3 +4067,34 @@ body.offer-popup-open {
     transition: none;
   }
 }
+
+/* Layout safety — long product names, tables, and stacked checkout */
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+.ui-summary-panel,
+.nav,
+main {
+  min-width: 0;
+}
+.offer-popup__dialog {
+  max-height: min(92dvh, 760px);
+  overflow: auto;
+}
+@media (max-width: 767px) {
+  .offer-popup__dialog {
+    width: calc(100vw - 1.25rem);
+    margin-inline: auto;
+  }
+}
+@media print {
+  .nav,
+  .whatsapp-float,
+  .scroll-top,
+  footer {
+    display: none !important;
+  }
+}

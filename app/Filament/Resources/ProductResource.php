@@ -147,15 +147,16 @@ class ProductResource extends Resource
                                 RichEditor::make('description')->maxLength(100000)->columnSpanFull()
                                     ->helperText('Full product story — original copy only.'),
                             ]),
-                        Section::make('Optional tax classification')
-                            ->description('Leave blank unless approved product classification and rate values are available.')
+                        Section::make('GST')
+                            ->description('Leave blank unless you have an HSN code and GST rate for this product.')
                             ->columns(3)
                             ->schema([
                                 TextInput::make('hsn_code')->label('HSN code')->maxLength(20),
-                                TextInput::make('tax_classification')->maxLength(80),
+                                TextInput::make('tax_classification')->label('Tax class')->maxLength(80),
                                 TextInput::make('tax_rate')
-                                    ->label('Approved tax rate (%)')
-                                    ->numeric()->minValue(0)->maxValue(100)->suffix('%'),
+                                    ->label('GST rate (%)')
+                                    ->numeric()->minValue(0)->maxValue(100)->suffix('%')
+                                    ->helperText('Overrides the store default GST rate for this product.'),
                             ]),
                         Section::make('Variants')
                             ->description('Optional sellable options — each row has its own price, stock, colour, specs and images. Leave empty for simple single-SKU products.')

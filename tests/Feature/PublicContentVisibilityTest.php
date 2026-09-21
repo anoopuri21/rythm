@@ -33,17 +33,24 @@ class PublicContentVisibilityTest extends TestCase
         Cache::flush();
     }
 
-    public function test_withheld_policy_slugs_are_not_public(): void
+    public function test_inactive_policy_pages_are_not_public(): void
     {
-        foreach (['shipping', 'returns', 'warranty', 'faqs'] as $slug) {
-            $this->assertTrue(PublicContent::isWithheld($slug));
+        Page::query()->whereIn('slug', ['shipping', 'returns', 'warranty', 'faqs', 'refund'])->update(['is_active' => false]);
+        PublicContent::forgetPageCache();
+        Cache::flush();
+
+        foreach (['shipping', 'returns', 'warranty', 'faqs', 'refund'] as $slug) {
             $this->assertNull(PublicContent::pageHref($slug));
             $this->get('/'.$slug)->assertNotFound();
         }
     }
 
-    public function test_product_page_omits_withheld_policy_links(): void
+    public function test_product_page_omits_inactive_policy_links(): void
     {
+        Page::query()->whereIn('slug', ['shipping', 'returns', 'faqs'])->update(['is_active' => false]);
+        PublicContent::forgetPageCache();
+        Cache::flush();
+
         $product = Product::query()->where('is_active', true)->firstOrFail();
 
         $this->get(route('product.show', $product))
@@ -51,7 +58,6 @@ class PublicContentVisibilityTest extends TestCase
             ->assertDontSee('href="/shipping"', false)
             ->assertDontSee('href="/returns"', false)
             ->assertDontSee('href="/faqs"', false)
-            // Track order is not a product-page CTA (order detail / account only).
             ->assertDontSee(route('orders.lookup'), false)
             ->assertDontSee('Track an order', false);
     }
@@ -114,10 +120,13 @@ class PublicContentVisibilityTest extends TestCase
             ->assertDontSeeHtml('>Tax</dt>');
     }
 
-    public function test_account_hides_returns_help_when_policy_withheld_and_returns_off(): void
+    public function test_account_hides_returns_help_when_policy_unpublished_and_returns_off(): void
     {
         $user = User::where('email', 'test@example.com')->firstOrFail();
         $this->actingAs($user);
+
+        Page::query()->whereIn('slug', ['returns', 'refund'])->update(['is_active' => false]);
+        PublicContent::forgetPageCache();
 
         SiteSetting::query()->updateOrCreate(
             ['key' => 'returns_enabled'],

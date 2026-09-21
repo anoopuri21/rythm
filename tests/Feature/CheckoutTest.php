@@ -118,6 +118,7 @@ class CheckoutTest extends TestCase
         SiteSetting::query()->updateOrCreate(['key' => 'shipping_free_above'], ['value' => '0']);
         SiteSetting::query()->updateOrCreate(['key' => 'tax_rules_enabled'], ['value' => '1']);
         SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '10']);
+        SiteSetting::query()->updateOrCreate(['key' => 'origin_state'], ['value' => 'Delhi']);
         Cache::forget('site.settings');
         Product::where('slug', 'fender-351-shape-picks-12-pack-medium')->update([
             'hsn_code' => 'APPROVED-HSN',
@@ -143,6 +144,10 @@ class CheckoutTest extends TestCase
         $this->assertSame(10.0, (float) $line->tax_rate_snapshot);
         $this->assertSame(798.0, (float) $line->taxable_amount_snapshot);
         $this->assertSame(79.8, (float) $line->tax_amount_snapshot);
+        $this->assertSame(39.9, (float) $line->cgst_amount_snapshot);
+        $this->assertSame(39.9, (float) $line->sgst_amount_snapshot);
+        $this->assertSame(0.0, (float) ($line->igst_amount_snapshot ?? 0));
+        $this->assertSame('intra', $line->gst_supply_type_snapshot);
         $this->assertTrue($line->tax_calculation_enabled_snapshot);
         $this->assertSame('Delhi', $line->tax_destination_region_snapshot);
 
@@ -150,14 +155,47 @@ class CheckoutTest extends TestCase
             ->assertOk()
             ->assertSee('798.00')
             ->assertSee('50.00')
-            ->assertSee('79.80')
+            ->assertSee('39.90')
             ->assertSee('927.80');
         $this->get(URL::signedRoute('orders.invoice', ['order' => $order]))
             ->assertOk()
             ->assertSee('798.00')
             ->assertSee('50.00')
-            ->assertSee('79.80')
+            ->assertSee('CGST')
+            ->assertSee('SGST')
             ->assertSee('927.80');
+    }
+
+    public function test_inter_state_orders_use_igst(): void
+    {
+        SiteSetting::query()->updateOrCreate(['key' => 'shipping_flat_fee'], ['value' => '0']);
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rules_enabled'], ['value' => '1']);
+        SiteSetting::query()->updateOrCreate(['key' => 'tax_rate'], ['value' => '10']);
+        SiteSetting::query()->updateOrCreate(['key' => 'origin_state'], ['value' => 'Delhi']);
+        Cache::forget('site.settings');
+
+        $this->fillCart(2);
+        $address = app(AddressService::class)->store($this->user->id, [
+            'name' => 'Anoop Puri',
+            'phone' => '9876543210',
+            'line1' => '12, MG Road',
+            'city' => 'Mumbai',
+            'state' => 'Maharashtra',
+            'pincode' => '400001',
+            'is_default' => true,
+        ]);
+
+        Livewire::test(CheckoutWizard::class)
+            ->call('selectAddress', $address->id)
+            ->call('placeOrder')
+            ->assertRedirect();
+
+        $line = Order::query()->firstOrFail()->items()->firstOrFail();
+        $this->assertSame('inter', $line->gst_supply_type_snapshot);
+        $this->assertSame(0.0, (float) ($line->cgst_amount_snapshot ?? 0));
+        $this->assertSame(0.0, (float) ($line->sgst_amount_snapshot ?? 0));
+        $this->assertSame(79.8, (float) $line->igst_amount_snapshot);
+        $this->assertSame(79.8, (float) $line->tax_amount_snapshot);
     }
 
     public function test_tax_values_remain_disabled_without_explicit_rule_enablement(): void
@@ -333,7 +371,7 @@ class CheckoutTest extends TestCase
         // Owner + signature → 200
         $this->actingAs($this->user)->get($signed)
             ->assertOk()
-            ->assertSee('Thank you! Your order is confirmed.')
+            ->assertSee('Thank you. Your order is confirmed.')
             ->assertSee($order->order_number);
     }
 

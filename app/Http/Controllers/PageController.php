@@ -23,7 +23,7 @@ final class PageController extends Controller
             ->firstOrFail();
 
         $this->seo->apply(SeoService::fromEntry($page->seoEntry, [
-            'meta_title' => $page->title.' — Rythme Music Store',
+            'meta_title' => $page->title.' — Rhythm Exports',
             'meta_description' => strip_tags((string) $page->content),
         ]));
 

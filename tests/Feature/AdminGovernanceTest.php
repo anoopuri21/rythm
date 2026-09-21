@@ -68,11 +68,16 @@ class AdminGovernanceTest extends TestCase
             AdminAccess::FINANCE_VIEW, AdminAccess::FINANCE_MANAGE,
             AdminAccess::SETTINGS_MANAGE, AdminAccess::STAFF_MANAGE,
             AdminAccess::AUDIT_VIEW, AdminAccess::NOTIFICATIONS_VIEW,
+            AdminAccess::PAYMENTS_MANAGE,
         ];
         $all = $permissions;
+        $adminWithoutPayments = array_values(array_filter(
+            $permissions,
+            fn (string $permission): bool => $permission !== AdminAccess::PAYMENTS_MANAGE,
+        ));
         $expected = [
             User::ROLE_SUPER_ADMIN => $all,
-            User::ROLE_ADMIN => $all,
+            User::ROLE_ADMIN => $adminWithoutPayments,
             User::ROLE_CATALOGUE_MANAGER => [AdminAccess::CATALOGUE_VIEW, AdminAccess::CATALOGUE_MANAGE],
             User::ROLE_ORDER_MANAGER => [AdminAccess::ORDERS_VIEW, AdminAccess::ORDERS_MANAGE, AdminAccess::CUSTOMERS_VIEW, AdminAccess::CATALOGUE_VIEW],
             User::ROLE_SUPPORT => [AdminAccess::ORDERS_VIEW, AdminAccess::CUSTOMERS_VIEW, AdminAccess::INTERACTIONS_MANAGE, AdminAccess::CATALOGUE_VIEW, AdminAccess::NOTIFICATIONS_VIEW],
@@ -120,6 +125,12 @@ class AdminGovernanceTest extends TestCase
         $this->actingAsAdmin($superAdmin)->get('/admin/admin-audit-logs')->assertOk();
         $this->actingAsAdmin($superAdmin)->get('/admin/staff')->assertOk();
         $this->actingAsAdmin($superAdmin)->get('/admin/settings')->assertOk();
+        $this->actingAsAdmin($superAdmin)->get('/admin/razorpay-settings')->assertOk();
+        $this->actingAsAdmin($catalogue)->get('/admin/razorpay-settings')->assertForbidden();
+        $legacyAdmin = $this->staff(User::ROLE_ADMIN);
+        $this->actingAsAdmin($legacyAdmin)->get('/admin/razorpay-settings')->assertForbidden();
+        $finance = $this->staff(User::ROLE_FINANCE);
+        $this->actingAsAdmin($finance)->get('/admin/razorpay-settings')->assertForbidden();
     }
 
     public function test_final_super_admin_cannot_be_demoted(): void

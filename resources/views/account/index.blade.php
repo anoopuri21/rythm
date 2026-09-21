@@ -207,8 +207,7 @@
                         </label>
                         <label class="block">
                             <span class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">State</span>
-                            <input type="text" name="state" value="{{ old('state') }}" required
-                                   class="h-11 w-full rounded-xl border border-ink/15 bg-paper px-4 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25">
+                            <x-state-select :value="old('state')" />
                             @error('state') <span class="mt-1 block text-xs text-brand">{{ $message }}</span> @enderror
                         </label>
                         <label class="block">

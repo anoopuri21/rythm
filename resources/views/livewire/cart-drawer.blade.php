@@ -99,7 +99,7 @@
                     <span class="text-sm text-muted">Subtotal</span>
                     <span class="text-xl font-bold text-ink">₹{{ number_format($totals['subtotal']) }}</span>
                 </div>
-                <p class="mb-4 text-xs text-muted">Shipping and taxes calculated at checkout.</p>
+                <p class="mb-4 text-xs text-muted">Shipping and GST are confirmed at checkout.</p>
                 <a href="{{ route('cart.index') }}" class="mb-2.5 block w-full rounded-full bg-ink py-3.5 text-center text-sm font-bold text-white transition hover:bg-ink-soft">
                     View full cart
                 </a>

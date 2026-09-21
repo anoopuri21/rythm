@@ -12,10 +12,10 @@
         <span class="music-note left-[8%] top-8">♪</span><span class="music-note right-[10%] bottom-6">♫</span>
         <div class="relative mx-auto grid max-w-[1520px] items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:py-20">
             <div>
-                <p class="section-kicker text-gold-light">The Rhythm Exports promise</p>
-                <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Ready to find <em class="text-gold-light">your sound?</em></h2>
+                <p class="section-kicker text-gold-light">Ready when you are</p>
+                <h2 id="cta-title" class="font-playfair text-4xl leading-tight sm:text-5xl">Find <em class="text-gold-light">your sound</em></h2>
                 <p class="mt-4 max-w-lg text-sm leading-7 text-white/55 sm:text-base">
-                    Explore the catalogue or contact the Rhythm Exports team with a product or order question.
+                    Browse the shop or send us a product or order question.
                 </p>
                 <div class="mt-8 flex flex-wrap items-center gap-4">
                     <a href="/shop" class="btn-gold btn-shine">Browse instruments <span aria-hidden="true">→</span></a>
@@ -24,20 +24,20 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
-                    <p class="text-base font-bold text-gold-light">Catalogue filters</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Narrow instruments by category, brand, price, stock and available specifications.</p>
+                    <p class="text-base font-bold text-gold-light">Filters</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Shop by category, brand, price and stock.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
-                    <p class="text-base font-bold text-gold-light">Verified totals</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Checkout totals are recalculated from current catalogue data.</p>
+                    <p class="text-base font-bold text-gold-light">Clear totals</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Prices and GST are confirmed at checkout.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
                     <p class="text-base font-bold text-gold-light">Wishlist</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Save products to a customer account for later consideration.</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Save items to look at later.</p>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40">
                     <p class="text-base font-bold text-gold-light">Order tracking</p>
-                    <p class="mt-1 text-xs leading-5 text-white/55">Follow recorded order-status updates through protected access.</p>
+                    <p class="mt-1 text-xs leading-5 text-white/55">Follow your order from your account.</p>
                 </div>
             </div>
         </div>
@@ -89,6 +89,7 @@
                 $careLinks = collect([
                     ['href' => '/contact', 'label' => 'Contact us', 'always' => true],
                     ['slug' => 'shipping', 'label' => 'Shipping'],
+                    ['slug' => 'refund', 'label' => 'Refunds'],
                     ['slug' => 'returns', 'label' => 'Returns'],
                     ['slug' => 'warranty', 'label' => 'Warranty'],
                     ['slug' => 'faqs', 'label' => 'FAQs'],
@@ -150,7 +151,7 @@
     <div class="border-t border-white/10">
         <div class="mx-auto flex max-w-[1520px] flex-col gap-5 px-5 py-7 text-[11px] text-white/60 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p>© {{ date('Y') }} {{ $brand }}. All rights reserved.</p>
-            <p class="inline-flex items-center gap-2"><span class="text-gold">●</span> Server-verified checkout totals</p>
+            <p class="inline-flex items-center gap-2"><span class="text-gold">●</span> Pay with Razorpay</p>
         </div>
     </div>
 

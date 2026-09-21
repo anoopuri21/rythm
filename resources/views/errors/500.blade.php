@@ -8,7 +8,7 @@
             <p class="font-bebas text-[7rem] leading-none text-brand/15 sm:text-[9rem]" aria-hidden="true">500</p>
             <h1 class="mt-2 font-playfair text-3xl font-bold text-ink sm:text-4xl">Something went wrong</h1>
             <p class="mt-4 max-w-md text-sm leading-6 text-muted">
-                The store could not complete this request. Please try again in a moment. If it continues, use Contact or try later.
+                Please try again in a moment. If it keeps happening, contact us.
             </p>
             <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
                 <a href="{{ route('home') }}" class="rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">Back home</a>

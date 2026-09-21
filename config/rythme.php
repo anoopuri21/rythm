@@ -63,7 +63,7 @@ return [
     | Public policy/content pages withheld until the owner approves their
     | business terms. Admin records may exist, but are not publication consent.
     */
-    'withheld_public_pages' => ['shipping', 'returns', 'warranty', 'faqs'],
+    'withheld_public_pages' => [],
 
     'shipping' => [
         'flat_fee' => 0,

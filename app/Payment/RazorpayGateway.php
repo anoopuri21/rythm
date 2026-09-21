@@ -7,6 +7,7 @@ namespace App\Payment;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Refund;
+use App\Services\PaymentSettingsService;
 use Razorpay\Api\Api;
 use RuntimeException;
 
@@ -142,6 +143,8 @@ final class RazorpayGateway implements PaymentGateway
 
     public static function isConfigured(): bool
     {
+        app(PaymentSettingsService::class)->applyToConfig();
+
         return trim((string) config('services.razorpay.key_id', '')) !== ''
             && trim((string) config('services.razorpay.key_secret', '')) !== '';
     }
@@ -156,13 +159,13 @@ final class RazorpayGateway implements PaymentGateway
             return app(FakePaymentGateway::class);
         }
 
-        throw new RuntimeException('A real payment gateway is not configured. Fake payments are disabled.');
+        throw new RuntimeException('Online payment is not set up yet. A Super Admin needs to add Razorpay keys in Admin → Razorpay.');
     }
 
     public static function fromConfig(): self
     {
         if (! self::isConfigured()) {
-            throw new RuntimeException('Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
+            throw new RuntimeException('Razorpay keys are missing. Add test or live keys in Admin → Razorpay.');
         }
 
         return new self(

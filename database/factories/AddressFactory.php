@@ -22,7 +22,7 @@ class AddressFactory extends Factory
             'line1' => fake()->streetAddress(),
             'line2' => fake()->secondaryAddress(),
             'city' => fake()->city(),
-            'state' => fake()->state(),
+            'state' => fake()->randomElement(\App\Support\IndiaStates::NAMES),
             'pincode' => fake()->numerify('######'),
             'country' => 'IN',
             'is_default' => false,
