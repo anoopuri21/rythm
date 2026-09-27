@@ -27,3 +27,4 @@ Thumbs.db
 
 # Local agent deploy credentials (never commit)
 /.agent-credentials/
+.env.before_lerd
