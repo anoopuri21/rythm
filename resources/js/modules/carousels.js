@@ -95,7 +95,7 @@ export function initCarousels(reducedMotion) {
             modules: commonModules,
             speed: reducedMotion ? 0 : 600,
             spaceBetween: 14,
-            slidesPerView: 2.3,
+            slidesPerView: 2.4,
             watchOverflow: true,
             // Re-measure automatically if the section's box changes without a
             // window resize (lazy CMS block swap, font swap, scrollbar change).
@@ -107,11 +107,22 @@ export function initCarousels(reducedMotion) {
             },
             keyboard: { enabled: true, onlyInViewport: true },
             a11y: { enabled: true },
+            // Fractional ladder chosen so the tile stays inside roughly
+            // 180–245px at every width. The old 640/768/1024/1400 integer steps
+            // swung the tile between 173px and 257px — a 62px jump at a single
+            // pixel of viewport change. Keep in sync with the
+            // `:not(.swiper-initialized)` fallback widths in app.css;
+            // tests/automation/homepage-categories-responsive.test.mjs fails on drift.
             breakpoints: {
-                640: { slidesPerView: 3 },
-                768: { slidesPerView: 4 },
-                1024: { slidesPerView: 5 },
-                1400: { slidesPerView: 6 },
+                480: { slidesPerView: 2.35 },
+                600: { slidesPerView: 2.75 },
+                720: { slidesPerView: 3.2 },
+                840: { slidesPerView: 3.65 },
+                960: { slidesPerView: 4 },
+                1080: { slidesPerView: 4.5 },
+                1200: { slidesPerView: 4.95 },
+                1320: { slidesPerView: 5.4 },
+                1440: { slidesPerView: 5.7 },
             },
         });
         remeasureOnSettle(catSwiper);

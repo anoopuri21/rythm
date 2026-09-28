@@ -79,6 +79,41 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-28 — Categories carousel: flatten the responsive sawtooth
+- Change-id: `home-categories-responsive-ladder`
+- Trigger: owner-ask (follow-up to `home-categories-slide-width` — smooth the card-width jumps)
+- Scope paths: `resources/js/modules/carousels.js` (`.cat-swiper` only), `resources/css/app.css` (fallback block only), `public/build/*`
+- Type tags: [x] code [ ] migration [x] test [x] front-build [ ] design-token [x] docs-only [ ] config [ ] admin [ ] commerce [ ] security
+- Checklist:
+  - [x] A1 Read five always-read files before editing
+  - [x] A2 Touched only `.cat-swiper` config + its CSS fallback — brands/testimonials/products carousels untouched
+  - [x] A3/A4/A5 n/a (frontend layout only; no service, money, stock or policy touched)
+  - [x] A6 `npm run test:automation` → **178 tests / 171 pass / 7 fail**, the same 7 pre-existing failures recorded in the previous entry. `php artisan test` still **not runnable** here (no `php`; apt cannot reach deb.debian.org)
+  - [x] A7 `npm run build` → **pass**; rebuild after a mid-task revert reproduced **byte-identical hashes** (`app-BnH0L5tc.css`, `carousels-DZ_yLQ-h.js`), which is the proof the re-applied source matches what was measured
+  - [x] A8 Design tokens only — n/a (no new colours/fonts; `slidesPerView` + `calc()` widths only)
+  - [x] A9 No secrets/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C verified unchanged — keys touched: `none`
+  - [x] A12 §D unchanged
+  - [x] A13 No new footgun (§F 15 already covers inline-width drift)
+  - [x] A14 Mirrors — n/a (no phase/launch/stack change)
+  - [x] A15 Owner summary prepared
+- What changed: `.cat-swiper` went from `slidesPerView 2.3` + integer breakpoints `640:3 / 768:4 / 1024:5 / 1400:6` to `slidesPerView 2.4` + a fractional ladder `480:2.35 / 600:2.75 / 720:3.2 / 840:3.65 / 960:4 / 1080:4.5 / 1200:4.95 / 1320:5.4 / 1440:5.7`. The 10 CSS fallback widths were regenerated to match.
+- Ladder was **derived, not guessed**: a bottleneck-DP over 0.05-step `slidesPerView` candidates minimised the largest single-boundary jump subject to keeping the tile inside a width band, using the real container model read out of the shipped CSS.
+- Verification executed:
+  1. **Responsive sweep, real shipped bundle, 40 viewports 320→2560px** → every viewport matches `(container − 14×(spv−1))/spv` within 0.01px, all 10 slides uniform, zero `[carousels]` warnings. 51/51 checks pass.
+  2. **Before → after**: max boundary jump **62.67px → 35.60px**; tile spread across 480–2560px **83.10px → 62.00px**; the 1023→1024 jump (`.cat-mm__inner` padding 16→30 shrinks the container 991→964) falls mid-segment now and drops from **55.65px to 6.75px**.
+  3. **Common devices**: 768px `173.5 → 220.4px`, 1024px `181.6 → 230.5px`, 1280px `232.8 → 235.3px`, 1440px `218.3 → 230.6px`, 1600px `231.7 → 244.6px`.
+  4. Slide-count sweep re-run at 1600px (1/2/4/6/7/10) → widths correct even when `watchOverflow` locks.
+  5. Built-CSS fallback parsed and checked against the JS formula at all 10 thresholds → all match.
+  6. Drift test mutation-checked again on the new 9-breakpoint config: changing a CSS divisor **and** deleting a JS breakpoint both turn it red.
+- Risks / follow-ups:
+  - **Visible-count change (owner should eyeball it)** — tiles are bigger, so fewer show per row: 768px `4 → 3.2`, 1024px `5 → 4`, ≥1520px `6 → 5.7`. Intentional (that was the point), but it is a design change, not just a smoothing.
+  - A 35.6px jump remains at 600px. Removing it entirely needs `slidesPerView:'auto'` + CSS-driven widths, which also makes the tile width editable in DevTools — deliberately **not** done: it changes the sizing model and cannot be verified without a real browser layout engine, which this sandbox lacks.
+  - 9 breakpoints now have to stay mirrored in CSS. `tests/automation/homepage-categories-responsive.test.mjs` enforces it; adding a breakpoint means editing both files.
+  - **Process note:** a mutation-check restored files with `git checkout --` while the ladder was still uncommitted, which destroyed the edit and left source/build inconsistent. Recovered and proven correct by the identical-hash rebuild. Use a file backup, not `git checkout`, for mutation checks on uncommitted work.
+- Status: COMPLETE (code + frontend verification) — **PHP suite still owed**
+
 ### 2026-09-28 — Categories carousel: full-width slide when Swiper misses init
 - Change-id: `home-categories-slide-width`
 - Trigger: bug (owner report — `#categories` tile `a[2]` rendering full device width on ≥1400px)
