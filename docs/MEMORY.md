@@ -82,15 +82,15 @@ Work may be reported **done** to the owner only when:
 ### 2026-09-28 — Categories carousel: full-width slide when Swiper misses init
 - Change-id: `home-categories-slide-width`
 - Trigger: bug (owner report — `#categories` tile `a[2]` rendering full device width on ≥1400px)
-- Scope paths: `resources/js/modules/carousels.js`, `resources/js/app.js`, `resources/css/app.css`, `public/build/*`
-- Type tags: [x] code [ ] migration [ ] test [x] front-build [ ] design-token [ ] docs-only [ ] config [ ] admin [ ] commerce [ ] security
+- Scope paths: `resources/js/modules/carousels.js`, `resources/js/app.js`, `resources/css/app.css`, `tests/automation/homepage-categories-responsive.test.mjs`, `public/build/*`
+- Type tags: [x] code [ ] migration [x] test [x] front-build [ ] design-token [ ] docs-only [ ] config [ ] admin [ ] commerce [ ] security
 - Checklist:
   - [x] A1 Read five always-read files before editing
   - [x] A2 Touched only task-relevant paths (no drive-by refactors) — `motion.js` `.category-card` dead selector + `app.js` `#categories.pin` dead gate **reported, deliberately not changed** (enabling a dormant GSAP animation on the same section under investigation would confuse the diff)
   - [x] A3 Services own business writes — n/a (frontend only, no service touched)
   - [x] A4 No client-trusted totals/prices — n/a
   - [x] A5 AuthZ/policies preserved — n/a
-  - [x] A6 Tests run → **partial**: `php artisan test` **NOT RUNNABLE in this sandbox** (no `php` binary; `apt-get` cannot reach deb.debian.org, only the npm registry is proxied). Frontend verified instead — see Notes
+  - [x] A6 Tests run → **`npm run test:automation` = 178 tests / 171 pass / 7 fail**; the 7 are **pre-existing and identical** at parent commit `642f5e7` (verified by running the suite on a `git archive` extract of that commit — 8 fail there, the 8th being an artifact of the extract having no `.git` for `git ls-files`). `php artisan test` **NOT RUNNABLE in this sandbox** (no `php` binary; `sudo apt-get update` cannot reach deb.debian.org — only the npm registry is proxied)
   - [x] A7 `npm run build` → **pass** (vite 7.3.6, 53 modules; new hashes `app-5xc9f3O4.css`, `app-D58vM8j5.js`, `carousels-8Lmv40jM.js`; old hashes removed, no stale assets)
   - [x] A8 Design tokens only — n/a (no new colours/fonts; only layout `width`/`gap`)
   - [x] A9 No secrets/.env/vendor/node_modules committed (`node_modules` ignored at `.gitignore:15`; spurious `package-lock.json` `"name": app → rythm` rewrite reverted)
@@ -105,9 +105,15 @@ Work may be reported **done** to the owner only when:
   2. Ran the **real shipped bundle** `public/build/assets/carousels-8Lmv40jM.js` in jsdom against the real `#categories` markup (10 slides, 1600px viewport, container box 1472px / padding 6px) → `initCarousels()` → slide[1] inline `width: 231.66666666666666px`, `swiper-initialized` present, **not** `100%`. Matches `(1472 − 2×6 − 14×5)/6`.
   3. Degraded path with the **real built CSS** loaded: without `swiper-initialized` the slide computes `calc(43.4783% − 7.91304px)` instead of the base `100%`; with `swiper-initialized` the fallback goes inert (`100%`, i.e. Swiper's inline width governs).
   4. Incidental proof of the new guard: an intentionally broken jsdom harness made `new Swiper` throw → `createSwiper` caught it, logged `[carousels] Swiper init failed on cat-swiper swiper …`, and `initCarousels` still ran to completion.
+  5. **Responsive sweep** (real bundle, container numbers read out of the shipped CSS rather than assumed) — 19 viewports 320→2560px, 10 slides: every viewport matches `(container − 14×(spv−1))/spv` within 0.01px and all 10 slides are uniform. Boundaries behave: 639→2.3, 640→3, 767→3, 768→4, 1023→4 (padding 16px), 1024→5 (padding 30px), 1399→5, 1400→6. Width clamps at `max-width:1520px` from 1520px upward (231.67px at 1520/1600/1920/2560).
+  6. **Slide-count sweep at 1600px** (1/2/4/6/7/10 slides) → `watchOverflow` does lock at ≤6 slides, **but slide width stays correct (231.67px) even when locked**. This **disproves** the earlier hypothesis that `watchOverflow` locking could produce the full-width tile.
+  7. **Mutation-checked the new regression test** (a test that cannot fail proves nothing): CSS 1400 divisor 6→5 → FAIL; JS base `slidesPerView` 2.3→2.5 → FAIL; `createSwiper(cats` → `new Swiper(cats` → FAIL. Restored, tree clean, 3/3 pass.
 - Risks / follow-ups:
   - **Root cause not pinned.** The sandbox has no browser and no PHP, so which of {carousels chunk 404 on the host, JS blocked, constructor error} actually fired on the owner's page is unconfirmed. The change makes all three non-fatal and self-reporting rather than fixing a proven single cause.
   - Owner should re-check the live page and read the console: `[home] failed to load carousels` ⇒ deploy/build hash problem; `[carousels] Swiper init failed` ⇒ instance-level problem.
+  - **Responsive sawtooth is by design but visible** — card width drops sharply at each breakpoint step: 767px→235.67px vs 768px→173.50px; 1023px→237.25px vs 1024px→181.60px; 1399px→256.60px vs 1400px→211.67px. Not a bug; smoothing it is an owner design call (add intermediate breakpoints or move to `slidesPerView:'auto'`).
+  - **Pre-existing automation failures (7), untouched** — incl. `release-phase15.test.mjs:43` asserting `.gitignore` must contain `/public/build`, which contradicts `.gitignore:16` ("public/build is COMMITTED on purpose") and the shared-hosting deploy convention this change followed. Owner decision needed.
+  - `docs/MEMORY.md` is 548 lines against the §K target of ≤450, with 18 §B entries against a policy of ~15; `docs/MEMORY_ARCHIVE.md` does not exist. Pre-existing, archiving not done here.
   - Untouched defects (owner decision): `resources/js/modules/motion.js:94` animates `.category-card` but markup uses `.cat-card` (animation never runs; orphan `.category-card::before` rules at `app.css:295,307`); `resources/js/app.js` gates on `#categories.pin` which no longer exists, so the `categories-pin` chunk is dead code.
 - Status: COMPLETE (code + frontend verification) — **PHP suite still owed**, run `php artisan test` on a PHP host
 
