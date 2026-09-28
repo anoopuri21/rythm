@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-tbjsgmGU.css",
+    "file": "assets/app-5xc9f3O4.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DRzq3ApJ.js",
+    "file": "assets/app-D58vM8j5.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -21,7 +21,7 @@
     ]
   },
   "resources/js/modules/carousels.js": {
-    "file": "assets/carousels-Dkup7VLU.js",
+    "file": "assets/carousels-8Lmv40jM.js",
     "name": "carousels",
     "src": "resources/js/modules/carousels.js",
     "isDynamicEntry": true,

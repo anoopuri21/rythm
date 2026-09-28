@@ -79,6 +79,38 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-28 — Categories carousel: full-width slide when Swiper misses init
+- Change-id: `home-categories-slide-width`
+- Trigger: bug (owner report — `#categories` tile `a[2]` rendering full device width on ≥1400px)
+- Scope paths: `resources/js/modules/carousels.js`, `resources/js/app.js`, `resources/css/app.css`, `public/build/*`
+- Type tags: [x] code [ ] migration [ ] test [x] front-build [ ] design-token [ ] docs-only [ ] config [ ] admin [ ] commerce [ ] security
+- Checklist:
+  - [x] A1 Read five always-read files before editing
+  - [x] A2 Touched only task-relevant paths (no drive-by refactors) — `motion.js` `.category-card` dead selector + `app.js` `#categories.pin` dead gate **reported, deliberately not changed** (enabling a dormant GSAP animation on the same section under investigation would confuse the diff)
+  - [x] A3 Services own business writes — n/a (frontend only, no service touched)
+  - [x] A4 No client-trusted totals/prices — n/a
+  - [x] A5 AuthZ/policies preserved — n/a
+  - [x] A6 Tests run → **partial**: `php artisan test` **NOT RUNNABLE in this sandbox** (no `php` binary; `apt-get` cannot reach deb.debian.org, only the npm registry is proxied). Frontend verified instead — see Notes
+  - [x] A7 `npm run build` → **pass** (vite 7.3.6, 53 modules; new hashes `app-5xc9f3O4.css`, `app-D58vM8j5.js`, `carousels-8Lmv40jM.js`; old hashes removed, no stale assets)
+  - [x] A8 Design tokens only — n/a (no new colours/fonts; only layout `width`/`gap`)
+  - [x] A9 No secrets/.env/vendor/node_modules committed (`node_modules` ignored at `.gitignore:15`; spurious `package-lock.json` `"name": app → rythm` rewrite reverted)
+  - [x] A10 Withheld legal pages / live pay / Phase 18 untouched
+  - [x] A11 §1 facts verified unchanged — keys touched: `none`
+  - [x] A12 §2 Locked decisions unchanged
+  - [x] A13 Footgun 15 added to §F: Swiper slide width is inline-only
+  - [x] A14 Cross-file mirrors — n/a (no phase/launch/stack change)
+  - [x] A15 Owner-facing summary prepared
+- Verification actually executed:
+  1. `node --check` on `carousels.js` → PARSE OK.
+  2. Ran the **real shipped bundle** `public/build/assets/carousels-8Lmv40jM.js` in jsdom against the real `#categories` markup (10 slides, 1600px viewport, container box 1472px / padding 6px) → `initCarousels()` → slide[1] inline `width: 231.66666666666666px`, `swiper-initialized` present, **not** `100%`. Matches `(1472 − 2×6 − 14×5)/6`.
+  3. Degraded path with the **real built CSS** loaded: without `swiper-initialized` the slide computes `calc(43.4783% − 7.91304px)` instead of the base `100%`; with `swiper-initialized` the fallback goes inert (`100%`, i.e. Swiper's inline width governs).
+  4. Incidental proof of the new guard: an intentionally broken jsdom harness made `new Swiper` throw → `createSwiper` caught it, logged `[carousels] Swiper init failed on cat-swiper swiper …`, and `initCarousels` still ran to completion.
+- Risks / follow-ups:
+  - **Root cause not pinned.** The sandbox has no browser and no PHP, so which of {carousels chunk 404 on the host, JS blocked, constructor error} actually fired on the owner's page is unconfirmed. The change makes all three non-fatal and self-reporting rather than fixing a proven single cause.
+  - Owner should re-check the live page and read the console: `[home] failed to load carousels` ⇒ deploy/build hash problem; `[carousels] Swiper init failed` ⇒ instance-level problem.
+  - Untouched defects (owner decision): `resources/js/modules/motion.js:94` animates `.category-card` but markup uses `.cat-card` (animation never runs; orphan `.category-card::before` rules at `app.css:295,307`); `resources/js/app.js` gates on `#categories.pin` which no longer exists, so the `categories-pin` chunk is dead code.
+- Status: COMPLETE (code + frontend verification) — **PHP suite still owed**, run `php artisan test` on a PHP host
+
 ### 2026-09-12 — Homepage Popular Brands slider
 - Change-id: `homepage-brands-slider`
 - Trigger: owner-ask (list → scroll/slide, professional, fully responsive)
@@ -417,7 +449,8 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 11. **Skipping MEMORY “because docs/small”** — causes next session full re-scan; **forbidden**.  
 12. Claiming **done** without §A checklist — treat as incomplete work.  
 13. **Empty client tax/policy/shipping** must **hide** on storefront — never fake values, never crash checkout (W5).  
-14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).
+14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).  
+15. **Swiper slide width is inline-only** — Swiper writes `style="width:…px"` per slide from `slidesPerView`/`spaceBetween`. Editing `.cat-card`/`.brand-card` width in CSS does nothing (inline wins), and if Swiper never initialises the base rule `.swiper-slide{width:100%}` makes **one tile fill the whole row**. Change per-row counts in `carousels.js`, not in CSS. Any no-JS fallback must be scoped `:not(.swiper-initialized)`.
 
 *New trap discovered → add numbered item same day.*
 

@@ -2414,6 +2414,40 @@ input:focus-visible {
 .cat-swiper .swiper-wrapper {
   height: auto;
 }
+
+/* Degraded mode: Swiper never initialised (chunk 404 on the host, JS blocked,
+   or a constructor error). Swiper's own base rule `.swiper-slide { width: 100% }`
+   would otherwise make a single tile fill the whole row. Scoped to
+   `:not(.swiper-initialized)` so it goes inert the moment Swiper takes over and
+   writes its own inline slide widths — no effect on the working carousel.
+   Widths mirror the JS `slidesPerView`/`spaceBetween` breakpoints. */
+.cat-swiper:not(.swiper-initialized) .swiper-wrapper {
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.cat-swiper:not(.swiper-initialized) .swiper-slide.cat-card {
+  width: calc((100% - 18.2px) / 2.3);
+}
+@media (min-width: 640px) {
+  .cat-swiper:not(.swiper-initialized) .swiper-slide.cat-card {
+    width: calc((100% - 28px) / 3);
+  }
+}
+@media (min-width: 768px) {
+  .cat-swiper:not(.swiper-initialized) .swiper-slide.cat-card {
+    width: calc((100% - 42px) / 4);
+  }
+}
+@media (min-width: 1024px) {
+  .cat-swiper:not(.swiper-initialized) .swiper-slide.cat-card {
+    width: calc((100% - 56px) / 5);
+  }
+}
+@media (min-width: 1400px) {
+  .cat-swiper:not(.swiper-initialized) .swiper-slide.cat-card {
+    width: calc((100% - 70px) / 6);
+  }
+}
 .cat-card__name,
 .cat-card__count {
   display: block;
