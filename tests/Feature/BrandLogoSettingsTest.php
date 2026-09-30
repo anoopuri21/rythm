@@ -38,7 +38,9 @@ class BrandLogoSettingsTest extends TestCase
             ->assertSee('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', escape: false)
             // …the footer keeps whitening it with the CSS tint…
             ->assertSee('brightness-0 invert', escape: false)
-            // …and the bundled favicon is used.
+            // …and the favicon is deliberately NOT admin-controlled, so the
+            // bundled <link rel="icon"> must stay exactly as it was.
+            ->assertSee('type="image/png" sizes="128x128"', escape: false)
             ->assertSee('/favicon.png', escape: false);
     }
 
@@ -72,18 +74,12 @@ class BrandLogoSettingsTest extends TestCase
             ->assertSee('brightness-0 invert', escape: false);
     }
 
-    public function test_favicon_and_default_og_image_come_from_settings(): void
+    public function test_default_og_image_comes_from_settings(): void
     {
-        $this->settings->saveAll([
-            'logo_favicon' => 'branding/icon.webp',
-            'logo_og' => 'branding/share.png',
-        ]);
+        $this->settings->saveAll(['logo_og' => 'branding/share.png']);
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('/storage/branding/icon.webp', escape: false)
-            // The <link rel="icon"> type must follow the uploaded format.
-            ->assertSee('type="image/webp"', escape: false)
             ->assertSee('property="og:image"', escape: false)
             ->assertSee('/storage/branding/share.png', escape: false);
     }
@@ -93,12 +89,10 @@ class BrandLogoSettingsTest extends TestCase
         $this->assertNull($this->settings->logoWhiteUrl());
         $this->assertNull($this->settings->ogImageUrl());
         $this->assertSame((string) config('rythme.logo_url'), $this->settings->logoUrl());
-        $this->assertSame('image/png', $this->settings->faviconMime());
 
-        $this->settings->saveAll(['logo_favicon' => 'branding/icon.webp']);
+        $this->settings->saveAll(['logo_og' => 'branding/share.png']);
 
-        $this->assertSame('image/webp', $this->settings->faviconMime());
-        $this->assertStringEndsWith('/storage/branding/icon.webp', $this->settings->faviconUrl());
+        $this->assertStringEndsWith('/storage/branding/share.png', (string) $this->settings->ogImageUrl());
     }
 
     public function test_an_absolute_url_is_passed_through_untouched(): void

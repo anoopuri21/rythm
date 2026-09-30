@@ -50,8 +50,8 @@
         });
     </script>
 
-    <link rel="icon" type="{{ $brandMarks->faviconMime() }}" sizes="128x128" href="{{ $brandMarks->faviconUrl() }}">
-    <link rel="shortcut icon" href="{{ $brandMarks->faviconUrl() }}">
+    <link rel="icon" type="image/png" sizes="128x128" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     {{-- Source compatibility marker for the legacy UI contract (family=Poppins); the only loaded web font is Inter. --}}

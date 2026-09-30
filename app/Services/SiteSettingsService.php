@@ -41,9 +41,10 @@ final class SiteSettingsService
         // either a path on the "public" disk (branding/…) or an absolute URL.
         // Empty means "use the bundled fallback", so an admin never has to
         // upload anything for the storefront to keep rendering correctly.
+        // The favicon is deliberately NOT here — it stays the bundled
+        // public/favicon.png (owner decision, 2026-09-30).
         'logo_regular' => '',
         'logo_white' => '',
-        'logo_favicon' => '',
         'logo_og' => '',
         // Outbound mail From (Admin → Settings). Live address requires verification.
         'mail_from_address' => '',
@@ -55,7 +56,7 @@ final class SiteSettingsService
     ];
 
     /** Brand-mark keys rendered as file uploads in Admin → Settings. */
-    public const MARK_KEYS = ['logo_regular', 'logo_white', 'logo_favicon', 'logo_og'];
+    public const MARK_KEYS = ['logo_regular', 'logo_white', 'logo_og'];
 
     /** @return array<string, string> */
     public function all(): array
@@ -129,28 +130,6 @@ final class SiteSettingsService
         $fallback = trim((string) config('rythme.logo_white_url'));
 
         return $fallback === '' ? null : $fallback;
-    }
-
-    /** Browser tab icon. Falls back to the bundled favicon. */
-    public function faviconUrl(): string
-    {
-        return $this->markUrl('logo_favicon') ?? asset('favicon.png');
-    }
-
-    /**
-     * MIME type matching the favicon actually in use, so the <link rel="icon">
-     * tag never advertises image/png for an uploaded WebP/JPEG mark.
-     */
-    public function faviconMime(): string
-    {
-        $path = (string) parse_url($this->faviconUrl(), PHP_URL_PATH);
-
-        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
-            'webp' => 'image/webp',
-            'jpg', 'jpeg' => 'image/jpeg',
-            'svg' => 'image/svg+xml',
-            default => 'image/png',
-        };
     }
 
     /**

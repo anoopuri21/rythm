@@ -64,11 +64,6 @@ class Settings extends Page implements HasForms
                             'Shown on the dark footer. Leave empty and the footer keeps whitening the standard logo with a CSS filter.'
                         ),
                         self::brandMark(
-                            'logo_favicon',
-                            'Favicon (browser tab)',
-                            'Square, 128×128 or larger. Leave empty to keep the bundled favicon.png.'
-                        ),
-                        self::brandMark(
                             'logo_og',
                             'Default social share image (og:image)',
                             '1200×630 recommended. Per-page SEO images still take priority over this.'
@@ -206,7 +201,7 @@ class Settings extends Page implements HasForms
     }
 
     /**
-     * Shared config for the four brand marks: raster only (PNG/JPEG/WebP),
+     * Shared config for the three brand marks: raster only (PNG/JPEG/WebP),
      * 2 MB cap, on the public disk under branding/.
      */
     private static function brandMark(string $key, string $label, string $helper): FileUpload
