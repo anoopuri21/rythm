@@ -79,6 +79,31 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-28 — WINDOWS_SETUP.md: PHP-not-on-PATH fix + 4 stale claims corrected
+- Change-id: `docs-windows-setup-php-path`
+- Trigger: owner-ask (hit `'php' is not recognized as the name of a cmdlet…` in PowerShell)
+- Scope paths: `docs/WINDOWS_SETUP.md` only — no code, build, migration or config touched
+- Type tags: [ ] code [ ] migration [ ] test [ ] front-build [ ] design-token [x] docs-only [ ] config [ ] admin [ ] commerce [ ] security
+- Checklist:
+  - [x] A1 Read five always-read files before editing
+  - [x] A2 Only `docs/WINDOWS_SETUP.md` touched
+  - [x] A3/A4/A5 n/a — documentation only
+  - [x] A6 `npm run test:automation` → 178 tests / 171 pass / 7 fail (unchanged; same 7 pre-existing). `php artisan test` still **not runnable** in this sandbox (no `php`)
+  - [x] A7 n/a — no front-end assets changed, no rebuild needed
+  - [x] A8/A9/A10 n/a
+  - [x] A11 §C verified unchanged — keys touched: `none`
+  - [x] A12 §D unchanged
+  - [x] A13 No new footgun (this is user-environment, not a code trap)
+  - [x] A14 Mirrors — `README.md` still carries its own stale stack/section/test claims; **not** touched here to keep the diff to one file, tracked as follow-up
+  - [x] A15 Owner summary prepared
+- What changed: added a `'php' is not recognized` section under Step 1 (Laragon → Menu → Terminal as the primary fix, plus `$env:Path` session fix, full-path invocation, and the permanent *Add Laragon to Path* route) and a matching Troubleshooting row 20. Corrected four claims that contradicted the tree:
+  1. "`.env.example` ab SQLite by default hai" → it actually ships `DB_CONNECTION=mysql` (line 35) and contains **no** `DB_CONNECTION=sqlite` line at all; documented the manual switch.
+  2. "`public/build/` gitignored hai, fresh clone pe exist nahi karta" → it is **committed** (8 tracked files; `.gitignore:16` documents the reason).
+  3. "`php artisan test` → Expect: 7 passed (25 assertions)" → 54 test classes (53 Feature + 1 Unit); added the automation-suite expectation.
+  4. "homepage 15+ sections (hero slider, bestsellers, video showcase, comparison, UGC, FAQ…)" → replaced with the 15 sections actually in `home/index.blade.php`, and noted the `@if($cats->isNotEmpty())` guard that makes seeding mandatory.
+- Risks / follow-ups: `README.md` has the same class of staleness (Filament v3 vs 5, Livewire 3 vs 4, "7 tests", old section names, `#d50808`/Poppins) — deliberately left for a separate owner-approved docs pass.
+- Status: COMPLETE (docs-only)
+
 ### 2026-09-28 — Categories carousel: flatten the responsive sawtooth
 - Change-id: `home-categories-responsive-ladder`
 - Trigger: owner-ask (follow-up to `home-categories-slide-width` — smooth the card-width jumps)

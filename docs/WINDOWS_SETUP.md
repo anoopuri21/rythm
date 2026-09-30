@@ -35,6 +35,37 @@ git --version
 
 > ✅ **PHP 8.3.30+ OK hai** — project ka composer.lock ab 8.3 ke liye resolve kiya gaya hai (Symfony 7.4). PHP 8.2 ya chhota ho tabhi ruko.
 
+### ⚠️ `'php' is not recognized as the name of a cmdlet…`
+
+Matlab `php` is shell ke **PATH** me nahi hai. Laragon PHP ko `C:\laragon\bin\php\` me
+rakhta hai aur apne **khud ke terminal** me PATH set kar deta hai — bahar khole gaye
+PowerShell/CMD me wo set nahi hota.
+
+**Sabse aasan fix — Laragon ka apna terminal use karo:**
+Laragon → **Menu → Terminal**. Wahan `php -v` turant chalega. Aage ke saare commands
+isi terminal me chalao.
+
+**PowerShell me hi chalna ho** to teen tarike:
+
+```powershell
+# 1) Pehle folder ka exact naam pata karo (version har install me alag hota hai)
+Get-ChildItem C:\laragon\bin\php
+
+# 2a) Sirf is session ke liye PATH me daalo — <folder> ko upar wale naam se badlo
+$env:Path = "C:\laragon\bin\php\<folder>;" + $env:Path
+php -v
+
+# 2b) Ya bina PATH chhede seedha full path se chalao
+C:\laragon\bin\php\<folder>\php.exe artisan migrate --seed
+```
+
+**Permanent fix:** Laragon tray icon par **right-click → Add Laragon to Path**
+(ya Menu → Preferences → System → Path). Phir **naya** PowerShell kholo — khula hua
+window purana PATH hi rakhega.
+
+> Composer bhi isi tarah Laragon ke terminal me milta hai. Agar `composer` bhi
+> `not recognized` de to wahi teen tarike composer par lagu honge.
+
 ---
 
 ## 2. Clone
@@ -72,9 +103,17 @@ composer install
 ```bash
 copy .env.example .env
 ```
-`.env.example` ab **SQLite by default** hai — kuch badalne ki zaroorat nahi. (MySQL
-chahiye ho to `.env` me commented MySQL lines uncomment karo + `DB_CONNECTION=sqlite`
-comment karo, aur `mysql -u root -e "CREATE DATABASE IF NOT EXISTS rythme_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"` chalao.)
+⚠️ **`.env.example` abhi `DB_CONNECTION=mysql` ke saath ship hota hai** (line 35) —
+file me kahin `DB_CONNECTION=sqlite` line hai hi nahi, sirf upar comment me SQLite
+recommend kiya gaya hai. To zero-config local dev ke liye `.env` me **manually** badlo:
+
+```env
+DB_CONNECTION=sqlite
+# DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD ko comment kar do
+```
+
+MySQL hi chahiye ho to `.env` waise hi rehne do, bas database bana lo:
+`mysql -u root -e "CREATE DATABASE IF NOT EXISTS rythm_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"`
 
 ### 4c. Key + database + seed
 ```bash
@@ -89,8 +128,11 @@ php artisan db:seed
 npm install
 npm run build
 ```
-> `public/build/` gitignored hai — fresh clone pe exist nahi karta. Skip kiya to site
-> bina CSS ke dikhegi + `Vite manifest not found` error aayega.
+> **`public/build/` repo me COMMITTED hai** (`.gitignore` line 16 pe reason likha hai —
+> shared hosting pe npm nahi hota), isliye fresh clone pe CSS pehle se maujood hoti hai
+> aur ye step optional hai. **Lekin** agar aapne `resources/css` ya `resources/js` me kuch
+> badla hai to `npm run build` chala kar naye `public/build/` assets commit karna zaroori
+> hai, warna deploy pe purani CSS/JS chalegi. Live-reload ke liye `npm run dev`.
 
 ---
 
@@ -112,8 +154,14 @@ Admin panel: **http://127.0.0.1:8000/admin**
 ```bash
 php artisan serve
 ```
-Browser: **http://127.0.0.1:8000** — homepage 15+ sections (hero slider, bestsellers,
-video showcase, comparison, UGC, FAQ…) dikhni chahiye.
+Browser: **http://127.0.0.1:8000** — homepage ke 15 sections dikhne chahiye, is order me
+(`resources/views/home/index.blade.php`): hero → offer-marquee → usp-strip → **categories**
+→ new-arrivals → category-banners → trending → category-product-rows → promo-banners →
+deals → advantages → recently-launched → brands → confidence → offer-popup.
+
+> Categories section tabhi render hota hai jab DB me active categories ho
+> (`_categories.blade.php` me `@if($cats->isNotEmpty())` guard hai) — isliye
+> `--seed` zaroori hai.
 
 **Ya Laragon virtual host:** (agar Step 1 me Start All on hai)
 - URL: **http://rythm.test** — is case me `.env` me `APP_URL=http://rythm.test` set karo.
@@ -126,9 +174,16 @@ video showcase, comparison, UGC, FAQ…) dikhni chahiye.
 ## 7. Tests (verify sab theek hai)
 
 ```bash
-php artisan test
-# Expect: 7 passed (25 assertions)
+php artisan test                     # 54 test classes (53 Feature + 1 Unit)
+php artisan test --filter=Homepage   # sirf homepage ke 8 test classes
+
+npm run test:automation              # 178 tests — 171 pass / 7 fail expected
 ```
+
+> Wo **7 automation failures pre-existing hain**, is repo ki base commit par bhi aate
+> hain — aapke change se nahi. Ek jaani-pehchani: `release-phase15.test.mjs` chahta hai
+> `.gitignore` me `/public/build` ho, jo upar wali "committed on purpose" policy se
+> contradict karta hai (owner decision pending).
 
 ---
 
@@ -155,6 +210,7 @@ php artisan test
 | 17 | `composer install` me `The "php" version ... platform config` / lock issue (8.4 active hone ke baad bhi) | `composer clear-cache` phir `composer update --lock` (lock file ko current platform se re-verify) |
 | 18 | `SQLSTATE[HY000]: General error: 14 unable to open database file` | `database\` folder ka path sahi hai? `.env` me `DB_CONNECTION=sqlite` + `database/database.sqlite` file exist karti hai? |
 | 19 | Filament `/admin` pe `404` / blank | `php artisan route:list` me `/admin` dikhta hai? Nahi to `php artisan optimize:clear` + `composer dump-autoload` |
+| 20 | **`'php' is not recognized as the name of a cmdlet…`** (PowerShell/CMD) | `php` PATH me nahi hai. **Laragon → Menu → Terminal** use karo, ya `$env:Path = "C:\laragon\bin\php\<folder>;" + $env:Path`. Permanent: tray icon → right-click → **Add Laragon to Path**, phir **naya** terminal kholo. Detail: Section 1 ke andar wala note. |
 
 ### PHP 8.4 install karne ka manual tarika (agar Laragon me na ho)
 
