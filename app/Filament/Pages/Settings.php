@@ -9,6 +9,7 @@ use App\Services\MailSenderSettingsService;
 use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -49,6 +50,30 @@ class Settings extends Page implements HasForms
     {
         return $form
             ->schema([
+                Section::make('Brand logo & marks')
+                    ->description('Uploads are stored in storage/app/public/branding and shown across the storefront immediately. Leave a field empty to keep the current look — nothing breaks and no mark goes missing.')
+                    ->schema([
+                        self::brandMark(
+                            'logo_regular',
+                            'Standard logo (navbar + mobile menu)',
+                            'Shown on light backgrounds. Transparent PNG recommended. Leave empty to keep the shipped Rhythm mark.'
+                        ),
+                        self::brandMark(
+                            'logo_white',
+                            'White / inverse logo (footer)',
+                            'Shown on the dark footer. Leave empty and the footer keeps whitening the standard logo with a CSS filter.'
+                        ),
+                        self::brandMark(
+                            'logo_favicon',
+                            'Favicon (browser tab)',
+                            'Square, 128×128 or larger. Leave empty to keep the bundled favicon.png.'
+                        ),
+                        self::brandMark(
+                            'logo_og',
+                            'Default social share image (og:image)',
+                            '1200×630 recommended. Per-page SEO images still take priority over this.'
+                        ),
+                    ])->columns(2),
                 Section::make('Shipping & taxes')
                     ->schema([
                         TextInput::make('shipping_flat_fee')->label('Shipping flat fee (₹)')->numeric()->prefix('₹'),
@@ -181,12 +206,37 @@ class Settings extends Page implements HasForms
     }
 
     /**
+     * Shared config for the four brand marks: raster only (PNG/JPEG/WebP),
+     * 2 MB cap, on the public disk under branding/.
+     */
+    private static function brandMark(string $key, string $label, string $helper): FileUpload
+    {
+        return FileUpload::make($key)
+            ->label($label)
+            ->disk('public')
+            ->directory('branding')
+            ->image()
+            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
+            ->maxSize(2048)
+            ->imageResizeMode('contain')
+            ->helperText($helper);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function formDataFromSettings(SiteSettingsService $settings, MailSenderSettingsService $mailSender): array
     {
         $data = $settings->all();
         $data['mail_from_status_display'] = $mailSender->statusSummary();
+
+        // FileUpload reads '' as a file path and tries to preview it. Null is
+        // the correct "no file uploaded" state.
+        foreach (SiteSettingsService::MARK_KEYS as $mark) {
+            if (($data[$mark] ?? '') === '') {
+                $data[$mark] = null;
+            }
+        }
 
         // Show pending address in the field while waiting for confirmation.
         if (($data['mail_from_pending_address'] ?? '') !== '') {

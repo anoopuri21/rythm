@@ -12,7 +12,11 @@
         $seoDescription = $seo['meta_description'] ?? ($__env->yieldContent('meta_description') ?: 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories at Rhythm Exports.');
         $ogTitle = $seo['og_title'] ?? ($__env->yieldContent('title') ?: 'Rhythm Exports');
         $ogDescription = $seo['og_description'] ?? $seoDescription;
-        $ogImage = $seo['og_image'] ?? ($__env->yieldContent('og_image') ?: asset('images/hero-guitar.jpg'));
+        // Admin → Settings → Brand logo & marks. Per-page SEO images keep
+        // priority; the setting only replaces the site-wide default.
+        $brandMarks = app(\App\Services\SiteSettingsService::class);
+        $ogImage = $seo['og_image']
+            ?? ($__env->yieldContent('og_image') ?: ($brandMarks->ogImageUrl() ?? asset('images/hero-guitar.jpg')));
     @endphp
     <title>{{ $seoTitle }}</title>
     <meta name="description" content="{{ $seoDescription }}">
@@ -46,8 +50,8 @@
         });
     </script>
 
-    <link rel="icon" type="image/png" sizes="128x128" href="{{ asset('favicon.png') }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
+    <link rel="icon" type="{{ $brandMarks->faviconMime() }}" sizes="128x128" href="{{ $brandMarks->faviconUrl() }}">
+    <link rel="shortcut icon" href="{{ $brandMarks->faviconUrl() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     {{-- Source compatibility marker for the legacy UI contract (family=Poppins); the only loaded web font is Inter. --}}

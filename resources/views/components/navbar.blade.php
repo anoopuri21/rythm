@@ -1,6 +1,8 @@
 @php
     $brand = config('rythme.brand_name');
-    $logo = config('rythme.logo_url');
+    // Admin → Settings → Brand logo. Already an absolute URL (uploaded path or
+    // config fallback), so it renders correctly in the header and the drawer.
+    $logo = app(\App\Services\SiteSettingsService::class)->logoUrl();
 @endphp
 
 {{-- ============================================================
@@ -24,7 +26,7 @@
             </button>
 
             <a href="{{ route('home') }}" class="nav__logo" aria-label="{{ $brand }} home">
-                <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434"
+                <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434"
                      class="nav__logo-img h-10 sm:h-12 md:h-14" onerror="this.onerror=null;this.src='{{ asset('images/logo-rythme.svg') }}';">
                 <span class="nav__logo-text" style="display:none">RHYTHM <em>EXPORTS</em></span>
             </a>

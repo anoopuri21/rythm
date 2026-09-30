@@ -1,6 +1,12 @@
 @php
     $brand = config('rythme.brand_name');
-    $logo = config('rythme.logo_url');
+    // Admin → Settings → Brand logo. The footer is a dark surface: use the
+    // uploaded white mark when the admin has one, otherwise keep whitening the
+    // standard logo with a CSS filter (previous behaviour — no regression).
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $logoWhite = $settings->logoWhiteUrl();
+    $logo = $logoWhite ?? $settings->logoUrl();
+    $logoInvert = $logoWhite === null;
     $cats = app(\App\Services\CategoryService::class)->tree();
     $brands = app(\App\Services\BrandService::class)->allWithCounts();
 @endphp
@@ -48,7 +54,7 @@
         <div class="mx-auto flex max-w-[1520px] flex-col items-center gap-6 px-5 py-12 text-center sm:px-8 lg:flex-row lg:justify-between lg:text-left">
             <div>
                 <a href="{{ route('home') }}" class="inline-flex flex-col items-center lg:items-start" aria-label="{{ $brand }} home">
-                    <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <img src="{{ $logo }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto{{ $logoInvert ? ' brightness-0 invert' : '' }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                     <span class="mt-2 hidden text-[9px] tracking-[0.35em] text-gold" style="display:none" aria-hidden="true">RHYTHM EXPORTS</span>
                 </a>
                 <p class="mx-auto mt-5 max-w-md text-sm leading-7 text-white/60 lg:mx-0">Browse musical instruments, studio gear and accessories through the Rhythm Exports catalogue.</p>

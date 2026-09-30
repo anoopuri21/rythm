@@ -79,6 +79,39 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-09-30 — Admin-controlled brand marks (regular logo, white logo, favicon, og:image)
+- Change-id: `brand-logo-admin-control`
+- Trigger: owner-ask — "project me logo control ka option admin panel me dena hai… regular logo and white logo dono control ho sake", with the explicit constraint "kuch aur disturb nahi hona chahiye"
+- Owner decisions taken: (1) white logo = **real upload**, (2) raster only **PNG/JPEG/WebP**, (3) **yes** — apply to favicon and og:image too
+- Scope paths: `app/Services/SiteSettingsService.php`, `app/Filament/Pages/Settings.php`, `config/rythme.php`, `resources/views/components/navbar.blade.php`, `resources/views/components/footer.blade.php`, `resources/views/layouts/app.blade.php`, `tests/Feature/BrandLogoSettingsTest.php` (new)
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [ ] docs-only [x] config [x] admin [ ] commerce [ ] security
+- Checklist:
+  - [x] A1 Read five always-read files before editing
+  - [x] A2 Only the seven scope paths touched
+  - [x] A3 No migration — `site_settings.value` is already `text` nullable, so a path string fits
+  - [x] A4 No new table/model — marks are plain key/value entries, **not** MediaLibrary (that would need a `HasMedia` model)
+  - [x] A5 Permission reused — `AdminAccess::SETTINGS_MANAGE`, no new permission
+  - [x] A6 `npm run test:automation` → **178 tests / 171 pass / 7 fail** (unchanged; same 7 pre-existing). `php artisan test` **still not runnable** here: no `php` binary anywhere on disk, `vendor/` is **empty (0 entries)**, and packagist + apt are both network-blocked. The new `BrandLogoSettingsTest` is therefore **written but NOT executed**.
+  - [x] A6b Substitute check that *did* run: `php-lint.mjs` drives the **real Zend parser** (official PHP **8.3.33** compiled to WASM via `@php-wasm/node`) through `token_get_all($src, TOKEN_PARSE)`. Control run proved it catches errors (`broken-control.php` → `ParseError: syntax error, unexpected token "{"`). Result: 3/3 changed PHP files PASS, new test PASS, and all 3 changed Blade files PASS after `@php`/`{{ }}` extraction (verified the extraction really contains the new code).
+  - [x] A7 No front-end assets changed → **no `npm run build`**, `public/build` untouched
+  - [x] A8/A9/A10 n/a — no CSS/JS/design-token change
+  - [x] A11 §C verified unchanged — keys touched: `none` (stack, phases, delivery facts all untouched)
+  - [x] A12 §D unchanged
+  - [x] A13 New footgun added (§F 16)
+  - [x] A14 Mirrors — navbar used `URL::to($logo)` while the mobile drawer (line 169) used the raw value; the resolver now always returns an absolute URL, which fixes that inconsistency without changing rendered output for the existing default
+  - [x] A15 Owner summary prepared
+- What changed:
+  1. `SiteSettingsService`: four new `DEFAULTS` keys (`logo_regular`, `logo_white`, `logo_favicon`, `logo_og`, all `''`) + a `MARK_KEYS` const + resolvers `logoUrl()`, `logoWhiteUrl()`, `faviconUrl()`, `faviconMime()`, `ogImageUrl()` over a private `markUrl()`. Absolute `http(s)` values pass through; anything else is treated as a `public`-disk path.
+  2. `Filament\Pages\Settings`: new **"Brand logo & marks"** section (first section) with four `FileUpload`s via a shared `brandMark()` helper — `disk('public')`, `directory('branding')`, `acceptedFileTypes(png/jpeg/webp)`, `maxSize(2048)`. `formDataFromSettings()` now coerces empty marks to `null`, because `FileUpload` reads `''` as a file path and would try to preview it. `resources/views/filament/pages/settings.blade.php` needed **no change** (it renders `{{ $this->form }}` generically).
+  3. `navbar.blade.php` — logo from the service; drawer now gets the same absolute URL.
+  4. `footer.blade.php` — uses the uploaded white mark when present and **drops `brightness-0 invert`** in that case; otherwise keeps the CSS tint exactly as before.
+  5. `layouts/app.blade.php` — favicon (with a MIME type that follows the uploaded format) and `og:image` default. Per-page `seo_entries.og_image` still takes priority via the existing `??` chain.
+  6. `config/rythme.php` — added `logo_white_url` (env `RYTHME_LOGO_WHITE_URL`, default `''`).
+- Zero-regression reasoning (owner's "kuch aur disturb nahi hona chahiye"): every mark is empty by default, so all four resolvers return the previous value — `logoUrl()` → the unchanged `config('rythme.logo_url')`, `logoWhiteUrl()` → `null` → footer keeps tinting, `faviconUrl()` → `asset('favicon.png')`, `ogImageUrl()` → `null` → previous fallback. `tests/Feature/HomepageSectionsTest.php:39` asserts the literal `rhythmexports.com/…/Rhythm.png` on `/` and therefore **must** keep passing, which is why the config default was left untouched. `AdminOpsTest:111`/`:130` and `AdminFormSchemaSmokeTest:94` only touch specific keys / just build the schema, so added keys are additive-safe.
+- Defect found while scoping: `layouts/app.blade.php` fell back to `asset('images/hero-guitar.jpg')`, and **that file does not exist** — the site-wide `og:image` fallback was a 404. Kept as the last-resort default (behaviour preserved) but an uploaded `logo_og` now fixes it.
+- Risks / follow-ups: (a) the new PHPUnit test is unexecuted in this sandbox; (b) `<img width="1466" height="434">` is still the old logo's intrinsic ratio — harmless because `.nav__logo-img` sets `height`+`width:auto` and `max-width` (190px/120px caps), but a square upload would reserve a wide box pre-load; (c) replaced uploads leave orphaned files in `storage/app/public/branding`; (d) `php artisan storage:link` must exist on the host (already in `scripts/deploy-cpanel.sh:141`); (e) the Filament admin panel's own favicon is separate and untouched.
+- Status: CODE COMPLETE, **verification PARTIAL** — automation suite + real-parser lint green; PHPUnit not runnable here.
+
 ### 2026-09-28 — WINDOWS_SETUP.md: PHP-not-on-PATH fix + 4 stale claims corrected
 - Change-id: `docs-windows-setup-php-path`
 - Trigger: owner-ask (hit `'php' is not recognized as the name of a cmdlet…` in PowerShell)
@@ -517,6 +550,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 13. **Empty client tax/policy/shipping** must **hide** on storefront — never fake values, never crash checkout (W5).  
 14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).  
 15. **Swiper slide width is inline-only** — Swiper writes `style="width:…px"` per slide from `slidesPerView`/`spaceBetween`. Editing `.cat-card`/`.brand-card` width in CSS does nothing (inline wins), and if Swiper never initialises the base rule `.swiper-slide{width:100%}` makes **one tile fill the whole row**. Change per-row counts in `carousels.js`, not in CSS. Any no-JS fallback must be scoped `:not(.swiper-initialized)`.
+16. **No PHP in the sandbox ≠ no PHP check.** `php`/`composer` are absent, `vendor/` is empty, and packagist + apt are network-blocked — so `php artisan test` cannot run. But the npm registry *is* open, and `@php-wasm/node` bundles the official PHP 8.3 build (WASM, no download needed). `cli()`/`popen` are unsupported there (`SPAWN_UNSUPPORTED`), so use `php.run({code})` + `token_get_all($src, TOKEN_PARSE)`, which drives the **real Zend parser** and throws `ParseError`. Response output is in `res.bytes` (there is no `res.stdout`), and `loadNodeRuntime()` needs `emscriptenOptions.processId`. Blade can be checked by extracting `@php`/`{{ }}` into PHP first — but **always prove the extraction contains the new code**, or a PASS means nothing. Script: `~/.cache/verify/php-lint.mjs`.
 
 *New trap discovered → add numbered item same day.*
 

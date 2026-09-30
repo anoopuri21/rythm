@@ -11,6 +11,10 @@ return [
     'brand_name' => 'Rhythm Exports',
     'brand_short' => 'RHYTHM',
     'logo_url' => env('RYTHME_LOGO_URL', 'https://rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png'),
+    // Optional inverse mark for dark surfaces (footer). No file ships with the
+    // repo, so this is empty by default and the footer keeps tinting the
+    // standard logo with a CSS filter until an admin uploads a real one.
+    'logo_white_url' => env('RYTHME_LOGO_WHITE_URL', ''),
 
     // Fallbacks only — the live values are managed in the admin panel
     // (Filament → Settings). See App\Services\SiteSettingsService.

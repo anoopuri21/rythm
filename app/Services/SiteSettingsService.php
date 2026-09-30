@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Cached key-value site settings (shipping, GST, contact, social…).
@@ -36,6 +37,14 @@ final class SiteSettingsService
         'social_facebook' => '',
         'social_x' => '',
         'social_linkedin' => '',
+        // Brand marks (Admin → Settings → Brand logo & marks). Every value is
+        // either a path on the "public" disk (branding/…) or an absolute URL.
+        // Empty means "use the bundled fallback", so an admin never has to
+        // upload anything for the storefront to keep rendering correctly.
+        'logo_regular' => '',
+        'logo_white' => '',
+        'logo_favicon' => '',
+        'logo_og' => '',
         // Outbound mail From (Admin → Settings). Live address requires verification.
         'mail_from_address' => '',
         'mail_from_name' => '',
@@ -44,6 +53,9 @@ final class SiteSettingsService
         'mail_from_pending_token' => '',
         'mail_from_pending_sent_at' => '',
     ];
+
+    /** Brand-mark keys rendered as file uploads in Admin → Settings. */
+    public const MARK_KEYS = ['logo_regular', 'logo_white', 'logo_favicon', 'logo_og'];
 
     /** @return array<string, string> */
     public function all(): array
@@ -63,6 +75,91 @@ final class SiteSettingsService
     public function getFloat(string $key, float $default = 0.0): float
     {
         return (float) ($this->get($key) ?? $default);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Brand marks
+    |--------------------------------------------------------------------------
+    | Each mark is stored as a plain string so it fits the existing key/value
+    | table and cache — no media table, no migration. Absolute URLs are passed
+    | through untouched; anything else is treated as a path on the "public"
+    | disk and resolved to an absolute URL, so callers never have to remember
+    | whether a value is a path or a URL (the mobile drawer used to get this
+    | wrong by rendering the raw value).
+    */
+
+    /** Absolute URL for a stored mark, or null when the admin has not set one. */
+    private function markUrl(string $key): ?string
+    {
+        $value = trim((string) $this->get($key, ''));
+
+        if ($value === '') {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $value) === 1) {
+            return $value;
+        }
+
+        return Storage::disk('public')->url(ltrim($value, '/'));
+    }
+
+    /**
+     * Standard logo for light surfaces (navbar, mobile drawer).
+     * Falls back to the shipped Rhythm mark so the header is never empty.
+     */
+    public function logoUrl(): string
+    {
+        return $this->markUrl('logo_regular') ?? (string) config('rythme.logo_url');
+    }
+
+    /**
+     * Light/inverse logo for dark surfaces (footer). Null means the caller
+     * should keep tinting the standard logo with a CSS filter instead.
+     */
+    public function logoWhiteUrl(): ?string
+    {
+        $mark = $this->markUrl('logo_white');
+
+        if ($mark !== null) {
+            return $mark;
+        }
+
+        $fallback = trim((string) config('rythme.logo_white_url'));
+
+        return $fallback === '' ? null : $fallback;
+    }
+
+    /** Browser tab icon. Falls back to the bundled favicon. */
+    public function faviconUrl(): string
+    {
+        return $this->markUrl('logo_favicon') ?? asset('favicon.png');
+    }
+
+    /**
+     * MIME type matching the favicon actually in use, so the <link rel="icon">
+     * tag never advertises image/png for an uploaded WebP/JPEG mark.
+     */
+    public function faviconMime(): string
+    {
+        $path = (string) parse_url($this->faviconUrl(), PHP_URL_PATH);
+
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'webp' => 'image/webp',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'svg' => 'image/svg+xml',
+            default => 'image/png',
+        };
+    }
+
+    /**
+     * Site-wide default social share image. Per-page SEO entries still win —
+     * this only replaces the (currently missing) bundled fallback image.
+     */
+    public function ogImageUrl(): ?string
+    {
+        return $this->markUrl('logo_og');
     }
 
     /**
