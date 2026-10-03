@@ -9,7 +9,7 @@
 #
 #  Full guide: docs/DEPLOY_MILESWEB.md
 # =====================================================================
-set -euo pipefail
+set -Eeuo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$APP_DIR"
@@ -18,6 +18,20 @@ say()  { printf '\n\033[1;36m==> %s\033[0m\n' "$1"; }
 ok()   { printf '\033[1;32m  ✔ %s\033[0m\n' "$1"; }
 warn() { printf '\033[1;33m  ! %s\033[0m\n' "$1"; }
 die()  { printf '\033[1;31m  ✘ %s\033[0m\n' "$1" >&2; exit 1; }
+
+# Safety net: `ERR` traps do not fire on `die()` (`exit 1`) and, without `-E`,
+# do not fire inside shell functions either — which left the site stuck in 503
+# maintenance mode whenever a step failed during `update`. An `EXIT` trap fires
+# on every exit path while `MAINTENANCE_ON=1`.
+MAINTENANCE_ON=0
+cleanup_maintenance() {
+  local status=$?
+  if [ "$MAINTENANCE_ON" = "1" ]; then
+    say "Update beech me ruka (exit $status) — site wapas live kar rahe hain"
+    "$PHP_BIN" artisan up 2>/dev/null || true
+  fi
+}
+trap cleanup_maintenance EXIT
 
 # ---------------------------------------------------------------------
 #  cPanel pe `php` command aksar PURANA version hota hai (7.4 etc).
@@ -238,21 +252,21 @@ case "${1:-}" in
   update)
     require_env
     say "Maintenance mode ON"; "$PHP_BIN" artisan down --retry=60 || true
-    # Safety net: agar beech me koi bhi step fail ho jaye (jaise route:cache),
-    # to site ko 503 maintenance mode me phansa mat chhodo — wapas ON karo.
-    trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
+    MAINTENANCE_ON=1
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
     # `git pull` may just have replaced THIS file, but bash already parsed the old copy of
     # this `case` block — carrying on here would run the OLD steps (new steps skipped on the
     # first deploy after a script change). Hand over to a fresh bash that reads the pulled file.
+    MAINTENANCE_ON=0
     exec bash "$APP_DIR/scripts/deploy-cpanel.sh" update-steps ;;
   update-steps)
     # 2nd half of `update` (internal): always executed by the freshly pulled copy of this script.
-    trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
+    # Keep the EXIT safety net armed until `artisan up` succeeds below.
+    MAINTENANCE_ON=1
     install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; media_sync_urls; optimize
     maybe_sync_public
-    trap - ERR
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up
+    MAINTENANCE_ON=0
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
