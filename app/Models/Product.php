@@ -151,9 +151,14 @@ class Product extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Gallery only: the `og` collection is handed to crawlers as-is (social
+        // scrapers want JPEG/PNG), so generating 480/1200 WebP copies for it
+        // would burn queue CPU and disk on shared hosting for nothing.
+        //
         // Conversions run through the bounded, stop-when-empty scheduled
         // worker; no persistent shared-hosting daemon is required.
         $this->addMediaConversion('thumb-webp')
+            ->performOnCollections('gallery')
             ->width(480)
             ->height(480)
             ->format('webp')
@@ -161,6 +166,7 @@ class Product extends Model implements HasMedia
             ->queued();
 
         $this->addMediaConversion('gallery-webp')
+            ->performOnCollections('gallery')
             ->width(1200)
             ->height(1200)
             ->format('webp')

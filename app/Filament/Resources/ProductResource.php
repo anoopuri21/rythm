@@ -211,7 +211,8 @@ class ProductResource extends Resource
                             ->description('Default product gallery (used when a variant has no images of its own).')
                             ->collapsible()
                             ->schema([
-                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12),
+                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12)
+                                    ->helperText('Up to 12 images. Drag to reorder — the first image is the card/hero image; PNG/JPG/WebP/AVIF, max 5 MB each.'),
                                 MediaUpload::single('og', 'og', maxSizeKb: 3072)->label('Social share image'),
                             ]),
                     ]),
@@ -226,7 +227,10 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('gallery')->collection('gallery')->circular(),
+                // The 480px WebP conversion keeps the list light — without
+                // `conversion()` the column fetches the full-size original for
+                // every row. Falls back to the original until it exists.
+                SpatieMediaLibraryImageColumn::make('gallery')->collection('gallery')->conversion('thumb-webp')->circular(),
                 TextColumn::make('name')->searchable()->sortable()->limit(38),
                 TextColumn::make('category.name')->badge()->color('gray'),
                 TextColumn::make('brand.name')->badge()->color('gray'),

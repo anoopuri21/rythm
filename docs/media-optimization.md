@@ -12,6 +12,15 @@
 
 Products preserve aspect ratio and use `object-fit: contain`. Existing locally committed fallback images continue to work. Views use the original media URL until a conversion is generated, preventing broken images during queue delay.
 
+`ProductVariant` follows the same convention for its own images (the PDP swaps the gallery when a shopper selects an option):
+
+- `variant-thumb-webp`: maximum 240×240, quality 80;
+- `variant-gallery-webp`: maximum 1200×1200, quality 84, used by the PDP/variant gallery (`ProductVariant::galleryUrls()`).
+
+`Product`'s gallery conversions are scoped with `->performOnCollections('gallery')`: the `og` social-share image is served to crawlers as uploaded, so no WebP copies are queued for it.
+
+Gallery order decides which photo is the primary one (`heroImage()` / `thumbnailImage()` take the first item) — admins reorder with drag-and-drop in the panel (`MediaUpload::gallery()` → `->reorderable()`, persisted in `order_column`).
+
 ## Hero media pipeline
 
 `HeroSlide` defines collection-specific queued conversions:
@@ -45,7 +54,8 @@ Confirm the installed Media Library version supports the option before execution
 ## Storage and acquisition
 
 - All acquired product media is locally managed; no source hotlink at runtime.
-- Upload MIME, pixel dimensions and file size must be bounded by admin validation.
+- Upload MIME, pixel dimensions and file size must be bounded by admin validation — all three live in `app/Filament/Components/MediaUpload.php` (mime list, `maxSize` in KB, `dimensions:max_width/max_height`). The pixel bound is what keeps a small-but-huge-decoded file (a 5 MB flat PNG can decode to gigabytes) from killing the shared-hosting queue worker, because conversion runs through GD/Imagick.
+- PHP limits must fit the largest *single* file, not the whole gallery: Livewire uploads one temp file per request, so `upload_max_filesize` ≥ 12M and `post_max_size` ≥ 16M cover the 8 MB hero field and Filament's 5 MB gallery fields (Livewire's unpublished default temp-upload rule is `max:12288`; a value above that needs `config/livewire.php`). Conversion memory needs roughly 4 bytes per pixel of the original — keep `memory_limit` ≥ 256M for 6000px sources.
 - Preserve originals for controlled regeneration, subject to storage policy.
 - Conversion directories require writable shared-host permissions and public storage linkage (`php artisan storage:link`).
 - Originals, conversions and responsive images all live on the one public media disk (`MEDIA_DISK`); `php artisan media:relocate` moves anything stored elsewhere.

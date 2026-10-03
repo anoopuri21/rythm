@@ -141,12 +141,15 @@ class ProductVariant extends Model implements HasMedia
     }
 
     /**
+     * PDP gallery URLs — the WebP conversion once the queue generated it,
+     * else the original (Spatie `getAvailableUrl`).
+     *
      * @return list<string>
      */
     public function galleryUrls(): array
     {
         return $this->getMedia('variant_gallery')
-            ->map(fn (Media $media): string => $media->getUrl())
+            ->map(fn (Media $media): string => $media->getAvailableUrl(['variant-gallery-webp']))
             ->filter()
             ->values()
             ->all();
@@ -164,11 +167,22 @@ class ProductVariant extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Two sizes, same convention as Product: a small WebP for thumbnails
+        // and a 1200px WebP for the PDP gallery (the storefront swaps the
+        // gallery to these images when a variant is selected, so serving the
+        // untouched original — up to 5 MB — would break the page budget).
         $this->addMediaConversion('variant-thumb-webp')
             ->width(240)
             ->height(240)
             ->format('webp')
             ->quality(80)
+            ->queued();
+
+        $this->addMediaConversion('variant-gallery-webp')
+            ->width(1200)
+            ->height(1200)
+            ->format('webp')
+            ->quality(84)
             ->queued();
     }
 

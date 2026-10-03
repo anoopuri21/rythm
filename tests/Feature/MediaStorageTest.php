@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -28,6 +29,8 @@ use Illuminate\Testing\TestResponse;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use ReflectionMethod;
+use Spatie\MediaLibrary\Conversions\Conversion;
+use Spatie\MediaLibrary\Conversions\ConversionCollection;
 use Spatie\MediaLibrary\HasMedia;
 use Tests\Concerns\IsolatesMediaDisks;
 use Tests\TestCase;
@@ -257,6 +260,61 @@ class MediaStorageTest extends TestCase
         $this->assertSame($media->getUrl('thumb-webp'), $product->thumbnailImage());
         $this->assertSame($media->getUrl('gallery-webp'), $product->heroImage());
         $this->assertSame([$media->getUrl('gallery-webp')], $product->galleryImages());
+    }
+
+    /**
+     * The PDP swaps the gallery to a variant's own images when that option is
+     * selected. Those must follow the same "conversion when ready, else
+     * original" chain as the product gallery — the untouched original can be
+     * a 5 MB JPEG and there can be six of them per variant.
+     */
+    public function test_variant_gallery_serves_the_webp_conversion_once_it_exists(): void
+    {
+        Queue::fake();
+
+        $variant = ProductVariant::factory()->create();
+        $media = $variant->addMedia(UploadedFile::fake()->image('sunburst.jpg', 80, 80))
+            ->toMediaCollection('variant_gallery');
+
+        $variant = $variant->fresh()->load('media');
+        $this->assertSame([$media->getUrl()], $variant->galleryUrls(), 'Original is served until the conversion is generated.');
+
+        $media->markAsConversionGenerated('variant-gallery-webp');
+        $media->markAsConversionGenerated('variant-thumb-webp');
+        $media->save();
+
+        $variant = $variant->fresh()->load('media');
+        $this->assertSame([$media->getUrl('variant-gallery-webp')], $variant->galleryUrls());
+        $this->assertSame($media->getUrl('variant-thumb-webp'), $variant->thumbnailImage());
+    }
+
+    /**
+     * The social-share (og) image is served to crawlers as uploaded; queueing
+     * the 480/1200 WebP gallery conversions for it would waste queue CPU and
+     * disk on shared hosting. This asserts the same collection filter the
+     * library applies when it decides which conversions to queue
+     * (Conversion::shouldBePerformedOn).
+     */
+    public function test_product_gallery_conversions_do_not_run_on_the_og_collection(): void
+    {
+        Queue::fake();
+
+        $product = Product::factory()->create();
+        $gallery = $product->addMedia(UploadedFile::fake()->image('front.jpg', 80, 80))->toMediaCollection('gallery');
+        $og = $product->addMedia(UploadedFile::fake()->image('share.jpg', 1200, 630))->toMediaCollection('og');
+
+        $this->assertTrue(
+            ConversionCollection::createForMedia($og)->getConversions('og')->isEmpty(),
+            'The og collection must not queue the product gallery conversions.',
+        );
+
+        $this->assertEqualsCanonicalizing(
+            ['thumb-webp', 'gallery-webp'],
+            ConversionCollection::createForMedia($gallery)
+                ->getConversions('gallery')
+                ->map(fn (Conversion $conversion): string => $conversion->getName())
+                ->all(),
+        );
     }
 
     public function test_media_urls_do_not_depend_on_app_url(): void

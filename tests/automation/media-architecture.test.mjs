@@ -37,6 +37,46 @@ test('storefront models resolve conversions through Spatie getAvailableUrl inste
     assert.match(await read('app/Models/Product.php'), /getAvailableUrl\(\['thumb-webp'\]\)/);
 });
 
+test('product and variant galleries are served as bounded WebP conversions, not originals', async () => {
+    const [product, variant, resource] = await Promise.all([
+        read('app/Models/Product.php'),
+        read('app/Models/ProductVariant.php'),
+        read('app/Filament/Resources/ProductResource.php'),
+    ]);
+
+    // Variant images are what the PDP swaps to, so they need the same 1200px
+    // WebP chain as the product gallery — never the raw upload.
+    assert.match(variant, /addMediaConversion\('variant-gallery-webp'\)[\s\S]*?->width\(1200\)/);
+    assert.match(variant, /getAvailableUrl\(\['variant-gallery-webp'\]\)/);
+    assert.doesNotMatch(variant, /galleryUrls[\s\S]{0,600}?->getUrl\(\)/, 'Variant gallery must not serve originals');
+
+    // Social-share images are handed to crawlers as-is; gallery conversions
+    // must not be queued for the og collection.
+    assert.match(product, /addMediaConversion\('thumb-webp'\)\s*->performOnCollections\('gallery'\)/);
+    assert.match(product, /addMediaConversion\('gallery-webp'\)\s*->performOnCollections\('gallery'\)/);
+
+    // The admin list shows the 480px conversion instead of full-size originals.
+    assert.match(resource, /SpatieMediaLibraryImageColumn::make\('gallery'\)[\s\S]{0,120}?->conversion\('thumb-webp'\)/);
+});
+
+test('every admin upload field bounds bytes, pixels and mime type without widening to image/*', async () => {
+    const source = await read('app/Filament/Components/MediaUpload.php');
+    // Comments explain why image() is avoided — assert on code only.
+    const factory = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+
+    // A byte limit alone does not bound decode cost (decompression bombs).
+    assert.match(factory, /dimensions:max_width=\{\$maxWidth\},max_height=\{\$maxHeight\}/);
+    assert.match(factory, /public const MAX_WIDTH = \d{4}/);
+    assert.match(factory, /public const MAX_HEIGHT = \d{4}/);
+
+    // Filament's image() rewrites acceptedFileTypes to `image/*`, which would
+    // re-admit SVG (script-capable) — the explicit raster list must stay.
+    assert.doesNotMatch(factory, /->image\(\)/);
+
+    // Galleries are reorderable: the first image is the storefront hero/card.
+    assert.match(factory, /->reorderable\(\)/);
+});
+
 test('SEO tags make host-relative media URLs absolute at the output boundary', async () => {
     const [layout, product] = await Promise.all([
         read('resources/views/layouts/app.blade.php'),

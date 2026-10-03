@@ -79,6 +79,38 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — Product image upload audit: variant gallery WebP, image order, upload bounds
+- Change-id: `arena/01a10254-rythm` (product-media-audit)
+- Trigger: owner-ask — "project overview lo aur image upload logic check karo. Start with the products." (products first; other media resources next)
+- Scope paths: `app/Models/{Product,ProductVariant}.php`, `app/Filament/Components/MediaUpload.php`, `app/Filament/Resources/ProductResource.php`, `tests/Feature/MediaStorageTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/{media-architecture,media-optimization,ADMIN_PRODUCT_UPLOAD_RUNBOOK,MEMORY}.md`, `tasks/ADMIN_PRODUCT_IMAGE_UPLOAD_FIX_PLAN.md`
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs-only [ ] config [x] admin [ ] commerce [ ] security
+- Findings (verified against the locked packages, not assumed: Filament **v5.7.6** `BaseFileUpload`/`FileUpload` + spatie-plugin v5.7.6, `spatie/laravel-medialibrary` **11.23.5** `FileAdder`/`ConversionCollection`/`Media`, Laravel **13.24** `ValidatesAttributes::validateDimensions`, Livewire 4.4.2 `FileUploadConfiguration`):
+  1. **Variant images were served as raw originals.** `ProductVariant::galleryUrls()` used `getUrl()` (full-size upload, up to 5 MB × 6 per variant) and the only variant conversion was a 240px thumb nothing rendered — so the PDP variant swap broke the ≤250 KB image budget. Fixed: `variant-gallery-webp` (1200×1200, q84, queued) + `getAvailableUrl(['variant-gallery-webp'])`.
+  2. **No way to choose the primary photo.** `heroImage()`/`thumbnailImage()` take the *first* media, but galleries were not `->reorderable()` → staff had to delete and re-upload to change the card image. Fixed: `MediaUpload::gallery()` is now reorderable (plugin persists `order_column` via `setNewOrder`).
+  3. **`og` images generated gallery WebP copies** (product conversions had no `performOnCollections`) — queue CPU + disk for files crawlers fetch as-is. Fixed: `->performOnCollections('gallery')`.
+  4. **Upload validation had no pixel bound.** `MediaUpload` bounded mime + bytes only, while `docs/media-optimization.md` claimed dimensions were bounded. A ≤5 MB flat PNG can decode to ~30 000², which OOMs the GD conversion and kills the scheduled queue worker. Fixed: `dimensions:max_width/max_height` (default 6000², overridable) added in the factory.
+  5. **Admin product list loaded full-size originals** for the thumbnail column (no `->conversion()`), i.e. up to 5 MB per row × page size. Fixed: `->conversion('thumb-webp')` (falls back to the original until generated).
+  6. **Ops guidance was wrong**: the fix-plan's "`post_max_size` ≥ 8M" would reject the 8 MB hero field exactly at the limit, and Livewire's unpublished temp rule is `max:12288`. Corrected in the runbook + plan (+ `memory_limit` ≥ 256M for 6000px conversions).
+- Not changed on purpose: no `acceptsMimeTypes()` on the collections. It looks like hardening, but `CatalogueAcquisitionService` accepts **GIF** for the import pipeline while the admin form does not — adding the guard without reconciling the two would break imports. Also no Filament `->image()` anywhere: it rewrites `acceptedFileTypes` to `image/*` and would re-admit SVG (script-capable).
+- Checklist:
+  - [x] A1 Read five always-read files before editing → `MEMORY.md` + media/runbook docs read in full; `ARCHITECTURE.md` §storefront/media; `RULES.md`/`PHASES.md`/`DESIGN.md` not re-read (no commerce/design/phase scope in this change)
+  - [x] A2 Touched only product-media paths (no drive-by refactors)
+  - [x] A3 No business/money/stock logic touched
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies untouched
+  - [x] A6 Tests: **node** `node --test tests/automation/*.test.mjs` → 183 tests, 173 pass / 10 fail vs baseline `HEAD` (181 / 170 / 11) → **0 new failures**, 2 new gates pass. **PHP suite NOT run:** this sandbox has no PHP/Composer/`vendor/` and no outbound network to install them — `php artisan test` (2 new cases in `MediaStorageTest`) must be run on a PHP host before merge
+  - [x] A7 `npm run build` n/a (no CSS/JS/Blade changed)
+  - [x] A8 Design tokens n/a (no UI styling)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C: `Media storage` row refreshed + `Product media pipeline` row added
+  - [x] A12 §D locked decisions unchanged
+  - [x] A13 Footgun #17 added (`->image()` widens to `image/*`; bound mime+bytes+pixels)
+  - [x] A14 Mirrors: `docs/media-architecture.md` (M-3, §4, §6), `docs/media-optimization.md`, `docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`, `tasks/ADMIN_PRODUCT_IMAGE_UPLOAD_FIX_PLAN.md`; PRD/PHASES/DESIGN/tracker n/a
+  - [x] A15 Owner summary prepared
+- Risks / follow-ups: variant-gallery WebP files appear only after the scheduled worker runs (`media-library:regenerate --only-missing` for images already uploaded); reordering only changes *display* order, never deletes files; the `og` scope means an admin who expects WebP for the social image now gets the original JPEG/PNG (intended — crawlers); remaining product-media observations **not** fixed here: product deletion is a soft delete so media rows/files stay (no orphan purge command), and the PDP thumbnail strip reuses the 1200px gallery URLs instead of the 480px thumbs. Other media resources (brand/category/hero/homepage block) audited only for the shared factory contract — full pass in a follow-up.
+- Status: COMPLETE (product media) — owner action: run `php artisan test` on a PHP host, then `npm run build` if any Blade/CSS is touched later
+
 ### 2026-10-03 — Media: preview stuck "loading" after save + images missing on storefront
 - Change-id: `arena/01a101b5-rythm` (media-disk-pin)
 - Trigger: bug (owner-ask: find real cause, simplify, enterprise-grade)
@@ -375,7 +407,8 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
-| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + imports + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload`; repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + imports + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
 | **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)
@@ -448,6 +481,8 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).
 15. **Media disk ≠ `FILESYSTEM_DISK`.** Filament's upload disk follows `config('filament.default_filesystem_disk')`; if that is the private `local` disk, saved images 403 on the storefront and the admin preview URL is signed + host-bound (FilePond spins forever — its `server.load` has no error path). Keep `config/filament.php` + `config/media-library.php` on `MEDIA_DISK`, keep media URLs relative (never `APP_URL`), build fields only with `MediaUpload`, never `vendor:publish` Filament's config over ours.
 16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them. Also: its ERR trap does not fire inside functions → a failed update leaves the site in maintenance mode.
+
+17. **Never add Filament's `->image()` to a media field.** It does not "validate an image" — it *rewrites* `acceptedFileTypes` to `image/*` (`packages/forms/src/Components/FileUpload.php`), which re-admits SVG (script-capable, same-origin `/storage`). Bounds are three-dimensional: mime list + `maxSize` (bytes) + `dimensions:max_width/max_height` (decode cost — a small file can decode to gigabytes and kill the queue worker). All three live only in `MediaUpload`.
 
 *New trap discovered → add numbered item same day.*
 

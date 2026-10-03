@@ -10,7 +10,7 @@
 |---|---|---|
 | M-1 | **One media disk.** Panel uploads, programmatic imports and storefront URLs all use `MEDIA_DISK` (default `public`). It must be publicly readable. | `config/media-library.php` (`disk_name`) + `config/filament.php` (`default_filesystem_disk`) — same env var |
 | M-2 | **Media URLs are host-relative** (`/storage/12/photo.jpg`). Never built from `APP_URL`, the request host or a signature. | `config/filesystems.php` → `disks.public.url` (`MEDIA_URL`, default `/storage`) |
-| M-3 | **One definition of an upload field**, with bounded MIME / size / count and a fixed collection. | `app/Filament/Components/MediaUpload.php` |
+| M-3 | **One definition of an upload field**, with bounded MIME / byte size / pixel size / count and a fixed collection. | `app/Filament/Components/MediaUpload.php` |
 | M-4 | **One way to resolve a URL**: "use the WebP conversion once it exists, else the original" = Spatie's `$media->getAvailableUrl([...])`. | `Product`, `ProductVariant`, `HeroSlide` |
 | M-5 | **Absolute URLs only where crawlers need them** (`og:image`, JSON-LD) — made absolute at the output boundary with `url()`. | `layouts/app.blade.php`, `product/show.blade.php` |
 | M-6 | **Media that is already stored on the wrong disk can be repaired** idempotently. | `php artisan media:relocate` → `MediaRelocationService` |
@@ -70,8 +70,15 @@ storefront / admin preview ◀── /storage/{id}/… (public/storage → stora
 ## 4. Adding a new media field
 
 1. Model (`HasMedia`): `$this->addMediaCollection('banner')->singleFile();` — **no `useDisk()`**, the disk is global.
-2. Admin: `MediaUpload::single('banner', 'banner', maxSizeKb: 4096)` (or `MediaUpload::gallery('photos', 'photos', maxFiles: 8)`). Never use `SpatieMediaLibraryFileUpload::make()` directly (a static test enforces this).
+2. Admin: `MediaUpload::single('banner', 'banner', maxSizeKb: 4096)` (or `MediaUpload::gallery('photos', 'photos', maxFiles: 8)`). Never use `SpatieMediaLibraryFileUpload::make()` directly (a static test enforces this). Both helpers bound MIME, bytes (`maxSize`) and pixels (`dimensions:max_width/max_height`, default 6000 — raise per field only with a matching PHP `memory_limit`); **never add Filament's `->image()`**, it rewrites the mime list to `image/*` and would re-admit SVG.
 3. Storefront: `$model->getFirstMedia('banner')?->getAvailableUrl(['<conversion>'])`.
+4. Conversions are **collection-scoped** (`->performOnCollections('gallery')`) so a collection that is served as-is (e.g. `og` for crawlers) does not queue WebP copies nobody requests.
+
+**Galleries are ordered, and order is the primary image.** `MediaUpload::gallery()` is
+`->reorderable()`, which persists through Spatie's `order_column`
+(`Media::setNewOrder()`), so the first image *is* the card/hero image
+(`Product::thumbnailImage()` / `heroImage()`). Drag-to-reorder in the panel is the
+supported way to change the primary photo — deleting and re-uploading is not needed.
 
 ## 5. Operations
 
@@ -132,8 +139,12 @@ item failed (e.g. its original file is missing) — that row is left untouched.
   category icon, hero desktop/mobile, homepage block): upload in the panel →
   reopen the edit form → file is on the public disk, preview URL is
   host-relative, unsigned and backed by a real file; storefront renders it;
-  `og:image` is absolute. Runs with `FILESYSTEM_DISK=local` (`phpunit.xml`).
+  `og:image` is absolute. Plus the gallery URL chain: product **and variant**
+  galleries serve `thumb-webp` / `gallery-webp` / `variant-gallery-webp` once
+  generated and the original until then, and the `og` collection registers no
+  gallery conversions. Runs with `FILESYSTEM_DISK=local` (`phpunit.xml`).
 * `tests/Feature/MediaRelocationTest.php` — repair command (move, dry-run,
   idempotency, split conversions disk, missing original, storage-link check).
 * `tests/automation/media-architecture.test.mjs` + the two upload-policy tests
-  in `security-*.test.mjs` — static guards (factory only, config files, env examples).
+  in `security-*.test.mjs` — static guards (factory only, config files, env examples,
+  bounded px/byte/mime limits, gallery conversions, admin list conversion).

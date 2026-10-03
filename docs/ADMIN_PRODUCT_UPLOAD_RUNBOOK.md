@@ -30,7 +30,7 @@
    - Short description + full description (original copy)  
 3. **Optional tax** — leave blank until CA-approved values exist.  
 4. **Variants** — leave empty for simple SKUs.  
-5. **Media** — upload gallery (and optional social OG image).  
+5. **Media** — upload gallery (and optional social OG image). Drag the thumbnails to order them: **the first image is the card/hero image** on the website.  
 6. **SEO** tab — title/description if you care about Google.  
 7. **Save**.  
 8. Header / row action **View on storefront** (only when Active) → confirm page.  
@@ -39,6 +39,8 @@
 **If it does not show:** Active off? Stock 0 with no purchasable path? Wrong category filter? Cache — hard refresh.
 
 **If an image preview keeps "loading" after you save and reopen, or the photo is missing on the site:** this is a server storage problem, not the photo. Ask whoever runs the server to run `php artisan storage:link` and `php artisan media:relocate` (see `docs/media-architecture.md` → Troubleshooting).
+
+**If a photo is rejected or the upload silently does nothing:** check the file. Allowed: JPG, PNG, WebP (galleries also AVIF), max 5 MB each (social image 3 MB, hero 8 MB), max 6000×6000 px. Server-side, the host must allow a single 12 MB upload (`upload_max_filesize` ≥ 12M, `post_max_size` ≥ 16M) and give PHP enough memory for the WebP conversions (`memory_limit` ≥ 256M).
 
 ---
 
