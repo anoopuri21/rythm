@@ -79,6 +79,35 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — Category images on storefront (`Category::iconUrl()`) + carry-over resilience fixes
+- Change-id: `arena/01a1029d-rythm` (category-storefront-images)
+- Trigger: owner-ask (Hinglish bug report) — "products ki image to visible hai ab but categories ki image website pe display nahi ho rahi hai." + carry-over of 2 unpushed post-PR-#40 commits (`SQLSTATE[42S22]` pending-migration graceful degrade + `deploy-cpanel.sh` maintenance-mode `EXIT` safety net).
+- Scope paths: `app/Services/{HomepageDataService,CategoryService,MediaRelocationService}.php`, `resources/views/home/_category-banners.blade.php`, `resources/views/livewire/shop-index.blade.php`, `app/Observers/MediaUrlObserver.php`, `app/Models/Concerns/SyncsResolvedMediaUrls.php`, `app/Console/Commands/{SyncMediaUrls,MediaDoctor}.php`, `scripts/deploy-cpanel.sh`, `tests/Feature/{MediaStorageTest,ResolvedMediaUrlTest}.php`, `tests/automation/media-architecture.test.mjs`, `docs/{media-architecture,MEMORY}.md`
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs-only [ ] config [x] admin [ ] commerce [ ] security
+- Root cause & fix:
+  1. **Homepage popular categories & category banners ignored `Category::iconUrl()`.** `HomepageDataService::popularCategories()` only checked `public/images/categories/{slug}.jpg` and queried `['id', 'parent_id', 'name', 'slug', 'sort_order']` without `icon_url` or eager-loading `media`. Fixed: selects `icon_url` (when migrated), eager-loads `media` (no N+1 on fallback), and resolves `$category->iconUrl() ?? (is_file(public_path($asset)) ? '/'.$asset : null)` (M-7 column-first → Media Library `'icon'` → committed asset → `null` SVG placeholder). `_category-banners.blade.php` no longer falls back to an unchecked `asset('images/categories/{slug}.jpg')` that 404s when no committed file exists.
+  2. **Shop page category shortcuts (`/shop`) hardcoded `asset('images/categories/{slug}.jpg')`.** Updated `CategoryService::tree()` + `resources/views/livewire/shop-index.blade.php` to use the same column-first `iconUrl()` chain with music-note SVG fallback (never a broken `<img>`). Other category surfaces (category-drawer, navbar, PDP breadcrumbs, recently-launched list) verified text-only by design.
+  3. **Cache invalidation on quiet URL syncs.** `syncResolvedMediaUrls()` uses `saveQuietly()`, which bypasses `CategoryObserver` and `HomepageDataObserver`. `MediaUrlObserver`, `SyncMediaUrls` (`php artisan media:sync-urls`), and `MediaRelocationService` now flush both `HomepageDataObserver` and `CategoryService` whenever stored URLs change.
+  4. **Carry-over fixes applied & pushed:** (a) `SyncsResolvedMediaUrls`, `SyncMediaUrls`, and `MediaDoctor` gracefully degrade when `2026_10_03_000001_add_resolved_media_url_columns` is pending (no `SQLSTATE[42S22]`); (b) `scripts/deploy-cpanel.sh` uses `set -Eeuo pipefail` + an `EXIT` trap (`cleanup_maintenance`) so any failed deploy step brings the site back `up` instead of leaving it in 503 maintenance mode.
+- Checklist:
+  - [x] A1 Read five always-read files before editing (`ARCHITECTURE`, `RULES`, `PHASES`, `DESIGN`, `MEMORY` + `media-architecture.md`)
+  - [x] A2 Touched only task-relevant paths (no drive-by refactors)
+  - [x] A3 Services own data assembly (`HomepageDataService`, `CategoryService`); no business/money/stock logic in Blade
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies preserved (n/a)
+  - [x] A6 Tests: `node --test tests/automation/media-architecture.test.mjs` → **17/17 pass** (2 new static guards); full `node --test tests/automation/*.test.mjs` → **192 tests, 182 pass / 10 fail** (exact 10 pre-existing baseline failures, **0 new**); `bash -n scripts/deploy-cpanel.sh` → pass; PHP feature test `test_category_icon_uploaded_in_admin_renders_on_the_storefront_and_falls_back_when_removed` added in `MediaStorageTest` + cache-flush assertion in `ResolvedMediaUrlTest` (PHP runtime unavailable in sandbox — run on host)
+  - [x] A7 `npm run build` → n/a (no CSS/JS changed; Blade markup uses existing classes)
+  - [x] A8 Design tokens only (reused existing `.pcard__img-fallback` / `.catban-mm__card`, no hex added)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld legal pages / live pay / Phase 18 untouched
+  - [x] A11 §C Current facts updated (`Media URL columns (M-7)` + `Session branch (Arena)`)
+  - [x] A12 §D Locked decisions unchanged
+  - [x] A13 Footguns #21, #22, #23 added (and #16 updated to reflect the `EXIT` trap fix)
+  - [x] A14 Cross-file mirrors done: `docs/media-architecture.md` (§3, §5 troubleshooting, §6 tests); `PHASES`/`DESIGN`/`ARCHITECTURE`/`PRD` verified unchanged
+  - [x] A15 Owner-facing summary + host verification commands prepared
+- Risks / follow-ups: On the host, if `2026_10_03_000001_add_resolved_media_url_columns` has not been migrated yet, run `php artisan migrate && php artisan media:sync-urls --only-missing && php artisan optimize:clear`; set `FILESYSTEM_DISK=local` in `.env` (keep `MEDIA_DISK=public`) so `media:doctor` reports 0 warnings.
+- Status: COMPLETE (code) — owner action on host: `php artisan migrate && php artisan media:sync-urls --only-missing && php artisan optimize:clear`, `php artisan media:doctor --fix`, `php artisan test`
+
 ### 2026-10-03 — "Upload ke baad image gayab / broken URL" — `/storage` route was owned by the private disk
 - Change-id: `arena/01a10254-rythm` (served-media-route)
 - Trigger: owner-ask (Hinglish bug report) — "admin panel me first upload par preview dikhta hai, par Save karne / page reload ke baad preview gayab ho jata hai; website par image broken aur uski `src` ka URL 404 deta hai."
@@ -459,10 +488,10 @@ Work may be reported **done** to the owner only when:
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
 | **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
-| **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first, `MediaUrlObserver` keeps them fresh, `php artisan media:sync-urls` backfills/repairs | 2026-10-03 |
+| **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first across products, variants, brands, categories (`HomepageDataService::popularCategories` + `CategoryService::tree`), hero slides and homepage blocks; `MediaUrlObserver` + `php artisan media:sync-urls` keep columns fresh and flush homepage/category caches | 2026-10-03 |
 | **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
 | **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
-| **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
+| **Session branch (Arena)** | `arena/01a1029d-rythm` (session-fixed) | 2026-10-03 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)
 
@@ -533,7 +562,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 13. **Empty client tax/policy/shipping** must **hide** on storefront — never fake values, never crash checkout (W5).  
 14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).
 15. **Media disk ≠ `FILESYSTEM_DISK`.** Filament's upload disk follows `config('filament.default_filesystem_disk')`; if that is the private `local` disk, saved images 403 on the storefront and the admin preview URL is signed + host-bound (FilePond spins forever — its `server.load` has no error path). Keep `config/filament.php` + `config/media-library.php` on `MEDIA_DISK`, keep media URLs relative (never `APP_URL`), build fields only with `MediaUpload`, never `vendor:publish` Filament's config over ours.
-16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them. Also: its ERR trap does not fire inside functions → a failed update leaves the site in maintenance mode.
+16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them.
 
 17. **Never add Filament's `->image()` to a media field.** It does not "validate an image" — it *rewrites* `acceptedFileTypes` to `image/*` (`packages/forms/src/Components/FileUpload.php`), which re-admits SVG (script-capable, same-origin `/storage`). Bounds are three-dimensional: mime list + `maxSize` (bytes) + `dimensions:max_width/max_height` (decode cost — a small file can decode to gigabytes and kill the queue worker). All three live only in `MediaUpload`.
 
@@ -541,6 +570,9 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 19. **`saveQuietly()` on a media row bypasses `MediaUrlObserver`.** Any code that repoints/deletes media quietly (e.g. `MediaRelocationService`) must call `syncResolvedMediaUrls()` on the owner itself, or the stored URL columns keep pointing at the old disk. Same applies to raw `DB::table('media')` writes — repair with `php artisan media:sync-urls`.
 
 20. **`serve => true` on any second local disk silently hijacks `/storage`.** Laravel registers `GET|PUT /storage/{path}` for *every* local disk with that flag (URI from the disk's `url`, else `/storage`) and throws at boot when two disks claim the same URI. On the **private** disk the route demands a signature unless `visibility === 'public'` → 403 (dev) / 404 (prod) for every image whenever `public/storage` is missing. So: `serve => true` **only** on the public media disk, `serve => false` on `local`; verify with `php artisan media:doctor`. A cached config (`config:clear`) keeps the old flags alive after a deploy.
+21. **Pending URL-column migrations must degrade gracefully (`SQLSTATE[42S22]`).** When code deploys before `php artisan migrate` runs on the host, explicit SQL references to new M-7 columns (`whereNull('icon_url')`, `get(['...', 'icon_url'])`, `saveQuietly()` on `forceFill`) throw `SQLSTATE[42S22]`. Guard explicit column lists and `SyncsResolvedMediaUrls` / `SyncMediaUrls` / `MediaDoctor` with `Schema::hasColumn(s)` so the app falls back to Media Library until `migrate` finishes.
+22. **Bash `trap ... ERR` without `set -E` does not fire inside functions or on `exit 1` (`die()`).** In `scripts/deploy-cpanel.sh`, use `set -Eeuo pipefail` + an `EXIT` trap guarded by `MAINTENANCE_ON=1` (disarmed right before `exec` handover and re-armed in `update-steps`) so a failed deploy step never leaves the site stuck in 503 maintenance mode.
+23. **Cached storefront builders + `saveQuietly()` URL syncs.** `HomepageDataService::all()` (`homepage.data`, 1h TTL) and `CategoryService::tree()` (`categories.tree`, forever) cache resolved category/brand arrays, while `syncResolvedMediaUrls()` writes via `saveQuietly()` (which bypasses `CategoryObserver`). Both `MediaUrlObserver` and `php artisan media:sync-urls` / `media:relocate` must explicitly flush `HomepageDataObserver` and `CategoryService`, and any partial `->get([...])` on `Category` must include `icon_url` + `->with('media')` or `iconUrl()` will silently miss the column and N+1 on fallback.
 
 *New trap discovered → add numbered item same day.*
 

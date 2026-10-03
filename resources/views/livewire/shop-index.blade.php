@@ -13,11 +13,21 @@
         </div>
         <div class="shop-shortcuts" role="list">
             @foreach(array_slice($categories, 0, 8) as $shortcut)
+                @php
+                    $shortcutAsset = 'images/categories/'.$shortcut['slug'].'.jpg';
+                    $shortcutImage = $shortcut['image'] ?? (is_file(public_path($shortcutAsset)) ? '/'.$shortcutAsset : null);
+                @endphp
                 <button type="button" role="listitem" wire:click="setCategory('{{ $shortcut['slug'] }}')"
                         class="shop-shortcut {{ $category === $shortcut['slug'] ? 'is-active' : '' }}"
                         aria-pressed="{{ $category === $shortcut['slug'] ? 'true' : 'false' }}">
                     <span class="shop-shortcut__image">
-                        <img src="{{ asset('images/categories/'.$shortcut['slug'].'.jpg') }}" alt="" width="160" height="160" loading="lazy" decoding="async">
+                        @if($shortcutImage)
+                            <img src="{{ $shortcutImage }}" alt="" width="160" height="160" loading="lazy" decoding="async">
+                        @else
+                            <span class="pcard__img-fallback" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3"/></svg>
+                            </span>
+                        @endif
                     </span>
                     <span>{{ $shortcut['name'] }}</span>
                 </button>

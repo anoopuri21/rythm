@@ -11,6 +11,8 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Observers\HomepageDataObserver;
+use App\Services\CategoryService;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -51,6 +53,7 @@ final class SyncMediaUrls extends Command
         $onlyMissing = (bool) $this->option('only-missing');
         $chunk = max(1, (int) $this->option('chunk'));
         $failures = 0;
+        $totalChanged = 0;
 
         foreach (self::TARGETS as $class) {
             $instance = new $class;
@@ -71,10 +74,21 @@ final class SyncMediaUrls extends Command
                 continue;
             }
 
+            $totalChanged += $result['changed'];
+
             $this->components->twoColumnDetail(
                 class_basename($class),
                 sprintf('%d scanned · %d %s · %d already current', $result['scanned'], $result['changed'], $dryRun ? 'would change' : 'updated', $result['unchanged']),
             );
+        }
+
+        // `syncResolvedMediaUrls()` writes with `saveQuietly()`, which bypasses
+        // model observers. Flush the cached homepage/category payloads when any
+        // stored URL column was updated so the storefront reflects the backfill
+        // immediately without waiting for the 1h TTL.
+        if (! $dryRun && $totalChanged > 0) {
+            HomepageDataObserver::flush();
+            app(CategoryService::class)->flush();
         }
 
         if ($failures > 0) {

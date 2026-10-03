@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Contracts\HasResolvedMediaUrls;
+use App\Observers\HomepageDataObserver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -106,6 +107,11 @@ final class MediaRelocationService
                 }
             }
         });
+
+        if (! $dryRun && $report['moved'] !== []) {
+            HomepageDataObserver::flush();
+            app(CategoryService::class)->flush();
+        }
 
         return $report;
     }
