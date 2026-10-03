@@ -9,7 +9,7 @@
 | # | Rule | Where it lives |
 |---|---|---|
 | M-1 | **One media disk.** Panel uploads, programmatic imports and storefront URLs all use `MEDIA_DISK` (default `public`). It must be publicly readable. | `config/media-library.php` (`disk_name`) + `config/filament.php` (`default_filesystem_disk`) — same env var |
-| M-2 | **Media URLs are host-relative** (`/storage/12/photo.jpg`). Never built from `APP_URL`, the request host or a signature. | `config/filesystems.php` → `disks.public.url` (`MEDIA_URL`, default `/storage`) |
+| M-2 | **Media URLs are host-relative** (`/storage/12/photo.jpg`), and **the media disk owns that path** — `serve => true` on `public`, `serve => false` on the private `local` disk. Never built from `APP_URL`, the request host or a signature. | `config/filesystems.php` → `disks.public.url` (`MEDIA_URL`, default `/storage`) + the `serve` flags · verify with `php artisan media:doctor` |
 | M-3 | **One definition of an upload field**, with bounded MIME / byte size / pixel size / count and a fixed collection. | `app/Filament/Components/MediaUpload.php` |
 | M-4 | **One way to resolve a URL**: "use the WebP conversion once it exists, else the original" = Spatie's `$media->getAvailableUrl([...])`. | `Product`, `ProductVariant`, `HeroSlide` |
 | M-5 | **Absolute URLs only where crawlers need them** (`og:image`, JSON-LD) — made absolute at the output boundary with `url()`. | `layouts/app.blade.php`, `product/show.blade.php` |
@@ -50,6 +50,28 @@ Fix: M-1 (disk pinned in config, independent of `FILESYSTEM_DISK`) and M-2
 drift, M-5 keeps SEO tags absolute, M-6 repairs rows created by the bug.
 M-7 (stored URL columns) and M-8 (admin-only intake) came from the follow-up
 "admin upload only, URL in DB" decision of 2026-10-03.
+
+### 2b. Who answers `/storage`? (2026-10-03, second round)
+
+Symptom after the M-1/M-2 fix, on a host **without** the `public/storage`
+symlink: the first upload still previews (FilePond renders Livewire's temporary
+file client-side), but after *Save* the preview is gone and the storefront `<img>`
+404s.
+
+Cause: **Laravel registers `GET /storage/{path}` itself for every local disk
+with `serve => true`** (`FilesystemServiceProvider::serveFiles()`), and only the
+first disk may claim a URI. The private `local` disk carried that flag with the
+default `/storage` path, so whenever no symlink let the web server answer first,
+the request went to the **private** disk's route instead of the media disk:
+`ServeFile` requires a signature unless the disk's `visibility` is `public` → 403
+in dev, 404 in production — for every image, however healthy the upload was.
+
+Fix: `serve => false` on `local`, `serve => true` on the public media disk
+(`config/filesystems.php`). With the symlink present the web server keeps serving
+statically and the route is never reached; without it, Laravel now streams the
+file from the media disk instead of rejecting it. `php artisan media:doctor`
+proves the whole chain (`/storage` owner, symlink, per-row files, stored URL
+columns) and `--fix` repairs the safe parts.
 
 ## 3. How it fits together
 
@@ -148,6 +170,19 @@ php artisan storage:link        # creates public/storage -> storage/app/public (
 php artisan media:relocate      # moves media stored on any other disk to MEDIA_DISK (idempotent)
 ```
 
+**One command to diagnose "images are broken" (read-only; nothing is deleted):**
+
+```bash
+php artisan media:doctor        # checks: disk config, who owns /storage, symlink,
+                                # per-row originals + conversion flags, stored URL columns
+php artisan media:doctor --fix  # storage:link + media:relocate + media:sync-urls when needed
+```
+
+Exit code is non-zero when a real problem was found (a missing original file,
+stale URL column, misplaced media), which makes it usable from monitoring.
+`scripts/deploy-cpanel.sh check` runs it too (`media_doctor || true` keeps the
+check report from aborting).
+
 **Stored URL columns (M-7).** Normal admin uploads keep themselves in sync
 (MediaUrlObserver runs on upload, delete, drag-reorder, conversion completion
 and disk repair). Run the backfill by hand only after importing rows created
@@ -177,6 +212,7 @@ item failed (e.g. its original file is missing) — that row is left untouched.
 |---|---|
 | Images 403 / 404 on the site, preview never loads | `php artisan media:relocate` (old rows on the private disk) · `php artisan storage:link` |
 | `/storage/...` returns 404 for a file that exists in `storage/app/public` | `public/storage` link missing / wrong target (cPanel "Plan B": re-run `bash scripts/deploy-cpanel.sh sync-public`) |
+| Every image 404s right after Save, on a host with no `public/storage` | `php artisan media:doctor` — the private disk must not carry `serve` (M-2); fix with `php artisan config:clear` after deploying `config/filesystems.php` |
 | New uploads land in `storage/app/private` | `MEDIA_DISK` overridden/blank in `.env`; `config/filament.php` replaced by a published copy; `php artisan config:clear` |
 | Admin list thumbnail empty although the image exists | `php artisan media:sync-urls` (the row's URL column is NULL/stale); confirm it renders through `StoredMediaUrlColumn`, not a plain `ImageColumn` |
 | A stored URL 404s after moving the storage root / changing `MEDIA_URL` | URLs are host-relative (M-2) — fix the symlink/disk, then `php artisan media:sync-urls` to rewrite the columns if the disk itself changed (`media:relocate` does both) |
@@ -201,6 +237,10 @@ item failed (e.g. its original file is missing) — that row is left untouched.
   fall back to Media Library, delete/reorder/conversion-completion re-sync,
   variants + brand/category/hero/homepage columns, and the backfill command
   (dry-run, idempotent, `--only-missing`).
+* `MediaStorageTest` also pins the 2026-10-03 round: `GET /storage/{path}` is
+  answered by the media disk (200, no symlink needed), the private disk's file is
+  **not** served, exactly one disk may claim `/storage`, and `media:doctor` reports
+  a healthy chain / fails on a missing original.
 * `tests/automation/media-architecture.test.mjs` + the two upload-policy tests
   in `security-*.test.mjs` — static guards (factory only, config files, env examples,
   bounded px/byte/mime limits, gallery conversions, stored-URL columns and the

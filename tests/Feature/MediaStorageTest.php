@@ -328,6 +328,80 @@ class MediaStorageTest extends TestCase
         $this->assertStringNotContainsString('wrong-host.invalid', $media->getUrl());
     }
 
+    // ── The URL is actually served (no symlink required) ────────────────────
+
+    /**
+     * Reproduction of the reported bug: an image uploads fine, previews once
+     * (Livewire's temp file), and then 404s after Save → reload because
+     * `/storage/...` was answered by the PRIVATE disk's signed serve route
+     * whenever `public/storage` was missing. The media disk must own that URL.
+     */
+    public function test_media_urls_are_served_from_the_media_disk_without_a_storage_symlink(): void
+    {
+        Queue::fake();
+
+        $product = Product::factory()->create();
+        $media = $product->addMedia(UploadedFile::fake()->image('amp.jpg', 80, 80))->toMediaCollection('gallery');
+
+        // A feature test has no web server in front of it, so this request can
+        // only be answered by Laravel's `/storage/{path}` route — exactly the
+        // path a browser takes on a host where `public/storage` is missing
+        // (fresh clone, cPanel plan B, failed Windows junction).
+        $response = $this->get($media->getUrl())->assertOk();
+        $this->assertStringStartsWith('image/', (string) $response->headers->get('content-type'));
+
+        // …and the URL the storefront/panel render is the one that works.
+        $this->assertSame($media->getUrl(), $product->fresh()->thumbnailImage());
+    }
+
+    public function test_the_private_disk_is_not_served_at_the_media_url_path(): void
+    {
+        Storage::disk('local')->put('private-only.jpg', 'PRIVATE');
+
+        $this->get('/storage/private-only.jpg')->assertNotFound();
+    }
+
+    public function test_only_the_media_disk_owns_the_storage_url_path(): void
+    {
+        $served = [];
+
+        foreach ((array) config('filesystems.disks', []) as $name => $config) {
+            if (($config['driver'] ?? null) === 'local' && ($config['serve'] ?? false) === true) {
+                $uri = isset($config['url'])
+                    ? (string) parse_url((string) $config['url'], PHP_URL_PATH)
+                    : '/storage';
+
+                $served[rtrim($uri, '/')][] = $name;
+            }
+        }
+
+        $mediaDisk = (string) config('media-library.disk_name');
+
+        $this->assertFalse(config('filesystems.disks.local.serve'), 'The private disk must never own a public URL (M-2).');
+        $this->assertTrue(config("filesystems.disks.{$mediaDisk}.serve"));
+        $this->assertSame([$mediaDisk], $served['/storage'] ?? [], 'Exactly one disk may serve /storage.');
+    }
+
+    /**
+     * `media:doctor` must name the problem on a machine where the file exists
+     * but the URL cannot be served — and repair it with --fix.
+     */
+    public function test_media_doctor_reports_a_healthy_chain_and_a_missing_original(): void
+    {
+        Queue::fake();
+
+        $product = Product::factory()->create();
+        $media = $product->addMedia(UploadedFile::fake()->image('amp.jpg', 24, 24))->toMediaCollection('gallery');
+
+        $this->artisan('media:doctor')->assertSuccessful();
+
+        // Simulate the "file is gone" state (deleted outside the app, restore
+        // from backup) — the doctor must fail loudly instead of silently 404ing.
+        Storage::disk('public')->delete($media->getPathRelativeToRoot());
+
+        $this->artisan('media:doctor')->assertFailed();
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
     /**

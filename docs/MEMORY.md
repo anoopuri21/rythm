@@ -79,6 +79,31 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — "Upload ke baad image gayab / broken URL" — `/storage` route was owned by the private disk
+- Change-id: `arena/01a10254-rythm` (served-media-route)
+- Trigger: owner-ask (Hinglish bug report) — "admin panel me first upload par preview dikhta hai, par Save karne / page reload ke baad preview gayab ho jata hai; website par image broken aur uski `src` ka URL 404 deta hai."
+- Scope paths: `config/filesystems.php`, `app/Console/Commands/MediaDoctor.php` (new), `scripts/deploy-cpanel.sh`, `tests/Feature/MediaStorageTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/media-architecture.md` (§2b, M-2 row, ops, troubleshooting, tests), `docs/RULES.md` §7
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs-only [x] config [x] admin [ ] commerce [ ] security
+- Root cause (framework-level, not app code): Laravel's `FilesystemServiceProvider::serveFiles()` registers `GET|PUT /storage/{path}` for **every** local disk with `serve => true`, defaulting the URI to `/storage`. This repo had `serve => true` on the **private** `local` disk (`storage/app/private`) and no such key on the public media disk. Whenever `public/storage` was absent (fresh clone, cPanel Plan B, failed junction, `storage:link` forgotten) nothing served the file statically, so the private disk's route answered: `ServeFile` requires a signature unless `visibility === 'public'` → **403 in dev / 404 in production** for every image. The first-upload preview looked fine only because FilePond renders Livewire's temporary blob client-side; after Save both the panel preview and the storefront 404'd.
+- Fix: `serve => false` on `local`, `serve => true` on the public media disk in `config/filesystems.php` (only one disk may claim a URI — two served disks on one URI throw at boot). New `php artisan media:doctor [--fix]`: read-only diagnosis of the M-1/M-2 contract (one media disk, public visibility, host-relative URL), which disk owns `/storage`, the `public/storage` symlink, per-row originals + stale `generated_conversions`, and the stored URL columns (stale vs unresolved); `--fix` only performs idempotent repairs (`storage:link`, `media:relocate`, `media:sync-urls`). `scripts/deploy-cpanel.sh check` now runs it.
+- Checklist:
+  - [x] A1 Five always-read files respected (MEMORY/RULES/ARCHITECTURE mirrors updated; PHASES untouched — no phase moved)
+  - [x] A2 Scope stayed media-only (config + one new command + guards; M-7/M-8 contract untouched)
+  - [x] A3 Business rules unchanged — no pricing/stock/auth logic touched
+  - [x] A4 n/a (no totals/prices)
+  - [x] A5 n/a (no new request surface; the new /storage route belongs to the media disk, still unsigned + `visibility public`)
+  - [x] A6 Tests: node `tests/automation/media-architecture.test.mjs` → **14/14 pass** (3 new gates: serve flags, media:doctor + deploy check wiring, feature-coverage names); PHP feature cases added to `MediaStorageTest` (`/storage` served from the media disk without a symlink, private disk **not** served, exactly one `/storage` owner, `media:doctor` healthy/missing-original) — **PHP suite still NOT runnable here** (no PHP/composer/vendor/network) → must run on the host
+  - [x] A7/A8 n/a (no CSS/JS/Blade)
+  - [x] A9 No secrets; no vendor/node_modules
+  - [x] A10 Withheld pages / live pay untouched
+  - [x] A11 §C `Media storage` row updated (serve flags + `media:doctor`)
+  - [x] A12 §D locked decisions unchanged
+  - [x] A13 Footgun #20 added (`serve => true` on a second local disk silently hijacks `/storage`)
+  - [x] A14 Mirrors: `media-architecture.md` (§2b + M-2 row + ops + troubleshooting + tests), `RULES.md` §7 M7; ARCHITECTURE/PHASES/PRD n/a
+  - [x] A15 Owner summary + host checklist prepared
+- Risks / follow-ups: the fix is a config change — hosts must `php artisan config:clear` (a cached config keeps the old `serve` flags and the 404s persist); the static symlink stays the fast path (route only answers when no file is served first); `media:doctor` finding "stale stored URL" means the underlying media row still resolves to the same URL → that file must be restored or the image re-uploaded; unrelated pre-existing docs (`docs/DEPLOY_RHYTHM_STEP_BY_STEP.md`, `docs/MILESWEB_DEPLOYMENT.md`) still tell operators to set `FILESYSTEM_DISK=public` and contradict the M-1/M-2 contract — reconcile in a docs pass.
+- Status: COMPLETE (code) — owner action on the host: `php artisan config:clear`, `php artisan storage:link`, `php artisan media:doctor --fix`, `php artisan test`
+
 ### 2026-10-03 — Admin-upload only: media URLs persisted in DB columns (M-7/M-8)
 - Change-id: `arena/01a10254-rythm` (media-url-columns)
 - Trigger: owner-ask — "import ki jarurat nahi hai. only admin se image upload hoga aur url DB me save hoga wahi se website and admin panel ke preview images use karenge." (decisions: hybrid storage · import dormant · all resources · migrate existing rows)
@@ -433,7 +458,7 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
-| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
 | **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first, `MediaUrlObserver` keeps them fresh, `php artisan media:sync-urls` backfills/repairs | 2026-10-03 |
 | **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
 | **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
@@ -515,6 +540,8 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 18. **Filament's `ImageColumn` reads its state as a path on the filesystem disk** (`$disk->exists($state)` then `$disk->url($state)`). A stored web URL like `/storage/12/a.webp` is looked up inside `storage/app/public/storage/…` and renders **nothing** (silent). For persisted media URLs use `App\Filament\Columns\StoredMediaUrlColumn` (returns app-relative state as-is) — the Spatie column resolves its own URLs, a plain `ImageColumn` does not.
 19. **`saveQuietly()` on a media row bypasses `MediaUrlObserver`.** Any code that repoints/deletes media quietly (e.g. `MediaRelocationService`) must call `syncResolvedMediaUrls()` on the owner itself, or the stored URL columns keep pointing at the old disk. Same applies to raw `DB::table('media')` writes — repair with `php artisan media:sync-urls`.
 
+20. **`serve => true` on any second local disk silently hijacks `/storage`.** Laravel registers `GET|PUT /storage/{path}` for *every* local disk with that flag (URI from the disk's `url`, else `/storage`) and throws at boot when two disks claim the same URI. On the **private** disk the route demands a signature unless `visibility === 'public'` → 403 (dev) / 404 (prod) for every image whenever `public/storage` is missing. So: `serve => true` **only** on the public media disk, `serve => false` on `local`; verify with `php artisan media:doctor`. A cached config (`config:clear`) keeps the old flags alive after a deploy.
+
 *New trap discovered → add numbered item same day.*
 
 ---
@@ -557,6 +584,8 @@ npm run build
 php artisan route:list
 php artisan migrate --force          # careful on shared DB
 php artisan storage:link             # public/storage -> storage/app/public (images)
+php artisan media:doctor            # WHY are images broken? disk/serve/symlink/files/URL columns (read-only)
+php artisan media:doctor --fix      # apply the safe repairs (storage:link, media:relocate, media:sync-urls)
 php artisan media:relocate --dry-run # then without --dry-run: move media to MEDIA_DISK
 php artisan media:sync-urls --dry-run # then without: refresh stored image-URL columns (M-7)
 php artisan serve --host=0.0.0.0 --port=8000

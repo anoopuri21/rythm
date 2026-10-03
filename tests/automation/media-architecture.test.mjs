@@ -28,6 +28,21 @@ test('environment templates declare the public media disk', async () => {
     }
 });
 
+test('the default disk stays private — FILESYSTEM_DISK=public is not a deployment recipe', async () => {
+    // Media follows MEDIA_DISK, so FILESYSTEM_DISK=public buys nothing and puts
+    // Livewire's pre-validation temp uploads inside the web-served root.
+    for (const file of ['.env.example', '.env.staging.example', '.env.production.example']) {
+        assert.match(await read(file), /^FILESYSTEM_DISK=local/m, `${file} must keep the default disk private`);
+    }
+
+    for (const file of ['docs/DEPLOY_RHYTHM_STEP_BY_STEP.md', 'docs/MILESWEB_DEPLOYMENT.md']) {
+        assert.match(await read(file), /^FILESYSTEM_DISK=local/m, `${file} still ships the old FILESYSTEM_DISK=public recipe`);
+        assert.match(await read(file), /^MEDIA_DISK=public/m, `${file} must name the media disk instead`);
+    }
+
+    assert.match(await read('app/Console/Commands/MediaDoctor.php'), /FILESYSTEM_DISK=local/);
+});
+
 test('storefront models resolve conversions through Spatie getAvailableUrl instead of hand-rolled fallbacks', async () => {
     for (const model of ['Product', 'ProductVariant', 'HeroSlide']) {
         const source = await read(`app/Models/${model}.php`);
@@ -179,4 +194,46 @@ test('media operations: relocate command, deploy hooks and architecture doc are 
     assert.match(doc, /MEDIA_DISK/);
     assert.match(doc, /media:relocate/);
     assert.match(optimisation, /media-architecture\.md/);
+});
+
+test('exactly the media disk owns the /storage URL — the private disk is never served', async () => {
+    const filesystems = await read('config/filesystems.php');
+    const localDisk = filesystems.slice(filesystems.indexOf("'local' => ["), filesystems.indexOf("'public' => ["));
+    const publicDisk = filesystems.slice(filesystems.indexOf("'public' => ["), filesystems.indexOf("'s3' => ["));
+
+    // Laravel registers `GET /storage/{path}` for every local disk with
+    // `serve => true`. On the PRIVATE disk that route demands a signature
+    // (403 in dev, 404 in production) and reads storage/app/private — so when
+    // the `public/storage` symlink was missing it answered every media URL and
+    // the images 404'd right after save, in the panel and on the storefront.
+    assert.match(localDisk, /'serve' => false/);
+    assert.doesNotMatch(localDisk, /'serve' => true/);
+    assert.match(publicDisk, /'serve' => true/);
+});
+
+test('media:doctor diagnoses the chain and is wired into the deploy check', async () => {
+    const [command, deploy] = await Promise.all([
+        read('app/Console/Commands/MediaDoctor.php'),
+        read('scripts/deploy-cpanel.sh'),
+    ]);
+
+    assert.match(command, /'media:doctor/);
+    assert.match(command, /--fix/);
+    assert.doesNotMatch(command, /function fail\(|function warn\(/, 'Command::fail()/warn() are reserved — use reportFail()/reportWarn()');
+    assert.match(command, /media:sync-urls/);   // URL-column repair path
+    assert.match(command, /storage:link/);      // symlink repair path
+
+    assert.match(deploy, /media_doctor\(\) \{[\s\S]*?artisan media:doctor/);
+    assert.match(deploy, /health; media_doctor \|\| true/);
+});
+
+test('the served-media regression has feature coverage', async () => {
+    const feature = await read('tests/Feature/MediaStorageTest.php');
+
+    // The URL must be served by the media disk with no symlink involved…
+    assert.match(feature, /test_media_urls_are_served_from_the_media_disk_without_a_storage_symlink/);
+    // …the private disk must NOT own it (403 before the fix, 404 after)…
+    assert.match(feature, /test_the_private_disk_is_not_served_at_the_media_url_path[\s\S]*?assertNotFound\(\)/);
+    // …and one disk only may claim /storage.
+    assert.match(feature, /test_only_the_media_disk_owns_the_storage_url_path[\s\S]*?assertSame\(\[\$mediaDisk\], \$served\['\/storage'\]/);
 });

@@ -53,7 +53,8 @@ SESSION_SAME_SITE=lax
 
 CACHE_STORE=file
 QUEUE_CONNECTION=database
-FILESYSTEM_DISK=public
+FILESYSTEM_DISK=local          # private default disk; media uses MEDIA_DISK (below)
+MEDIA_DISK=public              # admin-uploaded images; must be publicly readable
 
 MAIL_MAILER=smtp
 MAIL_SCHEME=tls

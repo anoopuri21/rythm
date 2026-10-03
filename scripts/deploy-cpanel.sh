@@ -160,6 +160,14 @@ media_sync_urls() {
     || warn "media:sync-urls me issue aaya — upar ka output dekho, fix ke baad dobara chalao: $PHP_BIN artisan media:sync-urls"
 }
 
+# Ek command me pura image chain verify karo: disk config, /storage ka owner,
+# symlink, files ki mojudgi, URL columns. Read-only — kuch delete nahi karta.
+# Fail hone par exit code non-zero deta hai, isliye `check` me `|| true`.
+media_doctor() {
+  say "Media doctor — images ka pura chain check"
+  "$PHP_BIN" artisan media:doctor || warn "Media doctor ne problem batayi — upar ka output dekho, ya chalao: $PHP_BIN artisan media:doctor --fix"
+}
+
 optimize() {
   say "Cache rebuild (site fast karne ke liye)"
   "$PHP_BIN" artisan optimize:clear
@@ -248,7 +256,7 @@ case "${1:-}" in
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
-    php_version_check; check_assets; require_env; db_check; health ;;
+    php_version_check; check_assets; require_env; db_check; health; media_doctor || true ;;
   sync-public)
     sync_public ;;
   *)
