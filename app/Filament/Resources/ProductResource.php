@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Services\ImportedProductActivationService;
 use App\Support\AdminAccess;
+use App\Support\SkuGenerator;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -77,9 +78,10 @@ class ProductResource extends Resource
                                     ->helperText('Customer-facing title (single H1 on the product page).'),
                                 TextInput::make('slug')->required()->maxLength(255)
                                     ->helperText('URL path under /product/{slug}. Keep stable after publish.'),
-                                TextInput::make('sku')->required()->maxLength(50)
+                                TextInput::make('sku')->maxLength(50)
                                     ->unique(ignoreRecord: true)
-                                    ->helperText('Unique stock-keeping code for this base product.'),
+                                    ->trim()
+                                    ->helperText('Optional — leave blank to auto-generate a unique SKU.'),
                                 Select::make('category_id')->relationship('category', 'name')
                                     ->searchable()->preload()
                                     ->createOptionForm([
@@ -173,7 +175,9 @@ class ProductResource extends Resource
                                         Grid::make(6)->schema([
                                             TextInput::make('name')->required()->label('Variant name')
                                                 ->helperText('e.g. Sunburst · 6-string'),
-                                            TextInput::make('sku')->required()->unique(ignoreRecord: true),
+                                            TextInput::make('sku')->unique(ignoreRecord: true)
+                                                ->trim()
+                                                ->helperText('Leave blank to auto-generate'),
                                             TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
                                                 ->label('Price override (optional)')
                                                 ->helperText('Blank = use product base price'),
@@ -410,7 +414,9 @@ class ProductResource extends Resource
         unset($data['color_name'], $data['color_hex'], $data['specs']);
         $data['options'] = $options === [] ? null : $options;
 
-        return $data;
+        // SKU is optional in the form; the DB column is NOT NULL + UNIQUE,
+        // so blank values become a generated, collision-free code.
+        return SkuGenerator::fillIfBlank($data);
     }
 
     public static function getPages(): array

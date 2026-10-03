@@ -6,12 +6,19 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
+use App\Support\SkuGenerator;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
+
+    /** SKU is optional in the form; generate one if it was cleared. */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return SkuGenerator::fillIfBlank($data);
+    }
 
     protected function getHeaderActions(): array
     {

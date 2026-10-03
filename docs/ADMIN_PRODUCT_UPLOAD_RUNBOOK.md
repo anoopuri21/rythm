@@ -20,7 +20,7 @@
 2. **Details**
    - **Name** (required)  
    - **Slug** (required; keep stable after go-live)  
-   - **SKU** (unique)  
+   - **SKU** — optional; leave blank to auto-generate a unique code  
    - **Category** — pick or **Create** inline if missing  
    - **Brand** — manufacturer label; create inline if missing  
    - **Price** (₹)  
@@ -45,7 +45,7 @@
 1. Create base product as above. Base **stock** can be 0 if every sale is via variants.  
 2. Open **Variants** section → **Add item** for each option:
    - Variant **name** (e.g. Sunburst)  
-   - Unique **SKU**  
+   - **SKU** — leave blank to auto-generate  
    - **Price override** (blank = base product price)  
    - **Stock** for that option only  
    - **Active**  
