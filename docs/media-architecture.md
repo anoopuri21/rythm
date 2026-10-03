@@ -95,6 +95,7 @@ bash scripts/deploy-cpanel.sh update
 php artisan storage:link             # "already exists" is fine
 php artisan media:relocate --dry-run # preview — expect: Storage link: ok
 php artisan media:relocate           # moves old private-disk images; "Nothing to move" is fine
+bash scripts/deploy-cpanel.sh sync-public   # ONLY if `public_html` is a real folder (Plan B) AND storage:link just created the link
 ```
 
 From then on `update` hands over to the freshly pulled script (`update-steps`), so
