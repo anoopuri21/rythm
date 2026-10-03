@@ -154,11 +154,12 @@ class ProductVariant extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('variant_gallery')
-            ->multiple()
-            ->image()
-            ->maxFiles(6)
-            ->acceptAllMimeTypes();
+        // Spatie MediaCollection only supports its own API (useDisk, singleFile,
+        // acceptsMimeTypes, onlyKeepLatest, …). `multiple()/image()/maxFiles()`
+        // belong to Filament's FileUpload component and crash here — keep this
+        // registration minimal; the "images only, max 6" rules are enforced on
+        // the admin form (ProductResource → Variant images).
+        $this->addMediaCollection('variant_gallery');
     }
 
     public function registerMediaConversions(?Media $media = null): void
