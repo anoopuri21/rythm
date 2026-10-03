@@ -14,6 +14,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -353,10 +354,19 @@ final class MediaDoctor extends Command
         $unresolved = 0;
         /** @var list<string> $stale */
         $stale = [];
+        /** @var list<string> $pendingTables */
+        $pendingTables = [];
 
         foreach (self::TARGETS as $class) {
+            $instance = new $class;
             /** @var list<string> $columns */
-            $columns = array_keys((new $class)->resolvedMediaUrls());
+            $columns = array_keys($instance->resolvedMediaUrls());
+
+            if (! Schema::hasColumns($instance->getTable(), $columns)) {
+                $pendingTables[] = $instance->getTable();
+
+                continue;
+            }
 
             $unresolved += (int) $this->rows($class)
                 ->whereHas('media')
@@ -409,6 +419,17 @@ final class MediaDoctor extends Command
         }
 
         $this->components->twoColumnDetail('Stored image URLs checked', (string) $inspected);
+
+        if ($pendingTables !== []) {
+            $this->reportWarn(
+                'URL column migration is pending on ['.implode(', ', $pendingTables).'] (falling back to Media Library)',
+                'Run: php artisan migrate && php artisan media:sync-urls --only-missing',
+            );
+
+            if (count($pendingTables) === count(self::TARGETS)) {
+                return;
+            }
+        }
 
         if ($stale === [] && $unresolved === 0) {
             $this->reportOk('Every stored image URL points at a file that exists');

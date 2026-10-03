@@ -105,8 +105,16 @@ outside the app) still resolves correctly.
 * **Edit-form preview** — `getUploadedFiles()` returns `$media->getUrl()` →
   `/storage/…` (same origin as the admin page → FilePond can always fetch it).
 * **Storefront** — models expose `heroImage()`, `thumbnailImage()`,
-  `galleryImages()`, `desktopImageUrl()` … (all built on `getAvailableUrl()`).
-  Products without media fall back to the committed `public/images/products/{slug}.jpg`.
+  `galleryImages()`, `desktopImageUrl()`, `logoUrl()`, `iconUrl()` …
+  Products without media fall back to the committed `public/images/products/{slug}.jpg`;
+  categories (`HomepageDataService::popularCategories()` for homepage tiles +
+  category banners, `CategoryService::tree()` for `/shop` shortcuts) resolve
+  `$category->iconUrl()` (`categories.icon_url` → eager-loaded Media Library `'icon'`)
+  first, then `public/images/categories/{slug}.jpg`, else `null` (music-note SVG placeholder).
+* **Caches** — `MediaUrlObserver`, `php artisan media:sync-urls` and
+  `MediaRelocationService` flush both `HomepageDataObserver` (`homepage.data`, 1h TTL)
+  and `CategoryService` (`categories.tree`) whenever a stored URL changes, because
+  `syncResolvedMediaUrls()` uses `saveQuietly()` (which bypasses model observers).
 * **Conversions** are queued (`->queued()`); until the scheduled worker has
   generated them the original URL is served, so nothing breaks during the delay.
 
@@ -217,6 +225,7 @@ item failed (e.g. its original file is missing) — that row is left untouched.
 | Every image 404s right after Save, on a host with no `public/storage` | `php artisan media:doctor` — the private disk must not carry `serve` (M-2); fix with `php artisan config:clear` after deploying `config/filesystems.php` |
 | New uploads land in `storage/app/private` | `MEDIA_DISK` overridden/blank in `.env`; `config/filament.php` replaced by a published copy; `php artisan config:clear` |
 | Admin list thumbnail empty although the image exists | `php artisan media:sync-urls` (the row's URL column is NULL/stale); confirm it renders through `StoredMediaUrlColumn`, not a plain `ImageColumn` |
+| Category icon uploaded in Admin does not appear on the homepage / `/shop` | Run `php artisan migrate && php artisan media:sync-urls --only-missing && php artisan optimize:clear` — ensures `categories.icon_url` is migrated, backfilled, and the 1h homepage / category caches (`homepage.data`, `categories.tree`) are cleared |
 | A stored URL 404s after moving the storage root / changing `MEDIA_URL` | URLs are host-relative (M-2) — fix the symlink/disk, then `php artisan media:sync-urls` to rewrite the columns if the disk itself changed (`media:relocate` does both) |
 | WebP not appearing | scheduler cron `* * * * * php artisan schedule:run` (see `docs/media-optimization.md`) — originals are served meanwhile |
 | Changed `MEDIA_DISK` | run `php artisan media:relocate` afterwards |
@@ -239,11 +248,14 @@ item failed (e.g. its original file is missing) — that row is left untouched.
   fall back to Media Library, delete/reorder/conversion-completion re-sync,
   variants + brand/category/hero/homepage columns, and the backfill command
   (dry-run, idempotent, `--only-missing`).
-* `MediaStorageTest` also pins the 2026-10-03 round: `GET /storage/{path}` is
+* `MediaStorageTest` also pins the 2026-10-03 rounds: `GET /storage/{path}` is
   answered by the media disk (200, no symlink needed), the private disk's file is
-  **not** served, exactly one disk may claim `/storage`, and `media:doctor` reports
-  a healthy chain / fails on a missing original.
+  **not** served, exactly one disk may claim `/storage`, `media:doctor` reports
+  a healthy chain / fails on a missing original, and an admin-uploaded category
+  icon overrides the committed `/images/categories/{slug}.jpg` asset on the
+  homepage (tiles + category banners) and falls back cleanly when removed.
 * `tests/automation/media-architecture.test.mjs` + the two upload-policy tests
   in `security-*.test.mjs` — static guards (factory only, config files, env examples,
-  bounded px/byte/mime limits, gallery conversions, stored-URL columns and the
-  deploy backfill step).
+  bounded px/byte/mime limits, gallery conversions, stored-URL columns, category
+  `iconUrl()` storefront wiring + cache flushes, pending-migration graceful degrade,
+  and the deploy backfill + maintenance-mode `EXIT` safety net).

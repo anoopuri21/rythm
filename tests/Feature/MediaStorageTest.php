@@ -17,6 +17,7 @@ use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Services\HomepageDataService;
 use Filament\Actions\Testing\TestAction;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Schemas\Schema;
@@ -199,6 +200,66 @@ class MediaStorageTest extends TestCase
         $category = Category::query()->where('slug', 'guitars-media')->firstOrFail();
 
         $this->assertSavedMediaPreviews($category, 'icon', $this->reopenedUploads($page, $category, 'icon'), expected: 1);
+    }
+
+    public function test_category_icon_uploaded_in_admin_renders_on_the_storefront_and_falls_back_when_removed(): void
+    {
+        $brand = Brand::factory()->create(['is_active' => true]);
+
+        // 1) A slug that ALSO has a committed public/images/categories/guitars.jpg
+        //    file — the uploaded icon must win over the committed asset (M-7).
+        Livewire::actingAs($this->admin, 'admin')->test(ManageCategories::class)
+            ->callAction(TestAction::make('create'), data: [
+                'name' => 'Guitars',
+                'slug' => 'guitars',
+                'is_active' => true,
+                'icon' => [UploadedFile::fake()->image('guitars-admin.png', 240, 240)],
+            ])
+            ->assertHasNoFormErrors();
+
+        // 2) A custom slug with NO committed file — falls back to null (SVG placeholder) when removed.
+        Livewire::actingAs($this->admin, 'admin')->test(ManageCategories::class)
+            ->callAction(TestAction::make('create'), data: [
+                'name' => 'Modular Synths',
+                'slug' => 'modular-synths',
+                'is_active' => true,
+                'icon' => [UploadedFile::fake()->image('synths-admin.png', 240, 240)],
+            ])
+            ->assertHasNoFormErrors();
+
+        $guitars = Category::query()->where('slug', 'guitars')->firstOrFail();
+        $synths = Category::query()->where('slug', 'modular-synths')->firstOrFail();
+
+        Product::factory()->create(['category_id' => $guitars->id, 'brand_id' => $brand->id, 'is_active' => true]);
+        Product::factory()->create(['category_id' => $synths->id, 'brand_id' => $brand->id, 'is_active' => true]);
+
+        $guitarsIcon = (string) $guitars->fresh()->icon_url;
+        $synthsIcon = (string) $synths->fresh()->icon_url;
+        $this->assertStringStartsWith('/storage/', $guitarsIcon);
+        $this->assertStringStartsWith('/storage/', $synthsIcon);
+
+        $popular = app(HomepageDataService::class)->all()['popularCategories']->keyBy('slug');
+        $this->assertSame($guitarsIcon, $popular['guitars']['image'], 'Uploaded icon_url must override the committed asset.');
+        $this->assertSame($synthsIcon, $popular['modular-synths']['image']);
+
+        // Storefront homepage renders the uploaded URLs in both Popular Categories and Category Banners.
+        $this->storefront('/')
+            ->assertOk()
+            ->assertSee('src="'.$guitarsIcon.'"', false)
+            ->assertSee('src="'.$synthsIcon.'"', false)
+            ->assertSee("background-image:url('{$guitarsIcon}')", false);
+
+        // Removing the uploaded icons flushes the homepage cache via MediaUrlObserver
+        // and falls back to the committed file (when present) or null (never a broken <img>).
+        $guitars->clearMediaCollection('icon');
+        $synths->clearMediaCollection('icon');
+
+        $this->assertNull($guitars->fresh()->icon_url);
+        $this->assertNull($synths->fresh()->icon_url);
+
+        $afterRemoval = app(HomepageDataService::class)->all()['popularCategories']->keyBy('slug');
+        $this->assertSame('/images/categories/guitars.jpg', $afterRemoval['guitars']['image']);
+        $this->assertNull($afterRemoval['modular-synths']['image']);
     }
 
     public function test_hero_slide_images_preview_after_save_and_render_on_the_storefront(): void

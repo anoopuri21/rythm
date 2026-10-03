@@ -237,3 +237,55 @@ test('the served-media regression has feature coverage', async () => {
     // …and one disk only may claim /storage.
     assert.match(feature, /test_only_the_media_disk_owns_the_storage_url_path[\s\S]*?assertSame\(\[\$mediaDisk\], \$served\['\/storage'\]/);
 });
+
+test('storefront category surfaces resolve iconUrl column-first with eager-loaded media fallback and no broken img', async () => {
+    const [homepage, categoryService, banners, shopIndex, observer, syncCommand, feature] = await Promise.all([
+        read('app/Services/HomepageDataService.php'),
+        read('app/Services/CategoryService.php'),
+        read('resources/views/home/_category-banners.blade.php'),
+        read('resources/views/livewire/shop-index.blade.php'),
+        read('app/Observers/MediaUrlObserver.php'),
+        read('app/Console/Commands/SyncMediaUrls.php'),
+        read('tests/Feature/MediaStorageTest.php'),
+    ]);
+
+    // popularCategories() must load `icon_url` + eager-load `media` (no N+1) and call `$category->iconUrl()` first.
+    const popCats = homepage.slice(homepage.indexOf('private function popularCategories'));
+    assert.match(popCats, /'icon_url'/);
+    assert.match(popCats, /->with\(\['children:id,parent_id', 'media'\]\)/);
+    assert.match(popCats, /\$category->iconUrl\(\)\s*\?\?\s*\(is_file\(public_path\(\$asset\)\)\s*\?\s*'\/'\.\$asset\s*:\s*null\)/);
+
+    // CategoryService::tree() (shop shortcuts) follows the same column-first + eager-loaded media chain.
+    assert.match(categoryService, /'icon_url'/);
+    assert.match(categoryService, /'media'/);
+    assert.match(categoryService, /\$category->iconUrl\(\)\s*\?\?\s*\(is_file\(public_path\(\$asset\)\)\s*\?\s*'\/'\.\$asset\s*:\s*null\)/);
+
+    // Views must never emit an unchecked `asset('images/categories/'...)` that 404s when no committed file exists.
+    assert.doesNotMatch(banners.replace(/\{\{--[\s\S]*?--\}\}/g, ''), /asset\('images\/categories\/'/);
+    assert.doesNotMatch(shopIndex.replace(/\{\{--[\s\S]*?--\}\}/g, ''), /asset\('images\/categories\/'/);
+
+    // Category media changes and URL-column backfills must flush both HomepageDataObserver and CategoryService caches.
+    assert.match(observer, /CategoryService::class\)->flush\(\)/);
+    assert.match(syncCommand, /HomepageDataObserver::flush\(\)/);
+    assert.match(syncCommand, /CategoryService::class\)->flush\(\)/);
+
+    // Feature test covers upload -> HomepageDataService + storefront -> removal fallback.
+    assert.match(feature, /test_category_icon_uploaded_in_admin_renders_on_the_storefront_and_falls_back_when_removed/);
+});
+
+test('pending URL-column migration degrades gracefully and deploy script clears maintenance mode on exit', async () => {
+    const [concern, syncCommand, doctor, deploy] = await Promise.all([
+        read('app/Models/Concerns/SyncsResolvedMediaUrls.php'),
+        read('app/Console/Commands/SyncMediaUrls.php'),
+        read('app/Console/Commands/MediaDoctor.php'),
+        read('scripts/deploy-cpanel.sh'),
+    ]);
+
+    assert.match(concern, /hasResolvedMediaUrlColumns/);
+    assert.match(concern, /42S22/);
+    assert.match(syncCommand, /Schema::hasColumns/);
+    assert.match(doctor, /Schema::hasColumns/);
+
+    assert.match(deploy, /^set -Eeuo pipefail$/m);
+    assert.match(deploy, /trap cleanup_maintenance EXIT/);
+});

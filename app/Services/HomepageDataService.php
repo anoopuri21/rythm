@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Observers\HomepageDataObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Single source of truth for ALL homepage data.
@@ -189,18 +190,24 @@ final class HomepageDataService
     private function popularCategories(Collection $configured): Collection
     {
         $configuredOrder = $configured->pluck('slug')->values();
+        $columns = ['id', 'parent_id', 'name', 'slug', 'sort_order'];
+
+        if (Schema::hasColumn('categories', 'icon_url')) {
+            $columns[] = 'icon_url';
+        }
+
         $categories = Category::query()
             ->where('is_active', true)
             ->where(function ($query): void {
                 $query->whereHas('products', fn ($products) => $products->active())
                     ->orWhereHas('children.products', fn ($products) => $products->active());
             })
-            ->with('children:id,parent_id')
+            ->with(['children:id,parent_id', 'media'])
             ->orderByRaw('parent_id IS NOT NULL')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->limit(self::MAX_DISCOVERY_CATEGORIES * 2)
-            ->get(['id', 'parent_id', 'name', 'slug', 'sort_order']);
+            ->get($columns);
         $categoryIds = $categories
             ->flatMap(fn (Category $category) => $category->children->pluck('id')->push($category->id))
             ->unique();
@@ -216,9 +223,11 @@ final class HomepageDataService
                 $ids = $category->children->pluck('id')->push($category->id);
                 $count = $ids->sum(fn (int $id): int => (int) ($counts[$id] ?? 0));
                 $asset = 'images/categories/'.$category->slug.'.jpg';
-                // Category art is a local managed asset. Avoid a per-category
-                // product/media fallback query on a cold homepage cache.
-                $image = is_file(public_path($asset)) ? '/'.$asset : null;
+                // Stored URL column first (M-7); `media` stays eager-loaded so
+                // rows the backfill has not reached yet resolve without N+1,
+                // then committed public asset, else null (Blade SVG fallback).
+                $image = $category->iconUrl()
+                    ?? (is_file(public_path($asset)) ? '/'.$asset : null);
                 $configuredRank = $configuredOrder->search($category->slug);
 
                 return [

@@ -293,7 +293,14 @@ class ResolvedMediaUrlTest extends TestCase
         $this->artisan('media:sync-urls --dry-run')->assertSuccessful();
         $this->assertNull($product->fresh()->gallery_urls, 'Dry run must not write.');
 
+        Cache::put(HomepageDataObserver::CACHE_KEY, ['stale' => true], 3600);
+
         $this->artisan('media:sync-urls')->assertSuccessful();
+
+        $this->assertNull(
+            Cache::get(HomepageDataObserver::CACHE_KEY),
+            'Backfilling URL columns must flush the cached homepage payload because saveQuietly() bypasses observers.',
+        );
 
         $fresh = $product->fresh();
         $this->assertSame([$media->getUrl()], $fresh->gallery_urls);

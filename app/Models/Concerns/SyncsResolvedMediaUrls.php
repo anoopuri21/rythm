@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Schema;
+
 /**
  * Write mechanics for App\Models\Contracts\HasResolvedMediaUrls.
  *
@@ -22,7 +25,7 @@ trait SyncsResolvedMediaUrls
     {
         $changes = $this->resolvedMediaUrlChanges();
 
-        if ($changes === []) {
+        if ($changes === [] || ! $this->hasResolvedMediaUrlColumns(array_keys($changes))) {
             return;
         }
 
@@ -35,9 +38,38 @@ trait SyncsResolvedMediaUrls
 
         try {
             $this->forceFill($changes)->saveQuietly();
+        } catch (QueryException $exception) {
+            // Graceful degrade when `2026_10_03_000001_add_resolved_media_url_columns`
+            // is still pending on the host: the media row itself is already saved
+            // and model accessors fall back to Media Library until `migrate` runs.
+            if (! $this->isMissingUrlColumnException($exception)) {
+                throw $exception;
+            }
         } finally {
             $this->timestamps = $timestamps;
         }
+    }
+
+    /**
+     * @param  list<string>  $columns
+     */
+    private function hasResolvedMediaUrlColumns(array $columns): bool
+    {
+        try {
+            return Schema::connection($this->getConnectionName())->hasColumns($this->getTable(), $columns);
+        } catch (QueryException) {
+            return false;
+        }
+    }
+
+    private function isMissingUrlColumnException(QueryException $exception): bool
+    {
+        $sqlState = (string) ($exception->errorInfo[0] ?? $exception->getCode());
+        $message = $exception->getMessage();
+
+        return $sqlState === '42S22'
+            || str_contains($message, 'Unknown column')
+            || str_contains($message, 'no such column');
     }
 
     /**

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Models\Category;
 use App\Models\Contracts\HasResolvedMediaUrls;
+use App\Services\CategoryService;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -76,10 +78,14 @@ final class MediaUrlObserver
             return;
         }
 
-        // The homepage caches the resolved payload (models + brand logo URLs)
-        // for an hour. A media change that moves a URL must drop that cache —
-        // exactly like a homepage-model save does — otherwise a replaced image
-        // keeps rendering the URL of the file that was just deleted.
+        // The homepage caches the resolved payload (models + brand logo URLs +
+        // category icon URLs) for an hour, and CategoryService caches the
+        // category tree forever. A media change that moves a URL must drop
+        // those caches — otherwise a replaced image keeps rendering the old URL.
         HomepageDataObserver::flush();
+
+        if ($owner instanceof Category) {
+            app(CategoryService::class)->flush();
+        }
     }
 }

@@ -11,18 +11,14 @@
     <div class="catban-mm__inner">
         @foreach($banners as $banner)
             @php
-                $bg = filled($banner['image'] ?? null)
-                    ? $banner['image']
-                    : asset('images/categories/'.($banner['slug'] ?? 'accessories').'.jpg');
-                // Ensure relative public path works when image is already "/images/..."
-                if (is_string($bg) && str_starts_with($bg, '/')) {
-                    $bgStyle = $bg;
-                } else {
-                    $bgStyle = $bg;
-                }
+                // `$banner['image']` already resolves: stored `icon_url` column (M-7) ->
+                // Media Library `'icon'` -> committed `public/images/categories/{slug}.jpg` -> null.
+                // Never fall back to an unchecked `asset('images/categories/{slug}.jpg')`,
+                // which would request a 404 image for categories without a committed file.
+                $bg = filled($banner['image'] ?? null) ? $banner['image'] : null;
             @endphp
             <a href="{{ route('shop.index', ['category' => $banner['slug']]) }}" class="catban-mm__card"
-               style="background-image:url('{{ $bgStyle }}')">
+               @if($bg) style="background-image:url('{{ $bg }}')" @endif>
                 <span class="catban-mm__scrim" aria-hidden="true"></span>
                 <span class="catban-mm__content">
                     <span class="catban-mm__kicker">{{ $banner['count'] }} {{ \Illuminate\Support\Str::plural('product', $banner['count']) }}</span>
