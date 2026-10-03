@@ -21,14 +21,16 @@ await test('shop listing stays bounded at 12 per page with eager commerce relati
 
 await test('product detail eager loads its relations and never serves inactive products', () => {
     assert.match(productController, /abort_unless\(\$product->is_active, 404\);/);
-    for (const relation of ["'brand'", "'category.parent'", "'media'", "'seoEntry'"]) {
+    // Product images live on the row (products.image), so there is no media
+    // relation to eager load — only brand, category and the SEO entry.
+    for (const relation of ["'brand'", "'category.parent'", "'seoEntry'"]) {
         assert.ok(productController.includes(relation), `missing eager load ${relation}`);
     }
     assert.match(productController, /'variants' => fn \(\$query\) => \$query->where\('is_active', true\)/);
 });
 
-await test('cart payload loads product, brand, media and variant in one query', () => {
-    assert.match(cartService, /->items\(\)\s*->with\(\['product\.brand', 'product\.media', 'variant'\]\)\s*->get\(\)/);
+await test('cart payload loads product, brand and variant in one query', () => {
+    assert.match(cartService, /->items\(\)\s*->with\(\['product\.brand', 'variant'\]\)\s*->get\(\)/);
 });
 
 await test('account, stock-alert and notification lists stay paginated', () => {

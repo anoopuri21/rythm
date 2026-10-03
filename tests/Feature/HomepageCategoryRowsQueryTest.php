@@ -76,9 +76,10 @@ class HomepageCategoryRowsQueryTest extends TestCase
 
         $this->assertCount(8, $products);
         $this->assertTrue($products->every(fn (Product $product): bool => $product->is_active));
+        // Product images live on the row (products.image), so only brand/category
+        // are eager-loaded here — there is no media relation to preload any more.
         $this->assertTrue($products->every(fn (Product $product): bool => $product->relationLoaded('brand')
-            && $product->relationLoaded('category')
-            && $product->relationLoaded('media')));
+            && $product->relationLoaded('category')));
     }
 
     public function test_configured_categories_lead_discovery_with_truthful_active_counts(): void

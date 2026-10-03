@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\MediaRelocationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -33,14 +33,17 @@ class MediaRelocationTest extends TestCase
     /** A media item stored the way the bug stored it: on the private `local` disk. */
     private function legacyMedia(string $name = 'legacy.jpg', string $disk = 'local', ?string $conversionsDisk = null): Media
     {
-        $adder = Product::factory()->create()
+        // Product images are plain uploads now, so the legacy-media fixture uses
+        // a variant gallery — the one product-side collection still in the media
+        // library (the relocate command itself is model agnostic).
+        $adder = ProductVariant::factory()->create()
             ->addMedia(UploadedFile::fake()->image($name, 120, 120));
 
         if ($conversionsDisk !== null) {
             $adder->storingConversionsOnDisk($conversionsDisk);
         }
 
-        return $adder->toMediaCollection('gallery', $disk);
+        return $adder->toMediaCollection('variant_gallery', $disk);
     }
 
     /** @return list<string> */
@@ -53,7 +56,7 @@ class MediaRelocationTest extends TestCase
     {
         $media = $this->legacyMedia();
         $original = $media->getPathRelativeToRoot();
-        $conversion = $media->getPathRelativeToRoot('thumb-webp');
+        $conversion = $media->getPathRelativeToRoot('variant-thumb-webp');
 
         // Legacy state: everything on the private disk, nothing public.
         Storage::disk('local')->assertExists($original);
@@ -110,7 +113,7 @@ class MediaRelocationTest extends TestCase
     public function test_conversions_stored_on_another_disk_are_moved_independently(): void
     {
         $media = $this->legacyMedia('split.jpg', disk: 'public', conversionsDisk: 'local');
-        $conversion = $media->getPathRelativeToRoot('thumb-webp');
+        $conversion = $media->getPathRelativeToRoot('variant-thumb-webp');
 
         $this->assertSame('public', $media->disk);
         $this->assertSame('local', $media->conversions_disk);

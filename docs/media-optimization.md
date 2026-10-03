@@ -5,12 +5,24 @@
 
 ## Product media pipeline
 
-`Product` defines two queued WebP conversions:
+**Product images are plain uploads — there is no conversion queue.** The file an
+admin uploads to `public/uploads/products` is exactly what the browser gets, and
+its URL is stored on the row (`products.image` / `.gallery` / `.og_image`); see
+`docs/media-architecture.md` §7.
 
-- `thumb-webp`: maximum 480×480, quality 82, used by product cards, cart, checkout and wishlist;
-- `gallery-webp`: maximum 1200×1200, quality 84, used by product detail galleries.
+Consequences for weight:
 
-Products preserve aspect ratio and use `object-fit: contain`. Existing locally committed fallback images continue to work. Views use the original media URL until a conversion is generated, preventing broken images during queue delay.
+- Nothing is resized or re-encoded server-side, so upload images at the size you
+  want served. A good default is **1200×1200 JPEG/WebP, quality ~80** — that
+  covers the product page, and cards scale it down with CSS
+  (`object-fit: contain`, explicit width/height, lazy loading).
+- Prefer WebP over JPEG for the same quality; the field accepts
+  JPEG/PNG/WebP/AVIF (never SVG).
+- The admin limit is 5 MB per file (3 MB for the social image), max 12 gallery
+  images — set in `App\Filament\Components\ImageUpload`.
+- Products with no upload fall back to the committed
+  `public/images/products/{slug}.jpg`, so a missing upload never renders a
+  broken image.
 
 ## Hero media pipeline
 

@@ -87,11 +87,20 @@ await test('all admin media fields have bounded MIME, size and count rules', () 
     assert.match(factory, /maxFiles/);
     assert.doesNotMatch(factory, /image\/svg\+xml/);
 
+    const imageFactory = read('app/Filament/Components/ImageUpload.php');
+    assert.match(imageFactory, /acceptedFileTypes/);
+    assert.match(imageFactory, /maxSize/);
+    assert.match(imageFactory, /maxFiles/);
+    assert.doesNotMatch(imageFactory, /image\/svg\+xml/);
+
     for (const resource of ['Product', 'Brand', 'Category', 'HeroSlide', 'HomepageBlock']) {
         const source = read(`app/Filament/Resources/${resource}Resource.php`);
-        const uploads = source.split('MediaUpload::').slice(1);
+        // Product images use ImageUpload (plain file + URL on the row); the rest
+        // still use the media library — both are the single bounded factory.
+        const uploads = source.split(/(?:Media|Image)Upload::/).slice(1);
         assert.ok(uploads.length > 0, `${resource} has no media upload`);
         assert.doesNotMatch(source, /SpatieMediaLibraryFileUpload::make/, `${resource} bypasses the bounded factory`);
+        assert.doesNotMatch(source, /[^a-zA-Z]FileUpload::make/, `${resource} bypasses the bounded factory`);
     }
 });
 

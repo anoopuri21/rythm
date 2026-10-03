@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\CatalogueAcquisitionService;
 use App\Services\CatalogueImportService;
 use App\Services\ImportedProductActivationService;
+use App\Support\ImageStore;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -26,6 +27,8 @@ class CatalogueImportTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        // Imported images land on the uploads disk like admin uploads do.
+        Storage::fake('uploads');
         $this->outputRoot = sys_get_temp_dir().'/rythme-import-test-'.bin2hex(random_bytes(4));
     }
 
@@ -60,9 +63,11 @@ class CatalogueImportTest extends TestCase
         $this->assertSame(0, $product->stock);
         $this->assertCount(2, $product->variants);
         $this->assertTrue($product->variants->every(fn ($variant): bool => ! $variant->is_active && $variant->stock === 0));
-        $this->assertCount(1, $product->media);
-        $this->assertFalse($product->media->first()->getCustomProperty('commercial_use_approved'));
-        $this->assertStringNotContainsString('bajaao.com', $product->media->first()->getUrl());
+        // The downloaded image is a plain file on the uploads disk; the URL sits on the row.
+        $this->assertCount(0, $product->media);
+        $this->assertStringStartsWith('/uploads/products/', (string) $product->image);
+        $this->assertStringNotContainsString('bajaao.com', (string) $product->image);
+        $this->assertTrue(ImageStore::exists($product->image));
         $this->assertDatabaseHas('product_import_sources', [
             'product_id' => $product->id,
             'source' => 'bajaao',
@@ -79,7 +84,10 @@ class CatalogueImportTest extends TestCase
         $this->assertSame(1, $rerun['skipped_unchanged']);
         $this->assertDatabaseCount('products', 1);
         $this->assertDatabaseCount('product_variants', 2);
-        $this->assertDatabaseCount('media', 1);
+        // Imported images live on disk with their URL on the product row, so no
+        // media-library row is created any more.
+        $this->assertDatabaseCount('media', 0);
+        $this->assertTrue(ImageStore::exists(Product::sole()->image));
     }
 
     public function test_expansion_batch_import_is_dry_run_first_and_commit_stays_inactive(): void
@@ -171,7 +179,8 @@ class CatalogueImportTest extends TestCase
         $this->assertNotNull($source->publication_reviewed_at);
         $this->assertSame($actor->id, $source->publication_reviewed_by);
         $this->assertNotNull($source->commercial_use_approved_at);
-        $this->assertTrue((bool) $activated->getFirstMedia('gallery')->getCustomProperty('commercial_use_approved'));
+        $this->assertNotNull($activated->image, 'Activation requires a locally stored product image.');
+        $this->assertTrue(ImageStore::exists($activated->image));
         $this->assertDatabaseHas('admin_audit_logs', [
             'actor_id' => $actor->id,
             'action' => 'catalogue.imported_product_activated',

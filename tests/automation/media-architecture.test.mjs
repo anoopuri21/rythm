@@ -33,8 +33,35 @@ test('storefront models resolve conversions through Spatie getAvailableUrl inste
         const source = await read(`app/Models/${model}.php`);
         assert.doesNotMatch(source, /hasGeneratedConversion/, `${model} re-implements the conversion fallback`);
     }
-    assert.match(await read('app/Models/Product.php'), /getAvailableUrl\(\['gallery-webp'\]\)/);
-    assert.match(await read('app/Models/Product.php'), /getAvailableUrl\(\['thumb-webp'\]\)/);
+    assert.match(await read('app/Models/ProductVariant.php'), /getAvailableUrl\(\['variant-thumb-webp'\]\)/);
+    assert.match(await read('app/Models/HeroSlide.php'), /getAvailableUrl\(/);
+});
+
+test('product images are plain uploads: file in public/uploads, URL on the row', async () => {
+    const [filesystems, store, product, resource] = await Promise.all([
+        read('config/filesystems.php'),
+        read('app/Support/ImageStore.php'),
+        read('app/Models/Product.php'),
+        read('app/Filament/Resources/ProductResource.php'),
+    ]);
+
+    // One disk, inside the web root, host-relative URL — no symlink, no APP_URL.
+    const uploadsDisk = filesystems.slice(filesystems.indexOf("'uploads' => ["), filesystems.indexOf("'s3' => ["));
+    assert.match(uploadsDisk, /'root' => public_path\('uploads'\)/);
+    assert.match(uploadsDisk, /'url' => rtrim\(\(string\) \(env\('UPLOADS_URL'\) \?: '\/uploads'\), '\/'\)/);
+    assert.doesNotMatch(uploadsDisk, /env\('APP_URL'/);
+
+    // Every stored value is normalised to a root-relative URL by the one helper.
+    assert.match(store, /public const DISK = 'uploads'/);
+    assert.match(store, /public static function url\(/);
+    assert.match(product, /ImageStore::url\(/);
+    assert.match(product, /public function heroImage\(\): \?string/);
+    assert.doesNotMatch(product, /addMediaConversion/, 'Products must not depend on the conversion queue.');
+
+    // The admin form uses the shared bounded field, never a raw FileUpload.
+    assert.match(resource, /ImageUpload::single\('image', 'products', maxSizeKb: [1-9][0-9]*\)/);
+    assert.match(resource, /ImageUpload::gallery\('gallery', 'products', maxFiles: [1-9][0-9]*\)/);
+    assert.doesNotMatch(resource, /FileUpload::make/, 'ProductResource must go through the ImageUpload factory.');
 });
 
 test('SEO tags make host-relative media URLs absolute at the output boundary', async () => {
@@ -54,12 +81,14 @@ test('media operations: relocate command, deploy hooks and architecture doc are 
         read('docs/media-optimization.md'),
     ]);
     assert.match(command, /media:relocate/);
-    assert.match(deploy, /migrate; seed; storage_link; media_relocate; optimize/);
-    assert.match(deploy, /migrate; storage_link; media_relocate; optimize/);
+    assert.match(deploy, /migrate; seed; storage_link; media_relocate; product_images; optimize/);
+    assert.match(deploy, /migrate; storage_link; media_relocate; product_images; optimize/);
     // `update` must continue in the freshly pulled copy of the script (bash already parsed the old one).
     assert.match(deploy, /git pull --ff-only[^\n]*\n[\s\S]*?exec bash "\$APP_DIR\/scripts\/deploy-cpanel\.sh" update-steps/);
     assert.match(deploy, /\n  update-steps\)[\s\S]*?media_relocate/);
     assert.match(doc, /MEDIA_DISK/);
     assert.match(doc, /media:relocate/);
+    assert.match(doc, /product-images:migrate/);
+    assert.match(doc, /public\/uploads/);
     assert.match(optimisation, /media-architecture\.md/);
 });

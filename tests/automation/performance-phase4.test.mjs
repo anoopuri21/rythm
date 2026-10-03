@@ -19,17 +19,22 @@ test('heavy storefront JavaScript is loaded only for matching pages', async () =
     assert.doesNotMatch(footer, /reveal-section|data-reveal/);
 });
 
-test('product and hero media define bounded queued WebP conversions', async () => {
-    const [product, hero, card] = await Promise.all([
-        read('app/Models/Product.php'),
+test('variant and hero media define bounded queued WebP conversions; product images are served as uploaded', async () => {
+    const [variant, hero, card, product] = await Promise.all([
+        read('app/Models/ProductVariant.php'),
         read('app/Models/HeroSlide.php'),
         read('resources/views/components/shop-card.blade.php'),
+        read('app/Models/Product.php'),
     ]);
-    for (const conversion of ['thumb-webp', 'gallery-webp']) assert.ok(product.includes(conversion));
+    assert.ok(variant.includes('variant-thumb-webp'));
     for (const conversion of ['hero-desktop-webp', 'hero-mobile-webp']) assert.ok(hero.includes(conversion));
-    assert.match(product, /->queued\(\)/);
+    assert.match(variant, /->queued\(\)/);
     assert.match(hero, /->queued\(\)/);
     assert.match(card, /thumbnailImage\(\)/);
+    // Product images have no conversion step: the stored URL is served directly,
+    // so a card never waits on the queue (docs/media-architecture.md §7).
+    assert.doesNotMatch(product, /addMediaConversion/);
+    assert.match(product, /public function thumbnailImage\(\): \?string/);
 });
 
 test('large customer lists are paginated and homepage cold-cache N plus one fallback is absent', async () => {

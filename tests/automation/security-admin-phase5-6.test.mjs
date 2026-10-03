@@ -38,30 +38,39 @@ test('rich text has a centralized write-boundary allowlist and arbitrary CMS scr
     assert.doesNotMatch(seo, /Textarea::make\('head_scripts'\)/);
 });
 
-test('all Filament media uploads go through the shared MediaUpload factory with explicit MIME size count and fixed collections', async () => {
-    // The limits live in ONE place (so no field can forget them)...
-    const factory = await read('app/Filament/Components/MediaUpload.php');
-    for (const mime of ["'image/jpeg'", "'image/png'", "'image/webp'"]) {
-        assert.ok(factory.includes(mime), `MediaUpload lacks ${mime}`);
+test('all Filament media uploads go through a shared factory with explicit MIME size count and a fixed destination', async () => {
+    // The limits live in ONE place per upload style (so no field can forget them).
+    // MediaUpload  → Spatie media library (brand logo, category icon, hero, variant images).
+    // ImageUpload  → plain file in public/uploads, URL on the row (product images).
+    const factories = [
+        ['app/Filament/Components/MediaUpload.php', /->collection\(\$collection\)/],
+        ['app/Filament/Components/ImageUpload.php', /ImageStore::DISK/],
+    ];
+    for (const [path, destination] of factories) {
+        const factory = await read(path);
+        for (const mime of ["'image/jpeg'", "'image/png'", "'image/webp'"]) {
+            assert.ok(factory.includes(mime), `${path} lacks ${mime}`);
+        }
+        assert.match(factory, /->acceptedFileTypes\(/);
+        assert.match(factory, /->maxSize\(\$maxSizeKb\)/);
+        assert.match(factory, /->maxFiles\(/);
+        assert.match(factory, destination, `${path} does not pin where the file goes`);
+        assert.doesNotMatch(factory, /image\/svg\+xml/);
     }
-    assert.match(factory, /->acceptedFileTypes\(\$mimeTypes\)/);
-    assert.match(factory, /->maxSize\(\$maxSizeKb\)/);
-    assert.match(factory, /->maxFiles\(/);
-    assert.match(factory, /->collection\(\$collection\)/);
-    assert.doesNotMatch(factory, /image\/svg\+xml/);
 
-    // ...and every resource must use it (never a raw SpatieMediaLibraryFileUpload).
+    // ...and every resource must use one of them (never a raw field).
     const paths = ['Brand', 'Category', 'HeroSlide', 'HomepageBlock', 'Product'];
     for (const name of paths) {
         const source = await read(`app/Filament/Resources/${name}Resource.php`);
         assert.doesNotMatch(source, /SpatieMediaLibraryFileUpload::make/, `${name} bypasses MediaUpload`);
-        const uploads = source.split('MediaUpload::').slice(1);
+        assert.doesNotMatch(source, /[^a-zA-Z]FileUpload::make/, `${name} bypasses ImageUpload`);
+        const uploads = source.split(/(?:Media|Image)Upload::/).slice(1);
         assert.ok(uploads.length > 0, `${name} has no upload contract`);
         for (const upload of uploads) {
             assert.match(
                 upload.slice(0, 160),
                 /^(single|gallery)\('[a-z_]+', '[a-z_]+', (maxSizeKb|maxFiles): [1-9][0-9]*/,
-                `${name} upload lacks a fixed collection or numeric limit`,
+                `${name} upload lacks a fixed destination or numeric limit`,
             );
         }
     }

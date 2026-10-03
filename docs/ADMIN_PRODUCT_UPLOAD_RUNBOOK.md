@@ -30,7 +30,7 @@
    - Short description + full description (original copy)  
 3. **Optional tax** — leave blank until CA-approved values exist.  
 4. **Variants** — leave empty for simple SKUs.  
-5. **Media** — upload gallery (and optional social OG image).  
+5. **Media** — **Main image** (required for the card/PDP), optional **Gallery images** (extra angles) and optional **Social share image**. Files are saved in the site’s own `public/uploads/products` folder and their address is stored on the product.  
 6. **SEO** tab — title/description if you care about Google.  
 7. **Save**.  
 8. Header / row action **View on storefront** (only when Active) → confirm page.  
@@ -38,7 +38,7 @@
 
 **If it does not show:** Active off? Stock 0 with no purchasable path? Wrong category filter? Cache — hard refresh.
 
-**If an image preview keeps "loading" after you save and reopen, or the photo is missing on the site:** this is a server storage problem, not the photo. Ask whoever runs the server to run `php artisan storage:link` and `php artisan media:relocate` (see `docs/media-architecture.md` → Troubleshooting).
+**If a photo is missing on the site:** copy the address from the product’s `image` field and open it in a new tab. If it 404s, ask whoever runs the server to run `php artisan product-images:migrate` — it lists every product whose stored address has no file on disk — and then re-upload the photo. (Variant, brand, category and hero images still use the media library: for those run `php artisan storage:link` and `php artisan media:relocate`. See `docs/media-architecture.md` → Troubleshooting.)
 
 ---
 
@@ -69,7 +69,7 @@ On **Products** list, use filters:
 | Published | Active on/off |
 | Out of stock (base) | Base stock ≤ 0 |
 | Has variants | Multi-option SKUs |
-| Missing gallery image | No product gallery media |
+| Missing image | No main image on the product row |
 | Imported — pending activation | Import pipeline waiting review |
 
 Row action **View** opens live PDP for active products.
@@ -100,7 +100,7 @@ Row action **View** opens live PDP for active products.
 ## 6. After upload checklist
 
 - [ ] Active ON  
-- [ ] At least one gallery image (product or every variant); after **Save**, reopen the product — thumbnails must still show  
+- [ ] Main image uploaded (or every variant has images); after **Save**, reopen the product — thumbnails must still show  
 - [ ] Price > 0  
 - [ ] Stock path exists (base or variant)  
 - [ ] Category + brand set  

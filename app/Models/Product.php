@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\SanitizedHtml;
+use App\Support\ImageStore;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,10 +19,9 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('products')]
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'image', 'gallery', 'og_image', 'meta_title', 'meta_description'])]
 class Product extends Model implements HasMedia
 {
     use HasFactory;
@@ -30,6 +30,7 @@ class Product extends Model implements HasMedia
 
     protected $casts = [
         'description' => SanitizedHtml::class,
+        'gallery' => 'array',
         'price' => 'decimal:2',
         'tax_rate' => 'decimal:4',
         'compare_at_price' => 'decimal:2',
@@ -54,16 +55,25 @@ class Product extends Model implements HasMedia
             }
 
             $hasStock = $product->stock > 0 || $product->variants()->where('is_active', true)->where('stock', '>', 0)->exists();
-            $mediaApproved = $product->getMedia('gallery')->isNotEmpty()
-                && $product->getMedia('gallery')->every(fn ($media): bool => (bool) $media->getCustomProperty('commercial_use_approved', false));
 
             if ($source->publication_reviewed_at === null
                 || $source->commercial_use_approved_at === null
                 || (float) $product->price <= 0
                 || ! $hasStock
-                || ! $mediaApproved) {
-                throw new \DomainException('Imported products require reviewed content, approved local media, a positive price and verified real stock before activation.');
+                || $product->image === null) {
+                throw new \DomainException('Imported products require reviewed content, an approved local image, a positive price and verified real stock before activation.');
             }
+        });
+
+        // Uploaded files belong to the row: drop the ones it no longer points at,
+        // and all of them once the row is gone for good (a soft-deleted product
+        // keeps its images so a restore brings them back).
+        static::updated(function (Product $product): void {
+            ImageStore::deleteMany(array_diff($product->originalImageUrls(), $product->imageUrls()));
+        });
+
+        static::forceDeleted(function (Product $product): void {
+            ImageStore::deleteMany($product->imageUrls());
         });
     }
 
@@ -142,71 +152,117 @@ class Product extends Model implements HasMedia
         return $this->stock <= $this->low_stock_threshold;
     }
 
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('gallery');
-        $this->addMediaCollection('og')
-            ->singleFile();
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        // Conversions run through the bounded, stop-when-empty scheduled
-        // worker; no persistent shared-hosting daemon is required.
-        $this->addMediaConversion('thumb-webp')
-            ->width(480)
-            ->height(480)
-            ->format('webp')
-            ->quality(82)
-            ->queued();
-
-        $this->addMediaConversion('gallery-webp')
-            ->width(1200)
-            ->height(1200)
-            ->format('webp')
-            ->quality(84)
-            ->queued();
-    }
-
     /**
-     * Best available product image URL (large, for the product page / social).
+     * Main product image URL.
      *
-     * 1. Spatie media (admin-uploaded / attached), if any — the WebP
-     *    conversion once the queue has generated it, else the original.
+     * 1. `products.image` — the URL of the file the admin uploaded
+     *    (`/uploads/products/…`, stored in the row).
      * 2. Committed public asset: public/images/products/{slug}.jpg
-     *    (reset-proof — travels with the git repo, needs no storage disk).
+     *    (reset-proof — travels with the git repo, needs no upload at all).
      * 3. null — caller decides the final placeholder.
      */
     public function heroImage(): ?string
     {
-        return $this->getFirstMedia('gallery')?->getAvailableUrl(['gallery-webp'])
-            ?? $this->committedImageUrl();
-    }
-
-    /** Card-sized product image URL (same fallback chain as heroImage()). */
-    public function thumbnailImage(): ?string
-    {
-        return $this->getFirstMedia('gallery')?->getAvailableUrl(['thumb-webp'])
-            ?? $this->committedImageUrl();
+        return $this->image ?: $this->committedImageUrl();
     }
 
     /**
-     * Gallery image URLs (media first, committed fallback, else []).
+     * Card-sized product image URL.
+     *
+     * Uploads are served as stored — there is no conversion queue any more, so
+     * the card uses the same file as the product page (the storefront scales it
+     * with CSS). Kept as its own method so the views stay readable.
+     */
+    public function thumbnailImage(): ?string
+    {
+        return $this->heroImage();
+    }
+
+    /**
+     * Every image of the product, main one first (extra gallery images follow).
+     * Falls back to the committed asset when nothing was uploaded.
      *
      * @return list<string>
      */
     public function galleryImages(): array
     {
-        $urls = $this->getMedia('gallery')
-            ->map(fn (Media $media): string => $media->getAvailableUrl(['gallery-webp']))
-            ->values()
-            ->all();
+        return array_values(array_unique(array_filter([
+            $this->heroImage(),
+            ...array_map(
+                fn ($url): ?string => is_string($url) ? ImageStore::url($url) : null,
+                (array) ($this->gallery ?? []),
+            ),
+        ], fn (?string $url): bool => is_string($url) && $url !== '')));
+    }
 
-        if ($urls === [] && ($fallback = $this->committedImageUrl()) !== null) {
-            $urls = [$fallback];
+    /** Social-share image: the explicit `og_image` upload, else the main image. */
+    public function ogImage(): ?string
+    {
+        return $this->og_image ?: $this->heroImage();
+    }
+
+    /**
+     * Every uploaded-image URL this row owns (used to clean up replaced files).
+     *
+     * @return list<string>
+     */
+    public function imageUrls(): array
+    {
+        return array_values(array_filter([
+            $this->image,
+            $this->og_image,
+            ...array_map(
+                fn ($url): ?string => is_string($url) ? ImageStore::url($url) : null,
+                (array) ($this->gallery ?? []),
+            ),
+        ], fn (?string $url): bool => is_string($url) && $url !== ''));
+    }
+
+    /** The URLs this row owned before the current save. @return list<string> */
+    public function originalImageUrls(): array
+    {
+        $gallery = $this->getRawOriginal('gallery');
+
+        if (is_string($gallery)) {
+            $decoded = json_decode($gallery, true);
+            $gallery = is_array($decoded) ? $decoded : [];
         }
 
-        return $urls;
+        return array_values(array_filter([
+            (string) $this->getRawOriginal('image'),
+            (string) $this->getRawOriginal('og_image'),
+            ...array_map(
+                fn ($url): string => is_string($url) ? (string) ImageStore::url($url) : '',
+                (array) ($gallery ?? []),
+            ),
+        ], fn (string $url): bool => $url !== ''));
+    }
+
+    /** Every written image value is normalised to the canonical URL (App\Support\ImageStore). */
+    public function setImageAttribute(?string $value): void
+    {
+        $this->attributes['image'] = ImageStore::url($value);
+    }
+
+    public function setOgImageAttribute(?string $value): void
+    {
+        $this->attributes['og_image'] = ImageStore::url($value);
+    }
+
+    /** @param  list<string>|string|null  $value */
+    public function setGalleryAttribute(mixed $value): void
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $value = is_array($decoded) ? $decoded : [];
+        }
+
+        $urls = array_values(array_unique(array_filter(array_map(
+            fn ($url): ?string => is_string($url) ? ImageStore::url($url) : null,
+            (array) ($value ?? []),
+        ), fn (?string $url): bool => is_string($url) && $url !== '')));
+
+        $this->attributes['gallery'] = $urls === [] ? null : json_encode($urls);
     }
 
     private function committedImageUrl(): ?string

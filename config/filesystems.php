@@ -58,6 +58,21 @@ return [
             'report' => false,
         ],
 
+        // Simple admin-uploaded images (products first — see
+        // docs/media-architecture.md §7). Files are written straight into a real
+        // folder inside the web root, so the URL stored in the database always
+        // resolves: no `public/storage` symlink, no queue, no media table.
+        //
+        // `url` stays host-relative (never APP_URL / request host) for the same
+        // reason as the `public` disk above. UPLOADS_URL is only for a CDN.
+        'uploads' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'url' => rtrim((string) (env('UPLOADS_URL') ?: '/uploads'), '/'),
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

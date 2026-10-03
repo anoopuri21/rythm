@@ -150,6 +150,16 @@ media_relocate() {
     || warn "media:relocate me issue aaya — upar ka output dekho, fix ke baad dobara chalao: $PHP_BIN artisan media:relocate"
 }
 
+# Product images public/uploads me rakhi jati hain aur unka URL product row me
+# save hota hai (docs/media-architecture.md §7). Ye step purani media-library
+# images ko wahan copy karta hai aur batata hai ki kis product ka image link
+# disk par maujood nahi hai. Idempotent — har deploy pe chalana safe hai.
+product_images() {
+  say "Product images: public/uploads me copy + link check"
+  "$PHP_BIN" artisan product-images:migrate \
+    || warn "product-images:migrate ne issue bataya — upar ka output dekho (missing image = admin se dobara upload karo)"
+}
+
 optimize() {
   say "Cache rebuild (site fast karne ke liye)"
   "$PHP_BIN" artisan optimize:clear
@@ -190,9 +200,19 @@ sync_public() {
   say "Plan B: public/ assets ko public_html me copy kar rahe hain"
   [ -d "$PUBLIC_HTML" ] || die "public_html folder nahi mila: $PUBLIC_HTML  (PUBLIC_HTML=<path> se batao)"
   if command -v rsync >/dev/null 2>&1; then
-    rsync -a --delete --exclude 'index.php' "$APP_DIR/public/" "$PUBLIC_HTML/"
+    # 'uploads' deliberately NOT synced: admin-uploaded images live there and a
+    # --delete copy would remove everything uploaded since the last deploy.
+    rsync -a --delete --exclude 'index.php' --exclude 'uploads' "$APP_DIR/public/" "$PUBLIC_HTML/"
   else
     cp -a "$APP_DIR/public/." "$PUBLIC_HTML/"
+  fi
+  # Uploaded images: docroot ko app/public/uploads tak ek link chahiye
+  # (storage:link jaisa hi), warna /uploads/... 404 dega.
+  if [ ! -e "$PUBLIC_HTML/uploads" ]; then
+    mkdir -p "$APP_DIR/public/uploads"
+    ln -s "$APP_DIR/public/uploads" "$PUBLIC_HTML/uploads" \
+      && ok "public_html/uploads -> $APP_DIR/public/uploads" \
+      || warn "public_html/uploads link nahi ban paya — cPanel File Manager me khud banalo (target: $APP_DIR/public/uploads)"
   fi
   cp "$APP_DIR/deploy/public_html-bridge-index.php" "$PUBLIC_HTML/index.php"
   # bridge file me app ka sahi path likh do
@@ -214,7 +234,7 @@ maybe_sync_public() {
 case "${1:-}" in
   setup)
     php_version_check; require_env; install_deps; check_assets
-    app_key; storage_perms; db_check; migrate; seed; storage_link; media_relocate; optimize
+    app_key; storage_perms; db_check; migrate; seed; storage_link; media_relocate; product_images; optimize
     maybe_sync_public; health
     say "SETUP COMPLETE 🎉  Ab browser me apna domain kholo." ;;
   update)
@@ -231,7 +251,7 @@ case "${1:-}" in
   update-steps)
     # 2nd half of `update` (internal): always executed by the freshly pulled copy of this script.
     trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
-    install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; optimize
+    install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; product_images; optimize
     maybe_sync_public
     trap - ERR
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up

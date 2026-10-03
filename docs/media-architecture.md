@@ -1,8 +1,12 @@
 # Media architecture (uploads · preview · storefront URLs)
 
-> Scope: every admin-managed image — product gallery / social image, variant
-> images, brand logo, category icon, hero slides, homepage blocks.
+> Scope: every admin-managed image — product images, variant images, brand logo,
+> category icon, hero slides, homepage blocks.
 > Optimisation (WebP conversions, queue): `docs/media-optimization.md`.
+>
+> **Product images no longer use the media library** — they are plain files in
+> `public/uploads` with their URL stored on the product row. See §7; everything
+> above it still applies to the media-library resources.
 
 ## 1. The contract (what must always be true)
 
@@ -14,6 +18,8 @@
 | M-4 | **One way to resolve a URL**: "use the WebP conversion once it exists, else the original" = Spatie's `$media->getAvailableUrl([...])`. | `Product`, `ProductVariant`, `HeroSlide` |
 | M-5 | **Absolute URLs only where crawlers need them** (`og:image`, JSON-LD) — made absolute at the output boundary with `url()`. | `layouts/app.blade.php`, `product/show.blade.php` |
 | M-6 | **Media that is already stored on the wrong disk can be repaired** idempotently. | `php artisan media:relocate` → `MediaRelocationService` |
+| M-7 | **Product images are plain uploads**: file in `public/uploads/products`, root-relative URL (`/uploads/products/…`) on the row. No media table, no conversion queue, no `public/storage` symlink. | `config/filesystems.php` (`disks.uploads`) · `App\Support\ImageStore` · `App\Filament\Components\ImageUpload` · `products.image` / `products.gallery` / `products.og_image` |
+| M-8 | **Moving a product off the media library is repeatable and verifiable** (also reports products whose stored URL has no file). | `php artisan product-images:migrate [--dry-run]` |
 
 `FILESYSTEM_DISK` is **not** part of this contract. It may stay `local` (the
 `.env.example` default) — media no longer follows it.
@@ -124,15 +130,88 @@ item failed (e.g. its original file is missing) — that row is left untouched.
 | New uploads land in `storage/app/private` | `MEDIA_DISK` overridden/blank in `.env`; `config/filament.php` replaced by a published copy; `php artisan config:clear` |
 | WebP not appearing | scheduler cron `* * * * * php artisan schedule:run` (see `docs/media-optimization.md`) — originals are served meanwhile |
 | Changed `MEDIA_DISK` | run `php artisan media:relocate` afterwards |
+| A product shows no image / the link looks wrong | `php artisan product-images:migrate` — it lists every product whose stored URL has no file on disk |
+| `/uploads/...` returns 404 | `public/uploads` missing from the document root: on cPanel Plan B re-run `bash scripts/deploy-cpanel.sh sync-public` (it links `public_html/uploads`) |
+
+## 7. Simple product images (public/uploads · URL in the database)
+
+Product images are the one part of the catalogue that is deliberately *not* in
+the media library any more. What an admin uploads is written to a real folder in
+the web root and its address is stored on the product:
+
+```
+admin form ──ImageUpload::single/gallery──▶ App\Support\ImageStore::store()
+                                                │  disk `uploads` = public/uploads (UPLOADS_URL, default /uploads)
+                                                ▼
+                                   public/uploads/products/01J9ZQ…​.jpg
+                                                │
+             products.image / .gallery / .og_image = "/uploads/products/01J9ZQ….jpg"
+                                                │
+storefront ◀── Product::heroImage() / thumbnailImage() / galleryImages() / ogImage()
+```
+
+Why this shape:
+
+* **The link cannot drift away from the file.** The URL in the row is the path
+  the browser requests; there is no media id, no conversion name and no
+  `public/storage` symlink between them. `/uploads/...` is served by the web
+  server straight out of the document root.
+* **Nothing is queued.** The uploaded file is what gets served, so an image is
+  visible the moment the record is saved (no waiting for a conversion worker).
+* **The database is self-describing** — an operator can paste `products.image`
+  into a browser and see the image.
+
+Rules that keep it honest:
+
+| # | Rule | Where |
+|---|---|---|
+| P-1 | Every product image value written anywhere is normalised by `ImageStore::url()` (a disk path becomes `/uploads/…`; a root-relative or `https://` value is kept as is). | `App\Models\Product` mutators |
+| P-2 | Uploads are bounded in one place: JPEG/PNG/WebP/AVIF only (never SVG), explicit `maxSize`, explicit `maxFiles`. | `App\Filament\Components\ImageUpload` |
+| P-3 | Files are named `{ulid}.{ext}` inside `products/` — unique and free of anything the uploader chose. | `ImageStore::store()` |
+| P-4 | Replacing or removing an image deletes the old file; a soft-deleted product keeps its files, a force-deleted one loses them. | `Product::booted()` (`updated` / `forceDeleted`) |
+| P-5 | A product with no upload falls back to the committed `public/images/products/{slug}.jpg`, then to `null`. | `Product::heroImage()` |
+| P-6 | URLs stay host-relative; only the SEO boundary makes them absolute (`url()`). | `resources/views/product/show.blade.php`, `layouts/app.blade.php` |
+
+**Operations**
+
+```bash
+php artisan product-images:migrate --dry-run   # what would be copied (writes nothing)
+php artisan product-images:migrate             # copy media-library images → public/uploads, fill the columns,
+                                               # and list products whose stored URL has no file on disk
+```
+
+`scripts/deploy-cpanel.sh setup|update` runs it on every deploy (idempotent).
+Exit code is non-zero when a product points at a missing file — that is the
+"the image link is wrong" report; re-upload the image in the panel.
+
+On cPanel "Plan B" (a real `public_html` folder) the deploy script links
+`public_html/uploads` → `app/public/uploads` once, the same way `storage:link`
+works for `/storage`; `rsync` deliberately skips `uploads` so a deploy never
+deletes what was uploaded since the last one.
+
+**Rolling this change out on an existing server (one time).** After the deploy
+that includes it:
+
+```bash
+cd ~/rhythm
+php artisan migrate                            # adds products.image / .gallery / .og_image
+php artisan product-images:migrate --dry-run   # look at what will be copied
+php artisan product-images:migrate             # do it
+```
 
 ## 6. What locks this in (tests)
 
 * `tests/Feature/MediaStorageTest.php` — config contract; for **every**
-  media-bearing resource (product gallery/og, variant images, brand logo,
-  category icon, hero desktop/mobile, homepage block): upload in the panel →
-  reopen the edit form → file is on the public disk, preview URL is
-  host-relative, unsigned and backed by a real file; storefront renders it;
-  `og:image` is absolute. Runs with `FILESYSTEM_DISK=local` (`phpunit.xml`).
+  media-library resource (variant images, brand logo, category icon, hero
+  desktop/mobile, homepage block): upload in the panel → reopen the edit form →
+  file is on the public disk, preview URL is host-relative, unsigned and backed
+  by a real file; storefront renders it; `og:image` is absolute. Runs with
+  `FILESYSTEM_DISK=local` (`phpunit.xml`).
+* `tests/Feature/ProductImageUploadTest.php` — the §7 contract: panel upload →
+  file in `public/uploads/products` → host-relative URL on the row → preview on
+  reopen → storefront + absolute `og:image`; replaced/removed files are deleted;
+  SVG is rejected; `product-images:migrate` copies media-library images and
+  reports broken links.
 * `tests/Feature/MediaRelocationTest.php` — repair command (move, dry-run,
   idempotency, split conversions disk, missing original, storage-link check).
 * `tests/automation/media-architecture.test.mjs` + the two upload-policy tests

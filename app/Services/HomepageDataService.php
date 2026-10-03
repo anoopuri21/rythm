@@ -62,18 +62,18 @@ final class HomepageDataService
                 'comparison' => HomepageBlock::query()->section('comparison')->get(),
                 'faqs' => Faq::query()->where('is_active', true)->orderBy('sort_order')->get(),
                 'bestsellers' => Product::query()->active()->featured()->withAvailableVariantStock()
-                    ->with(['brand', 'category.parent', 'media'])
+                    ->with(['brand', 'category.parent'])
                     ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
                 'newArrivals' => Product::query()->active()->withAvailableVariantStock()
-                    ->with(['brand', 'category.parent', 'media'])
+                    ->with(['brand', 'category.parent'])
                     ->latest('created_at')->latest('id')->limit(10)->get(),
                 'trending' => Product::query()->active()->trending()->withAvailableVariantStock()
-                    ->with(['brand', 'category.parent', 'media'])
+                    ->with(['brand', 'category.parent'])
                     ->orderByDesc('updated_at')->orderByDesc('id')->limit(10)->get(),
                 'bestDeals' => Product::query()->active()->withAvailableVariantStock()
                     ->whereNotNull('compare_at_price')
                     ->whereColumn('compare_at_price', '>', 'price')
-                    ->with(['brand', 'category.parent', 'media'])
+                    ->with(['brand', 'category.parent'])
                     ->orderByRaw('(compare_at_price - price) / NULLIF(compare_at_price, 0) DESC')
                     ->orderByDesc('updated_at')
                     ->limit(8)
@@ -135,7 +135,7 @@ final class HomepageDataService
     {
         $products = Product::query()->active()->withAvailableVariantStock()
             ->whereIn('slug', $slugs)
-            ->with(['brand', 'category.parent', 'media'])
+            ->with(['brand', 'category.parent'])
             ->get();
 
         return collect($slugs)
@@ -164,7 +164,7 @@ final class HomepageDataService
                     ->active()
                     ->withAvailableVariantStock()
                     ->where('category_id', $row->category_id)
-                    ->with(['brand', 'category.parent', 'media'])
+                    ->with(['brand', 'category.parent'])
                     ->orderByRaw('featured_rank IS NULL')
                     ->orderBy('featured_rank')
                     ->orderByDesc('updated_at')

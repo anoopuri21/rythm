@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -45,6 +46,10 @@ use Tests\TestCase;
  *
  * The suite runs with FILESYSTEM_DISK=local (phpunit.xml) — the .env.example
  * default — which is precisely the configuration that used to break.
+ *
+ * Scope: the resources that still use the media library (variant, brand,
+ * category, hero slide, homepage block). Product images are plain uploads and
+ * are covered by tests/Feature/ProductImageUploadTest.php.
  */
 class MediaStorageTest extends TestCase
 {
@@ -83,53 +88,11 @@ class MediaStorageTest extends TestCase
         $this->assertSame('/storage/7/a.jpg', Storage::disk('public')->url('7/a.jpg'));
     }
 
-    // ── Product (create page → reopen edit page → storefront) ───────────────
-
-    public function test_product_images_uploaded_in_admin_preview_after_save_and_render_on_the_storefront(): void
-    {
-        $category = Category::factory()->create();
-        $brand = Brand::factory()->create();
-
-        Livewire::actingAs($this->admin, 'admin')
-            ->test(CreateProduct::class)
-            ->fillForm([
-                'name' => 'Media Test Guitar',
-                'slug' => 'media-test-guitar',
-                'category_id' => $category->id,
-                'brand_id' => $brand->id,
-                'price' => 1000,
-                'stock' => 5,
-                'is_active' => true,
-                'gallery' => [UploadedFile::fake()->image('front.jpg', 600, 600), UploadedFile::fake()->image('back.jpg', 600, 600)],
-                'og' => [UploadedFile::fake()->image('share.jpg', 1200, 630)],
-            ])
-            ->call('create')
-            ->assertHasNoFormErrors();
-
-        $product = Product::query()->where('slug', 'media-test-guitar')->firstOrFail();
-
-        // Reopen the saved record exactly like the admin does.
-        $edit = Livewire::actingAs($this->admin, 'admin')
-            ->test(EditProduct::class, ['record' => $product->getRouteKey()]);
-        $form = $edit->instance()->getSchema('form');
-
-        $this->assertSavedMediaPreviews($product, 'gallery', $this->uploadedFiles($form, 'gallery'), expected: 2);
-        $this->assertSavedMediaPreviews($product, 'og', $this->uploadedFiles($form, 'og'), expected: 1);
-
-        // Storefront: card image resolves to a public-disk URL and is in the markup.
-        $product = $product->fresh();
-        $thumb = $product->thumbnailImage();
-        $this->assertStringStartsWith('/storage/', (string) $thumb);
-        $this->assertPublicFileBehindUrl((string) $thumb);
-
-        $this->storefront('/shop')->assertOk()->assertSee('src="'.$thumb.'"', false);
-
-        // Social image: absolute URL for crawlers, even though the media URL is host-relative.
-        $og = $product->getFirstMedia('og');
-        $this->storefront(route('product.show', $product))
-            ->assertOk()
-            ->assertSee('property="og:image" content="'.url($og->getUrl()).'"', false);
-    }
+    // ── Variant (nested in the product form) ────────────────────────────────
+    //
+    // Product images no longer live in the media library — they are plain
+    // files in public/uploads with their URL on the row. That flow is covered
+    // by tests/Feature/ProductImageUploadTest.php.
 
     public function test_variant_images_uploaded_in_admin_are_stored_on_the_media_disk(): void
     {
@@ -241,30 +204,25 @@ class MediaStorageTest extends TestCase
     {
         Queue::fake(); // conversions are queued: none are generated yet
 
-        $product = Product::factory()->create();
-        $media = $product->addMedia(UploadedFile::fake()->image('amp.jpg', 80, 80))->toMediaCollection('gallery');
+        $variant = ProductVariant::factory()->create();
+        $media = $variant->addMedia(UploadedFile::fake()->image('amp.jpg', 80, 80))->toMediaCollection('variant_gallery');
 
-        $product = $product->fresh()->load('media');
-        $this->assertSame($media->getUrl(), $product->thumbnailImage(), 'Original is served until the conversion is generated.');
-        $this->assertSame($media->getUrl(), $product->heroImage());
-        $this->assertSame([$media->getUrl()], $product->galleryImages());
+        $variant = $variant->fresh()->load('media');
+        $this->assertSame($media->getUrl(), $variant->thumbnailImage(), 'Original is served until the conversion is generated.');
 
-        $media->markAsConversionGenerated('thumb-webp');
-        $media->markAsConversionGenerated('gallery-webp');
+        $media->markAsConversionGenerated('variant-thumb-webp');
         $media->save();
 
-        $product = $product->fresh()->load('media');
-        $this->assertSame($media->getUrl('thumb-webp'), $product->thumbnailImage());
-        $this->assertSame($media->getUrl('gallery-webp'), $product->heroImage());
-        $this->assertSame([$media->getUrl('gallery-webp')], $product->galleryImages());
+        $variant = $variant->fresh()->load('media');
+        $this->assertSame($media->getUrl('variant-thumb-webp'), $variant->thumbnailImage());
     }
 
     public function test_media_urls_do_not_depend_on_app_url(): void
     {
         config(['app.url' => 'https://wrong-host.invalid']);
 
-        $product = Product::factory()->create();
-        $media = $product->addMedia(UploadedFile::fake()->image('amp.jpg', 80, 80))->toMediaCollection('gallery');
+        $variant = ProductVariant::factory()->create();
+        $media = $variant->addMedia(UploadedFile::fake()->image('amp.jpg', 80, 80))->toMediaCollection('variant_gallery');
 
         $this->assertStringStartsWith('/storage/', $media->getUrl());
         $this->assertStringNotContainsString('wrong-host.invalid', $media->getUrl());

@@ -47,8 +47,8 @@ class StatsOverviewWidget extends BaseWidget
         if ($user->hasAdminPermission(AdminAccess::CATALOGUE_VIEW)) {
             $stats[] = Stat::make('Low stock', Product::whereColumn('stock', '<=', 'low_stock_threshold')->where('is_active', true)->count())
                 ->description('Active products at/below threshold')->descriptionIcon('heroicon-m-exclamation-triangle')->color('danger');
-            $stats[] = Stat::make('Product health', Product::where('is_active', false)->orWhereDoesntHave('media')->count())
-                ->description('Inactive or missing media')->descriptionIcon('heroicon-m-wrench-screwdriver')->color('warning');
+            $stats[] = Stat::make('Product health', Product::where('is_active', false)->orWhereNull('image')->count())
+                ->description('Inactive or missing image')->descriptionIcon('heroicon-m-wrench-screwdriver')->color('warning');
         }
 
         return $stats;

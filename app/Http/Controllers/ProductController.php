@@ -28,14 +28,13 @@ final class ProductController extends Controller
             'brand',
             'category.parent',
             'variants' => fn ($query) => $query->where('is_active', true),
-            'media',
             'seoEntry',
         ]);
 
         $this->seo->apply(SeoService::fromEntry($product->seoEntry, [
             'meta_title' => $product->meta_title ?: $product->name.' — Buy Online in India | Rythme Music Store',
             'meta_description' => $product->meta_description ?: (string) $product->short_description,
-            'og_image' => $product->getFirstMediaUrl('og') ?: $product->heroImage(),
+            'og_image' => $product->ogImage(),
             'canonical_url' => route('product.show', ['product' => $product]),
             'robots' => 'index, follow',
         ]));

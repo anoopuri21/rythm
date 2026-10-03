@@ -44,17 +44,13 @@ final class ImportedProductActivationService
             if (! $hasStock) {
                 throw new RuntimeException('Verified real stock is required before activation.');
             }
-            $media = $locked->getMedia('gallery');
-            if ($media->isEmpty()) {
-                throw new RuntimeException('At least one locally managed product image is required before activation.');
+            if ($locked->image === null) {
+                throw new RuntimeException('A locally managed product image is required before activation.');
             }
 
-            foreach ($media as $item) {
-                $item->setCustomProperty('commercial_use_approved', true);
-                $item->setCustomProperty('commercial_use_approved_at', now()->toIso8601String());
-                $item->setCustomProperty('commercial_use_approved_by', $actor->id);
-                $item->save();
-            }
+            // The approval itself is recorded on the import source below
+            // (commercial_use_approved_*), which is what the activation guard
+            // in App\Models\Product checks on every later publish.
 
             $source->forceFill([
                 'publication_reviewed_at' => now(),

@@ -47,7 +47,7 @@ final class CartService
     {
         return $this->getOrCreateCart()
             ->items()
-            ->with(['product.brand', 'product.media', 'variant'])
+            ->with(['product.brand', 'variant'])
             ->get()
             ->filter(function (CartItem $item): bool {
                 // Check if product variant is out of stock
@@ -85,7 +85,7 @@ final class CartService
     {
         return $this->getOrCreateCart()
             ->items()
-            ->with(['product.brand', 'product.media', 'variant'])
+            ->with(['product.brand', 'variant'])
             ->get();
     }
 

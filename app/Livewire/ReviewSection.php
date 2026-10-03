@@ -28,7 +28,7 @@ final class ReviewSection extends Component
 
     public function mount(Product $product): void
     {
-        $this->product = $product->load('media');
+        $this->product = $product;
     }
 
     public function setRating(int $rating): void

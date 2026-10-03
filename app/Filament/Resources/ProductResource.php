@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\ImageUpload;
 use App\Filament\Components\MediaUpload;
 use App\Filament\Components\SeoFields;
 use App\Filament\Resources\ProductResource\Pages;
@@ -35,7 +36,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
@@ -60,7 +61,7 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['category', 'brand', 'media', 'importSource']);
+            ->with(['category', 'brand', 'importSource']);
     }
 
     public static function form(Schema $form): Schema
@@ -208,11 +209,18 @@ class ProductResource extends Resource
                                     ->columns(1),
                             ]),
                         Section::make('Media')
-                            ->description('Default product gallery (used when a variant has no images of its own).')
+                            ->description('Images are saved in the site’s own uploads folder (public/uploads/products) and their address is stored on the product. Used when a variant has no images of its own.')
                             ->collapsible()
                             ->schema([
-                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12),
-                                MediaUpload::single('og', 'og', maxSizeKb: 3072)->label('Social share image'),
+                                ImageUpload::single('image', 'products', maxSizeKb: 5120)
+                                    ->label('Main image')
+                                    ->helperText('Shown on the product page, shop cards, cart and checkout.'),
+                                ImageUpload::gallery('gallery', 'products', maxFiles: 12)
+                                    ->label('Gallery images')
+                                    ->helperText('Extra angles shown as thumbnails on the product page.'),
+                                ImageUpload::single('og_image', 'products', maxSizeKb: 3072)
+                                    ->label('Social share image')
+                                    ->helperText('Optional 1200×630 image for WhatsApp/Facebook previews. Main image is used when blank.'),
                             ]),
                     ]),
                 Tabs\Tab::make('SEO')
@@ -226,7 +234,10 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('gallery')->collection('gallery')->circular(),
+                ImageColumn::make('product_image')
+                    ->label('Image')
+                    ->state(fn (Product $record): ?string => $record->heroImage() === null ? null : url($record->heroImage()))
+                    ->circular(),
                 TextColumn::make('name')->searchable()->sortable()->limit(38),
                 TextColumn::make('category.name')->badge()->color('gray'),
                 TextColumn::make('brand.name')->badge()->color('gray'),
@@ -258,12 +269,9 @@ class ProductResource extends Resource
                 Filter::make('has_variants')
                     ->label('Has variants')
                     ->query(fn (Builder $query): Builder => $query->whereHas('variants')),
-                Filter::make('no_gallery')
-                    ->label('Missing gallery image')
-                    ->query(fn (Builder $query): Builder => $query->whereDoesntHave(
-                        'media',
-                        fn (Builder $media): Builder => $media->where('collection_name', 'gallery'),
-                    )),
+                Filter::make('no_image')
+                    ->label('Missing image')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('image')),
                 Filter::make('imported_pending')
                     ->label('Imported — pending activation')
                     ->query(fn (Builder $query): Builder => $query

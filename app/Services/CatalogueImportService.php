@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImportSource;
+use App\Support\ImageStore;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -78,19 +79,25 @@ final class CatalogueImportService
                 }
 
                 $createdProduct = $this->createProduct($payload, $hash);
+
+                // Downloaded images are copied into the same place admin uploads
+                // go (public/uploads) and their URLs land on the product row;
+                // provenance stays in ProductImportSource::media_hashes.
+                $imageUrls = [];
                 foreach ($payload['media'] as $media) {
-                    $createdProduct->addMedia($runDirectory.DIRECTORY_SEPARATOR.$media['file'])
-                        ->preservingOriginal()
-                        ->withCustomProperties([
-                            'source' => 'bajaao',
-                            'source_sha256' => $media['sha256'],
-                            'source_width' => $media['width'],
-                            'source_height' => $media['height'],
-                            'commercial_use_approved' => false,
-                        ])
-                        ->toMediaCollection('gallery');
+                    $url = ImageStore::storePath($runDirectory.DIRECTORY_SEPARATOR.$media['file'], 'products');
+
+                    if ($url === null) {
+                        continue;
+                    }
+
+                    $imageUrls[] = $url;
                     $result['media_attached']++;
                 }
+
+                $createdProduct->image = $imageUrls[0] ?? null;
+                $createdProduct->gallery = array_slice($imageUrls, 1);
+                $createdProduct->save();
 
                 $result['created']++;
                 $result['products'][] = ['slug' => $payload['slug'], 'status' => 'created-inactive'];

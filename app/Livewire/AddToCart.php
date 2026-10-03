@@ -180,7 +180,6 @@ final class AddToCart extends Component
             'variants.attributeValues.attribute',
             'variants.media',
             'brand',
-            'media',
         ]);
     }
 

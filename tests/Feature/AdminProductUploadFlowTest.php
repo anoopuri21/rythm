@@ -33,7 +33,7 @@ class AdminProductUploadFlowTest extends TestCase
         $source = file_get_contents((new ReflectionClass(ProductResource::class))->getFileName());
 
         $this->assertIsString($source);
-        foreach (['out_of_stock', 'has_variants', 'no_gallery', 'imported_pending', 'view_storefront'] as $needle) {
+        foreach (['out_of_stock', 'has_variants', 'no_image', 'imported_pending', 'view_storefront'] as $needle) {
             $this->assertStringContainsString($needle, $source);
         }
         $this->assertStringContainsString('createOptionForm', $source);
