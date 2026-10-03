@@ -82,6 +82,24 @@ MEDIA_DISK=public        # publicly readable disk — leave as is
 # MEDIA_URL=             # unset = relative /storage URLs (recommended). Set only for a CDN, e.g. https://cdn.example.com/storage
 ```
 
+**Rolling this change out on an existing server (one time).** The first
+`update` after merging is still run by the *previous* copy of
+`deploy-cpanel.sh` (bash had already parsed it before `git pull` replaced it), so it
+does not know the two new steps. After it finishes run them once by hand — or run
+`update` a second time:
+
+```bash
+cd ~/rhythm
+git branch --show-current            # must be the branch you merged into (main); update pulls THIS branch
+bash scripts/deploy-cpanel.sh update
+php artisan storage:link             # "already exists" is fine
+php artisan media:relocate --dry-run # preview — expect: Storage link: ok
+php artisan media:relocate           # moves old private-disk images; "Nothing to move" is fine
+```
+
+From then on `update` hands over to the freshly pulled script (`update-steps`), so
+future script changes also apply on their first deploy.
+
 **Every deploy** (`scripts/deploy-cpanel.sh setup|update` already does both):
 
 ```bash

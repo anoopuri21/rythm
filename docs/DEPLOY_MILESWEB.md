@@ -289,7 +289,13 @@ Sab `200` ya `302` = sab theek ✅
 cd ~/app
 bash scripts/deploy-cpanel.sh update
 ```
-Ye khud: maintenance ON → naya code pull → libraries update → DB migrate → cache rebuild → maintenance OFF.
+Ye khud: maintenance ON → naya code pull → libraries update → DB migrate → storage link → media files ko public disk par rakhna (`media:relocate`) → cache rebuild → maintenance OFF.
+
+> Script khatam hone par site apne aap live ho jati hai — alag se `php artisan up` ki zarurat nahi.
+> **Agar script beech me fail ho jaye** (✘ ya error dikhe) to site maintenance mode (503) me reh sakti hai: pehle output padho aur
+> wajah theek karo, phir `php artisan up` chalao.
+> Script update ke dauran khud bhi badal sakti hai; `update` pull ke baad naye copy se hi aage chalta hai (`update-steps`), isliye
+> naye steps pehle hi deploy me chal jate hain.
 
 ---
 

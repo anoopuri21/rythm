@@ -224,6 +224,13 @@ case "${1:-}" in
     # to site ko 503 maintenance mode me phansa mat chhodo — wapas ON karo.
     trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
+    # `git pull` may just have replaced THIS file, but bash already parsed the old copy of
+    # this `case` block — carrying on here would run the OLD steps (new steps skipped on the
+    # first deploy after a script change). Hand over to a fresh bash that reads the pulled file.
+    exec bash "$APP_DIR/scripts/deploy-cpanel.sh" update-steps ;;
+  update-steps)
+    # 2nd half of `update` (internal): always executed by the freshly pulled copy of this script.
+    trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
     install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; optimize
     maybe_sync_public
     trap - ERR

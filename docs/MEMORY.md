@@ -102,7 +102,7 @@ Work may be reported **done** to the owner only when:
   - [x] A13 Footgun #15 added
   - [x] A14 Mirrors: `ARCHITECTURE.md` §9, `media-optimization.md`, upload runbook; PHASES/DESIGN/PRD/tracker n/a
   - [x] A15 Owner summary prepared
-- Risks / follow-ups: every environment with existing uploads must run `php artisan storage:link && php artisan media:relocate` once (deploy script does it) and rebuild the config cache; verified at HTTP + Filament/Livewire level only (no browser in the build sandbox) — owner should open one product after Save → reopen; 10 unrelated pre-existing PHP and 10 unrelated node test failures remain
+- Risks / follow-ups: the FIRST `update` after merging still runs the previous deploy script (bash parsed it before `git pull` replaced it) → run `php artisan storage:link && php artisan media:relocate` once by hand (or `update` twice); `update` now hands over to the pulled script (`update-steps`) so this cannot recur; pre-existing: the script's ERR trap does not fire inside functions, so a failed step leaves maintenance mode ON (fix the cause, then `php artisan up`); verified at HTTP + Filament/Livewire level only (no browser in the build sandbox) — owner should open one product after Save → reopen; 10 unrelated pre-existing PHP and 10 unrelated node test failures remain
 - Status: COMPLETE (code) — owner action: deploy, then confirm one product's images after Save → reopen
 
 ### 2026-09-12 — Homepage Popular Brands slider
@@ -447,6 +447,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 13. **Empty client tax/policy/shipping** must **hide** on storefront — never fake values, never crash checkout (W5).  
 14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).
 15. **Media disk ≠ `FILESYSTEM_DISK`.** Filament's upload disk follows `config('filament.default_filesystem_disk')`; if that is the private `local` disk, saved images 403 on the storefront and the admin preview URL is signed + host-bound (FilePond spins forever — its `server.load` has no error path). Keep `config/filament.php` + `config/media-library.php` on `MEDIA_DISK`, keep media URLs relative (never `APP_URL`), build fields only with `MediaUpload`, never `vendor:publish` Filament's config over ours.
+16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them. Also: its ERR trap does not fire inside functions → a failed update leaves the site in maintenance mode.
 
 *New trap discovered → add numbered item same day.*
 

@@ -56,6 +56,9 @@ test('media operations: relocate command, deploy hooks and architecture doc are 
     assert.match(command, /media:relocate/);
     assert.match(deploy, /migrate; seed; storage_link; media_relocate; optimize/);
     assert.match(deploy, /migrate; storage_link; media_relocate; optimize/);
+    // `update` must continue in the freshly pulled copy of the script (bash already parsed the old one).
+    assert.match(deploy, /git pull --ff-only[^\n]*\n[\s\S]*?exec bash "\$APP_DIR\/scripts\/deploy-cpanel\.sh" update-steps/);
+    assert.match(deploy, /\n  update-steps\)[\s\S]*?media_relocate/);
     assert.match(doc, /MEDIA_DISK/);
     assert.match(doc, /media:relocate/);
     assert.match(optimisation, /media-architecture\.md/);
