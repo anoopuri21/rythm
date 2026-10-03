@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\SyncsResolvedMediaUrls;
+use App\Models\Contracts\HasResolvedMediaUrls;
 use App\Observers\CategoryObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -20,10 +22,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[Table('categories')]
 #[Fillable(['parent_id', 'name', 'slug', 'description', 'sort_order', 'is_active', 'seo_title', 'seo_description'])]
 #[ObservedBy(CategoryObserver::class)]
-class Category extends Model implements HasMedia
+class Category extends Model implements HasMedia, HasResolvedMediaUrls
 {
     use HasFactory;
     use InteractsWithMedia;
+    use SyncsResolvedMediaUrls;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -54,6 +57,19 @@ class Category extends Model implements HasMedia
     {
         return $this->belongsToMany(ProductAttribute::class)
             ->withPivot(['is_required', 'is_filterable', 'sort_order']);
+    }
+
+    /** Icon URL — the stored column first, Media Library for unsynced rows. */
+    public function iconUrl(): ?string
+    {
+        return $this->icon_url ?? $this->getFirstMedia('icon')?->getUrl();
+    }
+
+    public function resolvedMediaUrls(): array
+    {
+        return [
+            'icon_url' => $this->getFirstMedia('icon')?->getUrl(),
+        ];
     }
 
     public function registerMediaCollections(): void

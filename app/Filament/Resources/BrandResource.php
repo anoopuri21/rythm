@@ -16,7 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Filament\Columns\StoredMediaUrlColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -48,7 +48,8 @@ class BrandResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('logo')->collection('logo')->circular(),
+                // Stored URL column (M-7): no media query per row.
+                StoredMediaUrlColumn::make('logo_url')->label('Logo')->circular(),
                 TextColumn::make('name')->searchable()->sortable()->weight('bold'),
                 TextColumn::make('products_count')->counts('products')->sortable()->label('Products'),
                 TextColumn::make('sort_order')->sortable(),

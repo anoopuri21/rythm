@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\SyncsResolvedMediaUrls;
+use App\Models\Contracts\HasResolvedMediaUrls;
 use App\Observers\BrandObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -17,12 +19,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[Table('brands')]
 #[Fillable(['name', 'slug', 'description', 'sort_order', 'is_active'])]
 #[ObservedBy(BrandObserver::class)]
-class Brand extends Model implements HasMedia
+class Brand extends Model implements HasMedia, HasResolvedMediaUrls
 {
     use HasFactory;
     use InteractsWithMedia;
-
-    
+    use SyncsResolvedMediaUrls;
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -32,6 +33,19 @@ class Brand extends Model implements HasMedia
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /** Logo URL — the stored column first, Media Library for unsynced rows. */
+    public function logoUrl(): ?string
+    {
+        return $this->logo_url ?? $this->getFirstMedia('logo')?->getUrl();
+    }
+
+    public function resolvedMediaUrls(): array
+    {
+        return [
+            'logo_url' => $this->getFirstMedia('logo')?->getUrl(),
+        ];
     }
 
     public function registerMediaCollections(): void

@@ -107,8 +107,12 @@ Manual UAT (staging/prod):
 ## 5. Ops checklist (unchanged code — worth confirming on the host)
 
 - [ ] `php artisan storage:link` ran (else `/storage/...` image URLs 404).
-- [ ] PHP limits: `upload_max_filesize` / `post_max_size` ≥ 8M (gallery files
-      up to 5 MB, hero up to 8 MB).
+- [ ] PHP limits: `upload_max_filesize` ≥ 12M / `post_max_size` ≥ 16M.
+      Livewire uploads one temp file per request, so the ceiling is the
+      **largest single file** — gallery 5 MB, hero 8 MB (which the old
+      "≥ 8M" note would have rejected at exactly 8 MB), plus Livewire's
+      default temp-upload rule of `max:12288`. `memory_limit` ≥ 256M for the
+      queued WebP conversions (6000px originals ≈ 4 bytes/px in GD).
 - [ ] `storage/app/public` writable by the web user; cron runs
       `schedule:run` every minute (conversion jobs).
 - [ ] ~~Prod `.env`: `FILESYSTEM_DISK=public`~~ — **superseded 2026-10-03**: that

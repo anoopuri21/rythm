@@ -17,7 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Filament\Columns\StoredMediaUrlColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -59,7 +59,8 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('icon')->collection('icon')->circular(),
+                // Stored URL column (M-7): no media query per row.
+                StoredMediaUrlColumn::make('icon_url')->label('Icon')->circular(),
                 TextColumn::make('name')->searchable()->sortable()->weight('bold'),
                 TextColumn::make('parent.name')->placeholder('—')->label('Parent'),
                 TextColumn::make('products_count')->counts('products')->sortable()->label('Products'),

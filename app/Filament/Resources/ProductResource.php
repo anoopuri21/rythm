@@ -35,7 +35,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Filament\Columns\StoredMediaUrlColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
@@ -56,11 +56,15 @@ class ProductResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    /** Prevent N+1 on the list table (category/brand/gallery). */
+    /**
+     * Prevent N+1 on the list table. `media` is deliberately NOT loaded: the
+     * list thumbnail renders the stored `thumbnail_url` column (M-7), so the
+     * page no longer pulls every media row of every product.
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['category', 'brand', 'media', 'importSource']);
+            ->with(['category', 'brand', 'importSource']);
     }
 
     public static function form(Schema $form): Schema
@@ -211,7 +215,8 @@ class ProductResource extends Resource
                             ->description('Default product gallery (used when a variant has no images of its own).')
                             ->collapsible()
                             ->schema([
-                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12),
+                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12)
+                                    ->helperText('Up to 12 images. Drag to reorder — the first image is the card/hero image; PNG/JPG/WebP/AVIF, max 5 MB each.'),
                                 MediaUpload::single('og', 'og', maxSizeKb: 3072)->label('Social share image'),
                             ]),
                     ]),
@@ -226,7 +231,10 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('gallery')->collection('gallery')->circular(),
+                // Stored URL column (M-7): the 480px WebP when generated,
+                // else the original — resolved once per media change instead of
+                // per row render.
+                StoredMediaUrlColumn::make('thumbnail_url')->label('Image')->circular(),
                 TextColumn::make('name')->searchable()->sortable()->limit(38),
                 TextColumn::make('category.name')->badge()->color('gray'),
                 TextColumn::make('brand.name')->badge()->color('gray'),

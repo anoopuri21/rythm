@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\SyncsResolvedMediaUrls;
+use App\Models\Contracts\HasResolvedMediaUrls;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,13 +19,15 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('product_variants')]
 #[Fillable(['product_id', 'name', 'options', 'sku', 'price_override', 'stock', 'is_active'])]
-class ProductVariant extends Model implements HasMedia
+class ProductVariant extends Model implements HasMedia, HasResolvedMediaUrls
 {
     use HasFactory;
     use InteractsWithMedia;
+    use SyncsResolvedMediaUrls;
 
     protected $casts = [
         'options' => 'array',
+        'gallery_urls' => 'array',
         'price_override' => 'decimal:2',
         'stock' => 'integer',
         'is_active' => 'boolean',
@@ -141,15 +145,40 @@ class ProductVariant extends Model implements HasMedia
     }
 
     /**
+     * PDP gallery URLs — the stored column first (WebP conversion once the
+     * queue generated it, else the original), Media Library for unsynced rows.
+     *
      * @return list<string>
      */
     public function galleryUrls(): array
     {
-        return $this->getMedia('variant_gallery')
-            ->map(fn (Media $media): string => $media->getUrl())
-            ->filter()
-            ->values()
-            ->all();
+        $urls = $this->gallery_urls ?? [];
+
+        if ($urls === []) {
+            $urls = $this->getMedia('variant_gallery')
+                ->map(fn (Media $media): string => $media->getAvailableUrl(['variant-gallery-webp']))
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        return array_values($urls);
+    }
+
+    /**
+     * The values the URL columns must hold (source of truth = the collections).
+     *
+     * @see docs/media-architecture.md → M-7
+     */
+    public function resolvedMediaUrls(): array
+    {
+        return [
+            'gallery_urls' => $this->getMedia('variant_gallery')
+                ->map(fn (Media $media): string => $media->getAvailableUrl(['variant-gallery-webp']))
+                ->values()
+                ->all(),
+            'thumbnail_url' => $this->getFirstMedia('variant_gallery')?->getAvailableUrl(['variant-thumb-webp']),
+        ];
     }
 
     public function registerMediaCollections(): void
@@ -164,19 +193,31 @@ class ProductVariant extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Two sizes, same convention as Product: a small WebP for thumbnails
+        // and a 1200px WebP for the PDP gallery (the storefront swaps the
+        // gallery to these images when a variant is selected, so serving the
+        // untouched original — up to 5 MB — would break the page budget).
         $this->addMediaConversion('variant-thumb-webp')
             ->width(240)
             ->height(240)
             ->format('webp')
             ->quality(80)
             ->queued();
+
+        $this->addMediaConversion('variant-gallery-webp')
+            ->width(1200)
+            ->height(1200)
+            ->format('webp')
+            ->quality(84)
+            ->queued();
     }
 
     /**
-     * Get the first image for this variant.
+     * First image for this variant (stored column first, media fallback).
      */
     public function thumbnailImage(): ?string
     {
-        return $this->getFirstMedia('variant_gallery')?->getAvailableUrl(['variant-thumb-webp']);
+        return $this->thumbnail_url
+            ?? $this->getFirstMedia('variant_gallery')?->getAvailableUrl(['variant-thumb-webp']);
     }
 }

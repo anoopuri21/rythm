@@ -35,7 +35,15 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // NOT web-served. Laravel registers `GET /storage/{path}` for every
+            // local disk with `serve => true`; on the private disk that route
+            // requires a signed URL (403 in dev, 404 in production) and reads
+            // from storage/app/private. Because its URI defaults to `/storage`,
+            // it used to answer the storefront's media requests whenever the
+            // `public/storage` symlink was missing — every product image then
+            // 404'd in the panel and on the site. `/storage` belongs to the
+            // media disk below (see docs/media-architecture.md → M-2).
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -49,11 +57,20 @@ return [
         // domain, or on `www` vs apex. (An absolute APP_URL-based URL made both
         // <img> tags and Filament's file-upload preview fetch() fail silently.)
         // Set MEDIA_URL only to serve media from a CDN / other origin.
+        //
+        // `serve => true` makes Laravel itself answer `GET /storage/{path}` from
+        // THIS disk (visibility public → no signature needed). With the
+        // `public/storage` symlink in place the web server keeps serving those
+        // files statically and this route is never reached; without the symlink
+        // (fresh clone, cPanel plan B, Windows junction failed, `storage:link`
+        // forgotten) images still resolve instead of 404ing. Repair/verify with
+        // `php artisan media:doctor`.
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => rtrim((string) (env('MEDIA_URL') ?: '/storage'), '/'),
             'visibility' => 'public',
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

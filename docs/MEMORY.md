@@ -79,6 +79,89 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — "Upload ke baad image gayab / broken URL" — `/storage` route was owned by the private disk
+- Change-id: `arena/01a10254-rythm` (served-media-route)
+- Trigger: owner-ask (Hinglish bug report) — "admin panel me first upload par preview dikhta hai, par Save karne / page reload ke baad preview gayab ho jata hai; website par image broken aur uski `src` ka URL 404 deta hai."
+- Scope paths: `config/filesystems.php`, `app/Console/Commands/MediaDoctor.php` (new), `scripts/deploy-cpanel.sh`, `tests/Feature/MediaStorageTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/media-architecture.md` (§2b, M-2 row, ops, troubleshooting, tests), `docs/RULES.md` §7
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs-only [x] config [x] admin [ ] commerce [ ] security
+- Root cause (framework-level, not app code): Laravel's `FilesystemServiceProvider::serveFiles()` registers `GET|PUT /storage/{path}` for **every** local disk with `serve => true`, defaulting the URI to `/storage`. This repo had `serve => true` on the **private** `local` disk (`storage/app/private`) and no such key on the public media disk. Whenever `public/storage` was absent (fresh clone, cPanel Plan B, failed junction, `storage:link` forgotten) nothing served the file statically, so the private disk's route answered: `ServeFile` requires a signature unless `visibility === 'public'` → **403 in dev / 404 in production** for every image. The first-upload preview looked fine only because FilePond renders Livewire's temporary blob client-side; after Save both the panel preview and the storefront 404'd.
+- Fix: `serve => false` on `local`, `serve => true` on the public media disk in `config/filesystems.php` (only one disk may claim a URI — two served disks on one URI throw at boot). New `php artisan media:doctor [--fix]`: read-only diagnosis of the M-1/M-2 contract (one media disk, public visibility, host-relative URL), which disk owns `/storage`, the `public/storage` symlink, per-row originals + stale `generated_conversions`, and the stored URL columns (stale vs unresolved); `--fix` only performs idempotent repairs (`storage:link`, `media:relocate`, `media:sync-urls`). `scripts/deploy-cpanel.sh check` now runs it.
+- Checklist:
+  - [x] A1 Five always-read files respected (MEMORY/RULES/ARCHITECTURE mirrors updated; PHASES untouched — no phase moved)
+  - [x] A2 Scope stayed media-only (config + one new command + guards; M-7/M-8 contract untouched)
+  - [x] A3 Business rules unchanged — no pricing/stock/auth logic touched
+  - [x] A4 n/a (no totals/prices)
+  - [x] A5 n/a (no new request surface; the new /storage route belongs to the media disk, still unsigned + `visibility public`)
+  - [x] A6 Tests: node `tests/automation/media-architecture.test.mjs` → **14/14 pass** (3 new gates: serve flags, media:doctor + deploy check wiring, feature-coverage names); PHP feature cases added to `MediaStorageTest` (`/storage` served from the media disk without a symlink, private disk **not** served, exactly one `/storage` owner, `media:doctor` healthy/missing-original) — **PHP suite still NOT runnable here** (no PHP/composer/vendor/network) → must run on the host
+  - [x] A7/A8 n/a (no CSS/JS/Blade)
+  - [x] A9 No secrets; no vendor/node_modules
+  - [x] A10 Withheld pages / live pay untouched
+  - [x] A11 §C `Media storage` row updated (serve flags + `media:doctor`)
+  - [x] A12 §D locked decisions unchanged
+  - [x] A13 Footgun #20 added (`serve => true` on a second local disk silently hijacks `/storage`)
+  - [x] A14 Mirrors: `media-architecture.md` (§2b + M-2 row + ops + troubleshooting + tests), `RULES.md` §7 M7; ARCHITECTURE/PHASES/PRD n/a
+  - [x] A15 Owner summary + host checklist prepared
+- Risks / follow-ups: the fix is a config change — hosts must `php artisan config:clear` (a cached config keeps the old `serve` flags and the 404s persist); the static symlink stays the fast path (route only answers when no file is served first); `media:doctor` finding "stale stored URL" means the underlying media row still resolves to the same URL → that file must be restored or the image re-uploaded; unrelated pre-existing docs (`docs/DEPLOY_RHYTHM_STEP_BY_STEP.md`, `docs/MILESWEB_DEPLOYMENT.md`) still tell operators to set `FILESYSTEM_DISK=public` and contradict the M-1/M-2 contract — reconcile in a docs pass.
+- Status: COMPLETE (code) — owner action on the host: `php artisan config:clear`, `php artisan storage:link`, `php artisan media:doctor --fix`, `php artisan test`
+
+### 2026-10-03 — Admin-upload only: media URLs persisted in DB columns (M-7/M-8)
+- Change-id: `arena/01a10254-rythm` (media-url-columns)
+- Trigger: owner-ask — "import ki jarurat nahi hai. only admin se image upload hoga aur url DB me save hoga wahi se website and admin panel ke preview images use karenge." (decisions: hybrid storage · import dormant · all resources · migrate existing rows)
+- Scope paths: `database/migrations/2026_10_03_000001_add_resolved_media_url_columns.php`, `app/Models/{Contracts/HasResolvedMediaUrls,Concerns/SyncsResolvedMediaUrls}.php`, `app/Models/{Product,ProductVariant,Brand,Category,HeroSlide,HomepageBlock}.php`, `app/Observers/MediaUrlObserver.php`, `app/Console/Commands/SyncMediaUrls.php`, `app/Filament/Columns/StoredMediaUrlColumn.php`, `app/Filament/Resources/*Resource.php`, `app/Providers/AppServiceProvider.php`, `app/Http/Controllers/ProductController.php`, `app/Services/{HomepageDataService,MediaRelocationService}.php`, `scripts/deploy-cpanel.sh`, `tests/Feature/ResolvedMediaUrlTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/{media-architecture,media-optimization,ARCHITECTURE,RULES,PHASES,ADMIN_PRODUCT_UPLOAD_RUNBOOK,MEMORY}.md`, `tasks/ADMIN_MEDIA_URL_COLUMNS_PLAN.md`
+- Type tags: [x] code [x] migration [x] test [ ] front-build [ ] design-token [x] docs-only [x] config [x] admin [ ] commerce [x] security
+- What changed: hybrid model per owner's choice — Media Library stays the writer of truth (files + queued WebP conversions), and each media-bearing model now persists the resolved URL(s) in nullable columns; all reads are column-first with a Media Library fallback (legacy rows) and the committed-asset fallback after that. `MediaUrlObserver` (registered on `config('media-library.media_model')`) re-syncs the owner on upload / delete / drag-reorder / conversion completion / disk change with `forceFill()+saveQuietly()` (no audit noise, no mass-assignment path). `php artisan media:sync-urls [--dry-run|--only-missing]` backfills or repairs; deploy runs `--only-missing` after `media:relocate`. Admin lists now render the stored column via the new `StoredMediaUrlColumn` and ProductResource no longer eager-loads `media`. Import pipeline kept but **dormant** (M-6/RULES), admin upload is the only intake (M-8).
+- Two traps found while building this (footguns #18/#19): Filament's plain `ImageColumn` resolves its state as a **disk path** (`$disk->exists($state)` → `$disk->url($state)`), so a stored `/storage/…` web URL renders nothing — hence the app's own column class; and `MediaRelocationService` repoints media with `saveQuietly()`, which bypasses the observer, so it now syncs the owner explicitly.
+- Checklist:
+  - [x] A1 Read five always-read files before editing (MEMORY/RULES/ARCHITECTURE touched; PHASES/DESIGN read for mirrors)
+  - [x] A2 Touched only media-related paths (no drive-by refactors; `HomepageDataService` logo line + `ProductController` og line are the two consumers that had to follow)
+  - [x] A3 Business logic stays in services/models; the sync itself is a model concern, the backfill an Artisan command
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies untouched; URL columns are NOT fillable, so no request can set what the site displays
+  - [x] A6 Tests: **node** `node --test tests/automation/*.test.mjs` → 186 tests, 176 pass / 10 fail = the same 10 baseline failures (0 new); 3 new gates pass (columns+observer+command, admin stored-column rendering, deploy backfill). **PHP suite NOT run** — no PHP/Composer/vendor/network in this sandbox: `php artisan test` (new `ResolvedMediaUrlTest`, 11 cases) must run on a PHP host before merge
+  - [x] A7 `npm run build` n/a (no CSS/JS/Blade changed)
+  - [x] A8 Design tokens n/a (no styling)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C: `Media storage` + `Product media pipeline` rows refreshed (stored URL columns, M-7/M-8), new `Media URL columns` row added
+  - [x] A12 §D locked decisions unchanged (single-vendor, no guest checkout, etc.)
+  - [x] A13 Footguns #18 (Filament ImageColumn = disk path) + #19 (quiet media saves bypass the observer)
+  - [x] A14 Mirrors: `media-architecture.md` (M-7/M-8, §3, §4, §5 ops, §6 tests, troubleshooting), `media-optimization.md`, `ARCHITECTURE.md` §9, `RULES.md` §7, `PHASES.md` phase 6 (dormant), upload runbook; PRD/tracker n/a
+  - [x] A15 Owner summary prepared
+- Risks / follow-ups: columns are a cache — a media change made **outside** the app (raw SQL/rsync) leaves a stale URL until `media:sync-urls` runs (documented repair); `--only-missing` re-scans rows that legitimately have no `og` image every deploy (bounded, no write); conversion completion upgrades the column, but a page cached before that keeps the original URL until the cache turns over; only the admin upload path writes media now, so the import pipeline's dormant code must not be run without an owner command; PHP suite + one manual admin upload/reopen check still pending on a PHP host.
+- Status: COMPLETE (code) — owner action: run `php artisan test`, then `php artisan migrate` + `php artisan media:sync-urls` on the host (deploy script does both)
+
+### 2026-10-03 — Product image upload audit: variant gallery WebP, image order, upload bounds
+- Change-id: `arena/01a10254-rythm` (product-media-audit)
+- Trigger: owner-ask — "project overview lo aur image upload logic check karo. Start with the products." (products first; other media resources next)
+- Scope paths: `app/Models/{Product,ProductVariant}.php`, `app/Filament/Components/MediaUpload.php`, `app/Filament/Resources/ProductResource.php`, `tests/Feature/MediaStorageTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/{media-architecture,media-optimization,ADMIN_PRODUCT_UPLOAD_RUNBOOK,MEMORY}.md`, `tasks/ADMIN_PRODUCT_IMAGE_UPLOAD_FIX_PLAN.md`
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs-only [ ] config [x] admin [ ] commerce [ ] security
+- Findings (verified against the locked packages, not assumed: Filament **v5.7.6** `BaseFileUpload`/`FileUpload` + spatie-plugin v5.7.6, `spatie/laravel-medialibrary` **11.23.5** `FileAdder`/`ConversionCollection`/`Media`, Laravel **13.24** `ValidatesAttributes::validateDimensions`, Livewire 4.4.2 `FileUploadConfiguration`):
+  1. **Variant images were served as raw originals.** `ProductVariant::galleryUrls()` used `getUrl()` (full-size upload, up to 5 MB × 6 per variant) and the only variant conversion was a 240px thumb nothing rendered — so the PDP variant swap broke the ≤250 KB image budget. Fixed: `variant-gallery-webp` (1200×1200, q84, queued) + `getAvailableUrl(['variant-gallery-webp'])`.
+  2. **No way to choose the primary photo.** `heroImage()`/`thumbnailImage()` take the *first* media, but galleries were not `->reorderable()` → staff had to delete and re-upload to change the card image. Fixed: `MediaUpload::gallery()` is now reorderable (plugin persists `order_column` via `setNewOrder`).
+  3. **`og` images generated gallery WebP copies** (product conversions had no `performOnCollections`) — queue CPU + disk for files crawlers fetch as-is. Fixed: `->performOnCollections('gallery')`.
+  4. **Upload validation had no pixel bound.** `MediaUpload` bounded mime + bytes only, while `docs/media-optimization.md` claimed dimensions were bounded. A ≤5 MB flat PNG can decode to ~30 000², which OOMs the GD conversion and kills the scheduled queue worker. Fixed: `dimensions:max_width/max_height` (default 6000², overridable) added in the factory.
+  5. **Admin product list loaded full-size originals** for the thumbnail column (no `->conversion()`), i.e. up to 5 MB per row × page size. Fixed: `->conversion('thumb-webp')` (falls back to the original until generated).
+  6. **Ops guidance was wrong**: the fix-plan's "`post_max_size` ≥ 8M" would reject the 8 MB hero field exactly at the limit, and Livewire's unpublished temp rule is `max:12288`. Corrected in the runbook + plan (+ `memory_limit` ≥ 256M for 6000px conversions).
+- Not changed on purpose: no `acceptsMimeTypes()` on the collections. It looks like hardening, but `CatalogueAcquisitionService` accepts **GIF** for the import pipeline while the admin form does not — adding the guard without reconciling the two would break imports. Also no Filament `->image()` anywhere: it rewrites `acceptedFileTypes` to `image/*` and would re-admit SVG (script-capable).
+- Checklist:
+  - [x] A1 Read five always-read files before editing → `MEMORY.md` + media/runbook docs read in full; `ARCHITECTURE.md` §storefront/media; `RULES.md`/`PHASES.md`/`DESIGN.md` not re-read (no commerce/design/phase scope in this change)
+  - [x] A2 Touched only product-media paths (no drive-by refactors)
+  - [x] A3 No business/money/stock logic touched
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies untouched
+  - [x] A6 Tests: **node** `node --test tests/automation/*.test.mjs` → 183 tests, 173 pass / 10 fail vs baseline `HEAD` (181 / 170 / 11) → **0 new failures**, 2 new gates pass. **PHP suite NOT run:** this sandbox has no PHP/Composer/`vendor/` and no outbound network to install them — `php artisan test` (2 new cases in `MediaStorageTest`) must be run on a PHP host before merge
+  - [x] A7 `npm run build` n/a (no CSS/JS/Blade changed)
+  - [x] A8 Design tokens n/a (no UI styling)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C: `Media storage` row refreshed + `Product media pipeline` row added
+  - [x] A12 §D locked decisions unchanged
+  - [x] A13 Footgun #17 added (`->image()` widens to `image/*`; bound mime+bytes+pixels)
+  - [x] A14 Mirrors: `docs/media-architecture.md` (M-3, §4, §6), `docs/media-optimization.md`, `docs/ADMIN_PRODUCT_UPLOAD_RUNBOOK.md`, `tasks/ADMIN_PRODUCT_IMAGE_UPLOAD_FIX_PLAN.md`; PRD/PHASES/DESIGN/tracker n/a
+  - [x] A15 Owner summary prepared
+- Risks / follow-ups: variant-gallery WebP files appear only after the scheduled worker runs (`media-library:regenerate --only-missing` for images already uploaded); reordering only changes *display* order, never deletes files; the `og` scope means an admin who expects WebP for the social image now gets the original JPEG/PNG (intended — crawlers); remaining product-media observations **not** fixed here: product deletion is a soft delete so media rows/files stay (no orphan purge command), and the PDP thumbnail strip reuses the 1200px gallery URLs instead of the 480px thumbs. Other media resources (brand/category/hero/homepage block) audited only for the shared factory contract — full pass in a follow-up.
+- Status: COMPLETE (product media) — owner action: run `php artisan test` on a PHP host, then `npm run build` if any Blade/CSS is touched later
+
 ### 2026-10-03 — Media: preview stuck "loading" after save + images missing on storefront
 - Change-id: `arena/01a101b5-rythm` (media-disk-pin)
 - Trigger: bug (owner-ask: find real cause, simplify, enterprise-grade)
@@ -375,7 +458,10 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
-| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + imports + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload`; repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first, `MediaUrlObserver` keeps them fresh, `php artisan media:sync-urls` backfills/repairs | 2026-10-03 |
+| **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
+| **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
 | **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)
@@ -449,6 +535,13 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 15. **Media disk ≠ `FILESYSTEM_DISK`.** Filament's upload disk follows `config('filament.default_filesystem_disk')`; if that is the private `local` disk, saved images 403 on the storefront and the admin preview URL is signed + host-bound (FilePond spins forever — its `server.load` has no error path). Keep `config/filament.php` + `config/media-library.php` on `MEDIA_DISK`, keep media URLs relative (never `APP_URL`), build fields only with `MediaUpload`, never `vendor:publish` Filament's config over ours.
 16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them. Also: its ERR trap does not fire inside functions → a failed update leaves the site in maintenance mode.
 
+17. **Never add Filament's `->image()` to a media field.** It does not "validate an image" — it *rewrites* `acceptedFileTypes` to `image/*` (`packages/forms/src/Components/FileUpload.php`), which re-admits SVG (script-capable, same-origin `/storage`). Bounds are three-dimensional: mime list + `maxSize` (bytes) + `dimensions:max_width/max_height` (decode cost — a small file can decode to gigabytes and kill the queue worker). All three live only in `MediaUpload`.
+
+18. **Filament's `ImageColumn` reads its state as a path on the filesystem disk** (`$disk->exists($state)` then `$disk->url($state)`). A stored web URL like `/storage/12/a.webp` is looked up inside `storage/app/public/storage/…` and renders **nothing** (silent). For persisted media URLs use `App\Filament\Columns\StoredMediaUrlColumn` (returns app-relative state as-is) — the Spatie column resolves its own URLs, a plain `ImageColumn` does not.
+19. **`saveQuietly()` on a media row bypasses `MediaUrlObserver`.** Any code that repoints/deletes media quietly (e.g. `MediaRelocationService`) must call `syncResolvedMediaUrls()` on the owner itself, or the stored URL columns keep pointing at the old disk. Same applies to raw `DB::table('media')` writes — repair with `php artisan media:sync-urls`.
+
+20. **`serve => true` on any second local disk silently hijacks `/storage`.** Laravel registers `GET|PUT /storage/{path}` for *every* local disk with that flag (URI from the disk's `url`, else `/storage`) and throws at boot when two disks claim the same URI. On the **private** disk the route demands a signature unless `visibility === 'public'` → 403 (dev) / 404 (prod) for every image whenever `public/storage` is missing. So: `serve => true` **only** on the public media disk, `serve => false` on `local`; verify with `php artisan media:doctor`. A cached config (`config:clear`) keeps the old flags alive after a deploy.
+
 *New trap discovered → add numbered item same day.*
 
 ---
@@ -491,7 +584,10 @@ npm run build
 php artisan route:list
 php artisan migrate --force          # careful on shared DB
 php artisan storage:link             # public/storage -> storage/app/public (images)
+php artisan media:doctor            # WHY are images broken? disk/serve/symlink/files/URL columns (read-only)
+php artisan media:doctor --fix      # apply the safe repairs (storage:link, media:relocate, media:sync-urls)
 php artisan media:relocate --dry-run # then without --dry-run: move media to MEDIA_DISK
+php artisan media:sync-urls --dry-run # then without: refresh stored image-URL columns (M-7)
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 

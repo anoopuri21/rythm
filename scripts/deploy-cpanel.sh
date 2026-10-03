@@ -150,6 +150,24 @@ media_relocate() {
     || warn "media:relocate me issue aaya — upar ka output dekho, fix ke baad dobara chalao: $PHP_BIN artisan media:relocate"
 }
 
+# Har media-bearing row me resolved image URL DB column me hona chahiye
+# (docs/media-architecture.md → M-7). Observer naye uploads khud sync karta hai;
+# ye step un rows ko cover karta hai jo columns add hone se pehle bane the.
+# Idempotent + bounded: sirf missing columns wali rows dekhta hai. Deploy fail nahi karta.
+media_sync_urls() {
+  say "Purane products/variants/brands ki image URLs DB columns me bhar rahe hain"
+  "$PHP_BIN" artisan media:sync-urls --only-missing \
+    || warn "media:sync-urls me issue aaya — upar ka output dekho, fix ke baad dobara chalao: $PHP_BIN artisan media:sync-urls"
+}
+
+# Ek command me pura image chain verify karo: disk config, /storage ka owner,
+# symlink, files ki mojudgi, URL columns. Read-only — kuch delete nahi karta.
+# Fail hone par exit code non-zero deta hai, isliye `check` me `|| true`.
+media_doctor() {
+  say "Media doctor — images ka pura chain check"
+  "$PHP_BIN" artisan media:doctor || warn "Media doctor ne problem batayi — upar ka output dekho, ya chalao: $PHP_BIN artisan media:doctor --fix"
+}
+
 optimize() {
   say "Cache rebuild (site fast karne ke liye)"
   "$PHP_BIN" artisan optimize:clear
@@ -214,7 +232,7 @@ maybe_sync_public() {
 case "${1:-}" in
   setup)
     php_version_check; require_env; install_deps; check_assets
-    app_key; storage_perms; db_check; migrate; seed; storage_link; media_relocate; optimize
+    app_key; storage_perms; db_check; migrate; seed; storage_link; media_relocate; media_sync_urls; optimize
     maybe_sync_public; health
     say "SETUP COMPLETE 🎉  Ab browser me apna domain kholo." ;;
   update)
@@ -231,14 +249,14 @@ case "${1:-}" in
   update-steps)
     # 2nd half of `update` (internal): always executed by the freshly pulled copy of this script.
     trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
-    install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; optimize
+    install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; media_sync_urls; optimize
     maybe_sync_public
     trap - ERR
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
-    php_version_check; check_assets; require_env; db_check; health ;;
+    php_version_check; check_assets; require_env; db_check; health; media_doctor || true ;;
   sync-public)
     sync_public ;;
   *)

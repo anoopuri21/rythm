@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Contracts\HasResolvedMediaUrls;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -155,7 +156,17 @@ final class MediaRelocationService
 
             $media->disk = $target;
             $media->conversions_disk = $target;
+            // Quiet on purpose: a normal save would re-trigger Spatie's own
+            // MediaObserver (path/file-name syncing) mid-relocation.
             $media->saveQuietly();
+
+            // …which means MediaUrlObserver does not see this change, so the
+            // owner's stored URL columns (M-7) must be refreshed explicitly —
+            // the URLs just moved to another disk.
+            $owner = $media->model;
+            if ($owner instanceof HasResolvedMediaUrls) {
+                $owner->syncResolvedMediaUrls();
+            }
 
             $this->removeSources($plan, $generator->getPath($media));
         }

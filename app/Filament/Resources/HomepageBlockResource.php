@@ -15,7 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Filament\Columns\StoredMediaUrlColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -58,7 +58,8 @@ class HomepageBlockResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('image')->collection('image')->square()->label('Image'),
+                // Stored URL column (M-7): no media query per row.
+                StoredMediaUrlColumn::make('image_url')->label('Image')->square(),
                 TextColumn::make('section_key')->badge()->sortable(),
                 TextColumn::make('title')->searchable()->sortable()->weight('bold')->limit(34),
                 TextColumn::make('content')->limit(44)->toggleable(),

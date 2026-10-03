@@ -116,10 +116,13 @@
 
 | # | Rule |
 |---|---|
-| M1 | Product imagery: managed MediaLibrary first; keep license/source discipline. |
+| M1 | Product imagery comes from the **admin panel only** (`MediaUpload` → `MEDIA_DISK`), stored via MediaLibrary and read from the persisted URL columns; keep license/source discipline. |
 | M2 | No hotlinked random copyrighted assets. |
 | M3 | SEO: unique title/description, semantic headings, JSON-LD where implemented (Product/FAQ). |
 | M4 | Seeds and fixtures ≠ production catalogue rights clearance. |
+| M5 | Storefront and admin render the **stored URL columns** (M-7) — never re-resolve media per row in a table, never store absolute/CDN-bound URLs in them. |
+| M7 | `/storage/...` is served by the **media disk only** (`serve => true` there, `serve => false` on the private `local` disk). Two served local disks on the same URI throw at boot; on the private disk Laravel's route demands a signature → 403/404 without the `public/storage` symlink. Verify with `php artisan media:doctor`. |
+| M6 | The catalogue acquisition/import pipeline is **dormant** (owner decision 2026-10-03): do not run it, extend it, or add it back as a catalogue source without an explicit owner command. |
 
 ---
 
