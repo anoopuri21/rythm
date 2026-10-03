@@ -157,8 +157,9 @@ Admin: Filament `/admin` only (no public REST admin API).
 ## 9. Data & media
 
 - Money: consistent decimal strategy; display formatting non-authoritative.  
-- Media collections: product `gallery`/`og`, category `icon`, brand `logo`, hero, homepage blocks.  
-- Image resolve: MediaLibrary → `public/images/products/{slug}.jpg` → fallback.  
+- Media collections: product `gallery`/`og`, variant `variant_gallery`, category `icon`, brand `logo`, hero, homepage blocks.  
+- Image resolve: MediaLibrary (WebP conversion once generated, else original — `getAvailableUrl()`) → `public/images/products/{slug}.jpg` → fallback.  
+- **Media storage contract** (`docs/media-architecture.md`): one public disk `MEDIA_DISK` for panel uploads + imports + storefront (independent of `FILESYSTEM_DISK`); host-relative `/storage/...` URLs (never `APP_URL`/signed); admin fields only via `App\Filament\Components\MediaUpload`; `og:image`/JSON-LD made absolute with `url()`; repair via `php artisan media:relocate` (`MediaRelocationService`).  
 - Seeds = demo only, not production stock/legal consent.  
 - `config/rythme.php` + Site Settings for brand/contact/shipping fallbacks.  
 - Outbound mail **From**: `MailSenderSettingsService` — admin-set address is live only after signed `/mail/from/verify`; otherwise `MAIL_FROM_*`. SMTP/API stays in `.env`.  

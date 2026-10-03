@@ -38,6 +38,8 @@
 
 **If it does not show:** Active off? Stock 0 with no purchasable path? Wrong category filter? Cache — hard refresh.
 
+**If an image preview keeps "loading" after you save and reopen, or the photo is missing on the site:** this is a server storage problem, not the photo. Ask whoever runs the server to run `php artisan storage:link` and `php artisan media:relocate` (see `docs/media-architecture.md` → Troubleshooting).
+
 ---
 
 ## 2. Product with variants (colour / finish / size)
@@ -98,7 +100,7 @@ Row action **View** opens live PDP for active products.
 ## 6. After upload checklist
 
 - [ ] Active ON  
-- [ ] At least one gallery image (product or every variant)  
+- [ ] At least one gallery image (product or every variant); after **Save**, reopen the product — thumbnails must still show  
 - [ ] Price > 0  
 - [ ] Stock path exists (base or variant)  
 - [ ] Category + brand set  
@@ -107,4 +109,4 @@ Row action **View** opens live PDP for active products.
 
 ---
 
-*Related: `docs/CLIENT_HANDOVER_DETAILS.md` · `docs/C2_VARIANT_DEPTH_PLAN.md` · `docs/PRODUCTION_PRIORITY_PLAN.md`*
+*Related: `docs/CLIENT_HANDOVER_DETAILS.md` · `docs/C2_VARIANT_DEPTH_PLAN.md` · `docs/PRODUCTION_PRIORITY_PLAN.md` · `docs/media-architecture.md`*
