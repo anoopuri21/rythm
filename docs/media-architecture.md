@@ -69,7 +69,9 @@ in dev, 404 in production — for every image, however healthy the upload was.
 Fix: `serve => false` on `local`, `serve => true` on the public media disk
 (`config/filesystems.php`). With the symlink present the web server keeps serving
 statically and the route is never reached; without it, Laravel now streams the
-file from the media disk instead of rejecting it. `php artisan media:doctor`
+file from the media disk instead of rejecting it. The flag also registers
+Laravel's `PUT /storage/{path}`, but that handler (`ReceiveFile`) requires
+`upload=1` **plus** a valid signature, so no unsigned write path is opened. `php artisan media:doctor`
 proves the whole chain (`/storage` owner, symlink, per-row files, stored URL
 columns) and `--fix` repairs the safe parts.
 
