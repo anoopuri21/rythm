@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Resources\HeroSlideResource\Pages;
 use App\Models\HeroSlide;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -46,13 +46,9 @@ class HeroSlideResource extends Resource
                     Toggle::make('is_active')->default(true),
                 ])->columns(2),
                 Tabs\Tab::make('Images')->schema([
-                    SpatieMediaLibraryFileUpload::make('desktop_image')
-                        ->collection('desktop_image')->image()->maxFiles(1)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(8192)
+                    MediaUpload::single('desktop_image', 'desktop_image', maxSizeKb: 8192)
                         ->helperText('Desktop (≥768px): large landscape banner, ~1500×800.'),
-                    SpatieMediaLibraryFileUpload::make('mobile_image')
-                        ->collection('mobile_image')->image()->maxFiles(1)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(6144)
+                    MediaUpload::single('mobile_image', 'mobile_image', maxSizeKb: 6144)
                         ->helperText('Mobile (<768px): portrait banner, ~900×1200.'),
                 ])->columns(2),
             ])->columnSpanFull(),

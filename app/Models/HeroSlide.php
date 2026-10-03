@@ -55,24 +55,11 @@ class HeroSlide extends Model implements HasMedia
 
     public function desktopImageUrl(): ?string
     {
-        return $this->convertedUrl('desktop_image', 'hero-desktop-webp');
+        return $this->getFirstMedia('desktop_image')?->getAvailableUrl(['hero-desktop-webp']);
     }
 
     public function mobileImageUrl(): ?string
     {
-        return $this->convertedUrl('mobile_image', 'hero-mobile-webp');
-    }
-
-    private function convertedUrl(string $collection, string $conversion): ?string
-    {
-        $media = $this->getFirstMedia($collection);
-
-        if ($media === null) {
-            return null;
-        }
-
-        return $media->hasGeneratedConversion($conversion)
-            ? $media->getUrl($conversion)
-            : $media->getUrl();
+        return $this->getFirstMedia('mobile_image')?->getAvailableUrl(['hero-mobile-webp']);
     }
 }
