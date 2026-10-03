@@ -37,6 +37,7 @@ use App\Models\Shipment;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Observers\AdminAuditableObserver;
+use App\Observers\MediaUrlObserver;
 use App\Observers\PageObserver;
 use App\Observers\ProductHomepageObserver;
 use App\Policies\AuditPolicy;
@@ -64,6 +65,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -108,6 +110,11 @@ class AppServiceProvider extends ServiceProvider
 
         Product::observe(ProductHomepageObserver::class);
         Page::observe(PageObserver::class);
+
+        // Keeps the persisted media-URL columns in step with the media rows
+        // (upload / delete / reorder / conversion generated) — M-7.
+        $mediaModel = (string) config('media-library.media_model', Media::class);
+        $mediaModel::observe(MediaUrlObserver::class);
 
         foreach ([
             Product::class,

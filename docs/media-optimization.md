@@ -21,6 +21,18 @@ Products preserve aspect ratio and use `object-fit: contain`. Existing locally c
 
 Gallery order decides which photo is the primary one (`heroImage()` / `thumbnailImage()` take the first item) — admins reorder with drag-and-drop in the panel (`MediaUpload::gallery()` → `->reorderable()`, persisted in `order_column`).
 
+## Stored URL columns (M-7)
+
+Each model also keeps the resolved URLs in DB columns
+(`products.thumbnail_url`/`gallery_urls`/`og_image_url`, …) and all reads are
+column-first. Consequence for optimisation: when the queued WebP conversion
+finishes, `MediaUrlObserver` rewrites the column from the original URL to the
+WebP URL — no cache warm-up or manual step needed, and the storefront picks the
+smaller file up on the next request. Until then the column holds the original,
+so nothing 404s during the queue delay. A row whose column has never been
+resolved (pre-migration data) falls back to Media Library; `php artisan
+media:sync-urls` fills those in (deploy runs it with `--only-missing`).
+
 ## Hero media pipeline
 
 `HeroSlide` defines collection-specific queued conversions:
@@ -57,6 +69,7 @@ Confirm the installed Media Library version supports the option before execution
 - Upload MIME, pixel dimensions and file size must be bounded by admin validation — all three live in `app/Filament/Components/MediaUpload.php` (mime list, `maxSize` in KB, `dimensions:max_width/max_height`). The pixel bound is what keeps a small-but-huge-decoded file (a 5 MB flat PNG can decode to gigabytes) from killing the shared-hosting queue worker, because conversion runs through GD/Imagick.
 - PHP limits must fit the largest *single* file, not the whole gallery: Livewire uploads one temp file per request, so `upload_max_filesize` ≥ 12M and `post_max_size` ≥ 16M cover the 8 MB hero field and Filament's 5 MB gallery fields (Livewire's unpublished default temp-upload rule is `max:12288`; a value above that needs `config/livewire.php`). Conversion memory needs roughly 4 bytes per pixel of the original — keep `memory_limit` ≥ 256M for 6000px sources.
 - Preserve originals for controlled regeneration, subject to storage policy.
+- Admin panel is the only image intake (M-8): the catalogue acquisition/import pipeline is dormant; uploaded media is stored locally by `MediaUpload`, and its resolved URL is persisted in the model's URL column.
 - Conversion directories require writable shared-host permissions and public storage linkage (`php artisan storage:link`).
 - Originals, conversions and responsive images all live on the one public media disk (`MEDIA_DISK`); `php artisan media:relocate` moves anything stored elsewhere.
 - Do not infer publication approval from successful conversion.

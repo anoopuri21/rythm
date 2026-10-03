@@ -79,6 +79,32 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — Admin-upload only: media URLs persisted in DB columns (M-7/M-8)
+- Change-id: `arena/01a10254-rythm` (media-url-columns)
+- Trigger: owner-ask — "import ki jarurat nahi hai. only admin se image upload hoga aur url DB me save hoga wahi se website and admin panel ke preview images use karenge." (decisions: hybrid storage · import dormant · all resources · migrate existing rows)
+- Scope paths: `database/migrations/2026_10_03_000001_add_resolved_media_url_columns.php`, `app/Models/{Contracts/HasResolvedMediaUrls,Concerns/SyncsResolvedMediaUrls}.php`, `app/Models/{Product,ProductVariant,Brand,Category,HeroSlide,HomepageBlock}.php`, `app/Observers/MediaUrlObserver.php`, `app/Console/Commands/SyncMediaUrls.php`, `app/Filament/Columns/StoredMediaUrlColumn.php`, `app/Filament/Resources/*Resource.php`, `app/Providers/AppServiceProvider.php`, `app/Http/Controllers/ProductController.php`, `app/Services/{HomepageDataService,MediaRelocationService}.php`, `scripts/deploy-cpanel.sh`, `tests/Feature/ResolvedMediaUrlTest.php`, `tests/automation/media-architecture.test.mjs`, `docs/{media-architecture,media-optimization,ARCHITECTURE,RULES,PHASES,ADMIN_PRODUCT_UPLOAD_RUNBOOK,MEMORY}.md`, `tasks/ADMIN_MEDIA_URL_COLUMNS_PLAN.md`
+- Type tags: [x] code [x] migration [x] test [ ] front-build [ ] design-token [x] docs-only [x] config [x] admin [ ] commerce [x] security
+- What changed: hybrid model per owner's choice — Media Library stays the writer of truth (files + queued WebP conversions), and each media-bearing model now persists the resolved URL(s) in nullable columns; all reads are column-first with a Media Library fallback (legacy rows) and the committed-asset fallback after that. `MediaUrlObserver` (registered on `config('media-library.media_model')`) re-syncs the owner on upload / delete / drag-reorder / conversion completion / disk change with `forceFill()+saveQuietly()` (no audit noise, no mass-assignment path). `php artisan media:sync-urls [--dry-run|--only-missing]` backfills or repairs; deploy runs `--only-missing` after `media:relocate`. Admin lists now render the stored column via the new `StoredMediaUrlColumn` and ProductResource no longer eager-loads `media`. Import pipeline kept but **dormant** (M-6/RULES), admin upload is the only intake (M-8).
+- Two traps found while building this (footguns #18/#19): Filament's plain `ImageColumn` resolves its state as a **disk path** (`$disk->exists($state)` → `$disk->url($state)`), so a stored `/storage/…` web URL renders nothing — hence the app's own column class; and `MediaRelocationService` repoints media with `saveQuietly()`, which bypasses the observer, so it now syncs the owner explicitly.
+- Checklist:
+  - [x] A1 Read five always-read files before editing (MEMORY/RULES/ARCHITECTURE touched; PHASES/DESIGN read for mirrors)
+  - [x] A2 Touched only media-related paths (no drive-by refactors; `HomepageDataService` logo line + `ProductController` og line are the two consumers that had to follow)
+  - [x] A3 Business logic stays in services/models; the sync itself is a model concern, the backfill an Artisan command
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies untouched; URL columns are NOT fillable, so no request can set what the site displays
+  - [x] A6 Tests: **node** `node --test tests/automation/*.test.mjs` → 186 tests, 176 pass / 10 fail = the same 10 baseline failures (0 new); 3 new gates pass (columns+observer+command, admin stored-column rendering, deploy backfill). **PHP suite NOT run** — no PHP/Composer/vendor/network in this sandbox: `php artisan test` (new `ResolvedMediaUrlTest`, 11 cases) must run on a PHP host before merge
+  - [x] A7 `npm run build` n/a (no CSS/JS/Blade changed)
+  - [x] A8 Design tokens n/a (no styling)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C: `Media storage` + `Product media pipeline` rows refreshed (stored URL columns, M-7/M-8), new `Media URL columns` row added
+  - [x] A12 §D locked decisions unchanged (single-vendor, no guest checkout, etc.)
+  - [x] A13 Footguns #18 (Filament ImageColumn = disk path) + #19 (quiet media saves bypass the observer)
+  - [x] A14 Mirrors: `media-architecture.md` (M-7/M-8, §3, §4, §5 ops, §6 tests, troubleshooting), `media-optimization.md`, `ARCHITECTURE.md` §9, `RULES.md` §7, `PHASES.md` phase 6 (dormant), upload runbook; PRD/tracker n/a
+  - [x] A15 Owner summary prepared
+- Risks / follow-ups: columns are a cache — a media change made **outside** the app (raw SQL/rsync) leaves a stale URL until `media:sync-urls` runs (documented repair); `--only-missing` re-scans rows that legitimately have no `og` image every deploy (bounded, no write); conversion completion upgrades the column, but a page cached before that keeps the original URL until the cache turns over; only the admin upload path writes media now, so the import pipeline's dormant code must not be run without an owner command; PHP suite + one manual admin upload/reopen check still pending on a PHP host.
+- Status: COMPLETE (code) — owner action: run `php artisan test`, then `php artisan migrate` + `php artisan media:sync-urls` on the host (deploy script does both)
+
 ### 2026-10-03 — Product image upload audit: variant gallery WebP, image order, upload bounds
 - Change-id: `arena/01a10254-rythm` (product-media-audit)
 - Trigger: owner-ask — "project overview lo aur image upload logic check karo. Start with the products." (products first; other media resources next)
@@ -407,7 +433,9 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
-| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + imports + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first, `MediaUrlObserver` keeps them fresh, `php artisan media:sync-urls` backfills/repairs | 2026-10-03 |
+| **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
 | **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
 | **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
 
@@ -484,6 +512,9 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 
 17. **Never add Filament's `->image()` to a media field.** It does not "validate an image" — it *rewrites* `acceptedFileTypes` to `image/*` (`packages/forms/src/Components/FileUpload.php`), which re-admits SVG (script-capable, same-origin `/storage`). Bounds are three-dimensional: mime list + `maxSize` (bytes) + `dimensions:max_width/max_height` (decode cost — a small file can decode to gigabytes and kill the queue worker). All three live only in `MediaUpload`.
 
+18. **Filament's `ImageColumn` reads its state as a path on the filesystem disk** (`$disk->exists($state)` then `$disk->url($state)`). A stored web URL like `/storage/12/a.webp` is looked up inside `storage/app/public/storage/…` and renders **nothing** (silent). For persisted media URLs use `App\Filament\Columns\StoredMediaUrlColumn` (returns app-relative state as-is) — the Spatie column resolves its own URLs, a plain `ImageColumn` does not.
+19. **`saveQuietly()` on a media row bypasses `MediaUrlObserver`.** Any code that repoints/deletes media quietly (e.g. `MediaRelocationService`) must call `syncResolvedMediaUrls()` on the owner itself, or the stored URL columns keep pointing at the old disk. Same applies to raw `DB::table('media')` writes — repair with `php artisan media:sync-urls`.
+
 *New trap discovered → add numbered item same day.*
 
 ---
@@ -527,6 +558,7 @@ php artisan route:list
 php artisan migrate --force          # careful on shared DB
 php artisan storage:link             # public/storage -> storage/app/public (images)
 php artisan media:relocate --dry-run # then without --dry-run: move media to MEDIA_DISK
+php artisan media:sync-urls --dry-run # then without: refresh stored image-URL columns (M-7)
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 

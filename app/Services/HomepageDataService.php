@@ -113,13 +113,13 @@ final class HomepageDataService
             ->limit(16)
             ->get()
             ->map(function (Brand $brand): array {
-                $logo = $brand->getFirstMediaUrl('logo');
-
+                // Stored URL column first (M-7); `media` stays eager-loaded so
+                // rows the backfill has not reached yet resolve without N+1.
                 return [
                     'name' => $brand->name,
                     'slug' => $brand->slug,
                     'count' => (int) $brand->products_count,
-                    'logo' => $logo !== '' ? $logo : null,
+                    'logo' => $brand->logoUrl(),
                 ];
             })
             ->values();

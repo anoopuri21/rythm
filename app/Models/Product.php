@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\SanitizedHtml;
+use App\Models\Concerns\SyncsResolvedMediaUrls;
+use App\Models\Contracts\HasResolvedMediaUrls;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,14 +24,16 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Table('products')]
 #[Fillable(['category_id', 'brand_id', 'name', 'slug', 'sku', 'hsn_code', 'tax_classification', 'tax_rate', 'short_description', 'description', 'price', 'compare_at_price', 'stock', 'low_stock_threshold', 'is_active', 'is_featured', 'featured_rank', 'is_trending', 'meta_title', 'meta_description'])]
-class Product extends Model implements HasMedia
+class Product extends Model implements HasMedia, HasResolvedMediaUrls
 {
     use HasFactory;
     use InteractsWithMedia;
     use SoftDeletes;
+    use SyncsResolvedMediaUrls;
 
     protected $casts = [
         'description' => SanitizedHtml::class,
+        'gallery_urls' => 'array',
         'price' => 'decimal:2',
         'tax_rate' => 'decimal:4',
         'compare_at_price' => 'decimal:2',
@@ -177,42 +181,76 @@ class Product extends Model implements HasMedia
     /**
      * Best available product image URL (large, for the product page / social).
      *
-     * 1. Spatie media (admin-uploaded / attached), if any — the WebP
-     *    conversion once the queue has generated it, else the original.
-     * 2. Committed public asset: public/images/products/{slug}.jpg
+     * 1. The stored `gallery_urls` column (kept in sync by MediaUrlObserver) —
+     *    the WebP conversion once the queue has generated it, else the original.
+     * 2. Media Library, for rows the column has not been resolved for yet.
+     * 3. Committed public asset: public/images/products/{slug}.jpg
      *    (reset-proof — travels with the git repo, needs no storage disk).
-     * 3. null — caller decides the final placeholder.
+     * 4. null — caller decides the final placeholder.
+     *
+     * @see docs/media-architecture.md → M-7
      */
     public function heroImage(): ?string
     {
-        return $this->getFirstMedia('gallery')?->getAvailableUrl(['gallery-webp'])
+        return $this->gallery_urls[0]
+            ?? $this->getFirstMedia('gallery')?->getAvailableUrl(['gallery-webp'])
             ?? $this->committedImageUrl();
     }
 
     /** Card-sized product image URL (same fallback chain as heroImage()). */
     public function thumbnailImage(): ?string
     {
-        return $this->getFirstMedia('gallery')?->getAvailableUrl(['thumb-webp'])
+        return $this->thumbnail_url
+            ?? $this->getFirstMedia('gallery')?->getAvailableUrl(['thumb-webp'])
             ?? $this->committedImageUrl();
     }
 
+    /** Social-share image URL (`og` collection), else the hero image. */
+    public function ogImage(): ?string
+    {
+        return $this->og_image_url
+            ?? $this->getFirstMedia('og')?->getUrl()
+            ?? $this->heroImage();
+    }
+
     /**
-     * Gallery image URLs (media first, committed fallback, else []).
+     * Gallery image URLs (stored column first, media fallback, committed fallback, else []).
      *
      * @return list<string>
      */
     public function galleryImages(): array
     {
-        $urls = $this->getMedia('gallery')
-            ->map(fn (Media $media): string => $media->getAvailableUrl(['gallery-webp']))
-            ->values()
-            ->all();
+        $urls = $this->gallery_urls ?? [];
+
+        if ($urls === []) {
+            $urls = $this->getMedia('gallery')
+                ->map(fn (Media $media): string => $media->getAvailableUrl(['gallery-webp']))
+                ->values()
+                ->all();
+        }
 
         if ($urls === [] && ($fallback = $this->committedImageUrl()) !== null) {
             $urls = [$fallback];
         }
 
-        return $urls;
+        return array_values($urls);
+    }
+
+    /**
+     * The values the URL columns must hold (source of truth = the collections).
+     *
+     * @see docs/media-architecture.md → M-7
+     */
+    public function resolvedMediaUrls(): array
+    {
+        return [
+            'gallery_urls' => $this->getMedia('gallery')
+                ->map(fn (Media $media): string => $media->getAvailableUrl(['gallery-webp']))
+                ->values()
+                ->all(),
+            'thumbnail_url' => $this->getFirstMedia('gallery')?->getAvailableUrl(['thumb-webp']),
+            'og_image_url' => $this->getFirstMedia('og')?->getUrl(),
+        ];
     }
 
     private function committedImageUrl(): ?string

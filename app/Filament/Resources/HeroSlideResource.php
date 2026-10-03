@@ -14,7 +14,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use App\Filament\Columns\StoredMediaUrlColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -59,7 +59,8 @@ class HeroSlideResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('desktop_image')->collection('desktop_image')->square()->label('Image'),
+                // Stored URL column (M-7): no media query per row.
+                StoredMediaUrlColumn::make('desktop_image_url')->label('Image')->square(),
                 TextColumn::make('title')->searchable()->sortable()->weight('bold')->limit(30),
                 TextColumn::make('eyebrow')->limit(24)->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')->sortable()->label('Order'),

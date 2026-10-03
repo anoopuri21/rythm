@@ -34,7 +34,7 @@
 | **3** | Homepage + Shop frontend qualification | COMPLETE |
 | **4** | Accounts, cart, wishlist, checkout, orders | COMPLETE |
 | **5** | Reviews, coupons (product Q&A later **removed**) | COMPLETE |
-| **6** | Catalogue acquisition/import pipeline | COMPLETE |
+| **6** | Catalogue acquisition/import pipeline | COMPLETE — **dormant** since 2026-10-03 (admin upload is the only image intake; code kept, not used) |
 | **6A** | Multi-category catalogue + HP/Shop expansion | COMPLETE |
 | **7** | Admin RBAC, staff, auditability | COMPLETE |
 | **8** | Payment, refunds, financial reconciliation | COMPLETE |
