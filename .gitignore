@@ -19,6 +19,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
+# Spatie Media Library conversion scratch space (config media-library.temporary_directory_path)
+/storage/media-library
 /vendor
 Homestead.json
 Homestead.yaml

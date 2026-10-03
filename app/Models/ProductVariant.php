@@ -177,14 +177,6 @@ class ProductVariant extends Model implements HasMedia
      */
     public function thumbnailImage(): ?string
     {
-        $media = $this->getFirstMedia('variant_gallery');
-
-        if ($media !== null) {
-            return $media->hasGeneratedConversion('variant-thumb-webp')
-                ? $media->getUrl('variant-thumb-webp')
-                : $media->getUrl();
-        }
-
-        return null;
+        return $this->getFirstMedia('variant_gallery')?->getAvailableUrl(['variant-thumb-webp']);
     }
 }

@@ -111,10 +111,12 @@ Manual UAT (staging/prod):
       up to 5 MB, hero up to 8 MB).
 - [ ] `storage/app/public` writable by the web user; cron runs
       `schedule:run` every minute (conversion jobs).
-- [ ] Prod `.env`: `FILESYSTEM_DISK=public` (already in
-      `.env.production.example`). Note: dev default `FILESYSTEM_DISK=local`
-      stores uploads on the private disk — images won't render locally; use
-      `public` in `.env` when working on media.
+- [ ] ~~Prod `.env`: `FILESYSTEM_DISK=public`~~ — **superseded 2026-10-03**: that
+      advice treated the wrong disk as an ops detail, but it was the real cause of
+      "preview stuck loading after save / no images on the website". Media now has
+      its own pinned setting (`MEDIA_DISK`, independent of `FILESYSTEM_DISK`) and
+      host-relative URLs. See `docs/media-architecture.md`; repair old rows with
+      `php artisan media:relocate`.
 
 ## 6. What was *not* the problem
 

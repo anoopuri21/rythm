@@ -40,10 +40,19 @@ return [
             'report' => false,
         ],
 
+        // Publicly readable disk — admin-managed media (product / brand /
+        // category / hero images) lives here (see MEDIA_DISK + docs/media-architecture.md).
+        //
+        // `url` is deliberately a RELATIVE path. A browser resolves it against
+        // whatever origin it loaded the page from, so media keeps working when
+        // APP_URL is wrong/empty, behind a TLS-terminating proxy, on a preview
+        // domain, or on `www` vs apex. (An absolute APP_URL-based URL made both
+        // <img> tags and Filament's file-upload preview fetch() fail silently.)
+        // Set MEDIA_URL only to serve media from a CDN / other origin.
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'url' => rtrim((string) (env('MEDIA_URL') ?: '/storage'), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

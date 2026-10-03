@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
@@ -11,7 +12,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -49,9 +49,7 @@ class CategoryResource extends Resource
             TextInput::make('sort_order')->numeric()->default(0),
             Toggle::make('is_active')->default(true),
             Textarea::make('description')->rows(3),
-            SpatieMediaLibraryFileUpload::make('icon')
-                ->collection('icon')->image()->maxFiles(1)->label('Category icon')
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(2048),
+            MediaUpload::single('icon', 'icon', maxSizeKb: 2048)->label('Category icon'),
             TextInput::make('seo_title')->maxLength(70),
             Textarea::make('seo_description')->rows(2)->maxLength(160),
         ])->columns(2);

@@ -79,6 +79,32 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-03 — Media: preview stuck "loading" after save + images missing on storefront
+- Change-id: `arena/01a101b5-rythm` (media-disk-pin)
+- Trigger: bug (owner-ask: find real cause, simplify, enterprise-grade)
+- Scope paths: `config/{filament,media-library,filesystems}.php`, `app/Filament/Components/MediaUpload.php`, `app/Filament/Resources/{Product,Brand,Category,HeroSlide,HomepageBlock}Resource.php`, `app/Models/{Product,ProductVariant,HeroSlide}.php`, `app/Services/MediaRelocationService.php`, `app/Console/Commands/RelocateMedia.php`, `resources/views/{layouts/app,product/show}.blade.php`, `scripts/deploy-cpanel.sh`, `.env*.example`, `.gitignore`, `phpunit.xml`, `tests/{Feature,Concerns,automation}`, `docs/{media-architecture,media-optimization,ADMIN_PRODUCT_UPLOAD_RUNBOOK,ARCHITECTURE,MEMORY}.md`
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [ ] docs-only [x] config [x] admin [ ] commerce [ ] security
+- Root cause (reproduced): (1) Filament panel uploads used `filament.default_filesystem_disk` = `FILESYSTEM_DISK` (default `local`, PRIVATE) → storefront `/storage/..` 403/404; (2) preview/storefront URLs were absolute (APP_URL or request-host signed) → FilePond `fetch()` blocked on origin/scheme mismatch and Filament has no error branch → spinner forever. First upload previewed only because it uses Livewire's temp file.
+- Fix: `MEDIA_DISK` (default `public`) is the single disk for Spatie + Filament; `disks.public.url` = relative `/storage` (`MEDIA_URL` for CDN); `MediaUpload` factory for all 7 admin upload fields (also adds the MIME bound `variant_images` lacked); models use Spatie `getAvailableUrl()` (5 copy-pasted fallbacks removed); `og:image`/JSON-LD absolutised with `url()`; `php artisan media:relocate` (idempotent, dry-run, verified copy) repairs rows left on the private disk; deploy script runs `storage:link` + `media:relocate` on setup/update.
+- Checklist:
+  - [x] A1 Read five always-read files before editing (RULES/MEMORY/ARCHITECTURE read; PHASES/DESIGN n/a to scope)
+  - [x] A2 Touched only media-relevant paths (HeroSlide.php has a pre-existing Pint blank-line nit — left alone)
+  - [x] A3 No business/money/stock logic touched; relocation logic lives in `app/Services/MediaRelocationService.php`
+  - [x] A4 No client-trusted totals/prices (n/a)
+  - [x] A5 AuthZ/policies untouched (panel/resource gates unchanged)
+  - [x] A6 Tests: `php artisan test` → 460 pass / 10 fail; the 10 failures are identical to the pre-change baseline (copy/policy assertions, unrelated to media). New `MediaStorageTest` (10) + `MediaRelocationTest` (7) pass; 9 of the 10 `MediaStorageTest` cases fail on the pre-fix code (the 10th guards refactor behaviour). Node `tests/automation` → 171 pass / 10 fail (baseline 12: the 2 media-upload policy gates now pass, 6 new media gates added)
+  - [x] A7 `npm run build` n/a (no CSS/JS changed; Blade only)
+  - [x] A8 Design tokens n/a (no UI styling)
+  - [x] A9 No secrets/.env/vendor/node_modules committed
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C: added `Media storage` fact
+  - [x] A12 §2/§D locked decisions unchanged
+  - [x] A13 Footgun #15 added
+  - [x] A14 Mirrors: `ARCHITECTURE.md` §9, `media-optimization.md`, upload runbook; PHASES/DESIGN/PRD/tracker n/a
+  - [x] A15 Owner summary prepared
+- Risks / follow-ups: the FIRST `update` after merging still runs the previous deploy script (bash parsed it before `git pull` replaced it) → run `php artisan storage:link && php artisan media:relocate` once by hand (or `update` twice); `update` now hands over to the pulled script (`update-steps`) so this cannot recur; pre-existing: the script's ERR trap does not fire inside functions, so a failed step leaves maintenance mode ON (fix the cause, then `php artisan up`); verified at HTTP + Filament/Livewire level only (no browser in the build sandbox) — owner should open one product after Save → reopen; 10 unrelated pre-existing PHP and 10 unrelated node test failures remain
+- Status: COMPLETE (code) — owner action: deploy, then confirm one product's images after Save → reopen
+
 ### 2026-09-12 — Homepage Popular Brands slider
 - Change-id: `homepage-brands-slider`
 - Trigger: owner-ask (list → scroll/slide, professional, fully responsive)
@@ -349,6 +375,7 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + imports + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs; fields via `MediaUpload`; repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
 | **Session branch (Arena)** | `arena/01a09498-rythm` (session-fixed) | 2026-09-12 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)
@@ -394,6 +421,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 | Pay return | `RazorpayController` → payment verify → paid transition + `InventoryService` |
 | Orders | `OrderController` + policies/signed links |
 | Admin catalogue | Filament Product* + activation/import services |
+| Media upload / preview / storefront image | `MediaUpload` → Spatie (`MEDIA_DISK`) → `/storage/…` → model `getAvailableUrl()` · repair `MediaRelocationService` · `docs/media-architecture.md` |
 | Refunds | `RefundService` (Finance) |
 | Shipments | `FulfillmentService` |
 | Notifications | `CommerceNotificationService` + deliveries |
@@ -418,6 +446,8 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 12. Claiming **done** without §A checklist — treat as incomplete work.  
 13. **Empty client tax/policy/shipping** must **hide** on storefront — never fake values, never crash checkout (W5).  
 14. **Wishlist is product-level** today — variant-specific wishlist may need explicit work if owner expects it (W2.6).
+15. **Media disk ≠ `FILESYSTEM_DISK`.** Filament's upload disk follows `config('filament.default_filesystem_disk')`; if that is the private `local` disk, saved images 403 on the storefront and the admin preview URL is signed + host-bound (FilePond spins forever — its `server.load` has no error path). Keep `config/filament.php` + `config/media-library.php` on `MEDIA_DISK`, keep media URLs relative (never `APP_URL`), build fields only with `MediaUpload`, never `vendor:publish` Filament's config over ours.
+16. **A deploy script that `git pull`s itself runs its OLD logic for that run** (bash parses the whole `case` block first). Keep `update` split: pull, then `exec bash … update-steps`; never add deploy steps assuming they run on the first deploy that ships them. Also: its ERR trap does not fire inside functions → a failed update leaves the site in maintenance mode.
 
 *New trap discovered → add numbered item same day.*
 
@@ -460,6 +490,8 @@ php artisan test
 npm run build
 php artisan route:list
 php artisan migrate --force          # careful on shared DB
+php artisan storage:link             # public/storage -> storage/app/public (images)
+php artisan media:relocate --dry-run # then without --dry-run: move media to MEDIA_DISK
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
@@ -477,6 +509,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 | Domain / states / ACL | `docs/domain-model.md`, `state-machine.md`, `permissions-matrix.md` |
 | Tracker / sequence | `tasks/MASTER_PROJECT_TRACKER.md`, `CANONICAL_PHASE_SEQUENCE.md` |
 | Release / rollback | `docs/release-checklist.md`, `rollback-plan.md` |
+| Media storage / URLs / repair | `docs/media-architecture.md`, `docs/media-optimization.md` |
 
 ---
 

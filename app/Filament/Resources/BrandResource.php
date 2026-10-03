@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -40,9 +40,7 @@ class BrandResource extends Resource
             TextInput::make('sort_order')->numeric()->default(0),
             Toggle::make('is_active')->default(true),
             Textarea::make('description')->rows(3),
-            SpatieMediaLibraryFileUpload::make('logo')
-                ->collection('logo')->image()->maxFiles(1)->label('Brand logo')
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(2048),
+            MediaUpload::single('logo', 'logo', maxSizeKb: 2048)->label('Brand logo'),
         ])->columns(2);
     }
 

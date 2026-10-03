@@ -141,6 +141,15 @@ storage_link() {
   "$PHP_BIN" artisan storage:link || warn "storage:link fail hua — shayad pehle se bana hai. Chalega."
 }
 
+# Admin-uploaded images ek hi public media disk (MEDIA_DISK) par hone chahiye.
+# Purani uploads jo private disk par chali gayi thi, unhe yahan theek kiya jata hai.
+# Idempotent: kuch bhi galat na ho to "Nothing to move" dikhata hai. Deploy ko fail nahi karta.
+media_relocate() {
+  say "Media disk check + purani images ko public disk par shift karna"
+  "$PHP_BIN" artisan media:relocate \
+    || warn "media:relocate me issue aaya — upar ka output dekho, fix ke baad dobara chalao: $PHP_BIN artisan media:relocate"
+}
+
 optimize() {
   say "Cache rebuild (site fast karne ke liye)"
   "$PHP_BIN" artisan optimize:clear
@@ -205,7 +214,7 @@ maybe_sync_public() {
 case "${1:-}" in
   setup)
     php_version_check; require_env; install_deps; check_assets
-    app_key; storage_perms; db_check; migrate; seed; storage_link; optimize
+    app_key; storage_perms; db_check; migrate; seed; storage_link; media_relocate; optimize
     maybe_sync_public; health
     say "SETUP COMPLETE 🎉  Ab browser me apna domain kholo." ;;
   update)
@@ -215,7 +224,14 @@ case "${1:-}" in
     # to site ko 503 maintenance mode me phansa mat chhodo — wapas ON karo.
     trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
     git pull --ff-only origin "$(git rev-parse --abbrev-ref HEAD)"
-    install_deps; check_assets; storage_perms; db_check; migrate; optimize
+    # `git pull` may just have replaced THIS file, but bash already parsed the old copy of
+    # this `case` block — carrying on here would run the OLD steps (new steps skipped on the
+    # first deploy after a script change). Hand over to a fresh bash that reads the pulled file.
+    exec bash "$APP_DIR/scripts/deploy-cpanel.sh" update-steps ;;
+  update-steps)
+    # 2nd half of `update` (internal): always executed by the freshly pulled copy of this script.
+    trap 'say "Update fail hua — site wapas live kar rahe hain"; "$PHP_BIN" artisan up 2>/dev/null || true' ERR
+    install_deps; check_assets; storage_perms; db_check; migrate; storage_link; media_relocate; optimize
     maybe_sync_public
     trap - ERR
     say "Maintenance mode OFF"; "$PHP_BIN" artisan up

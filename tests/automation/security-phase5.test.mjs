@@ -81,16 +81,17 @@ await test('rich HTML uses a read/write sanitizer and raw head scripts are disab
 });
 
 await test('all admin media fields have bounded MIME, size and count rules', () => {
+    const factory = read('app/Filament/Components/MediaUpload.php');
+    assert.match(factory, /acceptedFileTypes/);
+    assert.match(factory, /maxSize/);
+    assert.match(factory, /maxFiles/);
+    assert.doesNotMatch(factory, /image\/svg\+xml/);
+
     for (const resource of ['Product', 'Brand', 'Category', 'HeroSlide', 'HomepageBlock']) {
         const source = read(`app/Filament/Resources/${resource}Resource.php`);
-        const uploads = source.split('SpatieMediaLibraryFileUpload::make').slice(1);
-        assert.ok(uploads.length > 0);
-        for (const upload of uploads) {
-            assert.match(upload, /acceptedFileTypes/);
-            assert.match(upload, /maxSize/);
-            assert.match(upload, /maxFiles/);
-            assert.doesNotMatch(upload, /image\/svg\+xml/);
-        }
+        const uploads = source.split('MediaUpload::').slice(1);
+        assert.ok(uploads.length > 0, `${resource} has no media upload`);
+        assert.doesNotMatch(source, /SpatieMediaLibraryFileUpload::make/, `${resource} bypasses the bounded factory`);
     }
 });
 

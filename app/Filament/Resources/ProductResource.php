@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Components\SeoFields;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Brand;
@@ -24,7 +25,6 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -199,13 +199,8 @@ class ProductResource extends Resource
                                                 ->dehydrated(false)
                                                 ->helperText('e.g. Finish → Gloss, Scale → 25.5″ (optional)')
                                                 ->columnSpanFull(),
-                                            SpatieMediaLibraryFileUpload::make('variant_images')
+                                            MediaUpload::gallery('variant_images', 'variant_gallery', maxFiles: 6)
                                                 ->label('Variant images')
-                                                ->collection('variant_gallery')
-                                                ->multiple()
-                                                ->image()
-                                                ->maxFiles(6)
-                                                ->maxSize(5120)
                                                 ->helperText('Max 6 images — storefront swaps gallery when this option is selected. Falls back to product gallery if empty.')
                                                 ->columnSpanFull(),
                                         ]),
@@ -216,14 +211,8 @@ class ProductResource extends Resource
                             ->description('Default product gallery (used when a variant has no images of its own).')
                             ->collapsible()
                             ->schema([
-                                SpatieMediaLibraryFileUpload::make('gallery')
-                                    ->collection('gallery')->multiple()->image()->maxFiles(12)
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
-                                    ->maxSize(5120),
-                                SpatieMediaLibraryFileUpload::make('og')
-                                    ->collection('og')->image()->maxFiles(1)->label('Social share image')
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->maxSize(3072),
+                                MediaUpload::gallery('gallery', 'gallery', maxFiles: 12),
+                                MediaUpload::single('og', 'og', maxSizeKb: 3072)->label('Social share image'),
                             ]),
                     ]),
                 Tabs\Tab::make('SEO')

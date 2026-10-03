@@ -1,5 +1,8 @@
 # Media Optimization
 
+> Where media lives, how URLs are built and how to repair stored files:
+> **`docs/media-architecture.md`** (single `MEDIA_DISK`, host-relative `/storage` URLs, `php artisan media:relocate`).
+
 ## Product media pipeline
 
 `Product` defines two queued WebP conversions:
@@ -44,7 +47,8 @@ Confirm the installed Media Library version supports the option before execution
 - All acquired product media is locally managed; no source hotlink at runtime.
 - Upload MIME, pixel dimensions and file size must be bounded by admin validation.
 - Preserve originals for controlled regeneration, subject to storage policy.
-- Conversion directories require writable shared-host permissions and public storage linkage.
+- Conversion directories require writable shared-host permissions and public storage linkage (`php artisan storage:link`).
+- Originals, conversions and responsive images all live on the one public media disk (`MEDIA_DISK`); `php artisan media:relocate` moves anything stored elsewhere.
 - Do not infer publication approval from successful conversion.
 
 ## Operational checks
@@ -55,3 +59,4 @@ Confirm the installed Media Library version supports the option before execution
 4. Measure representative encoded bytes against the performance budget.
 5. Test missing/corrupt originals and worker timeout behavior.
 6. Verify local disk consumption before bulk regeneration.
+7. Run `php artisan media:relocate --dry-run`: it must report "Nothing to move" and a working storage link.

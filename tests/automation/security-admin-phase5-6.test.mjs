@@ -38,18 +38,31 @@ test('rich text has a centralized write-boundary allowlist and arbitrary CMS scr
     assert.doesNotMatch(seo, /Textarea::make\('head_scripts'\)/);
 });
 
-test('all Filament media uploads have explicit MIME size count and fixed collections', async () => {
+test('all Filament media uploads go through the shared MediaUpload factory with explicit MIME size count and fixed collections', async () => {
+    // The limits live in ONE place (so no field can forget them)...
+    const factory = await read('app/Filament/Components/MediaUpload.php');
+    for (const mime of ["'image/jpeg'", "'image/png'", "'image/webp'"]) {
+        assert.ok(factory.includes(mime), `MediaUpload lacks ${mime}`);
+    }
+    assert.match(factory, /->acceptedFileTypes\(\$mimeTypes\)/);
+    assert.match(factory, /->maxSize\(\$maxSizeKb\)/);
+    assert.match(factory, /->maxFiles\(/);
+    assert.match(factory, /->collection\(\$collection\)/);
+    assert.doesNotMatch(factory, /image\/svg\+xml/);
+
+    // ...and every resource must use it (never a raw SpatieMediaLibraryFileUpload).
     const paths = ['Brand', 'Category', 'HeroSlide', 'HomepageBlock', 'Product'];
     for (const name of paths) {
         const source = await read(`app/Filament/Resources/${name}Resource.php`);
-        const uploads = source.split('SpatieMediaLibraryFileUpload::make').slice(1);
+        assert.doesNotMatch(source, /SpatieMediaLibraryFileUpload::make/, `${name} bypasses MediaUpload`);
+        const uploads = source.split('MediaUpload::').slice(1);
         assert.ok(uploads.length > 0, `${name} has no upload contract`);
         for (const upload of uploads) {
-            const chain = upload.slice(0, 600);
-            assert.match(chain, /->collection\('/, `${name} upload lacks fixed collection`);
-            assert.match(chain, /acceptedFileTypes\(\[[^\]]*'image\/jpeg'[^\]]*'image\/png'[^\]]*'image\/webp'[^\]]*\]\)/, `${name} MIME rule missing`);
-            assert.match(chain, /maxSize\([1-9][0-9]*\)/, `${name} size rule missing`);
-            assert.match(chain, /maxFiles\(/, `${name} count rule missing`);
+            assert.match(
+                upload.slice(0, 160),
+                /^(single|gallery)\('[a-z_]+', '[a-z_]+', (maxSizeKb|maxFiles): [1-9][0-9]*/,
+                `${name} upload lacks a fixed collection or numeric limit`,
+            );
         }
     }
 });

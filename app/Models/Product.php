@@ -169,55 +169,51 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * Best available product image URL.
+     * Best available product image URL (large, for the product page / social).
      *
-     * 1. Spatie media (admin-uploaded / attached), if any.
+     * 1. Spatie media (admin-uploaded / attached), if any — the WebP
+     *    conversion once the queue has generated it, else the original.
      * 2. Committed public asset: public/images/products/{slug}.jpg
      *    (reset-proof — travels with the git repo, needs no storage disk).
      * 3. null — caller decides the final placeholder.
      */
     public function heroImage(): ?string
     {
-        $media = $this->getFirstMedia('gallery');
-        if ($media !== null) {
-            return $media->hasGeneratedConversion('gallery-webp')
-                ? $media->getUrl('gallery-webp')
-                : $media->getUrl();
-        }
-
-        $file = 'images/products/'.$this->slug.'.jpg';
-
-        return is_file(public_path($file)) ? '/'.$file : null;
+        return $this->getFirstMedia('gallery')?->getAvailableUrl(['gallery-webp'])
+            ?? $this->committedImageUrl();
     }
 
+    /** Card-sized product image URL (same fallback chain as heroImage()). */
     public function thumbnailImage(): ?string
     {
-        $media = $this->getFirstMedia('gallery');
-
-        if ($media !== null) {
-            return $media->hasGeneratedConversion('thumb-webp')
-                ? $media->getUrl('thumb-webp')
-                : $media->getUrl();
-        }
-
-        return $this->heroImage();
+        return $this->getFirstMedia('gallery')?->getAvailableUrl(['thumb-webp'])
+            ?? $this->committedImageUrl();
     }
 
-    /** Gallery image URLs (media first, committed fallback, else []). */
+    /**
+     * Gallery image URLs (media first, committed fallback, else []).
+     *
+     * @return list<string>
+     */
     public function galleryImages(): array
     {
         $urls = $this->getMedia('gallery')
-            ->map(fn (Media $media): string => $media->hasGeneratedConversion('gallery-webp')
-                ? $media->getUrl('gallery-webp')
-                : $media->getUrl())
+            ->map(fn (Media $media): string => $media->getAvailableUrl(['gallery-webp']))
             ->values()
             ->all();
 
-        if ($urls === [] && ($fallback = $this->heroImage()) !== null) {
+        if ($urls === [] && ($fallback = $this->committedImageUrl()) !== null) {
             $urls = [$fallback];
         }
 
         return $urls;
+    }
+
+    private function committedImageUrl(): ?string
+    {
+        $file = 'images/products/'.$this->slug.'.jpg';
+
+        return is_file(public_path($file)) ? '/'.$file : null;
     }
 
     public function scopeActive(Builder $query): Builder
