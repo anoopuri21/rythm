@@ -12,7 +12,8 @@
         $seoDescription = $seo['meta_description'] ?? ($__env->yieldContent('meta_description') ?: 'Explore guitars, keyboards, drums, pro audio and musical-instrument accessories at Rhythm Exports.');
         $ogTitle = $seo['og_title'] ?? ($__env->yieldContent('title') ?: 'Rhythm Exports');
         $ogDescription = $seo['og_description'] ?? $seoDescription;
-        $ogImage = $seo['og_image'] ?? ($__env->yieldContent('og_image') ?: asset('images/hero-guitar.jpg'));
+        // Media URLs are host-relative (/storage/...); crawlers need an absolute og:image.
+        $ogImage = url(($seo['og_image'] ?? null) ?: ($__env->yieldContent('og_image') ?: asset('images/hero-guitar.jpg')));
     @endphp
     <title>{{ $seoTitle }}</title>
     <meta name="description" content="{{ $seoDescription }}">

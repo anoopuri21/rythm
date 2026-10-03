@@ -4,13 +4,13 @@
 @section('meta_description', $product->meta_description ?: $product->short_description)
 
 @push('head')
-    {{-- Product structured data (JSON-LD) --}}
+    {{-- Product structured data (JSON-LD). Image must be absolute; media URLs are host-relative. --}}
     <script type="application/ld+json">
     {!! json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'Product',
         'name' => $product->name,
-        'image' => $product->heroImage() ?: asset('images/hero-guitar.jpg'),
+        'image' => url($product->heroImage() ?: asset('images/hero-guitar.jpg')),
         'description' => $product->short_description,
         'sku' => $product->sku,
         'brand' => ['@type' => 'Brand', 'name' => $product->brand?->name ?? 'Rythme'],
