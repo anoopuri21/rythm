@@ -15,6 +15,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 /**
@@ -52,7 +53,14 @@ final class SyncMediaUrls extends Command
         $failures = 0;
 
         foreach (self::TARGETS as $class) {
-            $columns = array_keys((new $class)->resolvedMediaUrls());
+            $instance = new $class;
+            $columns = array_keys($instance->resolvedMediaUrls());
+
+            if (! Schema::hasColumns($instance->getTable(), $columns)) {
+                $this->components->warn(class_basename($class).': URL column(s) missing (migration pending) — run `php artisan migrate` first.');
+
+                continue;
+            }
 
             try {
                 $result = $this->syncModel($class, $columns, $dryRun, $onlyMissing, $chunk);
