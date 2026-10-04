@@ -46,13 +46,14 @@ class HomepageDataSeeder extends Seeder
     private function seedBlocks(): void
     {
         $blocks = [
-            // ── Verified storefront capabilities ──
-            ['section_key' => 'usp', 'title' => 'Catalogue filters', 'content' => 'Browse by category, brand, price, stock and available specifications.', 'sort_order' => 0],
-            ['section_key' => 'usp', 'title' => 'Server-verified totals', 'content' => 'Checkout recalculates current prices, discounts, shipping and tax.', 'sort_order' => 1],
-            ['section_key' => 'usp', 'title' => 'Protected checkout', 'content' => 'Payment state and inventory transitions are verified on the server.', 'sort_order' => 2],
-            ['section_key' => 'usp', 'title' => 'Order tracking', 'content' => 'Customers can follow recorded order-status updates through protected access.', 'sort_order' => 3],
-            ['section_key' => 'usp', 'title' => 'Verified reviews', 'content' => 'Only paid, delivered purchases can submit moderated reviews.', 'sort_order' => 4],
-            ['section_key' => 'usp', 'title' => 'Verified reviews', 'content' => 'Verified-purchase reviews are moderated before they appear on product pages.', 'sort_order' => 5],
+            // ── USP strip: exactly what the storefront showed while the copy
+            //    was still hardcoded in _usp-strip.blade.php, now editable in
+            //    Admin → Homepage blocks → "Why Rythme (USPs)".
+            ['section_key' => 'usp', 'icon' => 'box', 'title' => 'Instrument-first', 'content' => 'catalogue for every stage', 'sort_order' => 0],
+            ['section_key' => 'usp', 'icon' => 'truck', 'title' => 'Clear', 'content' => 'order tracking from your account', 'sort_order' => 1],
+            ['section_key' => 'usp', 'icon' => 'shield-check', 'title' => 'Category-led', 'content' => 'browsing for faster discovery', 'sort_order' => 2],
+            ['section_key' => 'usp', 'icon' => 'credit-card', 'title' => 'Secure checkout', 'content' => 'with server-verified totals', 'sort_order' => 3],
+            ['section_key' => 'usp', 'icon' => 'sparkles', 'title' => 'Stock-aware', 'content' => 'product availability', 'sort_order' => 4],
             // ── Capability labels (no unsupported business metrics) ──
             ['section_key' => 'number', 'title' => 'Curated', 'content' => 'Instrument catalogue', 'sort_order' => 0],
             ['section_key' => 'number', 'title' => 'Verified', 'content' => 'Checkout totals', 'sort_order' => 1],
@@ -74,6 +75,20 @@ class HomepageDataSeeder extends Seeder
             ['section_key' => 'promo', 'title' => 'Keys for every stage', 'subtitle' => 'Pianos & keyboards', 'content' => '/category/keyboards-pianos', 'sort_order' => 1],
             ['section_key' => 'promo', 'title' => 'Browse available accessories', 'subtitle' => 'Current catalogue pricing', 'content' => '/shop?sort=discount', 'sort_order' => 2],
         ];
+
+        // Superseded default USP rows. Deactivated rather than deleted: the
+        // storefront only renders active rows (scopeSection), the admin list
+        // still shows them, and an admin can switch one back on.
+        HomepageBlock::query()
+            ->where('section_key', 'usp')
+            ->whereIn('title', [
+                'Catalogue filters',
+                'Server-verified totals',
+                'Protected checkout',
+                'Order tracking',
+                'Verified reviews',
+            ])
+            ->update(['is_active' => false]);
 
         foreach ($blocks as $block) {
             HomepageBlock::updateOrCreate(

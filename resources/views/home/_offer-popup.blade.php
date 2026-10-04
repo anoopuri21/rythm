@@ -1,6 +1,9 @@
 @php
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $minDiscount = $settings->getCount('offer_min_discount', 0, 100);
+    $maxDiscount = $settings->getCount('offer_max_discount', 0, 100);
     $popupOffer = collect($homepage['bestDeals'] ?? [])
-        ->map(function ($product): ?array {
+        ->map(function ($product) use ($minDiscount, $maxDiscount): ?array {
             $compareAt = (float) ($product->compare_at_price ?? 0);
             $price = (float) ($product->price ?? 0);
 
@@ -10,7 +13,7 @@
 
             $discount = (int) floor((($compareAt - $price) / $compareAt) * 100);
 
-            return $discount >= 10 && $discount <= 50
+            return $discount >= $minDiscount && $discount <= $maxDiscount
                 ? [
                     'product' => $product,
                     'discount' => $discount,
@@ -58,8 +61,8 @@
                 <p id="offer-popup-description" class="offer-popup__copy">A deal from the shop, based on the marked price.</p>
                 <p class="offer-popup__product">{{ $popupOffer['product']->name }}</p>
                 <p class="offer-popup__price">
-                    <strong>₹{{ $popupOffer['price'] }}</strong>
-                    <del>₹{{ $popupOffer['compare_at'] }}</del>
+                    <strong>@currency{{ $popupOffer['price'] }}</strong>
+                    <del>@currency{{ $popupOffer['compare_at'] }}</del>
                 </p>
                 <a href="{{ route('product.show', $popupOffer['product']->slug) }}" class="offer-popup__cta">View this offer <span aria-hidden="true">→</span></a>
             </div>

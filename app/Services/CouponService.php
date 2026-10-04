@@ -62,7 +62,8 @@ final class CouponService
 
         if ($subtotal < (float) $coupon->min_order) {
             throw new RuntimeException(
-                'This coupon requires a minimum order of ₹'.number_format((float) $coupon->min_order).'.'
+                'This coupon requires a minimum order of '.app(SiteSettingsService::class)->currencySymbol()
+                    .number_format((float) $coupon->min_order).'.'
             );
         }
 

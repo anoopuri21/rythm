@@ -1,6 +1,7 @@
 @php
-    $testimonials = collect($homepage['testimonials'] ?? [])->take(3);
-    $faqs = collect($homepage['faqs'] ?? [])->take(6);
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $testimonials = collect($homepage['testimonials'] ?? [])->take($settings->getCount('home_testimonials', 1, 12));
+    $faqs = collect($homepage['faqs'] ?? [])->take($settings->getCount('home_faqs', 1, 24));
 @endphp
 
 @if($testimonials->isNotEmpty())

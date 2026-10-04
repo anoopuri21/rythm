@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -28,7 +29,7 @@ class StatsOverviewWidget extends BaseWidget
         $stats = [];
 
         if ($user->hasAdminPermission(AdminAccess::FINANCE_VIEW)) {
-            $stats[] = Stat::make('Revenue (7d)', '₹'.number_format((float) Order::where('payment_status', 'paid')->where('created_at', '>=', now()->startOfWeek())->sum('total')))
+            $stats[] = Stat::make('Revenue (7d)', app(SiteSettingsService::class)->currencySymbol().number_format((float) Order::where('payment_status', 'paid')->where('created_at', '>=', now()->startOfWeek())->sum('total')))
                 ->description('Paid orders this week')->descriptionIcon('heroicon-m-banknotes')->color('success');
             $stats[] = Stat::make('Payment attention', Payment::whereIn('status', [Payment::STATUS_FAILED, Payment::STATUS_INITIATED])->count())
                 ->description('Failed or still-initiated payments')->descriptionIcon('heroicon-m-credit-card')->color('warning');

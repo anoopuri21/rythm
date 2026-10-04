@@ -1,7 +1,10 @@
 @php
-    $brand = config('rythme.brand_name');
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $brand = $settings->brandOrMedia('brand_name');
+    // HERO BANNERS — built-in default + optional admin override (hero_banners table).
+    $heroBanners = app(\App\Services\HeroBannerService::class);
     // HERO SLIDES — admin-driven (hero_slides table + desktop/mobile media collections).
-    $slides = ($homepage['heroSlides'] ?? collect())->take(3);
+    $slides = ($homepage['heroSlides'] ?? collect())->take($settings->getCount('home_hero_slides', 1, 12));
     // Fallback imagery when a slide has no media attached (AI-generated, local).
     $fallbackSlideImages = [
         asset('images/hero/grid-slide-guitar.jpg'),
@@ -82,34 +85,39 @@
             </div>
         </div>
 
-        {{-- ===== TALL BANNER (middle) ===== --}}
-        <a href="/shop?category=keyboards-pianos" class="hero-mm__banner hero-mm__banner--tall">
-            <img src="{{ asset('images/hero/grid-banner-piano.jpg') }}" alt="Digital stage piano" width="896" height="1200" loading="eager" decoding="async">
+        {{-- ===== TALL BANNER (middle) =====
+             Built-in default lives in HeroBannerService::DEFAULTS; an admin row
+             in "Hero banners" overrides it field by field. --}}
+        @php $tall = $heroBanners->get(\App\Services\HeroBannerService::SLOT_HERO_TALL); @endphp
+        <a href="{{ $tall['href'] }}" class="hero-mm__banner hero-mm__banner--tall">
+            <img src="{{ $tall['image'] }}" alt="{{ $tall['alt'] }}" width="896" height="1200" loading="eager" decoding="async">
             <span class="hero-mm__banner-scrim" aria-hidden="true"></span>
             <span class="hero-mm__banner-copy">
-                <span class="hero-mm__banner-title">Stage Pianos</span>
-                <span class="hero-mm__banner-sub">As expressive as it is portable</span>
-                <span class="hero-mm__banner-link">Shop now</span>
+                <span class="hero-mm__banner-title">{{ $tall['title'] }}</span>
+                <span class="hero-mm__banner-sub">{{ $tall['subtitle'] }}</span>
+                <span class="hero-mm__banner-link">{{ $tall['cta_label'] }}</span>
             </span>
         </a>
 
         {{-- ===== SMALL BANNER 1 (top right) ===== --}}
-        <a href="/shop?category=drums-percussion" class="hero-mm__banner hero-mm__banner--small hero-mm__banner--s1">
-            <img src="{{ asset('images/hero/grid-banner-tabla.jpg') }}" alt="Tabla set" width="1312" height="816" loading="eager" decoding="async">
+        @php $small1 = $heroBanners->get(\App\Services\HeroBannerService::SLOT_HERO_SMALL_1); @endphp
+        <a href="{{ $small1['href'] }}" class="hero-mm__banner hero-mm__banner--small hero-mm__banner--s1">
+            <img src="{{ $small1['image'] }}" alt="{{ $small1['alt'] }}" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
-                <span class="hero-mm__banner-title">Tabla Sets</span>
-                <span class="hero-mm__banner-sub">Explore percussion instruments</span>
-                <span class="hero-mm__banner-link">Shop now →</span>
+                <span class="hero-mm__banner-title">{{ $small1['title'] }}</span>
+                <span class="hero-mm__banner-sub">{{ $small1['subtitle'] }}</span>
+                <span class="hero-mm__banner-link">{{ $small1['cta_label'] }}</span>
             </span>
         </a>
 
         {{-- ===== SMALL BANNER 2 (bottom right) ===== --}}
-        <a href="/shop?category=pro-audio" class="hero-mm__banner hero-mm__banner--small hero-mm__banner--s2">
-            <img src="{{ asset('images/hero/grid-banner-headphones.jpg') }}" alt="Studio headphones" width="1312" height="816" loading="eager" decoding="async">
+        @php $small2 = $heroBanners->get(\App\Services\HeroBannerService::SLOT_HERO_SMALL_2); @endphp
+        <a href="{{ $small2['href'] }}" class="hero-mm__banner hero-mm__banner--small hero-mm__banner--s2">
+            <img src="{{ $small2['image'] }}" alt="{{ $small2['alt'] }}" width="1312" height="816" loading="eager" decoding="async">
             <span class="hero-mm__banner-copy">
-                <span class="hero-mm__banner-title">Studio Gear</span>
-                <span class="hero-mm__banner-sub">Explore current studio offers</span>
-                <span class="hero-mm__banner-link">Shop now →</span>
+                <span class="hero-mm__banner-title">{{ $small2['title'] }}</span>
+                <span class="hero-mm__banner-sub">{{ $small2['subtitle'] }}</span>
+                <span class="hero-mm__banner-link">{{ $small2['cta_label'] }}</span>
             </span>
         </a>
     </div>

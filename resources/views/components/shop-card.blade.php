@@ -66,9 +66,9 @@
         </p>
 
         <div class="shop-card__price mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span class="text-lg font-bold text-ink">₹{{ $price }}</span>
+            <span class="text-lg font-bold text-ink">@currency{{ $price }}</span>
             @if($old)
-                <span class="text-xs text-muted line-through">₹{{ $old }}</span>
+                <span class="text-xs text-muted line-through">@currency{{ $old }}</span>
             @endif
         </div>
     </div>

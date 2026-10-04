@@ -22,7 +22,7 @@
                     <h1 class="section-title">Order {{ $order->order_number }}</h1>
                     <p class="mt-3 text-sm text-muted">
                         Placed {{ $order->placed_at?->format('d M Y, h:i A') }} ·
-                        <span class="font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</span>
+                        <span class="font-bold text-ink">@currency{{ number_format((float) $order->total, 2) }}</span>
                     </p>
                 </div>
                 <div class="text-right">
@@ -202,24 +202,24 @@
                                         {{ $item->sku }} @if(!empty($item->options)) · {{ $item->options['finish'] ?? '' }} @endif · Qty {{ $item->qty }}
                                     </p>
                                 </div>
-                                <p class="shrink-0 text-sm font-bold text-ink">₹{{ number_format((float) $item->total, 2) }}</p>
+                                <p class="shrink-0 text-sm font-bold text-ink">@currency{{ number_format((float) $item->total, 2) }}</p>
                             </li>
                         @endforeach
                     </ul>
 
                     <dl class="mt-4 space-y-2.5 border-t border-ink/10 pt-5 text-sm">
                         @php $gst = $order->gstTotals(); @endphp
-                        <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">@currency{{ number_format((float) $order->subtotal, 2) }}</dd></div>
                         @if((float) $order->shipping_fee > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">@currency{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                         @else
                             <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">Free</dd></div>
                         @endif
                         @if((float) $order->discount > 0)
-                            <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount, 2) }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−@currency{{ number_format((float) $order->discount, 2) }}</dd></div>
                         @endif
                         <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" />
-                        <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</dd></div>
+                        <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total</dt><dd class="text-xl font-bold text-ink">@currency{{ number_format((float) $order->total, 2) }}</dd></div>
                     </dl>
                 </section>
 
@@ -248,7 +248,7 @@
                                             <span class="font-semibold text-ink">Payment attempt</span>
                                             <span class="capitalize text-muted">{{ str_replace('_', ' ', $payment->status) }}</span>
                                         </div>
-                                        <p class="mt-1 text-muted">₹{{ number_format((float) $payment->amount, 2) }} · {{ $payment->currency }} · {{ $payment->created_at?->format('d M Y, h:i A') }}</p>
+                                        <p class="mt-1 text-muted">@currency{{ number_format((float) $payment->amount, 2) }} · {{ $payment->currency }} · {{ $payment->created_at?->format('d M Y, h:i A') }}</p>
                                     </li>
                                     @foreach($payment->refunds->sortBy('created_at') as $refund)
                                         <li class="rounded-xl bg-brand/5 px-4 py-3 text-xs">
@@ -256,7 +256,7 @@
                                                 <span class="font-semibold text-ink">Refund</span>
                                                 <span class="capitalize text-muted">{{ str_replace('_', ' ', $refund->status) }}</span>
                                             </div>
-                                            <p class="mt-1 text-muted">₹{{ number_format((float) $refund->amount, 2) }} · {{ $refund->currency }} · {{ $refund->created_at?->format('d M Y, h:i A') }}</p>
+                                            <p class="mt-1 text-muted">@currency{{ number_format((float) $refund->amount, 2) }} · {{ $refund->currency }} · {{ $refund->created_at?->format('d M Y, h:i A') }}</p>
                                         </li>
                                     @endforeach
                                 @endforeach

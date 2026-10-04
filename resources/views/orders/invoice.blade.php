@@ -60,8 +60,8 @@
                                     <p class="text-xs text-muted">{{ $item->sku }}</p>
                                 </td>
                                 <td class="py-3.5 text-center text-ink/70">{{ $item->qty }}</td>
-                                <td class="py-3.5 text-right text-ink/70">₹{{ number_format((float) $item->unit_price, 2) }}</td>
-                                <td class="py-3.5 text-right font-bold text-ink">₹{{ number_format((float) $item->total, 2) }}</td>
+                                <td class="py-3.5 text-right text-ink/70">@currency{{ number_format((float) $item->unit_price, 2) }}</td>
+                                <td class="py-3.5 text-right font-bold text-ink">@currency{{ number_format((float) $item->total, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -70,17 +70,17 @@
                 {{-- Totals --}}
                 @php $gst = $order->gstTotals(); @endphp
                 <dl class="ml-auto mt-6 w-full max-w-xs space-y-2.5 border-t border-ink/10 pt-5 text-sm">
-                    <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->subtotal, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-muted">Subtotal</dt><dd class="font-semibold text-ink">@currency{{ number_format((float) $order->subtotal, 2) }}</dd></div>
                     @if((float) $order->shipping_fee > 0)
-                        <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">₹{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">@currency{{ number_format((float) $order->shipping_fee, 2) }}</dd></div>
                     @else
                         <div class="flex justify-between"><dt class="text-muted">Shipping</dt><dd class="font-semibold text-ink">Free</dd></div>
                     @endif
                     @if((float) $order->discount > 0)
-                        <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−₹{{ number_format((float) $order->discount, 2) }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-muted">Discount</dt><dd class="font-semibold text-brand">−@currency{{ number_format((float) $order->discount, 2) }}</dd></div>
                     @endif
                     <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" class="text-muted" />
-                    <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total (INR)</dt><dd class="text-xl font-bold text-ink">₹{{ number_format((float) $order->total, 2) }}</dd></div>
+                    <div class="flex justify-between border-t border-ink/10 pt-3"><dt class="font-bold text-ink">Total (INR)</dt><dd class="text-xl font-bold text-ink">@currency{{ number_format((float) $order->total, 2) }}</dd></div>
                 </dl>
 
                 <p class="mt-10 border-t border-ink/10 pt-6 text-center text-[11px] text-muted">

@@ -20,9 +20,6 @@ final class HomeController extends Controller
 
     public function index(): View
     {
-        // Hero mode is config-driven (RYTHME_HERO_MODE env): 'slider' | 'video'
-        $heroMode = config('rythme.hero_mode', 'slider');
-
         // Admin-editable section headings (kicker/title/accent/body)
         $homeSections = Cache::remember('homepage.sections', 3600, function (): array {
             return HomepageSection::query()
@@ -52,6 +49,6 @@ final class HomeController extends Controller
         // ALL homepage content — DB-driven + cached (hero, blocks, faqs, products)
         $homepage = $this->homepage->all();
 
-        return view('home.index', compact('heroMode', 'homeSections', 'homepage'));
+        return view('home.index', compact('homeSections', 'homepage'));
     }
 }

@@ -253,7 +253,7 @@
                                 <p class="truncate text-sm font-semibold text-ink">{{ $item->product->name }}</p>
                                 @if($item->variant)<p class="text-xs text-muted">{{ $item->variant->optionSummary() }}</p>@endif
                             </div>
-                            <p class="text-sm font-bold text-ink">₹{{ number_format((float) $item->unit_price * $item->qty) }}</p>
+                            <p class="text-sm font-bold text-ink">@currency{{ number_format((float) $item->unit_price * $item->qty) }}</p>
                         </div>
                     @empty
                         <p class="text-sm text-muted">Your cart is empty.</p>
@@ -283,18 +283,18 @@
                 <dl class="mt-5 space-y-3 border-t border-ink/10 pt-5 text-sm">
                     <div class="flex items-center justify-between">
                         <dt class="text-ink/70">Subtotal</dt>
-                        <dd class="font-semibold text-ink">₹{{ number_format($totals['subtotal']) }}</dd>
+                        <dd class="font-semibold text-ink">@currency{{ number_format($totals['subtotal']) }}</dd>
                     </div>
                     @if($couponDiscount > 0)
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Coupon ({{ $appliedCoupon }})</dt>
-                            <dd class="font-semibold text-brand">−₹{{ number_format($couponDiscount) }}</dd>
+                            <dd class="font-semibold text-brand">−@currency{{ number_format($couponDiscount) }}</dd>
                         </div>
                     @endif
                     @if($shippingFee > 0)
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Shipping</dt>
-                            <dd class="font-semibold text-ink">₹{{ number_format($shippingFee, 2) }}</dd>
+                            <dd class="font-semibold text-ink">@currency{{ number_format($shippingFee, 2) }}</dd>
                         </div>
                     @else
                         <div class="flex items-center justify-between">
@@ -314,7 +314,7 @@
 
                     <div class="flex items-center justify-between border-t border-ink/10 pt-3">
                         <dt class="font-bold text-ink">Total</dt>
-                        <dd class="text-2xl font-bold text-ink">₹{{ number_format($grandTotal, 2) }}</dd>
+                        <dd class="text-2xl font-bold text-ink">@currency{{ number_format($grandTotal, 2) }}</dd>
                     </div>
                 </dl>
             </div>

@@ -22,6 +22,10 @@ use Illuminate\Support\Facades\Schema;
  */
 final class HomepageDataService
 {
+    public function __construct(private readonly SiteSettingsService $settings)
+    {
+    }
+
     private const MAX_CATEGORY_ROWS = 4;
 
     private const MAX_DISCOVERY_CATEGORIES = 10;
@@ -64,31 +68,28 @@ final class HomepageDataService
                 'faqs' => Faq::query()->where('is_active', true)->orderBy('sort_order')->get(),
                 'bestsellers' => Product::query()->active()->featured()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')->limit(8)->get(),
+                    ->orderByRaw('featured_rank IS NULL')->orderBy('featured_rank')->orderBy('updated_at', 'desc')
+                    ->limit($this->settings->getCount('home_bestsellers_limit'))->get(),
                 'newArrivals' => Product::query()->active()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->latest('created_at')->latest('id')->limit(10)->get(),
+                    ->latest('created_at')->latest('id')->limit($this->settings->getCount('home_new_arrivals_limit'))->get(),
                 'trending' => Product::query()->active()->trending()->withAvailableVariantStock()
                     ->with(['brand', 'category.parent', 'media'])
-                    ->orderByDesc('updated_at')->orderByDesc('id')->limit(10)->get(),
+                    ->orderByDesc('updated_at')->orderByDesc('id')->limit($this->settings->getCount('home_trending_limit'))->get(),
                 'bestDeals' => Product::query()->active()->withAvailableVariantStock()
                     ->whereNotNull('compare_at_price')
                     ->whereColumn('compare_at_price', '>', 'price')
                     ->with(['brand', 'category.parent', 'media'])
                     ->orderByRaw('(compare_at_price - price) / NULLIF(compare_at_price, 0) DESC')
                     ->orderByDesc('updated_at')
-                    ->limit(8)
+                    ->limit($this->settings->getCount('home_deals_limit'))
                     ->get(),
                 // Distinct set from New Arrivals (reference uses a separate pool) —
                 // fresh gear that has just landed in the store.
-                'recentlyLaunched' => $this->curatedProducts([
-                    'roland-fp-30x-digital-piano',
-                    'krk-rokit-5-g4-studio-monitor-single',
-                    'akg-k240-studio-headphones',
-                    'fender-mustang-lt25-modelling-amp',
-                    'casio-ct-s300-portable-keyboard',
-                    'numark-mixtrack-pro-fx',
-                ]),
+                // Admin → Settings → Storefront → "Recently launched" product slugs.
+                'recentlyLaunched' => $this->curatedProducts(
+                    $this->settings->slugList('recently_launched_slugs')
+                ),
                 'brands' => $brands,
                 // Legacy name list for any older includes; prefer `brands`.
                 'brandNames' => $brands->pluck('name'),
@@ -111,7 +112,7 @@ final class HomepageDataService
             ->withCount(['products' => fn ($query) => $query->where('is_active', true)])
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->limit(16)
+            ->limit($this->settings->getCount('home_brands_limit'))
             ->get()
             ->map(function (Brand $brand): array {
                 // Stored URL column first (M-7); `media` stays eager-loaded so

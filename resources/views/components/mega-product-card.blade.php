@@ -54,9 +54,9 @@
 
         <p class="pcard__price">
             @if($onSale)
-                <del>₹{{ number_format((float) $product->compare_at_price) }}</del>
+                <del>@currency{{ number_format((float) $product->compare_at_price) }}</del>
             @endif
-            <ins>₹{{ number_format((float) $product->price) }}</ins>
+            <ins>@currency{{ number_format((float) $product->price) }}</ins>
         </p>
         <p class="pcard__stock {{ $hasAvailableStock ? 'text-emerald-700' : 'text-muted' }}" aria-label="Availability">
             {{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}

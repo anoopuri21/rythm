@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\User;
+use App\Observers\HomepageDataObserver;
+use App\Services\CategoryService;
 use App\Services\MailSenderSettingsService;
 use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use App\Support\IndiaStates;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -53,8 +56,8 @@ class Settings extends Page implements HasForms
             ->schema([
                 Section::make('Shipping')
                     ->schema([
-                        TextInput::make('shipping_flat_fee')->label('Shipping fee (₹)')->numeric()->prefix('₹'),
-                        TextInput::make('shipping_free_above')->label('Free shipping above (₹)')->numeric()->prefix('₹'),
+                        TextInput::make('shipping_flat_fee')->label('Shipping fee ('.app(SiteSettingsService::class)->currencySymbol().')')->numeric()->prefix(app(SiteSettingsService::class)->currencySymbol()),
+                        TextInput::make('shipping_free_above')->label('Free shipping above ('.app(SiteSettingsService::class)->currencySymbol().')')->numeric()->prefix(app(SiteSettingsService::class)->currencySymbol()),
                     ])->columns(2),
                 Section::make('GST')
                     ->description('Same-state orders use CGST + SGST. Other-state orders use IGST. A product GST rate, if set, overrides the default rate.')
@@ -113,6 +116,54 @@ class Settings extends Page implements HasForms
                         TextInput::make('social_facebook')->label('Facebook URL')->url()->placeholder('https://facebook.com/yourpage'),
                         TextInput::make('social_x')->label('X (Twitter) URL')->url()->placeholder('https://x.com/yourhandle'),
                         TextInput::make('social_linkedin')->label('LinkedIn URL')->url()->placeholder('https://linkedin.com/company/yourcompany'),
+                    ])->columns(2),
+                Section::make('Storefront')
+                    ->description('How many items each storefront row shows, plus the currency symbol. Defaults match the previous hardcoded values; a blank field restores the default.')
+                    ->schema([
+                        TextInput::make('currency_symbol')
+                            ->label('Currency symbol')
+                            ->maxLength(5)
+                            ->placeholder(SiteSettingsService::DEFAULTS['currency_symbol'])
+                            ->helperText('Shown in front of every price on the storefront, invoices and order emails.'),
+                        TextInput::make('shop_category_shortcuts')
+                            ->label('Category shortcuts on /shop')
+                            ->integer()->minValue(2)->maxValue(12),
+                        TextInput::make('home_hero_slides')->label('Hero slides')->integer()->minValue(1)->maxValue(12),
+                        TextInput::make('home_category_banners')->label('Category banners')->integer()->minValue(1)->maxValue(12),
+                        TextInput::make('home_promo_banners')->label('Promo banners')->integer()->minValue(1)->maxValue(12),
+                        TextInput::make('home_bestsellers_limit')->label('Bestsellers')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('home_new_arrivals_limit')->label('New arrivals')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('home_trending_limit')->label('Trending')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('home_deals_limit')->label('Deals')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('home_brands_limit')->label('Brands loaded')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('home_brands_shown')->label('Brands shown per slide')->integer()->minValue(1)->maxValue(12),
+                        TextInput::make('home_testimonials')->label('Testimonials')->integer()->minValue(1)->maxValue(12),
+                        TextInput::make('home_faqs')->label('FAQs')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('offer_marquee_items')->label('Offers in the marquee')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('offer_min_discount')
+                            ->label('Offer minimum discount (%)')
+                            ->integer()->minValue(0)->maxValue(100)->suffix('%')
+                            ->helperText('A product only counts as an offer between the minimum and maximum discount.'),
+                        TextInput::make('offer_max_discount')
+                            ->label('Offer maximum discount (%)')
+                            ->integer()->minValue(0)->maxValue(100)->suffix('%'),
+                        TextInput::make('footer_category_links')->label('Footer category links')->integer()->minValue(1)->maxValue(24),
+                        TextInput::make('footer_brand_links')->label('Footer brand links')->integer()->minValue(1)->maxValue(24),
+                        Textarea::make('recently_launched_slugs')
+                            ->label('"Recently launched" product slugs')
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->helperText('Comma-separated product slugs, in the order they should appear. Slugs that do not match an active product are skipped.'),
+                    ])->columns(3),
+                Section::make('Brand & media')
+                    ->description('Leave a field empty to keep using the value in config/rythme.php.')
+                    ->schema([
+                        TextInput::make('brand_name')->label('Business name')->maxLength(120),
+                        TextInput::make('brand_short')->label('Short name / wordmark')->maxLength(40),
+                        TextInput::make('brand_logo_url')
+                            ->label('Logo URL')
+                            ->maxLength(500)
+                            ->helperText('Absolute URL or a path under /public. Shown in the navbar, footer and hero.'),
                     ])->columns(2),
                 Section::make('Outbound email (sender)')
                     ->description('Customer mails (verify email, orders, stock alerts) use this From address only after the mailbox owner confirms a verification link. SMTP/API credentials still come from the server .env.')
@@ -180,6 +231,11 @@ class Settings extends Page implements HasForms
         );
 
         $settings->saveAll($state);
+
+        // Storefront counts, currency and brand now live in settings, so the
+        // cached homepage payload has to be rebuilt too (NO-HARDCODE rule).
+        HomepageDataObserver::flush();
+        app(CategoryService::class)->flush();
 
         try {
             $result = $mailSender->saveFromAdmin([

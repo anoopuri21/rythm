@@ -2,10 +2,10 @@
     {{-- Price row --}}
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span class="text-3xl font-bold tracking-tight text-ink" x-data x-init="$wire.$watch('qty', () => $wire.$refresh())">
-            ₹{{ number_format($price) }}
+            @currency{{ number_format($price) }}
         </span>
         @if($compareAt > 0 && $compareAt > $price)
-            <span class="text-base text-muted line-through">₹{{ number_format($compareAt) }}</span>
+            <span class="text-base text-muted line-through">@currency{{ number_format($compareAt) }}</span>
             <span class="rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-brand">
                 {{ $compareAt > 0 ? round((($compareAt - $price) / $compareAt) * 100) : 0 }}% off
             </span>
@@ -24,7 +24,7 @@
             @if($variant)
                 <p class="mb-3 text-xs text-muted">
                     {{ $variant->optionSummary() }}
-                    · ₹{{ number_format($price) }}
+                    · @currency{{ number_format($price) }}
                     · {{ $stock }} in stock
                 </p>
             @endif
@@ -40,7 +40,7 @@
                             {{ $isSelected ? 'border-brand ring-2 ring-brand/20' : 'border-ink/15 hover:border-brand/50' }}
                             {{ $hasColor ? '' : ($isSelected ? 'bg-brand text-white' : 'bg-paper') }}"
                             style="{{ $hasColor ? 'padding: 4px;' : '' }}"
-                            title="{{ $v['summary'] }} — ₹{{ number_format($v['price']) }}"
+                            title="{{ $v['summary'] }} — @currency{{ number_format($v['price']) }}"
                             aria-label="{{ $v['name'] }}"
                             aria-pressed="{{ $isSelected ? 'true' : 'false' }}">
                         @if($hasColor)

@@ -86,9 +86,9 @@
                                 </div>
                                 <div class="flex items-baseline gap-2">
                                     @if($item->product->compare_at_price > $item->unit_price)
-                                        <span class="text-xs text-muted line-through">₹{{ number_format((float) $item->product->compare_at_price * $item->qty) }}</span>
+                                        <span class="text-xs text-muted line-through">@currency{{ number_format((float) $item->product->compare_at_price * $item->qty) }}</span>
                                     @endif
-                                    <span class="text-lg font-bold text-ink">₹{{ number_format((float) $item->unit_price * $item->qty) }}</span>
+                                    <span class="text-lg font-bold text-ink">@currency{{ number_format((float) $item->unit_price * $item->qty) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -127,11 +127,11 @@
                     <dl class="mt-5 space-y-3.5 text-sm">
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Subtotal ({{ $totals['count'] }} items)</dt>
-                            <dd class="font-semibold text-ink">₹{{ number_format($totals['subtotal']) }}</dd>
+                            <dd class="font-semibold text-ink">@currency{{ number_format($totals['subtotal']) }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
                             <dt class="text-ink/70">Shipping</dt>
-                            <dd class="font-semibold text-ink">{{ $shippingFee > 0 ? '₹'.number_format($shippingFee, 2) : 'Free' }}</dd>
+                            <dd class="font-semibold text-ink">@if($shippingFee > 0)@currency{{ number_format($shippingFee, 2) }}@else Free @endif</dd>
                         </div>
                         <x-gst-lines
                             :enabled="$gstQuote->enabled"
@@ -142,7 +142,7 @@
                         />
                         <div class="flex items-center justify-between border-t border-ink/10 pt-3.5">
                             <dt class="font-bold text-ink">Total</dt>
-                            <dd class="text-2xl font-bold text-ink">₹{{ number_format($grandTotal, 2) }}</dd>
+                            <dd class="text-2xl font-bold text-ink">@currency{{ number_format($grandTotal, 2) }}</dd>
                         </div>
                     </dl>
 

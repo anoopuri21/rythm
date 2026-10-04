@@ -18,6 +18,7 @@ use App\Models\Category;
 use App\Models\ContactMessage;
 use App\Models\Coupon;
 use App\Models\Faq;
+use App\Models\HeroBanner;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\HomepageCategoryRow;
@@ -61,6 +62,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -96,6 +98,7 @@ class AppServiceProvider extends ServiceProvider
             NewsletterSubscriber::class => MarketingPolicy::class,
             Page::class => ContentPolicy::class,
             Faq::class => ContentPolicy::class,
+            HeroBanner::class => ContentPolicy::class,
             HeroSlide::class => ContentPolicy::class,
             HomepageBlock::class => ContentPolicy::class,
             HomepageCategoryRow::class => ContentPolicy::class,
@@ -122,6 +125,7 @@ class AppServiceProvider extends ServiceProvider
             Brand::class,
             Page::class,
             Faq::class,
+            HeroBanner::class,
             HeroSlide::class,
             HomepageBlock::class,
             HomepageCategoryRow::class,
@@ -158,6 +162,11 @@ class AppServiceProvider extends ServiceProvider
         if (! $this->app->isProduction()) {
             Model::preventLazyLoading();
         }
+
+        // Currency symbol is an admin setting (NO-HARDCODE rule), so no view
+        // carries a literal symbol — every price renders through @currency.
+        Blade::directive('currency', static fn (): string =>
+            '<?php echo e(app(\App\Services\SiteSettingsService::class)->currencySymbol()); ?>');
 
         // DB-driven category tree for the navbar "Shop by Category" drawer.
         View::composer('components.navbar', function ($view): void {

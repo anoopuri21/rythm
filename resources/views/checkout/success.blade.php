@@ -38,7 +38,7 @@
                                     <p class="text-xs text-muted">{{ $item->options['finish'] ?? json_encode($item->options) }}</p>
                                 @endif
                             </div>
-                            <p class="shrink-0 text-sm text-ink">₹{{ number_format((float) $item->unit_price) }} × {{ $item->qty }}</p>
+                            <p class="shrink-0 text-sm text-ink">@currency{{ number_format((float) $item->unit_price) }} × {{ $item->qty }}</p>
                         </li>
                     @endforeach
                 </ul>
@@ -48,7 +48,7 @@
                     <x-gst-lines :enabled="$gst['enabled']" :cgst="$gst['cgst']" :sgst="$gst['sgst']" :igst="$gst['igst']" :tax="$gst['tax']" />
                     <div class="flex items-center justify-between">
                         <p class="font-bold text-ink">Total paid</p>
-                        <p class="text-2xl font-bold text-ink">₹{{ number_format((float) $order->total) }}</p>
+                        <p class="text-2xl font-bold text-ink">@currency{{ number_format((float) $order->total) }}</p>
                     </div>
                 </div>
 

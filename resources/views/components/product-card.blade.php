@@ -28,8 +28,8 @@
             <span class="tracking-wider text-gold">★★★★★</span><span class="{{ $dark ? 'text-white/40' : 'text-rythme-warm-gray' }}">({{ $product['reviews'] ?? 0 }})</span>
         </div>
         <div class="mt-auto flex items-end gap-2 pt-5">
-            <span class="text-lg font-bold">₹{{ $price }}</span>
-            @if($old)<span class="text-xs text-rythme-warm-gray line-through">₹{{ $old }}</span>@endif
+            <span class="text-lg font-bold">@currency{{ $price }}</span>
+            @if($old)<span class="text-xs text-rythme-warm-gray line-through">@currency{{ $old }}</span>@endif
         </div>
     </div>
 </article>

@@ -7,7 +7,7 @@
         <p class="section-kicker mb-4">Secure payment</p>
         <h1 class="section-title">Complete payment</h1>
         <p class="mt-4 text-sm leading-6 text-muted">
-            Order {{ $order->order_number }} · ₹{{ number_format((float) $order->total, 2) }}
+            Order {{ $order->order_number }} · @currency{{ number_format((float) $order->total, 2) }}
         </p>
         <p class="mt-6 rounded-xl bg-brand/5 px-4 py-3 text-sm text-ink" role="status" x-text="message">
             Opening the payment provider…

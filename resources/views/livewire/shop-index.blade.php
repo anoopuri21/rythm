@@ -11,22 +11,25 @@
                 <button type="button" wire:click="setCategory(null)" class="text-sm font-bold text-brand underline underline-offset-4">View all</button>
             @endif
         </div>
-        <div class="shop-shortcuts" role="list">
-            @foreach(array_slice($categories, 0, 8) as $shortcut)
-                @php
-                    $shortcutAsset = 'images/categories/'.$shortcut['slug'].'.jpg';
-                    $shortcutImage = $shortcut['image'] ?? (is_file(public_path($shortcutAsset)) ? '/'.$shortcutAsset : null);
-                @endphp
-                <button type="button" role="listitem" wire:click="setCategory('{{ $shortcut['slug'] }}')"
+        <div class="shop-shortcuts">
+            @php
+                // Admin → Settings → Storefront → "Category shortcuts shown".
+                $shortcutLimit = app(\App\Services\SiteSettingsService::class)
+                    ->getCount('shop_category_shortcuts', 2, 12);
+            @endphp
+            @foreach(array_slice($categories, 0, $shortcutLimit) as $shortcut)
+                <button type="button" wire:click="setCategory(@js($shortcut['slug']))"
                         class="shop-shortcut {{ $category === $shortcut['slug'] ? 'is-active' : '' }}"
                         aria-pressed="{{ $category === $shortcut['slug'] ? 'true' : 'false' }}">
-                    <span class="shop-shortcut__image">
-                        @if($shortcutImage)
-                            <img src="{{ $shortcutImage }}" alt="" width="160" height="160" loading="lazy" decoding="async">
-                        @else
-                            <span class="pcard__img-fallback" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3"/></svg>
-                            </span>
+                    {{-- Placeholder lives inside the fixed tile, so a missing image never collapses the row. --}}
+                    <span class="shop-shortcut__image" x-data="{ broken: false }">
+                        <span class="shop-shortcut__placeholder" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3"/></svg>
+                        </span>
+                        @if($shortcut['image'])
+                            <img src="{{ $shortcut['image'] }}" alt="" width="160" height="160" loading="lazy" decoding="async"
+                                 :class="{ 'is-missing': broken }" @error="broken = true"
+                                 x-init="broken = $el.complete && $el.naturalWidth === 0">
                         @endif
                     </span>
                     <span>{{ $shortcut['name'] }}</span>
@@ -139,7 +142,7 @@
             {{-- Price --}}
             <div class="border-b border-ink/10 py-6" x-data="{ priceOpen: true }">
                 <button type="button" @click="priceOpen = !priceOpen" class="flex w-full items-center justify-between py-1" :aria-expanded="priceOpen ? 'true' : 'false'">
-                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Price (₹)</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-ink">Price (@currency)</h2>
                     <svg class="h-4 w-4 text-muted transition-transform duration-200" :class="priceOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 <div x-cloak x-show="priceOpen" class="mt-3">
@@ -320,7 +323,7 @@
                     @endforeach
                     @if($this->minPrice !== null || $this->maxPrice !== null)
                         <span class="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">
-                            ₹{{ number_format((int) ($this->minPrice ?? 0)) }} – ₹{{ number_format((int) ($this->maxPrice ?? 999999)) }}
+                            @currency{{ number_format((int) ($this->minPrice ?? 0)) }} – @currency{{ number_format((int) ($this->maxPrice ?? 999999)) }}
                             <button type="button" wire:click="$set('minPrice', null); $set('maxPrice', null); $wire.resetPage()" class="transition hover:text-brand-dark" aria-label="Remove price filter">
                                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>

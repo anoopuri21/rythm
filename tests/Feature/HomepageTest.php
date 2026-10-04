@@ -24,7 +24,12 @@ class HomepageTest extends TestCase
         $response
             ->assertOk()
             ->assertViewIs('home.index')
-            ->assertViewHas('heroMode', 'slider')
+            // Hero banners ship with built-in copy (HeroBannerService::DEFAULTS)
+            // and are overridable from Admin → Hero banners.
+            ->assertSee('Stage Pianos')
+            ->assertSee('Tabla Sets')
+            ->assertSee('Studio Gear')
+            ->assertSee('Fresh gear, first play')
             // Main (arena) section order + classes
             ->assertSeeInOrder([
                 'id="hero"',

@@ -50,8 +50,9 @@ final class CategoryService
                         'id' => $category->id,
                         'name' => $category->name,
                         'slug' => $category->slug,
-                        'image' => $category->iconUrl()
-                            ?? (is_file(public_path($asset)) ? '/'.$asset : null),
+                        'image' => self::storefrontImage(
+                            $category->iconUrl() ?? (is_file(public_path($asset)) ? '/'.$asset : null)
+                        ),
                         'children' => $category->children
                             ->map(fn (Category $child): array => [
                                 'name' => $child->name,
@@ -62,6 +63,35 @@ final class CategoryService
                 })
                 ->all();
         });
+    }
+
+    /**
+     * Normalise a resolved icon for rendering inside `<img src>`.
+     *
+     * `icon_url` is free text in the admin form, so blanks and anything that is
+     * not a same-origin path or an http(s) URL are dropped here — once, at the
+     * cache boundary — instead of being re-checked in every view.
+     */
+    private static function storefrontImage(?string $url): ?string
+    {
+        // Browsers ignore control characters inside URLs, so strip them first or
+        // "java\nscript:" would slip past the scheme check below.
+        $url = trim((string) preg_replace('/[\x00-\x1F\x7F]/', '', (string) $url));
+
+        if ($url === '') {
+            return null;
+        }
+
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        // No scheme => same-origin (root-)relative asset path. `//host/...` is
+        // protocol-relative, not same-origin. (`parse_url` can also return
+        // false for a badly formed URL — treat that the same way.)
+        if (! is_string($scheme)) {
+            return str_starts_with($url, '//') ? null : $url;
+        }
+
+        return in_array(strtolower($scheme), ['http', 'https'], true) ? $url : null;
     }
 
     public function flush(): void

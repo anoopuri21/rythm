@@ -3632,8 +3632,13 @@ input:focus-visible {
   box-shadow: 0 16px 30px -24px rgba(0, 0, 0, 0.45);
   transform: translateY(-2px);
 }
+/* Square, position-anchored tile: the placeholder is absolutely positioned
+   inside it, so this must stay the containing block (without `position:
+   relative` it resolves against the viewport and paints a full-screen panel). */
 .shop-shortcut__image {
+  position: relative;
   display: block;
+  flex: 0 0 auto;
   width: 78px;
   height: 78px;
   overflow: hidden;
@@ -3641,9 +3646,45 @@ input:focus-visible {
   background: var(--color-paper-dark);
 }
 .shop-shortcut__image img {
+  position: relative;
+  z-index: 1;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* Resolved server-side but 404s in the browser: hide the <img> and let the
+   placeholder underneath show through. Tile geometry is untouched. */
+.shop-shortcut__image img.is-missing {
+  opacity: 0;
+}
+.shop-shortcut__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--color-ink) 30%, transparent);
+}
+.shop-shortcut__placeholder svg {
+  width: 30px;
+  height: 30px;
+}
+@media (max-width: 359px) {
+  .shop-shortcuts {
+    grid-auto-columns: minmax(96px, 1fr);
+    gap: 10px;
+  }
+  .shop-shortcut {
+    min-height: 122px;
+  }
+  .shop-shortcut__image {
+    width: 64px;
+    height: 64px;
+  }
+  .shop-shortcut__placeholder svg {
+    width: 26px;
+    height: 26px;
+  }
 }
 
 .shop-product-grid {
@@ -3667,10 +3708,12 @@ input:focus-visible {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+/* ≥1024px: no scroller. One equal track per category, whatever the count —
+   `repeat(8, …)` left empty tracks on the right whenever the catalogue held
+   fewer than eight parents. */
 @media (min-width: 1024px) {
   .shop-shortcuts {
-    grid-auto-flow: initial;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-columns: minmax(0, 1fr);
     overflow: visible;
   }
   .shop-shortcut {

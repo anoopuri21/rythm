@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\ContactMessage;
 use App\Models\Coupon;
 use App\Models\Faq;
+use App\Models\HeroBanner;
 use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\HomepageCategoryRow;
@@ -104,6 +105,7 @@ final class AdminAccess
         NewsletterSubscriber::class => ['view' => self::MARKETING_MANAGE, 'manage' => self::MARKETING_MANAGE],
         Page::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         Faq::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
+        HeroBanner::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HeroSlide::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HomepageBlock::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
         HomepageCategoryRow::class => ['view' => self::CONTENT_MANAGE, 'manage' => self::CONTENT_MANAGE],
