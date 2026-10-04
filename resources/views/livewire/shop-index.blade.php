@@ -26,9 +26,10 @@
                         <span class="shop-shortcut__placeholder" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 19l12-3"/></svg>
                         </span>
+                        {{-- "@@error" below is Blade-escaped: it is Alpine's img error listener, not the @error directive. --}}
                         @if($shortcut['image'])
                             <img src="{{ $shortcut['image'] }}" alt="" width="160" height="160" loading="lazy" decoding="async"
-                                 :class="{ 'is-missing': broken }" @error="broken = true"
+                                 :class="{ 'is-missing': broken }" @@error="broken = true"
                                  x-init="broken = $el.complete && $el.naturalWidth === 0">
                         @endif
                     </span>
