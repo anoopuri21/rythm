@@ -138,9 +138,22 @@ db_check() {
    ALL PRIVILEGES dena mat bhoolna."
 }
 
+verify_hero_banners_schema() {
+  say "Hero banners table check"
+  if ! "$PHP_BIN" artisan tinker --execute='
+    if (! \Illuminate\Support\Facades\Schema::hasTable("hero_banners")) {
+      throw new \RuntimeException("Required hero_banners table is missing.");
+    }
+  ' >/dev/null; then
+    die "hero_banners table check failed. Confirm .env DB_DATABASE, then run php artisan migrate --force and check migrate:status. Do not use migrate:fresh or db:wipe."
+  fi
+  ok "hero_banners table is present"
+}
+
 migrate() {
   say "Database migrate (tables banana)"
   "$PHP_BIN" artisan migrate --force
+  verify_hero_banners_schema
   ok "Migrations complete"
 }
 
@@ -270,7 +283,7 @@ case "${1:-}" in
     health
     say "UPDATE COMPLETE 🎉" ;;
   check)
-    php_version_check; check_assets; require_env; db_check; health; media_doctor || true ;;
+    php_version_check; check_assets; require_env; db_check; verify_hero_banners_schema; health; media_doctor || true ;;
   sync-public)
     sync_public ;;
   *)

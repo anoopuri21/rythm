@@ -5,6 +5,7 @@ import test from 'node:test';
 const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
 const consoleRoutes = read('routes/console.php');
+const deployScript = read('scripts/deploy-cpanel.sh');
 const hostingOps = read('tasks/PHASE_0B_SHARED_HOSTING_OPERATIONS.md');
 const rollback = read('docs/rollback-plan.md');
 const runbook = read('docs/ops-runbook.md');
@@ -24,6 +25,16 @@ await test('the cPanel cron contract invokes the scheduler every minute', () => 
     assert.match(hostingOps, /Oracle MySQL 8\.x/);
     assert.match(hostingOps, /does not satisfy the exact MySQL 8 gate/);
     assert.match(hostingOps, /never target persistent UAT or production\/cPanel data with `migrate:fresh`, `db:wipe`, `RefreshDatabase`/);
+});
+
+await test('deployment runs and verifies the hero-banners migration before claiming success', () => {
+    const migrate = deployScript.slice(deployScript.indexOf('migrate() {'), deployScript.indexOf('\nseed() {'));
+
+    assert.match(migrate, /artisan migrate --force/);
+    assert.match(migrate, /verify_hero_banners_schema/);
+    assert.match(deployScript, /artisan tinker --execute=/);
+    assert.match(deployScript, /Schema::hasTable\("hero_banners"\)/);
+    assert.match(deployScript, /verify_hero_banners_schema; health/);
 });
 
 await test('the rollback plan covers every layer and preserves financial data', () => {
