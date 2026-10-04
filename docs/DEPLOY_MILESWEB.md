@@ -326,6 +326,7 @@ Bas. Script khud:
 | Kya dikh raha hai | Matlab | Fix |
 |---|---|---|
 | **500 Server Error** | kuch toota hai | `tail -50 ~/app/storage/logs/laravel.log` chalao, error mujhe bhejo |
+| `Table '…hero_banners' doesn't exist` | Homepage banner migration pending hai ya app galat database se connect hai | Pehle `.env` me `DB_DATABASE` ko error me diye database se milao; phir `cd ~/app && php artisan migrate --force` chalao (ya poora `bash scripts/deploy-cpanel.sh update`). `php artisan migrate:status` se `2026_10_04_000002_create_hero_banners_table` verify karo. **`migrate:fresh` / `db:wipe` mat chalao.** Agar migration `Ran` hai par table phir bhi nahi, migration history manually edit na karo—schema drift ko forward migration se investigate/repair karo. |
 | Page **bina design** (plain text) | CSS load nahi hui | `ls ~/app/public/build/manifest.json` — na ho to `git pull` |
 | **"Vite manifest not found"** | wahi upar wali baat | same fix |
 | **403 Forbidden** | permissions / symlink | `chmod 755 ~ ~/app ~/app/public` + `chmod -R 775 ~/app/storage ~/app/bootstrap/cache` |

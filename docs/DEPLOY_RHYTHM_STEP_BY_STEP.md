@@ -306,6 +306,7 @@ Ye maintenance mode on karke update + migrate + cache refresh karke site wapas l
 | `SQLSTATE[HY000] [1045]` | DB password galat | Step 1.2 me naya password set karo → Step 3.2 wali `.env` dobara banao |
 | Setup me `Composer nahi mila` | Composer missing | Terminal me: `cd ~ && curl -sS https://getcomposer.org/installer | php -v` nahi chalega is form me — mujhe batao, exact command dunga |
 | Site khole to `500 Server Error` | App error | Terminal: `tail -30 ~/rythm/storage/logs/laravel.log` → last lines mujhe bhejo |
+| `Table '…hero_banners' doesn't exist` | Banner migration pending hai | `cd ~/rythm && php artisan migrate --force` chalao; `migrate:fresh` / `db:wipe` mat chalao. Agar migration `Ran` hai par table nahi, migration history manually mat badlo—forward repair investigate karo. |
 | Page khula par **bina CSS** (sab plain text) | Assets nahi mil rahe | `ls ~/rythm/public/build/manifest.json` chalao — file honi chahiye; docroot `rythm/public` hi hai ye verify karo |
 | `Vite manifest not found` | Build assets missing | `cd ~/rythm && git status` aur `ls public/build` → mujhe batao |
 | https warning / SSL error | AutoSSL pending | Step 1.3 dobara / MilesWeb support |
