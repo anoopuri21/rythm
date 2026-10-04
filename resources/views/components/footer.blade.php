@@ -1,6 +1,7 @@
 @php
-    $brand = config('rythme.brand_name');
-    $logo = config('rythme.logo_url');
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $brand = $settings->brandOrMedia('brand_name');
+    $logo = $settings->brandOrMedia('brand_logo_url');
     $cats = app(\App\Services\CategoryService::class)->tree();
     $brands = app(\App\Services\BrandService::class)->allWithCounts();
 @endphp
@@ -65,7 +66,7 @@
             <nav aria-labelledby="footer-shop">
                 <h3 id="footer-shop" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Shop</h3>
                 <ul class="mt-6 space-y-3.5">
-                    @foreach(array_slice($cats, 0, 5) as $cat)
+                    @foreach(array_slice($cats, 0, $settings->getCount('footer_category_links', 1, 24)) as $cat)
                         <li><a href="/shop?category={{ $cat['slug'] }}" class="footer-link text-sm text-white/60">{{ $cat['name'] }}</a></li>
                     @endforeach
                     <li><a href="/shop" class="footer-link text-sm font-semibold text-white/60">All products <span aria-hidden="true">→</span></a></li>
@@ -77,7 +78,7 @@
                 <nav aria-labelledby="footer-brands">
                     <h3 id="footer-brands" class="text-xs font-bold uppercase tracking-[0.2em] text-gold-light">Top brands</h3>
                     <ul class="mt-6 space-y-3.5">
-                        @foreach($brands->take(5) as $brandItem)
+                        @foreach($brands->take($settings->getCount('footer_brand_links', 1, 24)) as $brandItem)
                             <li><a href="/shop?brand[]={{ $brandItem->slug }}" class="footer-link text-sm text-white/60">{{ $brandItem->name }}</a></li>
                         @endforeach
                     </ul>

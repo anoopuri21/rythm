@@ -1,8 +1,9 @@
 {{-- Promo banners — DB HomepageBlock section "promo" only; hide when empty (C5). --}}
 @php
+    $settings = app(\App\Services\SiteSettingsService::class);
     $promos = collect($homepage['promos'] ?? [])
         ->filter(fn ($block) => filled($block->title ?? null))
-        ->take(2)
+        ->take($settings->getCount('home_promo_banners', 1, 12))
         ->values();
 @endphp
 

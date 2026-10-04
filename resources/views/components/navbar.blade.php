@@ -1,6 +1,7 @@
 @php
-    $brand = config('rythme.brand_name');
-    $logo = config('rythme.logo_url');
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $brand = $settings->brandOrMedia('brand_name');
+    $logo = $settings->brandOrMedia('brand_logo_url');
 @endphp
 
 {{-- ============================================================

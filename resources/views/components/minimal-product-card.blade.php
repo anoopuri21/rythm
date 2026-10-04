@@ -48,9 +48,9 @@
             <p class="mcard__brand">{{ $brand }}</p>
             <h3 class="mcard__name">{{ $name }}</h3>
             <div class="mcard__price mt-auto">
-                <span class="mcard__price-now">₹{{ number_format($price) }}</span>
+                <span class="mcard__price-now">@currency{{ number_format($price) }}</span>
                 @if($old)
-                    <span class="mcard__price-old">₹{{ number_format($old) }}</span>
+                    <span class="mcard__price-old">@currency{{ number_format($old) }}</span>
                 @endif
                 <span class="mcard__stock {{ $hasAvailableStock ? 'text-emerald-700' : 'text-muted' }}">{{ $hasAvailableStock ? 'In stock' : 'Out of stock' }}</span>
             </div>

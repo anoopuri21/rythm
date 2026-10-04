@@ -31,12 +31,12 @@
                         <strong>{{ $item->name }}</strong><br>
                         <span class="meta">SKU {{ $item->sku }} · Qty {{ $item->qty }}</span>
                     </td>
-                    <td align="right">₹{{ number_format((float) $item->total) }}</td>
+                    <td align="right">@currency{{ number_format((float) $item->total) }}</td>
                 </tr>
             @endforeach
             <tr class="total">
                 <td>Total paid ({{ $order->currency }})</td>
-                <td align="right">₹{{ $total }}</td>
+                <td align="right">@currency{{ $total }}</td>
             </tr>
         </table>
 

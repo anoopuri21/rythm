@@ -48,6 +48,17 @@ class ShopPageTest extends TestCase
             ->assertDontSee('Popularity');
     }
 
+    public function test_shop_category_shortcuts_keep_a_placeholder_tile_when_a_category_has_no_image(): void
+    {
+        $response = $this->get('/shop')->assertOk();
+
+        // The placeholder is rendered unconditionally inside a fixed square tile,
+        // so an empty/null/404ing categories.image cannot collapse the row or
+        // let an absolutely-positioned fallback escape to the viewport.
+        $response->assertSee('shop-shortcut__placeholder', escape: false);
+        $response->assertDontSee('pcard__img-fallback');
+    }
+
     public function test_shop_seo_policy_distinguishes_base_pagination_and_filtered_queries(): void
     {
         $this->get('/shop')

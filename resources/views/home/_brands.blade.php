@@ -1,4 +1,5 @@
 @php
+    $settings = app(\App\Services\SiteSettingsService::class);
     $sec = $homeSections['brands'] ?? null;
     $brands = $homepage['brands'] ?? collect();
     if ($brands->isEmpty() && isset($homepage['brandNames'])) {
@@ -45,7 +46,7 @@
                             $count = is_array($brand) ? (int) ($brand['count'] ?? 0) : 0;
                             $initials = collect(preg_split('/\s+/', trim($name)) ?: [])
                                 ->filter()
-                                ->take(2)
+                                ->take($settings->getCount('home_brands_shown', 1, 12))
                                 ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))
                                 ->implode('');
                             if ($initials === '') {

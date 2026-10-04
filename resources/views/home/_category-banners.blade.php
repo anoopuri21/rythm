@@ -1,8 +1,9 @@
 {{-- Category discovery banners — only active categories that have products (C5). --}}
 @php
+    $settings = app(\App\Services\SiteSettingsService::class);
     $banners = collect($homepage['popularCategories'] ?? [])
         ->filter(fn (array $cat): bool => ($cat['count'] ?? 0) > 0)
-        ->take(3)
+        ->take($settings->getCount('home_category_banners', 1, 12))
         ->values();
 @endphp
 

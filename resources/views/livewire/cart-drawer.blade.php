@@ -75,7 +75,7 @@
                                 <span class="w-6 text-center text-xs font-bold text-ink">{{ $quantities[$item->id]['qty'] }}</span>
                                 <button type="button" wire:click="updateQty({{ $item->id }}, {{ min(99, $quantities[$item->id]['qty'] + 1) }})" class="flex h-8 w-8 items-center justify-center rounded-full text-ink transition hover:text-brand" aria-label="Increase quantity">+</button>
                             </div>
-                            <p class="text-sm font-bold text-ink">₹{{ number_format((float) $item->unit_price * $item->qty) }}</p>
+                            <p class="text-sm font-bold text-ink">@currency{{ number_format((float) $item->unit_price * $item->qty) }}</p>
                         </div>
                     </div>
                 </div>
@@ -97,7 +97,7 @@
             <div class="ui-summary-panel mx-4 mb-4 rounded-2xl px-5 py-5">
                 <div class="mb-4 flex items-center justify-between">
                     <span class="text-sm text-muted">Subtotal</span>
-                    <span class="text-xl font-bold text-ink">₹{{ number_format($totals['subtotal']) }}</span>
+                    <span class="text-xl font-bold text-ink">@currency{{ number_format($totals['subtotal']) }}</span>
                 </div>
                 <p class="mb-4 text-xs text-muted">Shipping and GST are confirmed at checkout.</p>
                 <a href="{{ route('cart.index') }}" class="mb-2.5 block w-full rounded-full bg-ink py-3.5 text-center text-sm font-bold text-white transition hover:bg-ink-soft">

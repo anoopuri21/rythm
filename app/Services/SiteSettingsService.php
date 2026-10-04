@@ -47,6 +47,57 @@ final class SiteSettingsService
         'mail_from_pending_address' => '',
         'mail_from_pending_token' => '',
         'mail_from_pending_sent_at' => '',
+
+        /*
+        |----------------------------------------------------------------------
+        | Storefront presentation (NO-HARDCODE rule — docs/NO_HARDCODE_PLAN.md)
+        | Every default below is the value that used to be written into the
+        | Blade/PHP source, so switching to settings changes nothing until an
+        | admin edits it.
+        |----------------------------------------------------------------------
+        */
+        'currency_symbol' => '₹',
+        'shop_category_shortcuts' => '8',
+        'home_hero_slides' => '3',
+        'home_bestsellers_limit' => '8',
+        'home_new_arrivals_limit' => '10',
+        'home_trending_limit' => '10',
+        'home_deals_limit' => '8',
+        'home_brands_limit' => '16',
+        'home_brands_shown' => '2',
+        'home_category_banners' => '3',
+        'home_testimonials' => '3',
+        'home_faqs' => '6',
+        'home_promo_banners' => '2',
+        'offer_marquee_items' => '8',
+        'offer_min_discount' => '10',
+        'offer_max_discount' => '50',
+        'footer_category_links' => '5',
+        'footer_brand_links' => '5',
+        // Comma-separated product slugs for the "Recently launched" rail.
+        'recently_launched_slugs' => 'roland-fp-30x-digital-piano,krk-rokit-5-g4-studio-monitor-single,'
+            .'akg-k240-studio-headphones,fender-mustang-lt25-modelling-amp,'
+            .'casio-ct-s300-portable-keyboard,numark-mixtrack-pro-fx',
+
+        /*
+        |----------------------------------------------------------------------
+        | Brand & media — empty means "use config/rythme.php", so existing
+        | installs keep working until an admin saves real values here.
+        |----------------------------------------------------------------------
+        */
+        'brand_name' => '',
+        'brand_short' => '',
+        'brand_logo_url' => '',
+    ];
+
+    /**
+     * config/rythme.php fallback for each brand/media setting. These stay as a
+     * last-resort default only; the admin value always wins.
+     */
+    private const CONFIG_FALLBACKS = [
+        'brand_name' => 'rythme.brand_name',
+        'brand_short' => 'rythme.brand_short',
+        'brand_logo_url' => 'rythme.logo_url',
     ];
 
     /** @return array<string, string> */
@@ -67,6 +118,52 @@ final class SiteSettingsService
     public function getFloat(string $key, float $default = 0.0): float
     {
         return (float) ($this->get($key) ?? $default);
+    }
+
+    /**
+     * A count / limit setting. Falls back to DEFAULTS and is clamped, so a
+     * blank or absurd admin value can never render an empty section or a row
+     * that overflows its grid.
+     */
+    public function getCount(string $key, int $min = 1, int $max = 24): int
+    {
+        $value = (int) ($this->all()[$key] ?? $min);
+
+        return max($min, min($max, $value));
+    }
+
+    /** Brand / media setting, falling back to config/rythme.php when unset. */
+    public function brandOrMedia(string $key): string
+    {
+        $value = trim((string) $this->get($key, ''));
+
+        if ($value !== '') {
+            return $value;
+        }
+
+        return (string) config(self::CONFIG_FALLBACKS[$key] ?? '', '');
+    }
+
+    /**
+     * Storefront currency symbol. Rendered through the `@currency` Blade
+     * directive so no view carries a literal symbol.
+     */
+    public function currencySymbol(): string
+    {
+        $symbol = trim((string) $this->get('currency_symbol', ''));
+
+        return $symbol !== '' ? $symbol : self::DEFAULTS['currency_symbol'];
+    }
+
+    /** @return list<string> Comma-separated setting as a clean slug list. */
+    public function slugList(string $key): array
+    {
+        $parts = explode(',', (string) $this->get($key, ''));
+
+        return array_values(array_unique(array_filter(
+            array_map(fn (string $part): string => trim($part), $parts),
+            static fn (string $part): bool => $part !== '',
+        )));
     }
 
     /**

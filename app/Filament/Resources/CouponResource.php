@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Services\SiteSettingsService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -43,13 +44,13 @@ class CouponResource extends Resource
                 ->helperText('Customer enters this code at checkout. Saved in UPPERCASE.'),
             Select::make('type')->options([
                 Coupon::TYPE_PERCENT => 'Percent (%)',
-                Coupon::TYPE_FIXED => 'Fixed (₹)',
+                Coupon::TYPE_FIXED => 'Fixed ('.app(SiteSettingsService::class)->currencySymbol().')',
             ])->required()->live(),
             TextInput::make('value')->numeric()->required()->minValue(0.01)
                 ->maxValue(fn ($get): ?int => $get('type') === Coupon::TYPE_PERCENT ? 100 : null)
-                ->helperText('Percent must be 0.01–100; fixed amount is in ₹.'),
-            TextInput::make('min_order')->numeric()->default(0)->minValue(0)->prefix('₹'),
-            TextInput::make('max_discount')->numeric()->nullable()->minValue(0.01)->prefix('₹')
+                ->helperText('Percent must be 0.01–100; fixed amount is in '.app(SiteSettingsService::class)->currencySymbol().'.'),
+            TextInput::make('min_order')->numeric()->default(0)->minValue(0)->prefix(app(SiteSettingsService::class)->currencySymbol()),
+            TextInput::make('max_discount')->numeric()->nullable()->minValue(0.01)->prefix(app(SiteSettingsService::class)->currencySymbol())
                 ->helperText('Max discount cap for percent coupons (optional).'),
             DateTimePicker::make('starts_at'),
             DateTimePicker::make('expires_at')->after('starts_at'),
@@ -64,7 +65,7 @@ class CouponResource extends Resource
             ->columns([
                 TextColumn::make('code')->badge()->color('gray')->searchable()->sortable()->fontFamily('mono'),
                 TextColumn::make('type')->badge(),
-                TextColumn::make('value')->label('Value')->formatStateUsing(fn (Coupon $record): string => $record->type === 'percent' ? $record->value.'%' : '₹'.$record->value),
+                TextColumn::make('value')->label('Value')->formatStateUsing(fn (Coupon $record): string => $record->type === 'percent' ? $record->value.'%' : app(SiteSettingsService::class)->currencySymbol().$record->value),
                 TextColumn::make('min_order')->money('INR'),
                 TextColumn::make('used_count')->label('Uses')->suffix(fn (Coupon $record): string => $record->max_uses ? '/'.$record->max_uses : ''),
                 TextColumn::make('expires_at')->dateTime('d M Y')->placeholder('Never')->sortable(),

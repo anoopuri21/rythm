@@ -44,8 +44,8 @@
                         @endif
                         <h3 class="pcard__name"><a href="{{ $href }}">{{ $product->name }}</a></h3>
                         <p class="pcard__price">
-                            <del>₹{{ number_format((float) $product->compare_at_price) }}</del>
-                            <ins>₹{{ number_format((float) $product->price) }}</ins>
+                            <del>@currency{{ number_format((float) $product->compare_at_price) }}</del>
+                            <ins>@currency{{ number_format((float) $product->price) }}</ins>
                         </p>
 
                         <p class="dealcard__stock" aria-label="Availability">

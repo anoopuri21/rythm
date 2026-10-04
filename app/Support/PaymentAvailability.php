@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Payment\RazorpayGateway;
+use App\Services\SiteSettingsService;
 
 /**
  * Storefront-facing payment readiness (C4 / W2).
@@ -63,7 +64,7 @@ final class PaymentAvailability
 
     public static function payButtonLabel(float $grandTotal): string
     {
-        $amount = '₹'.number_format($grandTotal, 0);
+        $amount = app(SiteSettingsService::class)->currencySymbol().number_format($grandTotal, 0);
 
         return match (self::mode()) {
             'razorpay' => "Pay {$amount}",

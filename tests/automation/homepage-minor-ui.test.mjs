@@ -25,7 +25,7 @@ test('homepage top bar is settings-driven and hides missing contact data', async
   assert.match(settings, /'contact_phone'\s*=>\s*''/);
 });
 
-test('homepage offer marquee sits directly after the hero and only renders truthful 10 to 50 percent deals', async () => {
+test('homepage offer marquee sits directly after the hero and only renders deals inside the admin discount window', async () => {
   const [home, marquee, service] = await Promise.all([
     read('resources/views/home/index.blade.php'),
     read('resources/views/home/_offer-marquee.blade.php'),
@@ -34,8 +34,12 @@ test('homepage offer marquee sits directly after the hero and only renders truth
 
   assert.match(home, /home\._hero[\s\S]*home\._offer-marquee/);
   assert.match(marquee, /bestDeals/);
-  assert.match(marquee, /discount.*>= 10/);
-  assert.match(marquee, /discount.*<= 50/);
+  // The 10-50% window is an admin setting now (NO-HARDCODE rule), not a literal.
+  assert.match(marquee, /discount.*>= \$minDiscount/);
+  assert.match(marquee, /discount.*<= \$maxDiscount/);
+  assert.match(marquee, /getCount\('offer_min_discount', 0, 100\)/);
+  assert.match(marquee, /getCount\('offer_max_discount', 0, 100\)/);
+  assert.doesNotMatch(marquee, /discount.*>= 10|discount.*<= 50/);
   assert.match(marquee, /route\('product\.show'/);
   assert.match(marquee, /aria-hidden="true"/);
   assert.match(marquee, /offer-marquee__track/);
@@ -70,8 +74,9 @@ test('homepage offer popup is homepage-only, offer-backed, close-persistent and 
   assert.match(home, /home\._offer-popup/);
   assert.doesNotMatch(layout, /offer-popup/);
   assert.match(popup, /bestDeals/);
-  assert.match(popup, /discount >= 10/);
-  assert.match(popup, /discount <= 50/);
+  assert.match(popup, /discount >= \$minDiscount/);
+  assert.match(popup, /discount <= \$maxDiscount/);
+  assert.match(popup, /getCount\('offer_min_discount', 0, 100\)/);
   assert.match(popup, /data-offer-popup/);
   assert.match(popup, /data-offer-popup-close/);
   assert.match(popup, /role="dialog"/);

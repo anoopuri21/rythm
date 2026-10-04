@@ -8,6 +8,7 @@ use App\Filament\Resources\ReturnRequestResource\Pages;
 use App\Models\ReturnRequest;
 use App\Models\User;
 use App\Services\ReturnRequestService;
+use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
@@ -122,7 +123,7 @@ final class ReturnRequestResource extends Resource
                 && in_array($record->status, [ReturnRequest::STATUS_APPROVED, ReturnRequest::STATUS_RECEIVED], true))
             ->requiresConfirmation()
             ->schema([
-                TextInput::make('amount')->numeric()->prefix('₹')->minValue(0.01)->required(),
+                TextInput::make('amount')->numeric()->prefix(app(SiteSettingsService::class)->currencySymbol())->minValue(0.01)->required(),
                 Textarea::make('reason')
                     ->label('Financial review reason')
                     ->required()

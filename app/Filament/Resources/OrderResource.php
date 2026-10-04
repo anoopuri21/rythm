@@ -14,6 +14,7 @@ use App\Payment\RazorpayGateway;
 use App\Services\FulfillmentService;
 use App\Services\OrderService;
 use App\Services\RefundService;
+use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -341,7 +342,7 @@ class OrderResource extends Resource
             ->schema([
                 TextInput::make('amount')
                     ->numeric()
-                    ->prefix('₹')
+                    ->prefix(app(SiteSettingsService::class)->currencySymbol())
                     ->minValue(0.01)
                     ->required(),
                 Textarea::make('reason')

@@ -19,13 +19,15 @@
         </h2>
 
         <div class="launch-mm__layout">
-            {{-- Tall promo banner --}}
-            <a href="/shop" class="launch-mm__banner" style="background-image:url('{{ asset('images/brand-feature.jpg') }}')">
+            {{-- Tall promo banner — built-in default lives in HeroBannerService::DEFAULTS;
+                 an admin row in "Hero banners" (slot: launch-banner) overrides it. --}}
+            @php $launch = app(\App\Services\HeroBannerService::class)->get(\App\Services\HeroBannerService::SLOT_LAUNCH_BANNER); @endphp
+            <a href="{{ $launch['href'] }}" class="launch-mm__banner" style="background-image:url('{{ $launch['image'] }}')">
                 <span class="launch-mm__scrim" aria-hidden="true"></span>
                 <span class="launch-mm__banner-content">
-                    <span class="launch-mm__kicker">Just landed</span>
-                    <span class="launch-mm__banner-title">Fresh gear,<br>first play</span>
-                    <span class="launch-mm__cta">Explore all <span aria-hidden="true">&rarr;</span></span>
+                    <span class="launch-mm__kicker">{{ $launch['subtitle'] }}</span>
+                    <span class="launch-mm__banner-title">{!! nl2br(e($launch['title'])) !!}</span>
+                    <span class="launch-mm__cta">{{ $launch['cta_label'] }} <span aria-hidden="true">&rarr;</span></span>
                 </span>
             </a>
 

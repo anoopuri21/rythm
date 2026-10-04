@@ -1,4 +1,7 @@
 @php
+    $settings = app(\App\Services\SiteSettingsService::class);
+    $minDiscount = $settings->getCount('offer_min_discount', 0, 100);
+    $maxDiscount = $settings->getCount('offer_max_discount', 0, 100);
     $offers = collect($homepage['bestDeals'] ?? [])
         ->map(function ($product): ?array {
             $compareAt = (float) ($product->compare_at_price ?? 0);
@@ -13,8 +16,8 @@
                 'discount' => (int) floor((($compareAt - $price) / $compareAt) * 100),
             ];
         })
-        ->filter(fn (?array $offer): bool => $offer !== null && $offer['discount'] >= 10 && $offer['discount'] <= 50)
-        ->take(8)
+        ->filter(fn (?array $offer): bool => $offer !== null && $offer['discount'] >= $minDiscount && $offer['discount'] <= $maxDiscount)
+        ->take($settings->getCount('offer_marquee_items', 1, 24))
         ->values();
 @endphp
 

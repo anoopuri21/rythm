@@ -11,6 +11,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\ImportedProductActivationService;
+use App\Services\SiteSettingsService;
 use App\Support\AdminAccess;
 use App\Support\SkuGenerator;
 use Filament\Actions\Action;
@@ -132,9 +133,9 @@ class ProductResource extends Resource
                                         return (int) $brand->id;
                                     })
                                     ->helperText('Manufacturer label only (not a marketplace seller).'),
-                                TextInput::make('price')->numeric()->required()->minValue(0)->prefix('₹')
+                                TextInput::make('price')->numeric()->required()->minValue(0)->prefix(app(SiteSettingsService::class)->currencySymbol())
                                     ->helperText('Base selling price (variants may override).'),
-                                TextInput::make('compare_at_price')->numeric()->minValue(0)->prefix('₹')
+                                TextInput::make('compare_at_price')->numeric()->minValue(0)->prefix(app(SiteSettingsService::class)->currencySymbol())
                                     ->helperText('Optional MRP — strikethrough when higher than selling price.'),
                                 TextInput::make('stock')->numeric()->required()->default(0)->minValue(0)
                                     ->helperText('Used when the product has no active variants. With variants, each option has its own stock.'),
@@ -182,7 +183,7 @@ class ProductResource extends Resource
                                             TextInput::make('sku')->unique(ignoreRecord: true)
                                                 ->trim()
                                                 ->helperText('Leave blank to auto-generate'),
-                                            TextInput::make('price_override')->numeric()->minValue(0)->prefix('₹')
+                                            TextInput::make('price_override')->numeric()->minValue(0)->prefix(app(SiteSettingsService::class)->currencySymbol())
                                                 ->label('Price override (optional)')
                                                 ->helperText('Blank = use product base price'),
                                             TextInput::make('stock')->numeric()->default(0)->minValue(0)

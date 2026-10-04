@@ -17,19 +17,19 @@
     @if($igst > 0)
         <div {{ $attributes->class('flex items-center justify-between') }}>
             <dt class="text-ink/70">IGST</dt>
-            <dd class="font-semibold text-ink">₹{{ number_format($igst, 2) }}</dd>
+            <dd class="font-semibold text-ink">@currency{{ number_format($igst, 2) }}</dd>
         </div>
     @else
         @if($cgst > 0)
             <div {{ $attributes->class('flex items-center justify-between') }}>
                 <dt class="text-ink/70">CGST</dt>
-                <dd class="font-semibold text-ink">₹{{ number_format($cgst, 2) }}</dd>
+                <dd class="font-semibold text-ink">@currency{{ number_format($cgst, 2) }}</dd>
             </div>
         @endif
         @if($sgst > 0)
             <div class="flex items-center justify-between">
                 <dt class="text-ink/70">SGST</dt>
-                <dd class="font-semibold text-ink">₹{{ number_format($sgst, 2) }}</dd>
+                <dd class="font-semibold text-ink">@currency{{ number_format($sgst, 2) }}</dd>
             </div>
         @endif
     @endif

@@ -40,6 +40,17 @@ class HomepageBlockResource extends Resource
                 ->required()
                 ->searchable()
                 ->helperText('Which homepage section this item belongs to.'),
+            Select::make('icon')
+                ->label('Icon')
+                ->options([
+                    'box' => 'Box / catalogue',
+                    'truck' => 'Truck / delivery',
+                    'shield-check' => 'Shield / trust',
+                    'credit-card' => 'Card / checkout',
+                    'sparkles' => 'Sparkles / highlight',
+                ])
+                ->placeholder('None')
+                ->helperText('Optional glyph shown with the item (USP strip). Paths live in components/ui/icon.'),
             TextInput::make('title')
                 ->required()
                 ->helperText('Testimonial name / story title / stat value ("12+") / USP heading / promo heading.'),
