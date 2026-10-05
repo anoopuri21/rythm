@@ -114,6 +114,44 @@ class MediaReuseTest extends TestCase
         $this->assertSame($media->getUrl(), $product->fresh()->ogImage());
     }
 
+    // ── The lookup that every reuse path goes through ───────────────────────
+
+    public function test_resolving_to_matches_the_owner_row_and_every_usage(): void
+    {
+        $owner = Product::factory()->create();
+        $media = $owner->addMedia(UploadedFile::fake()->image('resolve.jpg', 60, 60))
+            ->toMediaCollection('gallery');
+
+        $other = Product::factory()->create();
+        $reference = app(MediaReuseService::class)->attach($media, $other, 'gallery');
+
+        $basePath = $media->sharingBasePath();
+
+        // The row that owns the file (matched by the primary key the base path
+        // is derived from) plus every row that reuses it.
+        $this->assertSame(
+            [$media->getKey(), $reference->getKey()],
+            Media::query()->resolvingTo($basePath)->orderBy('id')->pluck('id')->all(),
+            'The scope must return the owner row and its usages, not just the shared rows.',
+        );
+
+        // Excluding one row — what the file observer does while deleting it —
+        // must leave the others standing.
+        $this->assertSame(
+            [$reference->getKey()],
+            Media::rowsResolvingTo($basePath, $media->getKey())->pluck('id')->all(),
+        );
+
+        // Rows of a different file are never swept up by the OR.
+        $unrelated = Product::factory()->create()
+            ->addMedia(UploadedFile::fake()->image('unrelated.jpg', 60, 60))
+            ->toMediaCollection('gallery');
+
+        $this->assertFalse(
+            Media::query()->resolvingTo($unrelated->sharingBasePath())->whereKey($media->getKey())->exists(),
+        );
+    }
+
     // ── Conversions upgrade every usage ─────────────────────────────────────
 
     public function test_conversion_completion_upgrades_every_usage(): void

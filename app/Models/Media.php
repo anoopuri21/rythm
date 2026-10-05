@@ -164,7 +164,12 @@ class Media extends SpatieMedia
             $inner->where('shared_path', $basePath);
 
             if ($ownerKey !== null) {
-                $inner->orWhereKey($ownerKey);
+                // The owner row is the one whose id the base path is derived
+                // from — it carries no `shared_path` of its own. There is no
+                // `orWhereKey()` on the Eloquent/query builder (only
+                // `whereKey()` / `whereKeyNot()`), so the OR is built as a
+                // nested where on the qualified primary key.
+                $inner->orWhere(fn (Builder $byKey): Builder => $byKey->whereKey($ownerKey));
             }
         });
     }
