@@ -125,6 +125,53 @@ test('the rollout stays off for the PHP test suite unless a test opts in', async
     assert.match(phpunit, /<env name="MEDIA_CLOUDINARY" value="false" force="true"\/>/);
 });
 
+test('the Cloudinary suite proves no upload is written to the local disk', async () => {
+    const suite = await read('tests/Feature/CloudinaryMediaTest.php');
+
+    // Every phase-1 collection that the owner uploads through has a test that
+    // asserts the file exists on the cloud disk AND does not exist on the
+    // public (local, web-served) disk. Losing that pair would let a regression
+    // silently start storing product/category images on this server again.
+    const cloudExists = suite.match(/Storage::disk\('cloudinary'\)->exists\(\$media->getPathRelativeToRoot\(\)\)/g) ?? [];
+    const localMissing = suite.match(/assertFalse\(\s*Storage::disk\('public'\)->exists\(\$media->getPathRelativeToRoot\(\)\)/g) ?? [];
+
+    assert.ok(cloudExists.length >= 3, `Expected product, category and variant uploads to assert the cloud file exists (found ${cloudExists.length})`);
+    assert.ok(localMissing.length >= 3, `Expected at least 3 "nothing on the local disk" assertions (found ${localMissing.length})`);
+
+    // A legacy row must keep its exact /storage URL with the rollout on —
+    // media:sync-urls included (M-2/M-7).
+    assert.ok(suite.includes('test_enabling_cloudinary_never_changes_a_legacy_storage_url'));
+    assert.match(suite, /assertSame\(\$thumbBefore, \$fresh->thumbnail_url/);
+    assert.match(suite, /artisan\('media:sync-urls'\)/);
+
+    // Reuse (M-10) and duplicate cleanup (media:dedupe) are covered ON the
+    // cloud disk: one asset, no second upload, no local copy.
+    assert.ok(suite.includes('test_a_reused_image_stays_one_cloudinary_asset_and_uploads_nothing'));
+    assert.ok(suite.includes('test_media_dedupe_merges_duplicate_cloud_uploads_into_one_asset'));
+    assert.match(suite, /assertCount\(1, Storage::disk\('cloudinary'\)->allFiles\(\)/);
+});
+
+test('reuse, dedupe and relocation stay cloud-aware in the media services', async () => {
+    const [reuse, relocation, observer] = await Promise.all([
+        read('app/Services/MediaReuseService.php'),
+        read('app/Services/MediaRelocationService.php'),
+        read('app/Observers/MediaFileObserver.php'),
+    ]);
+
+    // A reused row inherits the owner's disk — cloud assets are shared by
+    // public_id, so the usage resolves to the same one asset (never re-uploaded).
+    assert.match(reuse, /'disk' => \$owner->disk/);
+    assert.match(reuse, /'conversions_disk' => \$owner->conversions_disk/);
+    // The duplicate copy is deleted from ITS disk (cloud included), and every
+    // cleanup call is Throwable-tolerant: the adapter throws when a delete fails.
+    assert.match(reuse, /Storage::disk\(\$diskName\)->delete\(\$original\)/);
+    assert.match(reuse, /array_unique\(\[\$disk, \$derivedDisk\]\)/);
+
+    // Nothing may copy a cloud file onto this server to "repair" it.
+    assert.match(relocation, /MediaDisk::isCloudinary\(\$originalDisk\)/);
+    assert.doesNotMatch(observer, /Storage::disk\(MediaDisk::mediaDisk/);
+});
+
 test('the rollout is documented next to the media architecture contract', async () => {
     const [doc, architecture] = await Promise.all([
         read('docs/cloudinary-media.md'),
@@ -135,4 +182,12 @@ test('the rollout is documented next to the media architecture contract', async 
     assert.match(doc, /media:doctor/);
     assert.match(architecture, /\| M-9 \|/);
     assert.match(architecture, /cloudinary-media\.md/);
+
+    // The verification section must keep the two proofs the owner asked for:
+    // nothing lands on the local disk, and an old image keeps its exact URL.
+    assert.match(doc, /php artisan test --filter=CloudinaryMediaTest/);
+    assert.match(doc, /find storage\/app\/public -type f \| wc -l/);
+    assert.match(doc, /storage\/app\/public` still has no new file/);
+    assert.match(doc, /exact\*\* original[\s\S]{0,40}\/storage\/\.\.\./);
+    assert.match(doc, /php artisan media:dedupe --dry-run/);
 });

@@ -94,21 +94,54 @@ Extension-less uploads deliver at the extension-less path.
 
 ## 4. Verify
 
+### 4.1 Automated (no browser needed)
+
+```bash
+php artisan test --filter=CloudinaryMediaTest   # phase-1 uploads, reuse, dedupe, legacy URLs
+php artisan test --filter=MediaReuseTest        # M-10 reuse contracts on the media disk
+```
+
+`CloudinaryMediaTest` runs with a **fake** cloud disk (no credentials, no
+network) and asserts the contract rather than a particular account:
+
+* a product gallery/og upload, a category icon and a variant image are stored on
+  the `cloudinary` disk and **absent** from `storage/app/public`;
+* the storefront serves the derived `https://res.cloudinary.com/<cloud>/...`
+  transformation URL for each of them;
+* a reused image stays **one** asset (public_id) and uploads nothing;
+* `media:dedupe` merges two identical cloud uploads into one asset without
+  touching the local disk;
+* a legacy `/storage/...` row keeps its exact URL, `media:sync-urls` included;
+* `media:relocate` / `media:doctor` never touch cloud rows.
+
+### 4.2 On the server (after `composer require` + `.env`)
+
 ```bash
 php artisan media:doctor          # expect: Cloudinary ready — collections [...]
 php artisan media:sync-urls       # backfills any column still NULL (idempotent)
+php artisan test --filter=CloudinaryMediaTest
 ```
 
-In the panel: upload a product gallery image and a category icon, then check
+Then, in the panel:
 
-1. the admin thumbnail renders immediately (no `/storage` path),
-2. the DB row: `php artisan tinker` →
+1. note the current file count on the web-served disk —
+   `find storage/app/public -type f | wc -l` — upload a product gallery image,
+   a variant image and a category icon, and check the count is **unchanged**;
+2. the admin thumbnail renders immediately (a `res.cloudinary.com` URL, not a
+   `/storage` path);
+3. `php artisan tinker` →
    `App\Models\Product::latest('id')->first()->thumbnail_url` starts with
-   `https://res.cloudinary.com/`,
-3. `Storage::disk('cloudinary')->exists('12/photo.jpg')` is `true`,
-4. `storage/app/public` gained **no** file for that upload, and
-5. an OLD product/category image still renders from its original `/storage/...`
-   URL.
+   `https://res.cloudinary.com/`;
+4. `Storage::disk('cloudinary')->exists('12/photo.jpg')` is `true`
+   (the driver strips the extension before asking Cloudinary — see §3);
+5. an OLD product/category image still renders from its **exact** original
+   `/storage/...` URL (no rewrite, no 404);
+6. reuse: Media library → **Use elsewhere** on a Cloudinary image → the target
+   product shows the same URL, the Cloudinary dashboard asset count does **not**
+   grow, and `storage/app/public` still has no new file;
+7. duplicates: `php artisan media:dedupe --dry-run` lists the duplicate cloud
+   uploads it would merge, `php artisan media:dedupe` merges them, and both
+   products keep rendering the same image.
 
 ## 5. Operations
 
@@ -121,7 +154,11 @@ In the panel: upload a product gallery image and a category icon, then check
   brand `logo`, hero `image`/`desktop_image`/`mobile_image`, homepage block
   `image`.
 * **Never** run `media:relocate` expecting it to move Cloudinary files, and
-  never add a cloud disk to a `media:doctor` local-file check.
+  never add a cloud disk to a `media:doctor` local-file check. `media:sync-urls`
+  is safe to re-run: it recomputes each affected column and writes only real
+  differences (`resolvedMediaUrlChanges()`), and a legacy row's resolution is
+  its own `/storage/...` value — so it stays byte-identical. An empty resolution
+  (e.g. credentials missing) never overwrites a non-empty stored URL.
 * **Reuse keeps it one asset** (`docs/media-reuse.md`, M-10): a reused image is a
   shared media row, so its public_id is the owner's — Cloudinary stores and
   bills **one** asset no matter how many products/categories use it. Reused rows

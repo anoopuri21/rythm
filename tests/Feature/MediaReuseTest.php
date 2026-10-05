@@ -213,11 +213,13 @@ class MediaReuseTest extends TestCase
         $productB = Product::factory()->create();
 
         // The very same bytes uploaded twice (exactly what the owner complained
-        // about) — two media rows, two files.
+        // about) — two media rows, two files. `preservingOriginal()` matters:
+        // Spatie unlinks the source path after a successful add, so without it
+        // the second upload would find no file (and the bytes would differ).
         $path = UploadedFile::fake()->image('same-photo.jpg', 70, 70)->getRealPath();
 
-        $owner = $productA->addMedia($path)->usingFileName('same-photo.jpg')->toMediaCollection('gallery');
-        $duplicate = $productB->addMedia($path)->usingFileName('same-photo.jpg')->toMediaCollection('gallery');
+        $owner = $productA->addMedia($path)->preservingOriginal()->usingFileName('same-photo.jpg')->toMediaCollection('gallery');
+        $duplicate = $productB->addMedia($path)->preservingOriginal()->usingFileName('same-photo.jpg')->toMediaCollection('gallery');
 
         $duplicatePath = $duplicate->getPathRelativeToRoot();
         $keptPath = $owner->getPathRelativeToRoot();

@@ -1,7 +1,9 @@
 # Cloudinary media — phase 1 (products + categories) plan
 
-**Status:** PARTIAL — code + docs + static tests in tree; PHPUnit + a real
-Cloudinary verification pending on the owner's PHP host.
+**Status:** PARTIAL (verified) — code + docs + tests in tree; a static audit of
+every product/category write path plus the automated suite below confirm that
+nothing is written to `storage/app/public`. The PHPUnit run and one real
+Cloudinary upload remain the owner's host step (this sandbox has no PHP).
 **Executed:** 2026-10-05 · **Branch:** `arena/01a10a94-rythm`
 **Runbook:** `docs/cloudinary-media.md` (install / verify / rollback)
 
@@ -69,7 +71,13 @@ Then `php artisan media:doctor` (expect: *Cloudinary ready — collections …*)
    `/storage/...` URL (mixed catalogue).
 5. `php artisan media:relocate --dry-run` reports nothing to move;
    `php artisan media:doctor` stays green.
-6. `php artisan test` (incl. `tests/Feature/CloudinaryMediaTest.php`) passes.
+6. `php artisan test --filter=CloudinaryMediaTest` passes (**11** tests: product
+   gallery/og, category icon, variant images, reuse = one asset, `media:dedupe`
+   on cloud rows, legacy URL byte-identical, relocation/doctor exemption).
+7. Reuse: Media library → *Use elsewhere* on a Cloudinary image — the target
+   shows the same URL, the Cloudinary dashboard asset count does **not** grow.
+8. Duplicates: `php artisan media:dedupe --dry-run` lists the duplicate cloud
+   uploads, `php artisan media:dedupe` merges them, both products keep working.
 
 ## 5. Rollback
 
