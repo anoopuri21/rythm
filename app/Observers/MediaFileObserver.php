@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Media;
+use App\Support\MediaDisk;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Observers\MediaObserver as SpatieMediaObserver;
 
@@ -71,6 +72,19 @@ final class MediaFileObserver extends SpatieMediaObserver
         if (! $media instanceof Media) {
             parent::deleted($media);
 
+            return;
+        }
+
+        // 0. A row that lives on Cloudinary whose driver is not installed
+        //    cannot have its remote files removed: Spatie's cleanup resolves
+        //    `Storage::disk($media->disk)` and would throw
+        //    "Driver [cloudinary] is not supported" (docs/cloudinary-media.md
+        //    §6.5). The row itself is still deleted — the file is simply left
+        //    where it is, and `php artisan media:doctor` names the missing
+        //    package. Storage stays on MEDIA_DISK until it is installed
+        //    (App\Support\MediaDisk), so this is only ever reached by rows
+        //    written before the package went missing.
+        if ($media->isStoredOnCloudinary() && ! MediaDisk::diskResolvable()) {
             return;
         }
 

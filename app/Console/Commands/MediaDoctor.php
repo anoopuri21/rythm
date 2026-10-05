@@ -256,37 +256,41 @@ final class MediaDoctor extends Command
         $configured = (array) config('filesystems.disks.'.MediaDisk::CLOUDINARY, []);
 
         if ($configured === [] || ($configured['driver'] ?? null) !== MediaDisk::CLOUDINARY) {
-            if (MediaDisk::enabled()) {
-                $this->reportFail(
-                    'Cloudinary is enabled (MEDIA_CLOUDINARY) but the [cloudinary] disk is not configured',
-                    'Add it to config/filesystems.php and run php artisan config:clear (docs/cloudinary-media.md)',
-                );
-            } elseif (config('media-library.cloudinary.enabled')) {
+            if (config('media-library.cloudinary.enabled')) {
                 $this->reportWarn(
-                    'MEDIA_CLOUDINARY is on but no Cloudinary credentials were found',
-                    'Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
+                    'MEDIA_CLOUDINARY is on but the [cloudinary] disk is not configured',
+                    'Add it to config/filesystems.php and run php artisan config:clear (docs/cloudinary-media.md) — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
                 );
             }
 
             return;
         }
 
-        if (! MediaDisk::enabled()) {
-            $reason = config('media-library.cloudinary.enabled')
-                ? 'no Cloudinary credentials'
-                : 'MEDIA_CLOUDINARY=false';
-
-            $this->reportOk("Cloudinary disk is configured but inactive ({$reason}) — products + categories stay on [".MediaDisk::mediaDisk().']');
+        if (! config('media-library.cloudinary.enabled')) {
+            $this->reportOk('Cloudinary disk is configured but inactive (MEDIA_CLOUDINARY=false) — products + categories stay on ['.MediaDisk::mediaDisk().']');
 
             return;
         }
 
-        try {
-            Storage::disk(MediaDisk::CLOUDINARY);
-        } catch (Throwable $exception) {
+        if (MediaDisk::cloudName() === null) {
+            $this->reportWarn(
+                'MEDIA_CLOUDINARY is on but no Cloudinary credentials were found',
+                'Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
+            );
+
+            return;
+        }
+
+        // Credentials are there, so the rollout WANTS to be on. If the disk
+        // still cannot be resolved, its driver was never registered — the
+        // package is missing (docs/cloudinary-media.md §6.5). That is a FAIL,
+        // not a warning: the switch asks for the cloud and cannot have it.
+        $diskError = MediaDisk::diskError();
+
+        if ($diskError !== null) {
             $this->reportFail(
-                'The [cloudinary] disk cannot be resolved: '.$exception->getMessage(),
-                'Run: composer require cloudinary-labs/cloudinary-laravel, then php artisan config:clear',
+                'The [cloudinary] disk cannot be resolved: '.$diskError,
+                'Run: composer require cloudinary-labs/cloudinary-laravel, then php artisan config:clear — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
             );
 
             return;

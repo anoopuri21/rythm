@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Storage;
+use Throwable;
+
 /**
  * The ONE place that decides which disk a new upload for a collection is
  * written to (docs/cloudinary-media.md).
@@ -25,6 +28,12 @@ namespace App\Support;
  *  - `App\Filament\Components\MediaUpload` → `->disk(MediaDisk::forCollection($collection))`
  *  - the media-bearing models → `->useDisk(MediaDisk::forCollection($collection))`
  *
+ * The rollout also counts as off when the `cloudinary` disk cannot actually be
+ * resolved (see `diskResolvable()`): its driver is provided by a package, not by
+ * the framework, so credentials without that package must never be able to turn
+ * an admin upload into a 500. Uploads then stay on MEDIA_DISK and
+ * `php artisan media:doctor` reports the disk as a FAIL.
+ *
  * @see docs/cloudinary-media.md
  * @see docs/media-architecture.md → M-1, M-9
  */
@@ -42,11 +51,15 @@ final class MediaDisk
      * Requires BOTH the explicit switch and resolvable credentials, so a
      * half-configured environment can never route uploads into a disk that
      * cannot accept them — it just keeps storing on MEDIA_DISK.
+     *
+     * The disk check comes last: a switched-off rollout must never touch the
+     * filesystem (or a driver that may not even exist).
      */
     public static function enabled(): bool
     {
         return (bool) config('media-library.cloudinary.enabled', false)
-            && self::cloudName() !== null;
+            && self::cloudName() !== null
+            && self::diskResolvable();
     }
 
     /** The disk a new upload for $collection must be written to. */
@@ -133,5 +146,41 @@ final class MediaDisk
         $cloud = trim((string) config('filesystems.disks.cloudinary.cloud', ''));
 
         return $cloud !== '' ? $cloud : null;
+    }
+
+    /**
+     * Can the [cloudinary] disk actually be resolved on this machine?
+     *
+     * `cloudinary` is NOT one of Laravel's built-in drivers: it is registered by
+     * cloudinary-labs/cloudinary-laravel through `Storage::extend('cloudinary', …)`
+     * (or by any `extend()` an app adds later). Having the disk in
+     * config/filesystems.php therefore proves nothing — with the package absent,
+     * `Storage::disk('cloudinary')` throws
+     * "Driver [cloudinary] is not supported" from FilesystemManager::resolve(),
+     * in the middle of an admin upload. Resolving the disk only builds the
+     * adapter (no HTTP call), so asking on every disk decision is cheap.
+     */
+    public static function diskResolvable(): bool
+    {
+        return self::diskError() === null;
+    }
+
+    /**
+     * Why the [cloudinary] disk cannot be resolved (null when it can).
+     *
+     * `php artisan media:doctor` prints this next to the fix, because the two
+     * usual causes need different actions: the package is missing
+     * (`composer require cloudinary-labs/cloudinary-laravel`) or the
+     * credentials are unusable.
+     */
+    public static function diskError(): ?string
+    {
+        try {
+            Storage::disk(self::CLOUDINARY);
+        } catch (Throwable $exception) {
+            return $exception->getMessage();
+        }
+
+        return null;
     }
 }

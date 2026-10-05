@@ -63,14 +63,18 @@ Keep `MEDIA_DISK=public` and `FILESYSTEM_DISK=local` exactly as they are.
 
 > `MEDIA_CLOUDINARY=true` **without** credentials is safe: the rollout counts as
 > off (`App\Support\MediaDisk::enabled()`), uploads stay on `MEDIA_DISK`, and
-> `php artisan media:doctor` says so. With credentials present but the package
-> missing, the doctor fails loudly instead of silently storing locally.
+> `php artisan media:doctor` says so. The same is true when credentials exist
+> but the package itself is missing — `MediaDisk::diskResolvable()` asks the
+> disk once, so the upload lands on `MEDIA_DISK` instead of failing with
+> `Driver [cloudinary] is not supported`, and `media:doctor` FAILS with the
+> `composer require` line instead of silently pretending all is well.
 
 ## 3. How it works
 
 | Step | Where |
 |---|---|
 | Which disk a collection uses | `App\Support\MediaDisk::forCollection()` — `cloudinary` when the rollout is on **and** the collection is listed, else `MEDIA_DISK` |
+| Is the rollout usable here | `App\Support\MediaDisk::diskResolvable()` — the `cloudinary` driver is registered by `cloudinary-labs/cloudinary-laravel`, not by the framework; without it `Storage::disk('cloudinary')` throws, so the rollout counts as off and `media:doctor` FAILs |
 | Panel uploads | `App\Filament\Components\MediaUpload` passes `->disk(MediaDisk::forCollection($collection))` to Filament's `SpatieMediaLibraryFileUpload` |
 | Programmatic writes / imports | the models' `registerMediaCollections()` call `->useDisk(MediaDisk::forCollection(...))` on the phase-1 collections — both sides read the same class, so they cannot drift |
 | URL generation | `App\Models\Media::getUrl()` / `getAvailableUrl()` (registered as `media-library.media_model`) derive `https://res.cloudinary.com/<cloud>/image/upload/<transformation>/<path>` from `App\Support\CloudinaryDeliveryUrl` — **no Admin API call per image** |
@@ -185,9 +189,15 @@ Then, in the panel:
 4. `App\Models\Media` is required for URLs to work without per-image API calls
    (`config/media-library.php` → `media_model`). Do not point it back at the
    Spatie class.
-5. `MEDIA_CLOUDINARY=true` + credentials but **missing package** = every
-   product/category upload fails (`Disk [cloudinary] does not have a configured
-   driver`). Run the `composer require` step first; `media:doctor` spells this out.
+5. `MEDIA_CLOUDINARY=true` + credentials but **missing package**: the disk
+   cannot be resolved, so the rollout counts as off
+   (`App\Support\MediaDisk::diskResolvable()`) — uploads stay on `MEDIA_DISK`
+   instead of 500-ing with `Driver [cloudinary] is not supported`, and
+   `media:doctor` FAILs with `composer require cloudinary-labs/cloudinary-laravel`.
+   Nothing is lost: install the package, `php artisan config:clear`, and the
+   next upload goes to the cloud. Rows already stored there keep rendering
+   (their URLs are derived, not fetched) and are the only ones that still need
+   the driver — deleting one then leaves its remote file behind.
 6. Do not delete the credentials while cloud rows exist: the derived URL needs
    the cloud name. The stored URL columns are **not** overwritten with an empty
    value in that state (`SyncsResolvedMediaUrls` keeps an already-resolved URL),

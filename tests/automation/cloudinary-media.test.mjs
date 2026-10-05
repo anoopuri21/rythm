@@ -43,9 +43,15 @@ test('MediaDisk is the single disk decision and fails safe without credentials',
     assert.match(source, /public static function enabled/);
     assert.match(source, /public static function isCloudinary/);
 
-    // Enabled requires BOTH the switch and a resolvable cloud name.
+    // Enabled requires BOTH the switch and a resolvable cloud name…
     assert.match(source, /'media-library\.cloudinary\.enabled'/);
     assert.match(source, /self::cloudName\(\) !== null/);
+
+    // …and a disk whose driver is really registered. `cloudinary` is not a
+    // framework driver (it comes from cloudinary-labs/cloudinary-laravel), so
+    // credentials without the package must never 500 an upload.
+    assert.match(source, /public static function diskResolvable/);
+    assert.match(source, /self::diskResolvable\(\)/);
 });
 
 test('Cloudinary delivery URLs are derived, never fetched through the Admin API', async () => {

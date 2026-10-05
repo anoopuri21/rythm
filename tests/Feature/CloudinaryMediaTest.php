@@ -100,6 +100,34 @@ class CloudinaryMediaTest extends TestCase
         $this->assertStringStartsWith('/storage/', (string) $product->fresh()->thumbnail_url);
     }
 
+    public function test_the_rollout_stays_off_when_the_cloudinary_driver_is_not_registered(): void
+    {
+        // `cloudinary` is not a framework driver: it is registered by
+        // cloudinary-labs/cloudinary-laravel. `Storage::fake()` in setUp()
+        // stands in for that package, so dropping the instance reproduces a
+        // machine where it was never installed (docs/cloudinary-media.md §6.5).
+        Storage::forgetDisk(MediaDisk::CLOUDINARY);
+
+        $this->assertFalse(MediaDisk::diskResolvable());
+        $this->assertFalse(
+            MediaDisk::enabled(),
+            'Credentials alone must never route uploads into a disk that cannot be resolved.',
+        );
+        $this->assertSame('public', MediaDisk::forCollection('gallery'));
+
+        // The upload must still work — on the media disk — instead of throwing
+        // "Driver [cloudinary] is not supported" in the middle of saving a
+        // product.
+        $product = Product::factory()->create();
+        $media = $product->addMedia(UploadedFile::fake()->image('no-driver.jpg', 80, 80))->toMediaCollection('gallery');
+
+        $this->assertSame('public', $media->disk);
+        $this->assertStringStartsWith('/storage/', (string) $product->fresh()->thumbnail_url);
+
+        // …and the doctor keeps saying so until the package is installed.
+        $this->artisan('media:doctor')->assertFailed();
+    }
+
     // ── Product uploads (admin panel) ───────────────────────────────────────
 
     public function test_product_images_uploaded_in_the_panel_are_stored_on_cloudinary_and_served_from_it(): void
