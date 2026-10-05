@@ -158,8 +158,9 @@ Admin: Filament `/admin` only (no public REST admin API).
 
 - Money: consistent decimal strategy; display formatting non-authoritative.  
 - Media collections: product `gallery`/`og`, variant `variant_gallery`, category `icon`, brand `logo`, hero, homepage blocks.  
+- Media reuse (M-10, `docs/media-reuse.md`): an image used on several products/categories/collections is stored **once** — the first upload owns the file, every other usage is a shared media row resolving through `App\Support\MediaPathGenerator`; conversions are generated once and mirrored to all usages. Admin: **Media library** (`/admin/media-library`) → *Use elsewhere*; duplicates: `php artisan media:dedupe`.  
 - Image resolve: **stored URL column first** (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`) → MediaLibrary (WebP conversion once generated, else original — `getAvailableUrl()`) → `public/images/products/{slug}.jpg` → fallback. Columns are written by `MediaUrlObserver` on every media change and repaired by `php artisan media:sync-urls`.  
-- **Media storage contract** (`docs/media-architecture.md`): one public disk `MEDIA_DISK` for panel uploads + imports + storefront (independent of `FILESYSTEM_DISK`); host-relative `/storage/...` URLs (never `APP_URL`/signed); admin fields only via `App\Filament\Components\MediaUpload`; `og:image`/JSON-LD made absolute with `url()`; repair via `php artisan media:relocate` (`MediaRelocationService`).  
+- **Media storage contract** (`docs/media-architecture.md`): one public disk `MEDIA_DISK` for panel uploads + imports + storefront (independent of `FILESYSTEM_DISK`); host-relative `/storage/...` URLs (never `APP_URL`/signed); admin fields only via `App\Filament\Components\MediaUpload`; `og:image`/JSON-LD made absolute with `url()`; repair via `php artisan media:relocate` (`MediaRelocationService`). **Exception (M-9, `docs/cloudinary-media.md`):** the phase-1 product + category collections write new uploads to the `cloudinary` disk and store absolute CDN delivery URLs; legacy rows and every other collection keep the contract above.  
 - Seeds = demo only, not production stock/legal consent.  
 - `config/rythme.php` + Site Settings for brand/contact/shipping fallbacks.  
 - Outbound mail **From**: `MailSenderSettingsService` — admin-set address is live only after signed `/mail/from/verify`; otherwise `MAIL_FROM_*`. SMTP/API stays in `.env`.  
@@ -173,7 +174,7 @@ Admin: Filament `/admin` only (no public REST admin API).
 |---|---|
 | Concurrency | DB transactions + `lockForUpdate` on checkout/stock |
 | Idempotency | checkout keys, payment_events, inventory movements, refunds |
-| Caching | Homepage/category caches; observers invalidate |
+| Caching | Homepage/category caches; observers invalidate. A **cached payload shape is versioned** (`CategoryService::PAYLOAD_VERSION`, validated read → rebuild on mismatch) and nullable keys of a cached array are read with `?? null` in Blade: a forever cache outlives the release that wrote it, so a new key must never be assumed present (2026-10-05 `/shop` incident: `Undefined array key "image"`) |
 | Jobs | Queued mail/notifications; shared-host cron worker drain |
 | Security | CSRF, throttles, signed URLs, SecurityHeaders/CSP, Razorpay HMAC |
 | Tests | PHPUnit Feature/Unit; FakePaymentGateway; build via `npm run build` |

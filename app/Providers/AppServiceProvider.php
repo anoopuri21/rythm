@@ -27,6 +27,7 @@ use App\Models\NewsletterSubscriber;
 use App\Models\NotificationDelivery;
 use App\Models\Order;
 use App\Models\Page;
+use App\Models\Media as AppMedia;
 use App\Models\Product;
 use App\Models\ProductMerchandisingRule;
 
@@ -89,6 +90,9 @@ class AppServiceProvider extends ServiceProvider
             Product::class => CataloguePolicy::class,
             ProductMerchandisingRule::class => MerchandisingRulePolicy::class,
             Category::class => CataloguePolicy::class,
+            // Media reuse + the admin Media library page (docs/media-reuse.md):
+            // catalogue staff manage the shared image pool.
+            AppMedia::class => CataloguePolicy::class,
             Brand::class => CataloguePolicy::class,
             Order::class => OrderPolicy::class,
             User::class => CustomerPolicy::class,

@@ -10,6 +10,7 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\MediaDisk;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +74,9 @@ final class MediaDoctor extends Command
 
         $this->checkStorageOwnership($mediaDisk);
         $this->checkSymlink($fix);
+        $this->checkCloudinary();
+        $this->checkSharedRows($limit);
+        $this->checkDuplicates();
         $this->checkMediaRows($mediaDisk, $fix, $limit);
         $this->checkUrlColumns($mediaDisk, $fix, $limit);
 
@@ -241,6 +245,160 @@ final class MediaDoctor extends Command
     }
 
     /**
+     * The Cloudinary rollout (docs/cloudinary-media.md): products + categories
+     * upload to Cloudinary while every other collection stays on MEDIA_DISK.
+     * "Enabled but unusable" is a FAIL — uploads would otherwise land on the
+     * wrong disk. Disabled is fine, and so is a configured disk waiting to be
+     * switched on.
+     */
+    private function checkCloudinary(): void
+    {
+        $configured = (array) config('filesystems.disks.'.MediaDisk::CLOUDINARY, []);
+
+        if ($configured === [] || ($configured['driver'] ?? null) !== MediaDisk::CLOUDINARY) {
+            if (MediaDisk::enabled()) {
+                $this->reportFail(
+                    'Cloudinary is enabled (MEDIA_CLOUDINARY) but the [cloudinary] disk is not configured',
+                    'Add it to config/filesystems.php and run php artisan config:clear (docs/cloudinary-media.md)',
+                );
+            } elseif (config('media-library.cloudinary.enabled')) {
+                $this->reportWarn(
+                    'MEDIA_CLOUDINARY is on but no Cloudinary credentials were found',
+                    'Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
+                );
+            }
+
+            return;
+        }
+
+        if (! MediaDisk::enabled()) {
+            $reason = config('media-library.cloudinary.enabled')
+                ? 'no Cloudinary credentials'
+                : 'MEDIA_CLOUDINARY=false';
+
+            $this->reportOk("Cloudinary disk is configured but inactive ({$reason}) — products + categories stay on [".MediaDisk::mediaDisk().']');
+
+            return;
+        }
+
+        try {
+            Storage::disk(MediaDisk::CLOUDINARY);
+        } catch (Throwable $exception) {
+            $this->reportFail(
+                'The [cloudinary] disk cannot be resolved: '.$exception->getMessage(),
+                'Run: composer require cloudinary-labs/cloudinary-laravel, then php artisan config:clear',
+            );
+
+            return;
+        }
+
+        $this->reportOk(
+            'Cloudinary ready — collections ['.implode(', ', MediaDisk::cloudCollections()).'] upload to cloud ['.MediaDisk::cloudName().']',
+        );
+    }
+
+    /**
+     * Reused images (docs/media-reuse.md): one file, several rows. The file must
+     * exist where the shared rows resolve to — a broken reuse is a 404 on the
+     * storefront exactly like a missing original.
+     */
+    private function checkSharedRows(int $limit): void
+    {
+        /** @var class-string<Media> $mediaModel */
+        $mediaModel = (string) config('media-library.media_model', Media::class);
+
+        if (! Schema::hasColumn('media', 'shared_path')) {
+            return; // migration pending — reused rows cannot exist yet
+        }
+
+        $shared = (int) $mediaModel::query()->whereNotNull('shared_path')->count();
+
+        if ($shared === 0) {
+            $this->reportOk('No reused media yet (every image owns its file)');
+
+            return;
+        }
+
+        $missing = [];
+        $checked = 0;
+
+        $mediaModel::query()
+            ->whereNotNull('shared_path')
+            // Cloudinary rows would cost one Admin API call each — skip them.
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->chunkById(200, function ($rows) use (&$missing, &$checked, $limit): bool {
+                foreach ($rows as $media) {
+                    if ($checked >= $limit) {
+                        return false;
+                    }
+
+                    $checked++;
+
+                    try {
+                        $exists = Storage::disk($media->disk)->exists($media->getPathRelativeToRoot());
+                    } catch (Throwable) {
+                        continue;
+                    }
+
+                    if (! $exists) {
+                        $missing[] = (int) $media->getKey();
+                    }
+                }
+
+                return true;
+            });
+
+        if ($missing === []) {
+            $this->reportOk("{$shared} reused image(s) point at a file that exists");
+
+            return;
+        }
+
+        $this->reportFail(
+            count($missing).' reused image(s) point at a file that is gone (#'.implode(', #', array_slice($missing, 0, 5)).')',
+            'Restore the file, or remove the usage in the admin and re-upload the image',
+        );
+    }
+
+    /**
+     * Byte-identical images stored twice (php artisan media:dedupe reads the
+     * stored `checksum`; rows never hashed are not counted here).
+     */
+    private function checkDuplicates(): void
+    {
+        /** @var class-string<Media> $mediaModel */
+        $mediaModel = (string) config('media-library.media_model', Media::class);
+
+        if (! Schema::hasColumn('media', 'checksum')) {
+            return; // migration pending
+        }
+
+        $groups = $mediaModel::query()
+            ->whereNull('shared_path')
+            ->whereNotNull('checksum')
+            ->where('checksum', '!=', '')
+            ->selectRaw('checksum, disk, COUNT(*) as copies')
+            ->groupBy('checksum', 'disk')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        $hashed = (int) $mediaModel::query()->whereNull('shared_path')->whereNotNull('checksum')->where('checksum', '!=', '')->count();
+
+        if ($groups->isEmpty()) {
+            $this->reportOk("No duplicate images found ({$hashed} file(s) hashed)");
+
+            return;
+        }
+
+        $copies = (int) $groups->sum('copies') - $groups->count();
+
+        $this->reportWarn(
+            "{$copies} duplicate image copy/copies in {$groups->count()} group(s)",
+            'Review: php artisan media:dedupe --dry-run — then php artisan media:dedupe to store each image once',
+        );
+    }
+
+    /**
      * Per-row file checks: originals that are gone, plus conversions the
      * database claims exist but that are missing on disk — the latter is a real
      * 404 source even when the disk, symlink and columns are all healthy.
@@ -250,11 +408,24 @@ final class MediaDoctor extends Command
         /** @var class-string<Media> $mediaModel */
         $mediaModel = (string) config('media-library.media_model', Media::class);
 
+        $cloudHosted = (int) $mediaModel::query()
+            ->where('disk', MediaDisk::CLOUDINARY)
+            ->count();
+
         $misplaced = (int) $mediaModel::query()
             ->where(function ($query) use ($mediaDisk): void {
                 $query->where('disk', '!=', $mediaDisk)
                     ->orWhere(fn ($inner) => $inner->whereNotNull('conversions_disk')->where('conversions_disk', '!=', $mediaDisk));
             })
+            // Cloud-hosted rows are deliberately off MEDIA_DISK (docs/cloudinary-media.md):
+            // counting them as misplaced would make `--fix` pull them back onto this server.
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->where(function ($query): void {
+                $query->whereNull('conversions_disk')
+                    ->orWhere('conversions_disk', '!=', MediaDisk::CLOUDINARY);
+            })
+            // Reused rows (M-10) own no file — their owner row is checked instead.
+            ->whereNull('shared_path')
             ->count();
 
         if ($misplaced > 0) {
@@ -266,6 +437,8 @@ final class MediaDoctor extends Command
             if ($fix) {
                 $this->call('media:relocate');
             }
+        } elseif ($cloudHosted > 0) {
+            $this->reportOk("Every media row lives on [{$mediaDisk}] or is served from Cloudinary ({$cloudHosted} row(s) off this server)");
         } else {
             $this->reportOk("Every media row lives on [{$mediaDisk}]");
         }
@@ -277,6 +450,9 @@ final class MediaDoctor extends Command
 
         $mediaModel::query()
             ->where('disk', $mediaDisk)
+            // Reused rows resolve to their owner's file, which the owner row
+            // already verifies — checking them here would double-report.
+            ->whereNull('shared_path')
             ->chunkById(200, function ($rows) use (&$scanned, &$missingOriginals, &$staleConversions, $storage, $fix, $limit): bool {
                 foreach ($rows as $media) {
                     if ($scanned >= $limit) {

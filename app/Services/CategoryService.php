@@ -17,6 +17,25 @@ final class CategoryService
     private const CACHE_KEY = 'categories.tree';
 
     /**
+     * Shape version of the cached payload.
+     *
+     * The tree is cached **forever**, so a release that adds/removes/renames a
+     * key would otherwise keep serving the payload of the previous release to
+     * the new Blade templates — that is how `/shop` died with
+     * `Undefined array key "image"` (the `image` key was added in the
+     * 2026-10-03 storefront-image release while the cache still held the
+     * pre-release payload).
+     *
+     * **Bump this whenever the payload shape changes.** An entry with another
+     * version is treated as a miss and rebuilt on the next request, so a deploy
+     * heals itself — no manual `php artisan cache:clear` needed.
+     *
+     * History: `1` = bare array payload without `image` (releases before
+     * 2026-10-03); `2` = versioned envelope, items carry `image` (nullable).
+     */
+    public const PAYLOAD_VERSION = 2;
+
+    /**
      * @return array<int, array{id:int, name:string, slug:string, image:?string, children:array<int, array{name:string, slug:string}>}>
      */
     public function tree(): array
@@ -27,42 +46,65 @@ final class CategoryService
             return [];
         }
 
-        return Cache::rememberForever(self::CACHE_KEY, function (): array {
-            $columns = ['id', 'name', 'slug', 'sort_order'];
+        $cached = Cache::get(self::CACHE_KEY);
 
-            if (Schema::hasColumn('categories', 'icon_url')) {
-                $columns[] = 'icon_url';
-            }
+        if (is_array($cached)
+            && (int) ($cached['version'] ?? 0) === self::PAYLOAD_VERSION
+            && is_array($cached['items'] ?? null)) {
+            return $cached['items'];
+        }
 
-            return Category::query()
-                ->with([
-                    'children' => fn ($query) => $query->orderBy('sort_order')->orderBy('name'),
-                    'media',
-                ])
-                ->whereNull('parent_id')
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->get($columns)
-                ->map(function (Category $category): array {
-                    $asset = 'images/categories/'.$category->slug.'.jpg';
+        $tree = $this->buildTree();
 
-                    return [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                        'slug' => $category->slug,
-                        'image' => self::storefrontImage(
-                            $category->iconUrl() ?? (is_file(public_path($asset)) ? '/'.$asset : null)
-                        ),
-                        'children' => $category->children
-                            ->map(fn (Category $child): array => [
-                                'name' => $child->name,
-                                'slug' => $child->slug,
-                            ])
-                            ->all(),
-                    ];
-                })
-                ->all();
-        });
+        // `forever`, not `rememberForever`: the envelope has to be validated
+        // before it is trusted, so the miss handling lives here.
+        Cache::forever(self::CACHE_KEY, [
+            'version' => self::PAYLOAD_VERSION,
+            'items' => $tree,
+        ]);
+
+        return $tree;
+    }
+
+    /**
+     * @return array<int, array{id:int, name:string, slug:string, image:?string, children:array<int, array{name:string, slug:string}>}>
+     */
+    private function buildTree(): array
+    {
+        $columns = ['id', 'name', 'slug', 'sort_order'];
+
+        if (Schema::hasColumn('categories', 'icon_url')) {
+            $columns[] = 'icon_url';
+        }
+
+        return Category::query()
+            ->with([
+                'children' => fn ($query) => $query->orderBy('sort_order')->orderBy('name'),
+                'media',
+            ])
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get($columns)
+            ->map(function (Category $category): array {
+                $asset = 'images/categories/'.$category->slug.'.jpg';
+
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'image' => self::storefrontImage(
+                        $category->iconUrl() ?? (is_file(public_path($asset)) ? '/'.$asset : null)
+                    ),
+                    'children' => $category->children
+                        ->map(fn (Category $child): array => [
+                            'name' => $child->name,
+                            'slug' => $child->slug,
+                        ])
+                        ->all(),
+                ];
+            })
+            ->all();
     }
 
     /**

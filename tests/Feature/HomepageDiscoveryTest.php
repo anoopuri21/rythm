@@ -114,6 +114,47 @@ class HomepageDiscoveryTest extends TestCase
         $this->assertArrayHasKey('image', $microphones);
     }
 
+    public function test_category_tree_ignores_a_legacy_payload_and_rebuilds_it_versioned(): void
+    {
+        [$category] = $this->catalogueParents();
+
+        // Exactly what a pre-2026-10-03 release left behind: a bare array of
+        // items without the `image` key, cached forever. /shop used to 500 on it
+        // ("Undefined array key "image"") until somebody cleared the cache.
+        Cache::forever('categories.tree', [
+            ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'children' => []],
+        ]);
+
+        $tree = app(CategoryService::class)->tree();
+
+        $this->assertNotEmpty($tree);
+        $this->assertSame(
+            ['id', 'name', 'slug', 'image', 'children'],
+            array_keys($tree[0]),
+            'The rebuild must restore the current payload shape (the legacy payload had no `image`).',
+        );
+
+        $cached = Cache::get('categories.tree');
+        $this->assertIsArray($cached);
+        $this->assertSame(CategoryService::PAYLOAD_VERSION, $cached['version'], 'The rebuilt payload must be versioned.');
+        $this->assertSame($tree, $cached['items']);
+    }
+
+    public function test_category_tree_rebuilds_when_the_cached_version_is_foreign(): void
+    {
+        [$category] = $this->catalogueParents('Keyboards', 'keyboards');
+
+        Cache::forever('categories.tree', [
+            'version' => CategoryService::PAYLOAD_VERSION + 1,
+            'items' => [['id' => $category->id, 'name' => 'Stale', 'slug' => $category->slug, 'children' => []]],
+        ]);
+
+        $tree = app(CategoryService::class)->tree();
+
+        $this->assertSame($category->name, $tree[0]['name'], 'A foreign payload version must never be served.');
+        $this->assertSame(CategoryService::PAYLOAD_VERSION, Cache::get('categories.tree')['version']);
+    }
+
     public function test_category_navigation_returns_empty_when_configured_database_is_unmigrated(): void
     {
         Schema::dropIfExists('categories');

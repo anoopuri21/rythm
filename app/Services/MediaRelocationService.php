@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Contracts\HasResolvedMediaUrls;
+use App\Models\Media as AppMedia;
+use App\Support\MediaPathGenerator;
 use App\Observers\HomepageDataObserver;
+use App\Support\MediaDisk;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -73,11 +76,24 @@ final class MediaRelocationService
     }
 
     /**
-     * Number of media rows whose original or conversions live on another disk.
+     * Number of media rows whose original or conversions live on another disk
+     * (cloud-hosted rows excluded — see misplacedQuery()).
      */
     public function misplacedCount(): int
     {
         return $this->misplacedQuery()->count();
+    }
+
+    /**
+     * Number of media rows stored on Cloudinary (intentionally off MEDIA_DISK).
+     */
+    public function cloudHostedCount(): int
+    {
+        $model = (string) config('media-library.media_model', Media::class);
+
+        return (int) $model::query()
+            ->where('disk', MediaDisk::CLOUDINARY)
+            ->count();
     }
 
     /**
@@ -128,6 +144,19 @@ final class MediaRelocationService
         $target = $this->targetDisk();
         $originalDisk = (string) $media->disk;
         $derivedDisk = (string) ($media->conversions_disk ?: $originalDisk);
+
+        // Never pull cloud-hosted media back onto this server — not even when a
+        // caller passes the row directly (docs/cloudinary-media.md).
+        if (MediaDisk::isCloudinary($originalDisk) || MediaDisk::isCloudinary($derivedDisk)) {
+            throw new RuntimeException("Media #{$media->getKey()} is stored on Cloudinary and is not relocated.");
+        }
+
+        // A reused image (M-10) does not own a file — relocating it would move
+        // somebody else's image. Its owner row carries the files.
+        if ($media instanceof AppMedia && $media->isShared()) {
+            throw new RuntimeException("Media #{$media->getKey()} reuses another row's file and is not relocated on its own.");
+        }
+
         $generator = PathGeneratorFactory::create($media);
 
         $original = $generator->getPath($media).$media->file_name;
@@ -174,10 +203,30 @@ final class MediaRelocationService
                 $owner->syncResolvedMediaUrls();
             }
 
+            // Rows that reuse this file must follow it onto the target disk —
+            // their own `disk` column would otherwise point at the old one.
+            $this->moveSharedRowsToTarget($media, $target);
+
             $this->removeSources($plan, $generator->getPath($media));
         }
 
         return ['id' => (int) $media->getKey(), 'from' => $originalDisk, 'files' => $files];
+    }
+
+    /**
+     * Point every row that reuses $media's file at the disk it just moved to.
+     * A normal save, so their owners' stored URL columns (M-7) are refreshed.
+     */
+    private function moveSharedRowsToTarget(Media $media, string $target): void
+    {
+        $rows = AppMedia::rowsResolvingTo(MediaPathGenerator::basePath($media), $media->getKey())->get();
+
+        foreach ($rows as $row) {
+            $row->forceFill([
+                'disk' => $target,
+                'conversions_disk' => $target,
+            ])->save();
+        }
     }
 
     /**
@@ -226,14 +275,31 @@ final class MediaRelocationService
         }
     }
 
+    /**
+     * Rows that should live on MEDIA_DISK but do not.
+     *
+     * Cloud-hosted rows (docs/cloudinary-media.md) are excluded on purpose:
+     * they are not misplaced — they are meant to live off this server, and
+     * "relocating" them would pull the images back onto disk and rewrite the
+     * storefront URLs.
+     */
     private function misplacedQuery(): Builder
     {
         $target = $this->targetDisk();
         $model = (string) config('media-library.media_model', Media::class);
 
-        return $model::query()->where(function ($query) use ($target): void {
-            $query->where('disk', '!=', $target)
-                ->orWhere('conversions_disk', '!=', $target);
-        });
+        return $model::query()
+            ->where(function ($query) use ($target): void {
+                $query->where('disk', '!=', $target)
+                    ->orWhere('conversions_disk', '!=', $target);
+            })
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->where(function ($query): void {
+                $query->whereNull('conversions_disk')
+                    ->orWhere('conversions_disk', '!=', MediaDisk::CLOUDINARY);
+            })
+            // Reused images (M-10) own no file: they follow their owner row and
+            // are updated by relocate() itself — never moved on their own.
+            ->whereNull('shared_path');
     }
 }

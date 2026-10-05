@@ -23,7 +23,7 @@
                         <a href="/shop?category={{ $cat['slug'] }}" class="swiper-slide cat-card"
                            aria-label="{{ $cat['name'] }} — {{ $cat['count'] }} {{ Str::plural('product', $cat['count']) }}">
                             <span class="cat-card__img">
-                                @if($cat['image'])
+                                @if($cat['image'] ?? null)
                                     <img src="{{ $cat['image'] }}" alt="{{ $cat['name'] }}" width="600" height="600"
                                          loading="lazy" decoding="async">
                                 @else

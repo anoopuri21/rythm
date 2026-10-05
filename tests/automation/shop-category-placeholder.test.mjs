@@ -35,7 +35,9 @@ test('shop category shortcut keeps a fixed placeholder tile when the category ha
   const tile = view.slice(view.indexOf('class="shop-shortcut__image"'), view.indexOf('@endforeach'));
   assert.ok(tile.length > 0, 'shop shortcut tile not found');
   assert.ok(
-    tile.indexOf('shop-shortcut__placeholder') < tile.indexOf("@if($shortcut['image'])"),
+    // `@if($shortcut['image'] ?? null)` — the paren is left open so the guard
+    // accepts the defensive null-coalescing read the key needs (cached payload).
+    tile.indexOf('shop-shortcut__placeholder') < tile.indexOf("@if($shortcut['image']"),
     'placeholder must render unconditionally, before the image branch',
   );
   assert.doesNotMatch(tile, /@else/);
@@ -156,4 +158,34 @@ test('every remaining product-card fallback lives inside a positioned parent', a
     assert.ok(nearest, `${name}: fallback has no positioned parent`);
     assert.match(nearest[1], /^(pcard__img|cat-card__img)$/);
   }
+});
+
+test('the cached category tree is versioned and its image key is read defensively', async () => {
+  const [service, shopView, homeView] = await Promise.all([
+    read('app/Services/CategoryService.php'),
+    read('resources/views/livewire/shop-index.blade.php'),
+    read('resources/views/home/_categories.blade.php'),
+  ]);
+
+  // The tree is cached forever, so a shape change (the `image` key arrived in
+  // the 2026-10-03 storefront-image release) must be able to invalidate it:
+  // versioned envelope, validated before it is trusted, rebuilt on mismatch.
+  // This is what the live `/shop` 500 ("Undefined array key \"image\"") came
+  // from — an older release's payload served to the newer Blade.
+  assert.match(service, /public const PAYLOAD_VERSION = \d+;/);
+  assert.match(service, /\$cached = Cache::get\(self::CACHE_KEY\);/);
+  assert.match(service, /\(int\) \(\$cached\['version'\] \?\? 0\) === self::PAYLOAD_VERSION/);
+  assert.match(service, /is_array\(\$cached\['items'\] \?\? null\)/);
+  assert.match(
+    service,
+    /Cache::forever\(self::CACHE_KEY, \[\s*'version' => self::PAYLOAD_VERSION,\s*'items' => \$tree,/,
+  );
+  assert.doesNotMatch(service, /Cache::rememberForever\(self::CACHE_KEY/);
+  // flush() (observers, commands, admin settings) still clears the same key.
+  assert.match(service, /Cache::forget\(self::CACHE_KEY\)/);
+
+  // Nullable key, cached payload: never read it bare — a stale payload must
+  // render the placeholder tile, not take the storefront down.
+  assert.match(shopView, /@if\(\$shortcut\['image'\] \?\? null\)/);
+  assert.match(homeView, /@if\(\$cat\['image'\] \?\? null\)/);
 });

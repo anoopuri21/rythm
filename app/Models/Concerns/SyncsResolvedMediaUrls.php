@@ -84,7 +84,21 @@ trait SyncsResolvedMediaUrls
         $changes = [];
 
         foreach ($this->resolvedMediaUrls() as $column => $value) {
-            if ($this->getAttribute($column) !== $value) {
+            if (is_array($value)) {
+                $value = array_values(array_filter($value, static fn ($url): bool => $url !== ''));
+            }
+
+            $current = $this->getAttribute($column);
+
+            // An empty resolution means a resolver could not build a URL right
+            // now — e.g. media on a cloud disk while its credentials are missing
+            // (docs/cloudinary-media.md). Never erase an already-resolved URL:
+            // the stored value keeps rendering until the resolver works again.
+            if ($value === '' && is_string($current) && $current !== '') {
+                continue;
+            }
+
+            if ($current !== $value) {
                 $changes[$column] = $value;
             }
         }

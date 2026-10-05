@@ -32,6 +32,12 @@
         <env name="FILESYSTEM_DISK" value="local"/>
         <env name="MEDIA_DISK" value="public"/>
         <env name="MEDIA_URL" value=""/>
+        <!-- Cloudinary rollout: OFF for every test unless a test opts in with
+             config() + Storage::fake('cloudinary') (tests/Feature/CloudinaryMediaTest.php).
+             force="true": a developer's .env must not flip the whole suite. -->
+        <env name="MEDIA_CLOUDINARY" value="false" force="true"/>
+        <env name="CLOUDINARY_URL" value="" force="true"/>
+        <env name="CLOUDINARY_CLOUD_NAME" value="" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
