@@ -6,6 +6,10 @@ namespace App\Models;
 
 use App\Support\CloudinaryDeliveryUrl;
 use App\Support\MediaDisk;
+use App\Support\MediaPathGenerator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
 
 /**
@@ -26,7 +30,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as SpatieMedia;
  * without ever reading the original back to the server.
  *
  * @see docs/cloudinary-media.md
- * @see docs/media-architecture.md → M-4, M-9
+ * @see docs/media-architecture.md → M-4, M-9, M-10
  */
 class Media extends SpatieMedia
 {
@@ -91,5 +95,77 @@ class Media extends SpatieMedia
         }
 
         return $this->getUrl();
+    }
+
+    // ── Media reuse: one file, several usages (M-10) ────────────────────────
+    //
+    // An upload owns its file (`shared_path` NULL, path `{id}/{file_name}`).
+    // Every further usage is a "shared" row that carries the owner's base path
+    // in `shared_path`, so it resolves — URL, conversions, responsive images —
+    // to the very same stored file. See App\Support\MediaPathGenerator and
+    // App\Services\MediaReuseService.
+
+    /** Does this row reuse another row's stored file instead of owning one? */
+    public function isShared(): bool
+    {
+        return trim((string) ($this->shared_path ?? '')) !== '';
+    }
+
+    /** The base path this row resolves to (its own, or the reused file's). */
+    public function sharingBasePath(): string
+    {
+        return MediaPathGenerator::basePath($this);
+    }
+
+    /** The row this one was reused from (null for file owners). */
+    public function sharedOwner(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'source_media_id');
+    }
+
+    /** Every row that reuses this row's file. */
+    public function usages(): HasMany
+    {
+        return $this->hasMany(static::class, 'source_media_id');
+    }
+
+    /** Rows that own a file (dedupe/doctor work on these, not on usages). */
+    public function scopeFileOwners(Builder $query): Builder
+    {
+        return $query->whereNull('shared_path');
+    }
+
+    /**
+     * Every row that resolves to the same stored file as $basePath — the owner
+     * row plus its shared rows — optionally excluding one id (e.g. the row
+     * being deleted).
+     *
+     * @return Builder<Media>
+     */
+    public static function rowsResolvingTo(string $basePath, ?int $exceptId = null): Builder
+    {
+        return static::query()
+            ->resolvingTo($basePath)
+            ->when($exceptId !== null, fn (Builder $query): Builder => $query->whereKeyNot($exceptId));
+    }
+
+    /**
+     * Scope: rows stored in the file that lives at $basePath (the owner row —
+     * whose id the base path is derived from — plus every shared row).
+     *
+     * @param  Builder<Media>  $query
+     * @return Builder<Media>
+     */
+    public function scopeResolvingTo(Builder $query, string $basePath): Builder
+    {
+        $ownerKey = MediaPathGenerator::ownerKeyFromBasePath($basePath);
+
+        return $query->where(function (Builder $inner) use ($basePath, $ownerKey): void {
+            $inner->where('shared_path', $basePath);
+
+            if ($ownerKey !== null) {
+                $inner->orWhereKey($ownerKey);
+            }
+        });
     }
 }

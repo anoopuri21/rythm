@@ -198,6 +198,11 @@ class ProductVariant extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Reused images resolve to the owner's conversion files (docs/media-reuse.md).
+        if ($media?->isShared()) {
+            return;
+        }
+
         // Cloudinary delivers both sizes itself (App\Models\Media maps this
         // model's conversion names to delivery transformations), so nothing is
         // queued and the original is never pulled back onto this server.

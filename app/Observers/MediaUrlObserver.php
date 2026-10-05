@@ -31,6 +31,7 @@ final class MediaUrlObserver
         'name',
         'disk',
         'conversions_disk',
+        'shared_path',
         'generated_conversions',
         'order_column',
         'mime_type',

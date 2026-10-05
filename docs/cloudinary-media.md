@@ -5,8 +5,9 @@
 > (MEDIA_DISK, `/storage/...` URLs). Nothing moves until the owner flips the
 > switch.
 >
-> Companion to `docs/media-architecture.md` (M-1 … M-8); this doc is the
-> exception layer for cloud-hosted media.
+> Companion to `docs/media-architecture.md` (M-1 … M-10); this doc is the
+> exception layer for cloud-hosted media. Image reuse across records is M-10
+> (`docs/media-reuse.md`) and works the same on both disks.
 
 ## 1. What this does
 
@@ -121,6 +122,13 @@ In the panel: upload a product gallery image and a category icon, then check
   `image`.
 * **Never** run `media:relocate` expecting it to move Cloudinary files, and
   never add a cloud disk to a `media:doctor` local-file check.
+* **Reuse keeps it one asset** (`docs/media-reuse.md`, M-10): a reused image is a
+  shared media row, so its public_id is the owner's — Cloudinary stores and
+  bills **one** asset no matter how many products/categories use it. Reused rows
+  are never uploaded, never converted and never relocated on their own.
+  `media:dedupe` is cloud-aware: it hashes cloud rows by reading each file once
+  over the network (it warns first) and only deletes a copy whose usages were
+  re-pointed.
 * Cloudinary free tier limits (transformations/bandwidth/storage) apply —
   monitor the account dashboard; delivery is `f_auto,q_auto:good`, which keeps
   pages light.

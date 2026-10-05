@@ -121,8 +121,10 @@
 | M3 | SEO: unique title/description, semantic headings, JSON-LD where implemented (Product/FAQ). |
 | M4 | Seeds and fixtures ≠ production catalogue rights clearance. |
 | M5 | Storefront and admin render the **stored URL columns** (M-7) — never re-resolve media per row in a table. The columns are local `/storage/...` URLs for media on `MEDIA_DISK`; when a collection is inside the documented Cloudinary rollout (M-9, owner-commanded 2026-10-05) its rows store the absolute Cloudinary delivery URL instead — that is the one sanctioned CDN-bound value. |
-| M7 | `/storage/...` is served by the **media disk only** (`serve => true` there, `serve => false` on the private `local` disk). Two served local disks on the same URI throw at boot; on the private disk Laravel's route demands a signature → 403/404 without the `public/storage` symlink. Verify with `php artisan media:doctor`. |
 | M6 | The catalogue acquisition/import pipeline is **dormant** (owner decision 2026-10-03): do not run it, extend it, or add it back as a catalogue source without an explicit owner command. |
+| M7 | `/storage/...` is served by the **media disk only** (`serve => true` there, `serve => false` on the private `local` disk). Two served local disks on the same URI throw at boot; on the private disk Laravel's route demands a signature → 403/404 without the `public/storage` symlink. Verify with `php artisan media:doctor`. |
+| M8 | **Cloud media is opt-in and owned by the config** (M-9): with `MEDIA_CLOUDINARY=true` + `CLOUDINARY_URL`, new product `gallery`/`og`/`variant_gallery` and category `icon` files live on Cloudinary and are served from `res.cloudinary.com`; every other collection and every existing row keeps `MEDIA_DISK` + `/storage/...`. Never add cloud disks to local-file repair paths. See `docs/cloudinary-media.md`. |
+| M9 | **Same image = reuse, not re-upload** (M-10, `docs/media-reuse.md`): attach an existing image (Media library → *Use elsewhere*, or `MediaReuseService::attach()`) — a reuse stores nothing new, locally or on Cloudinary. Duplicates already on the server: `php artisan media:dedupe` (dry-run first). |
 
 ---
 

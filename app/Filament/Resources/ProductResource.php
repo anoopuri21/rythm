@@ -218,7 +218,9 @@ class ProductResource extends Resource
                             ->schema([
                                 MediaUpload::gallery('gallery', 'gallery', maxFiles: 12)
                                     ->helperText('Up to 12 images. Drag to reorder — the first image is the card/hero image; PNG/JPG/WebP/AVIF, max 5 MB each.'),
-                                MediaUpload::single('og', 'og', maxSizeKb: 3072)->label('Social share image'),
+                                MediaUpload::single('og', 'og', maxSizeKb: 3072)
+                                    ->label('Social share image')
+                                    ->helperText('Optional — leave empty to use the first gallery image.'),
                             ]),
                     ]),
                 Tabs\Tab::make('SEO')

@@ -39,6 +39,13 @@ class HeroSlide extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // A reused image (docs/media-reuse.md) owns no file, so it must not
+        // generate its own WebP copies — the file owner already does, and both
+        // rows resolve to the same `conversions/` directory.
+        if ($media?->isShared()) {
+            return;
+        }
+
         $this->addMediaConversion('hero-desktop-webp')
             ->width(1920)
             ->height(1080)

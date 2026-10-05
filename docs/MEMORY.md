@@ -79,6 +79,42 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-05 — Media reuse: ek image, kai jagah (M-10)
+- Change-id: `arena/01a10a94-rythm` (media-reuse)
+- Trigger: owner-ask (Hinglish) — "admin panel me media upload karne me same image ko multiple jageh use karne ke liye multiple time image upload karna padta hai jiski wajeh se ek hi image server pe bhi multiple time save ho jati hai…" (research → plan → approval → implement)
+- Scope paths: `database/migrations/2026_10_06_000001_add_shared_path_to_media_table.php`, `app/Support/MediaPathGenerator.php`, `app/Observers/{MediaFileObserver,MediaUrlObserver}.php`, `app/Models/{Media,Product,ProductVariant,HeroSlide}.php`, `app/Services/{MediaReuseService,MediaRelocationService}.php`, `app/Console/Commands/{DedupeMedia,MediaDoctor}.php`, `app/Filament/Resources/MediaLibraryResource.php`, `app/Filament/Resources/MediaLibraryResource/Pages/ManageMediaLibrary.php`, `app/Filament/Resources/ProductResource.php`, `app/Providers/AppServiceProvider.php`, `config/media-library.php`, `tests/Feature/MediaReuseTest.php`, `tests/automation/media-reuse.test.mjs`, `docs/{media-reuse.md,media-architecture.md,media-optimization.md,RULES.md,ARCHITECTURE.md,MEMORY.md}`, `tasks/MEDIA_REUSE_PLAN.md`
+- Type tags: [x] code [x] migration [x] test [ ] front-build [ ] design-token [x] docs [x] config [x] admin [ ] commerce [ ] security
+- Owner decisions (asked + approved before coding): D1 shared reference rows (recommended) · D2 `media:dedupe` in this phase · D3 no upload auto-link · D4 og fallback yes.
+- What changed:
+  1. **One file, many usages.** `media.shared_path` (+ `source_media_id`, `checksum`) migration; `App\Support\MediaPathGenerator` (registered as `media-library.path_generator`) makes a reused row resolve into the owner's base path — originals, `conversions/` and `responsive-images/` all by Spatie's own logic, nothing re-implemented.
+  2. **File safety.** `App\Observers\MediaFileObserver` (registered as `media-library.media_observer`): a reused row never deletes/renames the file it does not own; an owner's file survives while any usage exists (last usage cleans up); conversions/responsive state is mirrored to every usage and `MediaUrlObserver` then upgrades their stored URL columns (M-7).
+  3. **No duplicate conversions.** `Product`/`ProductVariant`/`HeroSlide` skip `registerMediaConversions()` for reused rows.
+  4. **Admin:** new read-only **Media library** page (`/admin/media-library`, CONTENT group) listing every image with row type, place, disk, size, "Used in" (share-group count, tooltip = where); row actions *Use elsewhere* (whitelisted target model → record → collection → `MediaReuseService::attach()`, zero disk writes, idempotent, singleFile collections replaced), *Open file*, *Delete* (confirm dialog shows "Used in: …"); filters incl. "Same file stored more than once". `App\Models\Media` → `CataloguePolicy`.
+  5. **Cleanup:** `php artisan media:dedupe [--dry-run|--disk=|--limit=|--no-hash]` hashes file owners (sha256, stored in `media.checksum`), keeps the oldest copy of each byte-identical group and re-points all usages to it — including the duplicate row itself (it is somebody's gallery item) — then removes the now-unreachable copy; `media:doctor` reports duplicates + broken reuses.
+  6. **Repair tooling:** `media:relocate` never moves a reused row (owner carry its `disk` along) and `media:doctor` skips them in the misplaced/file checks.
+  7. **OG:** `ogImage()` already fell back to the gallery; it now prefers the gallery **original** (scrapers refuse WebP) and the product form says "Optional — leave empty to use the first gallery image."
+- Checklist:
+  - [x] A1 Read five always-read files before editing (`docs/ARCHITECTURE.md`, `docs/RULES.md`, `docs/PHASES.md`, `docs/DESIGN.md`, `docs/MEMORY.md` + `docs/media-architecture.md`)
+  - [x] A2 Touched only task-relevant paths (no drive-by refactors)
+  - [x] A3 Services own the writes — reuse/dedupe live in `MediaReuseService`; no logic in Blade/controller
+  - [x] A4 No client-trusted totals/prices (n/a — no commerce path touched)
+  - [x] A5 AuthZ preserved — Media library is behind `CataloguePolicy` (view/manage = catalogue.view/manage) + `strictAuthorization()`; the reuse action only accepts whitelisted target models
+  - [x] A6 Tests → `node --test tests/automation/*.test.mjs`: **230 tests / 220 pass / 10 fail** (same 10 pre-existing; new media-reuse suite 11/11). `tests/Feature/MediaReuseTest.php` (11 cases) runs on the owner's PHP host — no PHP in this sandbox.
+  - [x] A7 `npm run build` n/a (no CSS/JS changes)
+  - [x] A8 Design tokens only — n/a (no new UI styling; Filament components/tokens)
+  - [x] A9 No secrets committed (only env var names; no new env keys needed)
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C updated: new **Media reuse (M-10)** row + **Media storage** row mention; others verified unchanged
+  - [x] A12 §D unchanged — owner-commanded feature; M-8 intake rule intact (images still enter only through the records that own them; the library page is read-only)
+  - [x] A13 Footgun **#25** added (reuse/delete semantics + dedupe order + shared_path authority)
+  - [x] A14 Mirrors: `docs/media-reuse.md` (new), `docs/media-architecture.md` (M-10 + §4/§5/§6), `docs/RULES.md` §7 (M8 cloud + M9 reuse rows), `docs/ARCHITECTURE.md` §9, `docs/media-optimization.md`, `docs/cloudinary-media.md`, `README.md`, `docs/MEMORY.md` §C/§F/§H/§I/§J, `tasks/MEDIA_REUSE_PLAN.md`; PHASES/PRD/tracker n/a
+  - [x] A15 Owner summary prepared — admin flow + `media:dedupe` + verification (see `docs/media-reuse.md` §2/§3, `tasks/MEDIA_REUSE_PLAN.md` §5)
+- Risks / follow-ups:
+  - Owner host: `php artisan migrate` (shared_path/source_media_id/checksum) → `php artisan media:dedupe --dry-run` → `php artisan media:dedupe` → `php artisan media:doctor` → `php artisan test`.
+  - Path generator + delete semantics are Spatie internals-adjacent: covered by `MediaReuseTest`; if a future Spatie bump changes `getBasePath()`/`MediaObserver`, re-run that suite first.
+  - Cloudinary reuse shares one public_id (one asset) — verify on the owner's cloud with one product + one category reuse.
+- Status: PARTIAL (code + docs + tests in tree; PHP side + real Cloudinary verification pending on the owner's machine)
+
 ### 2026-10-05 — Cloudinary media rollout, phase 1 (products + categories)
 - Change-id: `arena/01a10a94-rythm` (cloudinary-media-phase1)
 - Trigger: owner-ask (Hinglish) — "is project me Cloudinary integrate karna hai, abhi pehle products and categories images ke liye … jo images pehle se use ho rahi hai wo same url path se use hoti rahe, and jo bhi new images upload ho wo Cloudinary ke server pe save ho and usike server se use ho. Local server pe save nahi hongi."
@@ -520,8 +556,9 @@ Work may be reported **done** to the owner only when:
 | **Storefront routes** | `routes/web.php` | 2026-09-12 |
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
-| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate`; the **same image used in many places is stored once** (M-10) — `docs/media-architecture.md` | 2026-10-05 |
 | **Cloudinary media (phase 1)** | When `MEDIA_CLOUDINARY=true` + credentials exist, NEW uploads for product `gallery`/`og`/`variant_gallery` and category `icon` are stored on the `cloudinary` disk and served from `https://res.cloudinary.com/<cloud>/…`; legacy rows and all other collections keep `MEDIA_DISK` + `/storage` URLs. Disk decided only by `App\Support\MediaDisk`; URLs derived by `App\Support\CloudinaryDeliveryUrl` + `App\Models\Media` (conversion names → delivery transformations, no local conversions for cloud rows); relocation/doctor exempt cloud rows — `docs/cloudinary-media.md` (M-9) | 2026-10-05 |
+| **Media reuse (M-10)** | One image in several places = **one stored file**: the first upload owns it (`media.shared_path` NULL), every further usage is a shared row (`shared_path` = owner's base path, `source_media_id`, `checksum`) resolving through `App\Support\MediaPathGenerator` (original + `conversions/` + `responsive-images/`); reused rows generate no conversions (owner's are mirrored to every usage, M-7 URLs re-synced); deleting a usage never breaks the others (last usage removes the file); reused rows are skipped by `media:relocate`/`media:doctor` misplaced checks; admin **Media library** (`/admin/media-library`, `CataloguePolicy`) → *Use elsewhere*; existing duplicates `php artisan media:dedupe [--dry-run]`; empty `og` falls back to the first gallery original — `docs/media-reuse.md` | 2026-10-05 |
 | **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first across products, variants, brands, categories (`HomepageDataService::popularCategories` + `CategoryService::tree`), hero slides and homepage blocks; `MediaUrlObserver` + `php artisan media:sync-urls` keep columns fresh and flush homepage/category caches | 2026-10-03 |
 | **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
 | **Product media pipeline** | Local disk: `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel. **Cloudinary rows:** same conversion names delivered as `c_fit`/`f_auto,q_auto:good` transformations — nothing queued locally | 2026-10-05 |
@@ -536,6 +573,7 @@ Work may be reported **done** to the owner only when:
 | Stack / Filament / Laravel major | Stack (+ ARCHITECTURE.md) |
 | Design tokens / font | Design tokens (+ DESIGN.md) |
 | New service authority / invariant | Business logic / Inventory / Order rows (+ ARCHITECTURE) |
+| Media upload/reuse/disk behaviour | Media storage / Media reuse / Product media pipeline (+ media-architecture.md + RULES) |
 | Commerce model / checkout policy | Commerce model, Checkout (+ PRD + RULES) |
 | Only bugfix, same architecture | §C **Verified unchanged** in log (`none`) — still required |
 
@@ -606,6 +644,8 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 20. **`serve => true` on any second local disk silently hijacks `/storage`.** Laravel registers `GET|PUT /storage/{path}` for *every* local disk with that flag (URI from the disk's `url`, else `/storage`) and throws at boot when two disks claim the same URI. On the **private** disk the route demands a signature unless `visibility === 'public'` → 403 (dev) / 404 (prod) for every image whenever `public/storage` is missing. So: `serve => true` **only** on the public media disk, `serve => false` on `local`; verify with `php artisan media:doctor`. A cached config (`config:clear`) keeps the old flags alive after a deploy.
 21. **Pending URL-column migrations must degrade gracefully (`SQLSTATE[42S22]`).** When code deploys before `php artisan migrate` runs on the host, explicit SQL references to new M-7 columns (`whereNull('icon_url')`, `get(['...', 'icon_url'])`, `saveQuietly()` on `forceFill`) throw `SQLSTATE[42S22]`. Guard explicit column lists and `SyncsResolvedMediaUrls` / `SyncMediaUrls` / `MediaDoctor` with `Schema::hasColumn(s)` so the app falls back to Media Library until `migrate` finishes.
 22. **Bash `trap ... ERR` without `set -E` does not fire inside functions or on `exit 1` (`die()`).** In `scripts/deploy-cpanel.sh`, use `set -Eeuo pipefail` + an `EXIT` trap guarded by `MAINTENANCE_ON=1` (disarmed right before `exec` handover and re-armed in `update-steps`) so a failed deploy step never leaves the site stuck in 503 maintenance mode.
+24. **A reused image is a reference row — never its own file.** Deleting a duplicated media row (`$media->delete()`) would drop a *usage* (the row may be a product's gallery item) and Spatie would try to delete files a shared row does not own. So: re-point first, delete after (`MediaReuseService::mergeDuplicates`). Also: (a) a shared row must never have its `file_name` changed without changing `shared_path` — the observer refuses; (b) `MediaUrlObserver` must keep watching `shared_path` or dedupe leaves stale URL columns; (c) `MediaPathGenerator` decides the base path from `shared_path`, so any code path that computes media paths by hand (relocation, doctor) must skip `whereNull('shared_path')`; (d) `media:dedupe` reads owner files to hash them — on Cloudinary that is a network read per row (fine for the owner's small catalogue).
+
 23. **Cached storefront builders + `saveQuietly()` URL syncs.** `HomepageDataService::all()` (`homepage.data`, 1h TTL) and `CategoryService::tree()` (`categories.tree`, forever) cache resolved category/brand arrays, while `syncResolvedMediaUrls()` writes via `saveQuietly()` (which bypasses `CategoryObserver`). Both `MediaUrlObserver` and `php artisan media:sync-urls` / `media:relocate` must explicitly flush `HomepageDataObserver` and `CategoryService`, and any partial `->get([...])` on `Category` must include `icon_url` + `->with('media')` or `iconUrl()` will silently miss the column and N+1 on fallback.
 
 24. **Cloud-hosted media must be exempt from every "misplaced / wrong disk" check — and its URLs are derived, not fetched.** Cloudinary rows are deliberately off `MEDIA_DISK`, so `MediaRelocationService::misplacedQuery()` and `MediaDoctor::checkMediaRows()` exclude them (otherwise `media:doctor` FAILs and `media:relocate` — also run by `deploy-cpanel.sh` — streams the CDN files back into `storage/app/public` and deletes the cloud copies). `MediaDoctor::checkUrlColumns()` only stat-checks `/storage/`-prefixed URLs, which is why absolute delivery URLs are skipped safely. Never call `Storage::disk('cloudinary')->url($path)` per row (the package's adapter hits the Admin API — one HTTP round trip per image); `App\Models\Media` + `CloudinaryDeliveryUrl` derive `res.cloudinary.com/<cloud>/image/upload/…` instead. `php artisan cloudinary:install` is **not** needed (it only publishes the package's own `config/cloudinary.php`; the disk reads `config/filesystems.php`), and an empty `CLOUDINARY_URL=` line must stay equivalent to "unset" (`env(...) ?: null`) because the driver branches on `isset($config['url'])`. `Storage::fake('cloudinary')` swaps the driver to `local` in tests — restore the config driver value if a test asserts the disk contract.
@@ -638,7 +678,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 | Tokens / typography / UI law | `DESIGN.md` + `resources/css/app.css` (+ design-system doc if deep) |
 | Layers / services / routes / aggregates | `ARCHITECTURE.md` (+ PRD §architecture if product-level) |
 | Product scope / personas / NFR | `PRD.md` + `RULES.md` as needed |
-| Media disk topology / new image intake / CDN rules | `docs/media-architecture.md` (M-1…M-9) + `docs/cloudinary-media.md` + `docs/RULES.md` §7 + `docs/ARCHITECTURE.md` §9 + `docs/media-optimization.md` |
+| Media disk topology / new image intake / CDN rules | `docs/media-architecture.md` (M-1…M-10) + `docs/cloudinary-media.md` + `docs/media-reuse.md` + `docs/RULES.md` §7 + `docs/ARCHITECTURE.md` §9 + `docs/media-optimization.md` |
 | Binding behavioral law | `RULES.md` first, then MEMORY §D |
 | README entry points | `README.md` always-read table if files move |
 
@@ -656,6 +696,7 @@ php artisan media:doctor            # WHY are images broken? disk/serve/symlink/
 php artisan media:doctor --fix      # apply the safe repairs (storage:link, media:relocate, media:sync-urls)
 php artisan media:relocate --dry-run # then without --dry-run: move media to MEDIA_DISK
 php artisan media:sync-urls --dry-run # then without: refresh stored image-URL columns (M-7)
+php artisan media:dedupe --dry-run    # then without: merge duplicate uploads into one stored file (M-10)
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
@@ -674,6 +715,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 | Tracker / sequence | `tasks/MASTER_PROJECT_TRACKER.md`, `CANONICAL_PHASE_SEQUENCE.md` |
 | Release / rollback | `docs/release-checklist.md`, `rollback-plan.md` |
 | Media storage / URLs / repair | `docs/media-architecture.md`, `docs/media-optimization.md` |
+| Media reuse (one image, many places) | `docs/media-reuse.md` |
 | Cloudinary rollout (products + categories) | `docs/cloudinary-media.md` |
 
 ---

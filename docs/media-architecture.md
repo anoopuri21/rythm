@@ -16,6 +16,7 @@
 | M-6 | **Media that is already stored on the wrong disk can be repaired** idempotently. | `php artisan media:relocate` → `MediaRelocationService` |
 | M-7 | **Every media URL is also stored in DB columns** (`products.gallery_urls`/`thumbnail_url`/`og_image_url`, `product_variants.gallery_urls`/`thumbnail_url`, `brands.logo_url`, `categories.icon_url`, `hero_slides.desktop_image_url`/`mobile_image_url`, `homepage_blocks.image_url`). Reads are columns-first, Media Library is the fallback, and writes happen automatically on every media change. | `MediaUrlObserver` + `SyncsResolvedMediaUrls` + `php artisan media:sync-urls` |
 | M-8 | **The admin panel is the only image intake.** Storefront and panel render the stored URL column (M-7); the catalogue acquisition/import pipeline is dormant and must not be reintroduced as a catalogue source without an owner decision. | `MediaUpload`, `docs/RULES.md` §7 |
+| M-10 | **An image used in several places is stored once.** The first upload owns the file; every further usage is a shared row (`media.shared_path` → the owner's base path) that resolves to the very same file — originals, conversions and responsive images included. Removing a usage never breaks the others; the last usage to go removes the file. Admin reuse: **Media library → Use elsewhere**; existing duplicates: `php artisan media:dedupe`. | `app/Support/MediaPathGenerator.php`, `app/Observers/MediaFileObserver.php`, `app/Services/MediaReuseService.php`, `app/Filament/Resources/MediaLibraryResource.php`, `docs/media-reuse.md` |
 | M-9 | **Cloud-hosted media is opt-in, per collection and reversible.** When `MEDIA_CLOUDINARY=true` + credentials exist, new uploads for `media-library.cloudinary.collections` are stored on and served from Cloudinary (nothing written to the local disk); pre-existing rows and every other collection keep `MEDIA_DISK` and their URLs. Conversion names become delivery transformations, and relocation/doctor must never treat cloud rows as misplaced. | `app/Support/MediaDisk.php`, `app/Support/CloudinaryDeliveryUrl.php`, `app/Models/Media.php`, `docs/cloudinary-media.md` |
 
 `FILESYSTEM_DISK` is **not** part of this contract. It may stay `local` (the
@@ -140,6 +141,14 @@ hitting the media table and it is invisible to `media:sync-urls`:
    Filament's plain `ImageColumn`, which treats its state as a path on the disk
    and would look for `storage/app/public/storage/…`.
 
+**Reuse instead of re-uploading.** The same image in another record or collection
+must be *attached*, not uploaded again (M-10): Media library → **Use elsewhere**,
+or `MediaReuseService::attach($existingMedia, $targetModel, $collection)` in code.
+Reused rows are normal rows for every reader (stored URL column, Filament
+preview, ordering, delete), they simply share the owner's file — so no new copy
+is written locally or on Cloudinary. Conversions are never generated for them;
+the owner's conversions are mirrored to every usage when they finish.
+
 **Galleries are ordered, and order is the primary image.** `MediaUpload::gallery()` is
 `->reorderable()`, which persists through Spatie's `order_column`
 (`Media::setNewOrder()`), so the first image *is* the card/hero image
@@ -165,6 +174,15 @@ MEDIA_CLOUDINARY=true
 `deploy-cpanel.sh` (bash had already parsed it before `git pull` replaced it), so it
 does not know the two new steps. After it finishes run them once by hand — or run
 `update` a second time:
+
+**One image, many places** (M-10) is handled in the panel (Media library →
+*Use elsewhere*). For duplicates that were uploaded before reuse existed:
+
+```bash
+php artisan media:dedupe --dry-run   # report only
+php artisan media:dedupe             # merge: oldest copy owns the file, rest become usages
+php artisan media:doctor            # verify: "No duplicate images found", reused rows healthy
+```
 
 ```bash
 cd ~/rhythm
@@ -265,6 +283,13 @@ item failed (e.g. its original file is missing) — that row is left untouched.
   bounded px/byte/mime limits, gallery conversions, stored-URL columns, category
   `iconUrl()` storefront wiring + cache flushes, pending-migration graceful degrade,
   and the deploy backfill + maintenance-mode `EXIT` safety net).
+* `tests/Feature/MediaReuseTest.php` + `tests/automation/media-reuse.test.mjs`
+  — the M-10 contract: reuse writes no second file and resolves to the same URL,
+  idempotent per collection, reuse across collections, conversions upgrade every
+  usage, deleting a usage/owner never breaks the others (and the last usage
+  cleans up), relocation refuses reused rows, `media:doctor` stays healthy,
+  `media:dedupe` (dry-run + merge) leaves one stored file, and the admin Media
+  library action attaches a reuse without uploading.
 * `tests/Feature/CloudinaryMediaTest.php` + `tests/automation/cloudinary-media.test.mjs`
   — the M-9 contract: new phase-1 uploads land on the `cloudinary` disk, resolve to a
   Cloudinary delivery URL (with the conversion → transformation mapping), legacy

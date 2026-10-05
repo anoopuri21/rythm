@@ -51,6 +51,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Media reuse — one file, several usages (M-10)
+    |--------------------------------------------------------------------------
+    |
+    | A media row that reuses another row's file (`media.shared_path`) must
+    | resolve to that file's path instead of its own `{id}/…` directory, and must
+    | survive its own deletion / never rename a file it does not own. Both live in
+    | the two classes below.
+    |
+    | See docs/media-reuse.md, tasks/MEDIA_REUSE_PLAN.md
+    |
+    */
+
+    'path_generator' => App\Support\MediaPathGenerator::class,
+
+    'media_observer' => App\Observers\MediaFileObserver::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Cloudinary rollout (products + categories — phase 1)
     |--------------------------------------------------------------------------
     |

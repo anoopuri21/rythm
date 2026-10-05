@@ -3,6 +3,11 @@
 > Where media lives, how URLs are built and how to repair stored files:
 > **`docs/media-architecture.md`** (single `MEDIA_DISK`, host-relative `/storage` URLs, `php artisan media:relocate`).
 >
+> **Reused images (`docs/media-reuse.md`) are optimised once:** the file owner
+> generates the WebP conversions, every reused usage mirrors the same
+> `generated_conversions` and resolves into the owner's `conversions/`
+> directory — so N usages cost one conversion, not N.
+>
 > **Cloudinary phase 1 (`docs/cloudinary-media.md`) changes the pipeline for
 > product + category uploads only:** those rows are stored on Cloudinary and get
 > their sizes at delivery time, so they queue **no local conversions** and are

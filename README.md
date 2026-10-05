@@ -120,6 +120,7 @@ php artisan test          # 7 tests (homepage sections + newsletter)
 
 ### Deeper reference
 
+- `docs/media-reuse.md` — ek image, kai jagah: reuse an uploaded image in the panel (`Media library → Use elsewhere`) + `media:dedupe`
 - `docs/architecture-overview.md` — current-state inventory
 - `docs/architecture/*` — commerce / design-system deep dives
 - `docs/WINDOWS_SETUP.md` — Windows clone→run guide

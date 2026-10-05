@@ -163,6 +163,13 @@ class Product extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // A reused image (docs/media-reuse.md) owns no file: its conversions are
+        // the owner row's files, reached through the shared path — generating
+        // another copy here would defeat the whole point.
+        if ($media?->isShared()) {
+            return;
+        }
+
         // Cloudinary generates these sizes at delivery time (App\Models\Media
         // maps the conversion names to delivery transformations). Queuing a
         // conversion here would download the original back to this server, burn
@@ -227,6 +234,10 @@ class Product extends Model implements HasMedia, HasResolvedMediaUrls
     {
         return $this->og_image_url
             ?? $this->getFirstMedia('og')?->getUrl()
+            // No separate social image? The first gallery image is used — and the
+            // original rather than the WebP conversion, because social scrapers
+            // are not browsers and some still refuse WebP.
+            ?? $this->getFirstMedia('gallery')?->getUrl()
             ?? $this->heroImage();
     }
 

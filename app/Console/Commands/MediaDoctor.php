@@ -75,6 +75,8 @@ final class MediaDoctor extends Command
         $this->checkStorageOwnership($mediaDisk);
         $this->checkSymlink($fix);
         $this->checkCloudinary();
+        $this->checkSharedRows($limit);
+        $this->checkDuplicates();
         $this->checkMediaRows($mediaDisk, $fix, $limit);
         $this->checkUrlColumns($mediaDisk, $fix, $limit);
 
@@ -296,6 +298,107 @@ final class MediaDoctor extends Command
     }
 
     /**
+     * Reused images (docs/media-reuse.md): one file, several rows. The file must
+     * exist where the shared rows resolve to — a broken reuse is a 404 on the
+     * storefront exactly like a missing original.
+     */
+    private function checkSharedRows(int $limit): void
+    {
+        /** @var class-string<Media> $mediaModel */
+        $mediaModel = (string) config('media-library.media_model', Media::class);
+
+        if (! Schema::hasColumn('media', 'shared_path')) {
+            return; // migration pending — reused rows cannot exist yet
+        }
+
+        $shared = (int) $mediaModel::query()->whereNotNull('shared_path')->count();
+
+        if ($shared === 0) {
+            $this->reportOk('No reused media yet (every image owns its file)');
+
+            return;
+        }
+
+        $missing = [];
+        $checked = 0;
+
+        $mediaModel::query()
+            ->whereNotNull('shared_path')
+            // Cloudinary rows would cost one Admin API call each — skip them.
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->chunkById(200, function ($rows) use (&$missing, &$checked, $limit): bool {
+                foreach ($rows as $media) {
+                    if ($checked >= $limit) {
+                        return false;
+                    }
+
+                    $checked++;
+
+                    try {
+                        $exists = Storage::disk($media->disk)->exists($media->getPathRelativeToRoot());
+                    } catch (Throwable) {
+                        continue;
+                    }
+
+                    if (! $exists) {
+                        $missing[] = (int) $media->getKey();
+                    }
+                }
+
+                return true;
+            });
+
+        if ($missing === []) {
+            $this->reportOk("{$shared} reused image(s) point at a file that exists");
+
+            return;
+        }
+
+        $this->reportFail(
+            count($missing).' reused image(s) point at a file that is gone (#'.implode(', #', array_slice($missing, 0, 5)).')',
+            'Restore the file, or remove the usage in the admin and re-upload the image',
+        );
+    }
+
+    /**
+     * Byte-identical images stored twice (php artisan media:dedupe reads the
+     * stored `checksum`; rows never hashed are not counted here).
+     */
+    private function checkDuplicates(): void
+    {
+        /** @var class-string<Media> $mediaModel */
+        $mediaModel = (string) config('media-library.media_model', Media::class);
+
+        if (! Schema::hasColumn('media', 'checksum')) {
+            return; // migration pending
+        }
+
+        $groups = $mediaModel::query()
+            ->whereNull('shared_path')
+            ->whereNotNull('checksum')
+            ->where('checksum', '!=', '')
+            ->selectRaw('checksum, disk, COUNT(*) as copies')
+            ->groupBy('checksum', 'disk')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        $hashed = (int) $mediaModel::query()->whereNull('shared_path')->whereNotNull('checksum')->where('checksum', '!=', '')->count();
+
+        if ($groups->isEmpty()) {
+            $this->reportOk("No duplicate images found ({$hashed} file(s) hashed)");
+
+            return;
+        }
+
+        $copies = (int) $groups->sum('copies') - $groups->count();
+
+        $this->reportWarn(
+            "{$copies} duplicate image copy/copies in {$groups->count()} group(s)",
+            'Review: php artisan media:dedupe --dry-run — then php artisan media:dedupe to store each image once',
+        );
+    }
+
+    /**
      * Per-row file checks: originals that are gone, plus conversions the
      * database claims exist but that are missing on disk — the latter is a real
      * 404 source even when the disk, symlink and columns are all healthy.
@@ -321,6 +424,8 @@ final class MediaDoctor extends Command
                 $query->whereNull('conversions_disk')
                     ->orWhere('conversions_disk', '!=', MediaDisk::CLOUDINARY);
             })
+            // Reused rows (M-10) own no file — their owner row is checked instead.
+            ->whereNull('shared_path')
             ->count();
 
         if ($misplaced > 0) {
@@ -345,6 +450,9 @@ final class MediaDoctor extends Command
 
         $mediaModel::query()
             ->where('disk', $mediaDisk)
+            // Reused rows resolve to their owner's file, which the owner row
+            // already verifies — checking them here would double-report.
+            ->whereNull('shared_path')
             ->chunkById(200, function ($rows) use (&$scanned, &$missingOriginals, &$staleConversions, $storage, $fix, $limit): bool {
                 foreach ($rows as $media) {
                     if ($scanned >= $limit) {

@@ -1,6 +1,6 @@
 # Media reuse — ek image, kai jagah (plan)
 
-**Status:** PROPOSED — owner approval pending. **Koi app code change nahi hua hai.**
+**Status:** APPROVED (owner, 2026-10-05) → **IMPLEMENTED** (phases 1–5 code + docs + tests in tree; host verification pending — see §5).
 **Date:** 2026-10-05 · **Branch:** `arena/01a10a94-rythm`
 **Owner ask (verbatim):** "admin panel me media upload karne me same image ko multiple jageh use karne ke liye multiple time image upload karna padta hai jiski wajeh se ek hi image server pe bhi multiple time save ho jati hai jiski need nahi hoti, kyuki ek hi image url path se multiple jageh pe image use kiya jaa sakta hai."
 
@@ -116,4 +116,15 @@ storage/bandwidth usage.
 - **D3 — Upload par auto-link:** same bytes dobara upload → automatically existing file se link (haan/nahi).
 - **D4 — OG fallback:** `og` khaali ho to pehli gallery image use ho (haan/nahi).
 
-**Approval ke baad hi implementation shuru hoga.**
+### Approval record (2026-10-05)
+
+| Decision | Owner ka jawab |
+|---|---|
+| **D1 — Approach** | **shared reference rows** (option a) — ek file, baaki jagah lightweight reference rows |
+| **D2 — Purani duplicates** | **haan**, is phase me `media:dedupe` se clean |
+| **D3 — Upload par auto-link** | **nahi** — dobara upload karne par koi automatic link nahi |
+| **D4 — OG fallback** | **haan** — `og` khaali ho to pehli gallery image (original) use ho |
+
+Ab implementation ho chuki hai (code + docs + tests is branch me); owner host par
+`php artisan migrate` → `media:dedupe --dry-run` → `media:dedupe` → `media:doctor`
+→ `php artisan test` chala kar verify karega (`docs/media-reuse.md`).
