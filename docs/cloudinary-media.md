@@ -29,20 +29,34 @@
 
 ```bash
 composer require cloudinary-labs/cloudinary-laravel
-php artisan cloudinary:install        # publishes config/cloudinary.php
 php artisan config:clear
 ```
 
-Add credentials to `.env` (either shape works):
+Add credentials to `.env` — **one line does it all** (cloud name, API key and
+API secret are all inside the URL; copy the "API environment variable" value
+from the Cloudinary dashboard):
 
 ```
-MEDIA_CLOUDINARY=true
 CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-# or:
+MEDIA_CLOUDINARY=true
+```
+
+`php artisan cloudinary:install` is **not needed** for this integration — it only
+publishes the package's own `config/cloudinary.php` (used by its Blade
+components/helpers, which this app does not use). The storage disk reads
+`config/filesystems.php`.
+
+Prefer separate keys? That also works:
+
+```
 # CLOUDINARY_CLOUD_NAME=...
 # CLOUDINARY_KEY=...
 # CLOUDINARY_SECRET=...
 ```
+
+Both shapes are safe to use on their own; if you ever set both, `CLOUDINARY_URL`
+wins on both sides (the disk driver and the delivery-URL builder check it first,
+deliberately).
 
 Keep `MEDIA_DISK=public` and `FILESYSTEM_DISK=local` exactly as they are.
 
@@ -126,8 +140,9 @@ In the panel: upload a product gallery image and a category icon, then check
 4. `App\Models\Media` is required for URLs to work without per-image API calls
    (`config/media-library.php` → `media_model`). Do not point it back at the
    Spatie class.
-5. `MEDIA_CLOUDINARY=true` + missing package = every product/category upload
-   fails. Run the composer step first; `media:doctor` spells this out.
+5. `MEDIA_CLOUDINARY=true` + credentials but **missing package** = every
+   product/category upload fails (`Disk [cloudinary] does not have a configured
+   driver`). Run the `composer require` step first; `media:doctor` spells this out.
 6. Do not delete the credentials while cloud rows exist: the derived URL needs
    the cloud name. The stored URL columns are **not** overwritten with an empty
    value in that state (`SyncsResolvedMediaUrls` keeps an already-resolved URL),

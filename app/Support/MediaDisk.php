@@ -114,23 +114,24 @@ final class MediaDisk
     }
 
     /**
-     * The Cloudinary cloud name, from `CLOUDINARY_CLOUD_NAME` or from the
-     * connection URL (`CLOUDINARY_URL=cloudinary://key:secret@cloud_name`).
+     * The Cloudinary cloud name: from the connection URL
+     * (`CLOUDINARY_URL=cloudinary://key:secret@cloud_name`) or from
+     * `CLOUDINARY_CLOUD_NAME`.
+     *
+     * The URL is checked first because the package's disk driver does exactly
+     * that (`isset($config['url'])` → `new Cloudinary($url)`), so uploads and
+     * the delivery URLs this app derives can never point at different clouds.
      */
     public static function cloudName(): ?string
     {
-        $cloud = trim((string) config('filesystems.disks.cloudinary.cloud', ''));
-
-        if ($cloud !== '') {
-            return $cloud;
-        }
-
         $url = trim((string) config('filesystems.disks.cloudinary.url', ''));
 
         if ($url !== '' && preg_match('~@([^/@:]+)/?$~', $url, $matches) === 1) {
             return $matches[1];
         }
 
-        return null;
+        $cloud = trim((string) config('filesystems.disks.cloudinary.cloud', ''));
+
+        return $cloud !== '' ? $cloud : null;
     }
 }

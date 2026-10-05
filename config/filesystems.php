@@ -105,7 +105,7 @@ return [
         // using the MEDIA_DISK disk above.
         'cloudinary' => [
             'driver' => 'cloudinary',
-            'url' => env('CLOUDINARY_URL'),
+            'url' => env('CLOUDINARY_URL') ?: null,
             'cloud' => env('CLOUDINARY_CLOUD_NAME'),
             'key' => env('CLOUDINARY_KEY') ?: env('CLOUDINARY_API_KEY'),
             'secret' => env('CLOUDINARY_SECRET') ?: env('CLOUDINARY_API_SECRET'),

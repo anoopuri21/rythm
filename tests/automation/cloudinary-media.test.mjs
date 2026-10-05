@@ -16,7 +16,7 @@ test('the cloudinary disk is a normal filesystem disk fed by CLOUDINARY_* env', 
     const disk = filesystems.slice(filesystems.indexOf("'cloudinary' => ["));
 
     assert.match(disk, /'driver' => 'cloudinary'/);
-    assert.match(disk, /'url' => env\('CLOUDINARY_URL'\)/);
+    assert.match(disk, /'url' => env\('CLOUDINARY_URL'\) \?: null/);
     assert.match(disk, /'cloud' => env\('CLOUDINARY_CLOUD_NAME'\)/);
     assert.match(disk, /'key' => env\('CLOUDINARY_KEY'\)/);
     assert.match(disk, /'secret' => env\('CLOUDINARY_SECRET'\)/);

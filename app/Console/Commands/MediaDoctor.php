@@ -284,7 +284,7 @@ final class MediaDoctor extends Command
         } catch (Throwable $exception) {
             $this->reportFail(
                 'The [cloudinary] disk cannot be resolved: '.$exception->getMessage(),
-                'Run: composer require cloudinary-labs/cloudinary-laravel && php artisan cloudinary:install',
+                'Run: composer require cloudinary-labs/cloudinary-laravel, then php artisan config:clear',
             );
 
             return;

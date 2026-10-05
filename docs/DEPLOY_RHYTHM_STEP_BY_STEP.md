@@ -165,7 +165,6 @@ MEDIA_DISK=public              # admin-uploaded images; must be publicly readabl
 
 # Cloudinary phase 1 (products + categories) — docs/cloudinary-media.md
 # Pehle ek baar: composer require cloudinary-labs/cloudinary-laravel
-#                && php artisan cloudinary:install
 # Phir ye do lines bharo aur `php artisan config:clear` chalao:
 MEDIA_CLOUDINARY=true
 CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME

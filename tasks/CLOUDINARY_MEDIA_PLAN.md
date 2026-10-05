@@ -46,15 +46,15 @@ Cloudinary verification pending on the owner's PHP host.
 
 ```bash
 composer require cloudinary-labs/cloudinary-laravel
-php artisan cloudinary:install
 php artisan config:clear
 ```
 
-`.env`: keep `MEDIA_DISK=public` + `FILESYSTEM_DISK=local`, add
+`.env`: keep `MEDIA_DISK=public` + `FILESYSTEM_DISK=local`, add (two lines —
+`CLOUDINARY_URL` carries cloud name + key + secret):
 
 ```
-MEDIA_CLOUDINARY=true
 CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+MEDIA_CLOUDINARY=true
 ```
 
 Then `php artisan media:doctor` (expect: *Cloudinary ready — collections …*).
