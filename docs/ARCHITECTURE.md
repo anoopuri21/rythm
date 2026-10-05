@@ -174,7 +174,7 @@ Admin: Filament `/admin` only (no public REST admin API).
 |---|---|
 | Concurrency | DB transactions + `lockForUpdate` on checkout/stock |
 | Idempotency | checkout keys, payment_events, inventory movements, refunds |
-| Caching | Homepage/category caches; observers invalidate |
+| Caching | Homepage/category caches; observers invalidate. A **cached payload shape is versioned** (`CategoryService::PAYLOAD_VERSION`, validated read → rebuild on mismatch) and nullable keys of a cached array are read with `?? null` in Blade: a forever cache outlives the release that wrote it, so a new key must never be assumed present (2026-10-05 `/shop` incident: `Undefined array key "image"`) |
 | Jobs | Queued mail/notifications; shared-host cron worker drain |
 | Security | CSRF, throttles, signed URLs, SecurityHeaders/CSP, Razorpay HMAC |
 | Tests | PHPUnit Feature/Unit; FakePaymentGateway; build via `npm run build` |

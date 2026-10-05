@@ -12,7 +12,9 @@ use App\Models\ProductAttribute;
 use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use App\Models\Review;
+use App\Services\CategoryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -46,6 +48,34 @@ class ShopPageTest extends TestCase
             ->assertSee('Search brands')
             ->assertSee('value="featured"', escape: false)
             ->assertDontSee('Popularity');
+    }
+
+    /**
+     * Regression for the live `/shop` 500:
+     * `ErrorException: Undefined array key "image"` at shop-index.blade.php:30.
+     *
+     * Even a *current-version* cached item that somehow lacks the nullable image
+     * key must render the placeholder tile — never take the storefront down.
+     */
+    public function test_shop_page_survives_a_cached_category_tree_without_the_image_key(): void
+    {
+        $category = Category::query()->whereNull('parent_id')->orderBy('sort_order')->firstOrFail();
+
+        Cache::forever('categories.tree', [
+            'version' => CategoryService::PAYLOAD_VERSION,
+            'items' => [[
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                // `image` deliberately missing.
+                'children' => [],
+            ]],
+        ]);
+
+        $this->get('/shop')
+            ->assertOk()
+            ->assertSee('shop-shortcuts', escape: false)
+            ->assertSee('shop-shortcut__placeholder', escape: false);
     }
 
     public function test_shop_category_shortcuts_keep_a_placeholder_tile_when_a_category_has_no_image(): void
