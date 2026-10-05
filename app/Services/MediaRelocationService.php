@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Contracts\HasResolvedMediaUrls;
 use App\Observers\HomepageDataObserver;
+use App\Support\MediaDisk;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -73,11 +74,24 @@ final class MediaRelocationService
     }
 
     /**
-     * Number of media rows whose original or conversions live on another disk.
+     * Number of media rows whose original or conversions live on another disk
+     * (cloud-hosted rows excluded — see misplacedQuery()).
      */
     public function misplacedCount(): int
     {
         return $this->misplacedQuery()->count();
+    }
+
+    /**
+     * Number of media rows stored on Cloudinary (intentionally off MEDIA_DISK).
+     */
+    public function cloudHostedCount(): int
+    {
+        $model = (string) config('media-library.media_model', Media::class);
+
+        return (int) $model::query()
+            ->where('disk', MediaDisk::CLOUDINARY)
+            ->count();
     }
 
     /**
@@ -128,6 +142,13 @@ final class MediaRelocationService
         $target = $this->targetDisk();
         $originalDisk = (string) $media->disk;
         $derivedDisk = (string) ($media->conversions_disk ?: $originalDisk);
+
+        // Never pull cloud-hosted media back onto this server — not even when a
+        // caller passes the row directly (docs/cloudinary-media.md).
+        if (MediaDisk::isCloudinary($originalDisk) || MediaDisk::isCloudinary($derivedDisk)) {
+            throw new RuntimeException("Media #{$media->getKey()} is stored on Cloudinary and is not relocated.");
+        }
+
         $generator = PathGeneratorFactory::create($media);
 
         $original = $generator->getPath($media).$media->file_name;
@@ -226,14 +247,28 @@ final class MediaRelocationService
         }
     }
 
+    /**
+     * Rows that should live on MEDIA_DISK but do not.
+     *
+     * Cloud-hosted rows (docs/cloudinary-media.md) are excluded on purpose:
+     * they are not misplaced — they are meant to live off this server, and
+     * "relocating" them would pull the images back onto disk and rewrite the
+     * storefront URLs.
+     */
     private function misplacedQuery(): Builder
     {
         $target = $this->targetDisk();
         $model = (string) config('media-library.media_model', Media::class);
 
-        return $model::query()->where(function ($query) use ($target): void {
-            $query->where('disk', '!=', $target)
-                ->orWhere('conversions_disk', '!=', $target);
-        });
+        return $model::query()
+            ->where(function ($query) use ($target): void {
+                $query->where('disk', '!=', $target)
+                    ->orWhere('conversions_disk', '!=', $target);
+            })
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->where(function ($query): void {
+                $query->whereNull('conversions_disk')
+                    ->orWhere('conversions_disk', '!=', MediaDisk::CLOUDINARY);
+            });
     }
 }

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Concerns\SyncsResolvedMediaUrls;
 use App\Models\Contracts\HasResolvedMediaUrls;
 use App\Observers\CategoryObserver;
+use App\Support\MediaDisk;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -74,7 +75,9 @@ class Category extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaCollections(): void
     {
+        // Category icons are phase-1 Cloudinary media (docs/cloudinary-media.md).
         $this->addMediaCollection('icon')
-            ->singleFile();
+            ->singleFile()
+            ->useDisk(MediaDisk::forCollection('icon'));
     }
 }

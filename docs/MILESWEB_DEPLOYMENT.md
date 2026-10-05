@@ -56,6 +56,12 @@ QUEUE_CONNECTION=database
 FILESYSTEM_DISK=local          # private default disk; media uses MEDIA_DISK (below)
 MEDIA_DISK=public              # admin-uploaded images; must be publicly readable
 
+# Cloudinary phase 1 (products + categories) — docs/cloudinary-media.md
+# Ek baar: composer require cloudinary-labs/cloudinary-laravel && php artisan cloudinary:install
+# Phir credentials + switch, aur `php artisan config:clear`:
+MEDIA_CLOUDINARY=true
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+
 MAIL_MAILER=smtp
 MAIL_SCHEME=tls
 MAIL_HOST=mail.vsinfosys.in

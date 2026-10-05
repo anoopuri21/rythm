@@ -163,6 +163,15 @@ QUEUE_CONNECTION=database
 FILESYSTEM_DISK=local          # private default disk; media uses MEDIA_DISK (below)
 MEDIA_DISK=public              # admin-uploaded images; must be publicly readable
 
+# Cloudinary phase 1 (products + categories) — docs/cloudinary-media.md
+# Pehle ek baar: composer require cloudinary-labs/cloudinary-laravel
+#                && php artisan cloudinary:install
+# Phir ye do lines bharo aur `php artisan config:clear` chalao:
+MEDIA_CLOUDINARY=true
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+# (Purani /storage images ka URL nahi badlega; naye product/category uploads
+#  Cloudinary par jaayenge. Rollback: MEDIA_CLOUDINARY=false + config:clear.)
+
 MAIL_MAILER=log
 MAIL_HOST=
 MAIL_PORT=587

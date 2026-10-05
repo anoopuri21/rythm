@@ -8,14 +8,15 @@
 
 | # | Rule | Where it lives |
 |---|---|---|
-| M-1 | **One media disk.** Panel uploads, programmatic imports and storefront URLs all use `MEDIA_DISK` (default `public`). It must be publicly readable. | `config/media-library.php` (`disk_name`) + `config/filament.php` (`default_filesystem_disk`) — same env var |
-| M-2 | **Media URLs are host-relative** (`/storage/12/photo.jpg`), and **the media disk owns that path** — `serve => true` on `public`, `serve => false` on the private `local` disk. Never built from `APP_URL`, the request host or a signature. | `config/filesystems.php` → `disks.public.url` (`MEDIA_URL`, default `/storage`) + the `serve` flags · verify with `php artisan media:doctor` |
+| M-1 | **One home for local media.** By default panel uploads, programmatic imports and storefront URLs all use `MEDIA_DISK` (default `public`), which must be publicly readable. A collection may be moved off it as a **deliberate, documented rollout** (Cloudinary phase 1 — see M-9); the disk is then decided by `App\Support\MediaDisk`, never by a hand-written field. | `config/media-library.php` (`disk_name`) + `config/filament.php` (`default_filesystem_disk`) — same env var · `app/Support/MediaDisk.php` |
+| M-2 | **Local media URLs are host-relative** (`/storage/12/photo.jpg`), and **the media disk owns that path** — `serve => true` on `public`, `serve => false` on the private `local` disk. Never built from `APP_URL`, the request host or a signature. Cloud-hosted rows (M-9) instead store their absolute `https://res.cloudinary.com/...` URL; both shapes coexist in a mixed catalogue. | `config/filesystems.php` → `disks.public.url` (`MEDIA_URL`, default `/storage`) + the `serve` flags · verify with `php artisan media:doctor` |
 | M-3 | **One definition of an upload field**, with bounded MIME / byte size / pixel size / count and a fixed collection. | `app/Filament/Components/MediaUpload.php` |
 | M-4 | **One way to resolve a URL**: "use the WebP conversion once it exists, else the original" = Spatie's `$media->getAvailableUrl([...])`. | `Product`, `ProductVariant`, `HeroSlide` |
 | M-5 | **Absolute URLs only where crawlers need them** (`og:image`, JSON-LD) — made absolute at the output boundary with `url()`. | `layouts/app.blade.php`, `product/show.blade.php` |
 | M-6 | **Media that is already stored on the wrong disk can be repaired** idempotently. | `php artisan media:relocate` → `MediaRelocationService` |
 | M-7 | **Every media URL is also stored in DB columns** (`products.gallery_urls`/`thumbnail_url`/`og_image_url`, `product_variants.gallery_urls`/`thumbnail_url`, `brands.logo_url`, `categories.icon_url`, `hero_slides.desktop_image_url`/`mobile_image_url`, `homepage_blocks.image_url`). Reads are columns-first, Media Library is the fallback, and writes happen automatically on every media change. | `MediaUrlObserver` + `SyncsResolvedMediaUrls` + `php artisan media:sync-urls` |
 | M-8 | **The admin panel is the only image intake.** Storefront and panel render the stored URL column (M-7); the catalogue acquisition/import pipeline is dormant and must not be reintroduced as a catalogue source without an owner decision. | `MediaUpload`, `docs/RULES.md` §7 |
+| M-9 | **Cloud-hosted media is opt-in, per collection and reversible.** When `MEDIA_CLOUDINARY=true` + credentials exist, new uploads for `media-library.cloudinary.collections` are stored on and served from Cloudinary (nothing written to the local disk); pre-existing rows and every other collection keep `MEDIA_DISK` and their URLs. Conversion names become delivery transformations, and relocation/doctor must never treat cloud rows as misplaced. | `app/Support/MediaDisk.php`, `app/Support/CloudinaryDeliveryUrl.php`, `app/Models/Media.php`, `docs/cloudinary-media.md` |
 
 `FILESYSTEM_DISK` is **not** part of this contract. It may stay `local` (the
 `.env.example` default) — media no longer follows it.
@@ -120,7 +121,7 @@ outside the app) still resolves correctly.
 
 ## 4. Adding a new media field
 
-1. Model (`HasMedia`): `$this->addMediaCollection('banner')->singleFile();` — **no `useDisk()`**, the disk is global.
+1. Model (`HasMedia`): `$this->addMediaCollection('banner')->singleFile();` — the disk is global (`MEDIA_DISK`), so a plain collection needs **no `useDisk()`**. Add `->useDisk(MediaDisk::forCollection('banner'))` only when the collection is part of a documented cloud rollout (M-9, `docs/cloudinary-media.md`); the Filament field then reads the same value, so panel and code cannot disagree.
 2. Admin: `MediaUpload::single('banner', 'banner', maxSizeKb: 4096)` (or `MediaUpload::gallery('photos', 'photos', maxFiles: 8)`). Never use `SpatieMediaLibraryFileUpload::make()` directly (a static test enforces this). Both helpers bound MIME, bytes (`maxSize`) and pixels (`dimensions:max_width/max_height`, default 6000 — raise per field only with a matching PHP `memory_limit`); **never add Filament's `->image()`**, it rewrites the mime list to `image/*` and would re-admit SVG.
 3. Storefront: `$model->getFirstMedia('banner')?->getAvailableUrl(['<conversion>'])`.
 4. Conversions are **collection-scoped** (`->performOnCollections('gallery')`) so a collection that is served as-is (e.g. `og` for crawlers) does not queue WebP copies nobody requests.
@@ -152,6 +153,11 @@ supported way to change the primary photo — deleting and re-uploading is not n
 ```
 MEDIA_DISK=public        # publicly readable disk — leave as is
 # MEDIA_URL=             # unset = relative /storage URLs (recommended). Set only for a CDN, e.g. https://cdn.example.com/storage
+
+# Cloudinary (products + categories — docs/cloudinary-media.md). Leave the
+# switch on only once the package + credentials are installed.
+MEDIA_CLOUDINARY=true
+# CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
 ```
 
 **Rolling this change out on an existing server (one time).** The first
@@ -259,3 +265,9 @@ item failed (e.g. its original file is missing) — that row is left untouched.
   bounded px/byte/mime limits, gallery conversions, stored-URL columns, category
   `iconUrl()` storefront wiring + cache flushes, pending-migration graceful degrade,
   and the deploy backfill + maintenance-mode `EXIT` safety net).
+* `tests/Feature/CloudinaryMediaTest.php` + `tests/automation/cloudinary-media.test.mjs`
+  — the M-9 contract: new phase-1 uploads land on the `cloudinary` disk, resolve to a
+  Cloudinary delivery URL (with the conversion → transformation mapping), legacy
+  `/storage/...` rows are untouched, other collections stay on `MEDIA_DISK`,
+  relocation/doctor never flag cloud rows, and the rollout stays off without
+  credentials. Config/tests detail: `docs/cloudinary-media.md`.

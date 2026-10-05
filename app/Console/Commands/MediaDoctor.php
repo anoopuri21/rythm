@@ -10,6 +10,7 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\MediaDisk;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -73,6 +74,7 @@ final class MediaDoctor extends Command
 
         $this->checkStorageOwnership($mediaDisk);
         $this->checkSymlink($fix);
+        $this->checkCloudinary();
         $this->checkMediaRows($mediaDisk, $fix, $limit);
         $this->checkUrlColumns($mediaDisk, $fix, $limit);
 
@@ -241,6 +243,59 @@ final class MediaDoctor extends Command
     }
 
     /**
+     * The Cloudinary rollout (docs/cloudinary-media.md): products + categories
+     * upload to Cloudinary while every other collection stays on MEDIA_DISK.
+     * "Enabled but unusable" is a FAIL — uploads would otherwise land on the
+     * wrong disk. Disabled is fine, and so is a configured disk waiting to be
+     * switched on.
+     */
+    private function checkCloudinary(): void
+    {
+        $configured = (array) config('filesystems.disks.'.MediaDisk::CLOUDINARY, []);
+
+        if ($configured === [] || ($configured['driver'] ?? null) !== MediaDisk::CLOUDINARY) {
+            if (MediaDisk::enabled()) {
+                $this->reportFail(
+                    'Cloudinary is enabled (MEDIA_CLOUDINARY) but the [cloudinary] disk is not configured',
+                    'Add it to config/filesystems.php and run php artisan config:clear (docs/cloudinary-media.md)',
+                );
+            } elseif (config('media-library.cloudinary.enabled')) {
+                $this->reportWarn(
+                    'MEDIA_CLOUDINARY is on but no Cloudinary credentials were found',
+                    'Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET — uploads stay on ['.MediaDisk::mediaDisk().'] until then',
+                );
+            }
+
+            return;
+        }
+
+        if (! MediaDisk::enabled()) {
+            $reason = config('media-library.cloudinary.enabled')
+                ? 'no Cloudinary credentials'
+                : 'MEDIA_CLOUDINARY=false';
+
+            $this->reportOk("Cloudinary disk is configured but inactive ({$reason}) — products + categories stay on [".MediaDisk::mediaDisk().']');
+
+            return;
+        }
+
+        try {
+            Storage::disk(MediaDisk::CLOUDINARY);
+        } catch (Throwable $exception) {
+            $this->reportFail(
+                'The [cloudinary] disk cannot be resolved: '.$exception->getMessage(),
+                'Run: composer require cloudinary-labs/cloudinary-laravel && php artisan cloudinary:install',
+            );
+
+            return;
+        }
+
+        $this->reportOk(
+            'Cloudinary ready — collections ['.implode(', ', MediaDisk::cloudCollections()).'] upload to cloud ['.MediaDisk::cloudName().']',
+        );
+    }
+
+    /**
      * Per-row file checks: originals that are gone, plus conversions the
      * database claims exist but that are missing on disk — the latter is a real
      * 404 source even when the disk, symlink and columns are all healthy.
@@ -250,10 +305,21 @@ final class MediaDoctor extends Command
         /** @var class-string<Media> $mediaModel */
         $mediaModel = (string) config('media-library.media_model', Media::class);
 
+        $cloudHosted = (int) $mediaModel::query()
+            ->where('disk', MediaDisk::CLOUDINARY)
+            ->count();
+
         $misplaced = (int) $mediaModel::query()
             ->where(function ($query) use ($mediaDisk): void {
                 $query->where('disk', '!=', $mediaDisk)
                     ->orWhere(fn ($inner) => $inner->whereNotNull('conversions_disk')->where('conversions_disk', '!=', $mediaDisk));
+            })
+            // Cloud-hosted rows are deliberately off MEDIA_DISK (docs/cloudinary-media.md):
+            // counting them as misplaced would make `--fix` pull them back onto this server.
+            ->where('disk', '!=', MediaDisk::CLOUDINARY)
+            ->where(function ($query): void {
+                $query->whereNull('conversions_disk')
+                    ->orWhere('conversions_disk', '!=', MediaDisk::CLOUDINARY);
             })
             ->count();
 
@@ -266,6 +332,8 @@ final class MediaDoctor extends Command
             if ($fix) {
                 $this->call('media:relocate');
             }
+        } elseif ($cloudHosted > 0) {
+            $this->reportOk("Every media row lives on [{$mediaDisk}] or is served from Cloudinary ({$cloudHosted} row(s) off this server)");
         } else {
             $this->reportOk("Every media row lives on [{$mediaDisk}]");
         }

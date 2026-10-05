@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Components;
 
+use App\Support\MediaDisk;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 /**
@@ -14,10 +15,15 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
  * limits are explicit, bounded and identical everywhere — a field cannot
  * forget them.
  *
- * Disk and visibility are intentionally NOT configured per field. They come
- * from the one media-disk setting (MEDIA_DISK → config/media-library.php and
- * config/filament.php), so no field can end up on the private default disk
- * (whose files the storefront cannot serve). See docs/media-architecture.md.
+ * The disk is decided in ONE place — `App\Support\MediaDisk::forCollection()`:
+ * MEDIA_DISK (config/media-library.php + config/filament.php) for every
+ * collection, Cloudinary for the collections the rollout names
+ * (docs/cloudinary-media.md). The models resolve the same value, so a field can
+ * never end up on the private default disk (whose files the storefront cannot
+ * serve) or on a different disk than the one the storefront reads its stored
+ * URL columns from. See docs/media-architecture.md.
+ *
+ * Visibility is still never configured per field: it comes from the disk.
  *
  * Deliberately NOT used: Filament's `->image()`, which re-writes
  * acceptedFileTypes to `image/*` and would therefore re-admit SVG (and any
@@ -88,6 +94,12 @@ final class MediaUpload
     {
         return SpatieMediaLibraryFileUpload::make($name)
             ->collection($collection)
+            // Where the saved file is written: MEDIA_DISK for every collection,
+            // Cloudinary for the ones the rollout names (docs/cloudinary-media.md).
+            // The models resolve the same disk through the same class
+            // (App\Support\MediaDisk), so the panel and the storefront's stored
+            // URL columns can never disagree.
+            ->disk(MediaDisk::forCollection($collection))
             ->acceptedFileTypes($mimeTypes)
             ->maxSize($maxSizeKb)
             // Ordered after acceptedFileTypes on purpose: Laravel stops at the

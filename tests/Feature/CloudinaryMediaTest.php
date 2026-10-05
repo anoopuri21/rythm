@@ -1,0 +1,267 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Filament\Resources\CategoryResource\Pages\ManageCategories;
+use App\Filament\Resources\ProductResource\Pages\CreateProduct;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\User;
+use App\Services\MediaRelocationService;
+use App\Support\MediaDisk;
+use Filament\Actions\Testing\TestAction;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
+use Livewire\Livewire;
+use RuntimeException;
+use Tests\Concerns\IsolatesMediaDisks;
+use Tests\TestCase;
+
+/**
+ * docs/cloudinary-media.md → M-9 — phase 1: product (gallery/og/variants) and
+ * category icons are stored on and served from Cloudinary.
+ *
+ * The rollout is enabled per test with a fake disk, so no credentials and no
+ * network are needed; the delivery URLs are still the real derived
+ * `https://res.cloudinary.com/<cloud>/...` shapes (that is the code under test).
+ *
+ * `phpunit.xml` pins MEDIA_CLOUDINARY=false: every other suite keeps running in
+ * the legacy mode (MEDIA_DISK + /storage URLs), which is what these tests
+ * compare against.
+ */
+class CloudinaryMediaTest extends TestCase
+{
+    use IsolatesMediaDisks;
+    use RefreshDatabase;
+
+    private const BASE_URL = 'https://res.cloudinary.com/demo/image/upload/';
+
+    private User $admin;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->isolateMediaDisks();
+
+        Storage::fake(MediaDisk::CLOUDINARY);
+
+        // Storage::fake() swaps in a local driver — restore the configured
+        // driver so media:doctor's config contract sees the real shape, and
+        // name the cloud the delivery URLs must be derived from.
+        config([
+            'filesystems.disks.cloudinary.driver' => 'cloudinary',
+            'filesystems.disks.cloudinary.cloud' => 'demo',
+            'media-library.cloudinary.enabled' => true,
+        ]);
+
+        $this->admin = User::factory()->create(['role' => User::ROLE_SUPER_ADMIN]);
+    }
+
+    // ── Which collections follow Cloudinary ─────────────────────────────────
+
+    public function test_only_the_phase_one_collections_follow_cloudinary(): void
+    {
+        $this->assertTrue(MediaDisk::enabled());
+
+        foreach (['gallery', 'og', 'variant_gallery', 'icon'] as $collection) {
+            $this->assertSame('cloudinary', MediaDisk::forCollection($collection), $collection);
+        }
+
+        // Everything else keeps the media disk until the owner widens the list.
+        foreach (['logo', 'image', 'desktop_image', 'mobile_image'] as $collection) {
+            $this->assertSame('public', MediaDisk::forCollection($collection), $collection);
+        }
+    }
+
+    public function test_the_rollout_stays_off_without_credentials(): void
+    {
+        config([
+            'media-library.cloudinary.enabled' => true,
+            'filesystems.disks.cloudinary.cloud' => null,
+            'filesystems.disks.cloudinary.url' => null,
+        ]);
+
+        $this->assertFalse(MediaDisk::enabled(), 'A half-configured rollout must never route uploads to a disk it cannot serve.');
+        $this->assertSame('public', MediaDisk::forCollection('gallery'));
+
+        $product = Product::factory()->create();
+        $media = $product->addMedia(UploadedFile::fake()->image('local.jpg', 80, 80))->toMediaCollection('gallery');
+
+        $this->assertSame('public', $media->disk);
+        $this->assertStringStartsWith('/storage/', (string) $product->fresh()->thumbnail_url);
+    }
+
+    // ── Product uploads (admin panel) ───────────────────────────────────────
+
+    public function test_product_images_uploaded_in_the_panel_are_stored_on_cloudinary_and_served_from_it(): void
+    {
+        $category = Category::factory()->create();
+        $brand = Brand::factory()->create();
+
+        Livewire::actingAs($this->admin, 'admin')
+            ->test(CreateProduct::class)
+            ->fillForm([
+                'name' => 'Cloudinary Test Guitar',
+                'slug' => 'cloudinary-test-guitar',
+                'category_id' => $category->id,
+                'brand_id' => $brand->id,
+                'price' => 1000,
+                'stock' => 5,
+                'is_active' => true,
+                'gallery' => [UploadedFile::fake()->image('front.jpg', 600, 600)],
+                'og' => [UploadedFile::fake()->image('share.jpg', 1200, 630)],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $product = Product::query()->where('slug', 'cloudinary-test-guitar')->firstOrFail();
+        $media = $product->getFirstMedia('gallery');
+
+        $this->assertNotNull($media);
+        $this->assertSame('cloudinary', $media->disk);
+        $this->assertSame('cloudinary', $media->conversions_disk ?: $media->disk);
+        $this->assertTrue(Storage::disk('cloudinary')->exists($media->getPathRelativeToRoot()));
+
+        // Nothing was written to the local media disk for this upload.
+        $this->assertFalse(
+            Storage::disk('public')->exists($media->getPathRelativeToRoot()),
+            'A Cloudinary upload must not touch storage/app/public.',
+        );
+
+        $fresh = $product->fresh();
+
+        // Small image = the thumb-webp conversion name, now a delivery transformation.
+        $this->assertStringStartsWith(self::BASE_URL, (string) $fresh->thumbnail_url);
+        $this->assertStringContainsString('c_fit,w_480,h_480,f_auto,q_auto:good', (string) $fresh->thumbnail_url);
+
+        // Large image = the gallery-webp conversion name.
+        $this->assertStringStartsWith(self::BASE_URL.'c_fit,w_1200,h_1200,f_auto,q_auto:good/', (string) ($fresh->gallery_urls[0] ?? null));
+        $this->assertSame($fresh->gallery_urls[0], $fresh->heroImage());
+
+        $og = $product->getFirstMedia('og');
+        $this->assertNotNull($og);
+        $this->assertSame('cloudinary', $og->disk);
+        $this->assertSame(self::BASE_URL.'f_auto,q_auto:good/'.$og->getPathRelativeToRoot(), $fresh->og_image_url);
+
+        // The storefront renders the CDN URL straight from the stored column.
+        $this->storefront('/shop')->assertOk()->assertSee('src="'.$fresh->thumbnailImage().'"', false);
+    }
+
+    // ── Category icons (admin panel) ────────────────────────────────────────
+
+    public function test_category_icons_uploaded_in_the_panel_are_stored_on_cloudinary(): void
+    {
+        Livewire::actingAs($this->admin, 'admin')->test(ManageCategories::class)
+            ->callAction(TestAction::make('create'), data: [
+                'name' => 'Guitars',
+                'slug' => 'guitars-cloudinary',
+                'icon' => [UploadedFile::fake()->image('icon.png', 240, 240)],
+            ])
+            ->assertHasNoFormErrors();
+
+        $category = Category::query()->where('slug', 'guitars-cloudinary')->firstOrFail();
+        $media = $category->getFirstMedia('icon');
+
+        $this->assertNotNull($media);
+        $this->assertSame('cloudinary', $media->disk);
+        $this->assertTrue(Storage::disk('cloudinary')->exists($media->getPathRelativeToRoot()));
+        $this->assertFalse(Storage::disk('public')->exists($media->getPathRelativeToRoot()));
+
+        $this->assertSame(
+            self::BASE_URL.'f_auto,q_auto:good/'.$media->getPathRelativeToRoot(),
+            $category->fresh()->icon_url,
+        );
+    }
+
+    // ── Legacy rows and other collections are untouched ─────────────────────
+
+    public function test_existing_storage_urls_and_other_collections_keep_the_media_disk(): void
+    {
+        // Queued WebP conversions must not fire: the point of this test is the
+        // exact original-URL path every pre-Cloudinary row already renders.
+        Queue::fake();
+
+        $product = Product::factory()->create();
+
+        // Exactly how every pre-Cloudinary row looks: stored on the media disk.
+        $legacy = $product->addMedia(UploadedFile::fake()->image('legacy.jpg', 80, 80))
+            ->toMediaCollection('gallery', 'public');
+
+        $this->assertSame('public', $legacy->disk);
+        $this->assertTrue(Storage::disk('public')->exists($legacy->getPathRelativeToRoot()));
+
+        $fresh = $product->fresh();
+        $this->assertSame('/storage/'.$legacy->getPathRelativeToRoot(), $fresh->thumbnail_url);
+        $this->assertSame('/storage/'.$legacy->getPathRelativeToRoot(), $fresh->gallery_urls[0]);
+
+        // Mixed catalogue: a new cloud upload next to the legacy row must not
+        // disturb the legacy URL (M-2/M-7).
+        $cloud = $product->addMedia(UploadedFile::fake()->image('cloud.jpg', 80, 80))
+            ->toMediaCollection('gallery');
+
+        $this->assertSame('cloudinary', $cloud->disk);
+        $this->assertSame('/storage/'.$legacy->getPathRelativeToRoot(), $product->fresh()->thumbnail_url);
+
+        // Collections outside the phase-1 list stay on MEDIA_DISK.
+        $brand = Brand::factory()->create();
+        $logo = $brand->addMedia(UploadedFile::fake()->image('logo.png', 60, 60))->toMediaCollection('logo');
+
+        $this->assertSame('public', $logo->disk);
+        $this->assertSame('/storage/'.$logo->getPathRelativeToRoot(), $brand->fresh()->logo_url);
+    }
+
+    // ── Repair tooling must never fight Cloudinary rows ─────────────────────
+
+    public function test_cloud_rows_are_never_reported_or_relocated_as_misplaced(): void
+    {
+        $product = Product::factory()->create();
+        $cloud = $product->addMedia(UploadedFile::fake()->image('cloud.jpg', 80, 80))->toMediaCollection('gallery');
+
+        $this->assertSame('cloudinary', $cloud->disk);
+
+        $service = app(MediaRelocationService::class);
+
+        $this->assertSame(0, $service->misplacedCount(), 'Cloudinary rows are intentionally off MEDIA_DISK — not misplaced.');
+        $this->assertSame(1, $service->cloudHostedCount());
+        $this->assertSame(0, $service->relocateAll(true)['examined'], 'media:relocate must leave Cloudinary files alone.');
+
+        $this->expectException(RuntimeException::class);
+        $service->relocate($cloud);
+    }
+
+    public function test_media_doctor_stays_healthy_with_cloud_rows(): void
+    {
+        $product = Product::factory()->create();
+        $product->addMedia(UploadedFile::fake()->image('cloud.jpg', 80, 80))->toMediaCollection('gallery');
+
+        // Exit code 0 = no FAIL rows; the only WARN (missing symlink) is expected in tests.
+        $this->artisan('media:doctor')->assertExitCode(0);
+    }
+
+    // ── helpers ─────────────────────────────────────────────────────────────
+
+    /**
+     * GET a storefront page. Rendering a page right after a Filament
+     * CreateRecord Livewire test leaves one empty output buffer open (a
+     * harness quirk that exists without any media involved) and PHPUnit then
+     * flags the test as risky — close what the request opened.
+     */
+    private function storefront(string $uri): TestResponse
+    {
+        $level = ob_get_level();
+        $response = $this->get($uri);
+
+        while (ob_get_level() > $level) {
+            ob_end_clean();
+        }
+
+        return $response;
+    }
+}

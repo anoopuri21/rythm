@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\SyncsResolvedMediaUrls;
 use App\Models\Contracts\HasResolvedMediaUrls;
+use App\Support\MediaDisk;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -188,11 +189,22 @@ class ProductVariant extends Model implements HasMedia, HasResolvedMediaUrls
         // belong to Filament's FileUpload component and crash here — keep this
         // registration minimal; the "images only, max 6" rules are enforced on
         // the admin form (ProductResource → Variant images).
-        $this->addMediaCollection('variant_gallery');
+        //
+        // Disk: variant images are product images, so they follow the same
+        // Cloudinary rollout as the product gallery (docs/cloudinary-media.md).
+        $this->addMediaCollection('variant_gallery')
+            ->useDisk(MediaDisk::forCollection('variant_gallery'));
     }
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Cloudinary delivers both sizes itself (App\Models\Media maps this
+        // model's conversion names to delivery transformations), so nothing is
+        // queued and the original is never pulled back onto this server.
+        if (MediaDisk::isCloudinary($media?->disk)) {
+            return;
+        }
+
         // Two sizes, same convention as Product: a small WebP for thumbnails
         // and a 1200px WebP for the PDP gallery (the storefront swaps the
         // gallery to these images when a variant is selected, so serving the

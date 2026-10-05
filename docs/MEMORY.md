@@ -79,6 +79,39 @@ Work may be reported **done** to the owner only when:
 
 # B. Session log (newest first — checklist entries live here)
 
+### 2026-10-05 — Cloudinary media rollout, phase 1 (products + categories)
+- Change-id: `arena/01a10a94-rythm` (cloudinary-media-phase1)
+- Trigger: owner-ask (Hinglish) — "is project me Cloudinary integrate karna hai, abhi pehle products and categories images ke liye … jo images pehle se use ho rahi hai wo same url path se use hoti rahe, and jo bhi new images upload ho wo Cloudinary ke server pe save ho and usike server se use ho. Local server pe save nahi hongi."
+- Scope paths: `config/filesystems.php`, `config/media-library.php`, `app/Support/{MediaDisk,CloudinaryDeliveryUrl}.php`, `app/Models/{Media,Product,ProductVariant,Category}.php`, `app/Models/Concerns/SyncsResolvedMediaUrls.php`, `app/Filament/Components/MediaUpload.php`, `app/Services/MediaRelocationService.php`, `app/Console/Commands/MediaDoctor.php`, `.env.example`, `.env.staging.example`, `.env.production.example`, `phpunit.xml`, `tests/Feature/CloudinaryMediaTest.php`, `tests/automation/cloudinary-media.test.mjs`, `docs/cloudinary-media.md`, `tasks/CLOUDINARY_MEDIA_PLAN.md`, `docs/media-architecture.md`, `docs/media-optimization.md`, `docs/RULES.md`, `docs/ARCHITECTURE.md`
+- Type tags: [x] code [ ] migration [x] test [ ] front-build [ ] design-token [x] docs [x] config [x] admin [ ] commerce [ ] security
+- What changed:
+  1. **One disk decision, opt-in:** `App\Support\MediaDisk::forCollection($collection)` → `cloudinary` only when `MEDIA_CLOUDINARY=true` **and** a resolvable cloud name (`CLOUDINARY_URL` / `CLOUDINARY_CLOUD_NAME`), else `MEDIA_DISK`. `MediaUpload` passes `->disk(MediaDisk::forCollection(...))`; the phase-1 collections (`Product` `gallery`+`og`, `ProductVariant` `variant_gallery`, `Category` `icon`) call `->useDisk(...)`, so panel uploads and programmatic writes cannot drift. Brand/hero/homepage collections untouched (next phase = env-list edit).
+  2. **URLs without API calls:** `App\Models\Media` (now `media-library.media_model`) derives `https://res.cloudinary.com/<cloud>/image/upload/<transformation>/<path>` via `App\Support\CloudinaryDeliveryUrl`, and maps conversion names (`thumb-webp`, `gallery-webp`, `variant-*-webp`) to delivery transformations (`c_fit,…,f_auto,q_auto:good`). Cloud rows queue **no** local conversions, so no original is ever pulled back to this server.
+  3. **Legacy untouched:** existing rows keep their `disk`/`conversions_disk` and `/storage/...` URL — no migration, no URL rewrite. Mixed catalogues are expected; M-7 columns now resolve per row (`$media->getUrl()`), never from the global disk. `SyncsResolvedMediaUrls` also refuses to overwrite an already-resolved URL with an empty string, so a missing-cloud-name state degrades to "users still see the old CDN URL" instead of blank images.
+  4. **Repair tooling exempts cloud rows:** `MediaRelocationService::misplacedQuery()` + `MediaDoctor` exclude `cloudinary` rows (previously they would have been "misplaced" → `media:doctor` FAIL and `media:relocate` pulling them back to disk and deleting the cloud copies); `relocate()` refuses a cloud row outright; new `media:doctor` `checkCloudinary()` reports readiness.
+  5. **Tests/docs:** `tests/Feature/CloudinaryMediaTest.php` (panel upload → fake cloudinary disk, derived URL shapes, mixed catalogue, legacy URL unchanged, relocation/doctor exemption, fail-safe without credentials) + `tests/automation/cloudinary-media.test.mjs` (10 static guards); `phpunit.xml` pins `MEDIA_CLOUDINARY=false` (force) + blank Cloudinary creds so every other suite keeps the legacy contract; `docs/cloudinary-media.md` is the install/verify/rollback runbook; `docs/media-architecture.md` gains M-9 (+M-1/M-2/§4/§5/§6 edits).
+- Checklist:
+  - [x] A1 Read five always-read files before editing (`docs/ARCHITECTURE.md`, `docs/RULES.md`, `docs/PHASES.md`, `docs/DESIGN.md`, `docs/MEMORY.md` + `docs/media-architecture.md`)
+  - [x] A2 Touched only task-relevant paths (no drive-by refactors)
+  - [x] A3 Business-write ownership preserved — disk decision lives in `App\Support\MediaDisk`; no money/stock/controller logic touched
+  - [x] A4 No client-trusted totals/prices (n/a — no commerce path touched)
+  - [x] A5 AuthZ/policies preserved (n/a — no policy change)
+  - [x] A6 Tests → `node --test tests/automation/*.test.mjs`: **219 tests / 209 pass / 10 fail** (same 10 pre-existing failures; new Cloudinary suite 10/10). PHPUnit **not runnable here** (no PHP/vendor) → `CloudinaryMediaTest` + full PHP suite must run on the owner's PHP host.
+  - [x] A7 `npm run build` n/a (no CSS/JS/views touched)
+  - [x] A8 Design tokens only — n/a (no UI)
+  - [x] A9 No secrets committed — only env var **names** in the example templates
+  - [x] A10 Withheld pages / live pay / Phase 18 untouched
+  - [x] A11 §C updated: **Media storage** row, new **Cloudinary media (phase 1)** row, **Product media pipeline**, **Session branch**; others verified unchanged
+  - [x] A12 §D unchanged — this is an owner-commanded intake change (M-8 intake rule narrowed by scope, not reversed); noted in docs/RULES.md M1/M5
+  - [x] A13 Footgun **#24** added (cloud rows vs relocate/doctor + derived delivery URLs + `Storage::fake` driver swap)
+  - [x] A14 Mirrors: `docs/media-architecture.md` (M-1, M-2, M-9, §4, §5, §6), `docs/RULES.md` (M1, M5), `docs/ARCHITECTURE.md` §9, `docs/media-optimization.md` header, `docs/MEMORY.md` §F/§H/§J; PHASES/PRD/tracker n/a (no phase or scope change)
+  - [x] A15 Owner summary prepared — install + env + verify + rollback: `docs/cloudinary-media.md` §2/§4/§5
+- Risks / follow-ups:
+  - Owner must run on the PHP host: `composer require cloudinary-labs/cloudinary-laravel` → `php artisan cloudinary:install` → add `CLOUDINARY_URL` (+`MEDIA_CLOUDINARY=true`) → `php artisan config:clear` → `php artisan media:doctor`, then upload one product image + one category icon and check both the new CDN URL **and** an old `/storage/...` image.
+  - PHPUnit + real panel/cloud verification pending on the owner's machine (sandbox has no PHP).
+  - §B now has 23 entries — the §K.2 archive pass to `docs/MEMORY_ARCHIVE.md` (which does not exist yet) is still pending.
+- Status: PARTIAL (code + docs + tests in tree; PHP-side verification pending on the owner's machine)
+
 ### 2026-10-03 — Category images on storefront (`Category::iconUrl()`) + carry-over resilience fixes
 - Change-id: `arena/01a1029d-rythm` (category-storefront-images)
 - Trigger: owner-ask (Hinglish bug report) — "products ki image to visible hai ab but categories ki image website pe display nahi ho rahi hai." + carry-over of 2 unpushed post-PR-#40 commits (`SQLSTATE[42S22]` pending-migration graceful degrade + `deploy-cpanel.sh` maintenance-mode `EXIT` safety net).
@@ -488,10 +521,11 @@ Work may be reported **done** to the owner only when:
 | **Brand config** | `config/rythme.php` + Filament Site Settings | 2026-09-12 |
 | **Outbound mail From** | Verified Admin → Settings sender, else `MAIL_FROM_*` | 2026-09-12 |
 | **Media storage** | One public disk `MEDIA_DISK` (default `public`) for panel uploads + storefront, independent of `FILESYSTEM_DISK`; host-relative `/storage` URLs served by that disk (`serve => true`; the private `local` disk must keep `serve => false`); fields via `MediaUpload` (mime + bytes + **6000² px** + count bound, galleries reorderable); diagnose `php artisan media:doctor [--fix]`, repair `php artisan media:relocate` — `docs/media-architecture.md` | 2026-10-03 |
+| **Cloudinary media (phase 1)** | When `MEDIA_CLOUDINARY=true` + credentials exist, NEW uploads for product `gallery`/`og`/`variant_gallery` and category `icon` are stored on the `cloudinary` disk and served from `https://res.cloudinary.com/<cloud>/…`; legacy rows and all other collections keep `MEDIA_DISK` + `/storage` URLs. Disk decided only by `App\Support\MediaDisk`; URLs derived by `App\Support\CloudinaryDeliveryUrl` + `App\Models\Media` (conversion names → delivery transformations, no local conversions for cloud rows); relocation/doctor exempt cloud rows — `docs/cloudinary-media.md` (M-9) | 2026-10-05 |
 | **Media URL columns (M-7)** | Resolved URL(s) persisted per model (`products.thumbnail_url`/`gallery_urls`/`og_image_url`, `product_variants.*`, `brands.logo_url`, `categories.icon_url`, `hero_slides.*_image_url`, `homepage_blocks.image_url`); reads column-first across products, variants, brands, categories (`HomepageDataService::popularCategories` + `CategoryService::tree`), hero slides and homepage blocks; `MediaUrlObserver` + `php artisan media:sync-urls` keep columns fresh and flush homepage/category caches | 2026-10-03 |
 | **Image intake (M-8)** | **Admin panel only** — catalogue acquisition/import pipeline dormant (owner decision 2026-10-03), code kept | 2026-10-03 |
-| **Product media pipeline** | `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel | 2026-10-03 |
-| **Session branch (Arena)** | `arena/01a1029d-rythm` (session-fixed) | 2026-10-03 |
+| **Product media pipeline** | Local disk: `gallery` → `thumb-webp` 480² (cards/cart) + `gallery-webp` 1200² (PDP); `variant_gallery` → `variant-thumb-webp` 240² + `variant-gallery-webp` 1200²; `og` → original only; first gallery image = card/hero, set by drag-order in the panel. **Cloudinary rows:** same conversion names delivered as `c_fit`/`f_auto,q_auto:good` transformations — nothing queued locally | 2026-10-05 |
+| **Session branch (Arena)** | `arena/01a10a94-rythm` (session-fixed) | 2026-10-05 |
 
 ### C.1 Fact-update matrix (which §1 keys to touch)
 
@@ -574,6 +608,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 22. **Bash `trap ... ERR` without `set -E` does not fire inside functions or on `exit 1` (`die()`).** In `scripts/deploy-cpanel.sh`, use `set -Eeuo pipefail` + an `EXIT` trap guarded by `MAINTENANCE_ON=1` (disarmed right before `exec` handover and re-armed in `update-steps`) so a failed deploy step never leaves the site stuck in 503 maintenance mode.
 23. **Cached storefront builders + `saveQuietly()` URL syncs.** `HomepageDataService::all()` (`homepage.data`, 1h TTL) and `CategoryService::tree()` (`categories.tree`, forever) cache resolved category/brand arrays, while `syncResolvedMediaUrls()` writes via `saveQuietly()` (which bypasses `CategoryObserver`). Both `MediaUrlObserver` and `php artisan media:sync-urls` / `media:relocate` must explicitly flush `HomepageDataObserver` and `CategoryService`, and any partial `->get([...])` on `Category` must include `icon_url` + `->with('media')` or `iconUrl()` will silently miss the column and N+1 on fallback.
 
+24. **Cloud-hosted media must be exempt from every "misplaced / wrong disk" check — and its URLs are derived, not fetched.** Cloudinary rows are deliberately off `MEDIA_DISK`, so `MediaRelocationService::misplacedQuery()` and `MediaDoctor::checkMediaRows()` exclude them (otherwise `media:doctor` FAILs and `media:relocate` — also run by `deploy-cpanel.sh` — streams the CDN files back into `storage/app/public` and deletes the cloud copies). `MediaDoctor::checkUrlColumns()` only stat-checks `/storage/`-prefixed URLs, which is why absolute delivery URLs are skipped safely. Never call `Storage::disk('cloudinary')->url($path)` per row (the package's adapter hits the Admin API — one HTTP round trip per image); `App\Models\Media` + `CloudinaryDeliveryUrl` derive `res.cloudinary.com/<cloud>/image/upload/…` instead. `Storage::fake('cloudinary')` swaps the driver to `local` in tests — restore the config driver value if a test asserts the disk contract.
 *New trap discovered → add numbered item same day.*
 
 ---
@@ -603,6 +638,7 @@ Change only with **explicit owner approval** + PRD/RULES update + log.
 | Tokens / typography / UI law | `DESIGN.md` + `resources/css/app.css` (+ design-system doc if deep) |
 | Layers / services / routes / aggregates | `ARCHITECTURE.md` (+ PRD §architecture if product-level) |
 | Product scope / personas / NFR | `PRD.md` + `RULES.md` as needed |
+| Media disk topology / new image intake / CDN rules | `docs/media-architecture.md` (M-1…M-9) + `docs/cloudinary-media.md` + `docs/RULES.md` §7 + `docs/ARCHITECTURE.md` §9 + `docs/media-optimization.md` |
 | Binding behavioral law | `RULES.md` first, then MEMORY §D |
 | README entry points | `README.md` always-read table if files move |
 
@@ -638,6 +674,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 | Tracker / sequence | `tasks/MASTER_PROJECT_TRACKER.md`, `CANONICAL_PHASE_SEQUENCE.md` |
 | Release / rollback | `docs/release-checklist.md`, `rollback-plan.md` |
 | Media storage / URLs / repair | `docs/media-architecture.md`, `docs/media-optimization.md` |
+| Cloudinary rollout (products + categories) | `docs/cloudinary-media.md` |
 
 ---
 

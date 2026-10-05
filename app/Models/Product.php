@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Casts\SanitizedHtml;
 use App\Models\Concerns\SyncsResolvedMediaUrls;
 use App\Models\Contracts\HasResolvedMediaUrls;
+use App\Support\MediaDisk;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -148,13 +149,29 @@ class Product extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('gallery');
+        // Products + variants are the phase-1 Cloudinary collections
+        // (docs/cloudinary-media.md): `MediaDisk` returns 'cloudinary' while the
+        // rollout is on, MEDIA_DISK otherwise. Rows uploaded before the switch
+        // keep the disk they were stored on, so their URLs do not change.
+        $this->addMediaCollection('gallery')
+            ->useDisk(MediaDisk::forCollection('gallery'));
+
         $this->addMediaCollection('og')
-            ->singleFile();
+            ->singleFile()
+            ->useDisk(MediaDisk::forCollection('og'));
     }
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        // Cloudinary generates these sizes at delivery time (App\Models\Media
+        // maps the conversion names to delivery transformations). Queuing a
+        // conversion here would download the original back to this server, burn
+        // CPU on a WebP copy and re-upload it — for an image that is already
+        // served from the CDN. So cloud media register no conversions at all.
+        if (MediaDisk::isCloudinary($media?->disk)) {
+            return;
+        }
+
         // Gallery only: the `og` collection is handed to crawlers as-is (social
         // scrapers want JPEG/PNG), so generating 480/1200 WebP copies for it
         // would burn queue CPU and disk on shared hosting for nothing.

@@ -88,6 +88,32 @@ return [
             'report' => false,
         ],
 
+        // Cloudinary — products + categories images (phase 1, docs/cloudinary-media.md).
+        //
+        // The `cloudinary` driver is registered by cloudinary-labs/cloudinary-laravel
+        // (`FilesystemManager::extend('cloudinary', …)`), so this is an ordinary
+        // Laravel disk: put/read/delete/url all go through Cloudinary's API.
+        //
+        // NOTE: `url` here is Cloudinary's *connection string*
+        // (`cloudinary://API_KEY:API_SECRET@CLOUD_NAME`) — that is the package's
+        // convention, not a public base URL. The storefront's delivery URLs are
+        // derived (no API call) by App\Support\CloudinaryDeliveryUrl from
+        // `cloud` / `url` + the asset path.
+        //
+        // Only collections named in config('media-library.cloudinary.collections')
+        // are written here (App\Support\MediaDisk); every other collection keeps
+        // using the MEDIA_DISK disk above.
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+            'url' => env('CLOUDINARY_URL'),
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
+            'key' => env('CLOUDINARY_KEY') ?: env('CLOUDINARY_API_KEY'),
+            'secret' => env('CLOUDINARY_SECRET') ?: env('CLOUDINARY_API_SECRET'),
+            'secure' => (bool) env('CLOUDINARY_SECURE', true),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*
