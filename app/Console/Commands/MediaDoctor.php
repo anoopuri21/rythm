@@ -10,6 +10,7 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\SiteBranding;
 use App\Support\MediaDisk;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
@@ -49,7 +50,7 @@ final class MediaDoctor extends Command
     protected $description = 'Diagnose (and with --fix, repair) why uploaded images 404 in the panel or on the site';
 
     /** Must match SyncMediaUrls::TARGETS. */
-    private const TARGETS = [Product::class, ProductVariant::class, Brand::class, Category::class, HeroSlide::class, HomepageBlock::class];
+    private const TARGETS = [Product::class, ProductVariant::class, Brand::class, Category::class, HeroSlide::class, HomepageBlock::class, SiteBranding::class];
 
     private int $failures = 0;
 

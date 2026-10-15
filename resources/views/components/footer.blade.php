@@ -1,7 +1,8 @@
 @php
     $settings = app(\App\Services\SiteSettingsService::class);
     $brand = $settings->brandOrMedia('brand_name');
-    $logo = $settings->brandOrMedia('brand_logo_url');
+    $footerLogo = \App\Models\SiteBranding::current()->footerLogoUrl();
+    $logo = $footerLogo ?: $settings->brandOrMedia('brand_logo_url');
     $cats = app(\App\Services\CategoryService::class)->tree();
     $brands = app(\App\Services\BrandService::class)->allWithCounts();
 @endphp
@@ -49,7 +50,7 @@
         <div class="mx-auto flex max-w-[1520px] flex-col items-center gap-6 px-5 py-12 text-center sm:px-8 lg:flex-row lg:justify-between lg:text-left">
             <div>
                 <a href="{{ route('home') }}" class="inline-flex flex-col items-center lg:items-start" aria-label="{{ $brand }} home">
-                    <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto brightness-0 invert" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <img src="{{ \Illuminate\Support\Facades\URL::to($logo) }}" alt="{{ $brand }} logo" width="1466" height="434" class="h-10 w-auto{{ $footerLogo ? '' : ' brightness-0 invert' }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
                     <span class="mt-2 hidden text-[9px] tracking-[0.35em] text-gold" style="display:none" aria-hidden="true">RHYTHM EXPORTS</span>
                 </a>
                 <p class="mx-auto mt-5 max-w-md text-sm leading-7 text-white/60 lg:mx-0">Browse musical instruments, studio gear and accessories through the Rhythm Exports catalogue.</p>

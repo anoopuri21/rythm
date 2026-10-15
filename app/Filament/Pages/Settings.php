@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Components\MediaUpload;
+use App\Models\SiteBranding;
 use App\Models\User;
 use App\Observers\HomepageDataObserver;
 use App\Services\CategoryService;
@@ -48,6 +50,7 @@ class Settings extends Page implements HasForms
     public function mount(SiteSettingsService $settings, MailSenderSettingsService $mailSender): void
     {
         $this->form->fill($this->formDataFromSettings($settings, $mailSender));
+        $this->form->loadStateFromRelationships(shouldHydrate: true);
     }
 
     public function form(Schema $form): Schema
@@ -156,14 +159,16 @@ class Settings extends Page implements HasForms
                             ->helperText('Comma-separated product slugs, in the order they should appear. Slugs that do not match an active product are skipped.'),
                     ])->columns(3),
                 Section::make('Brand & media')
-                    ->description('Leave a field empty to keep using the value in config/rythme.php.')
+                    ->description('Name fields fall back to config/rythme.php when empty. Upload a logo to replace the shared one; leave an upload empty to keep the logo already in use.')
                     ->schema([
                         TextInput::make('brand_name')->label('Business name')->maxLength(120),
                         TextInput::make('brand_short')->label('Short name / wordmark')->maxLength(40),
-                        TextInput::make('brand_logo_url')
-                            ->label('Logo URL')
-                            ->maxLength(500)
-                            ->helperText('Absolute URL or a path under /public. Shown in the navbar, footer and hero.'),
+                        MediaUpload::single('navbar_logo', 'navbar_logo', maxSizeKb: 2048)
+                            ->label('Navbar logo')
+                            ->helperText('Shown in the header and the mobile menu. JPEG, PNG or WebP.'),
+                        MediaUpload::single('footer_logo', 'footer_logo', maxSizeKb: 2048)
+                            ->label('Footer logo')
+                            ->helperText('Shown in the footer as uploaded. JPEG, PNG or WebP.'),
                     ])->columns(2),
                 Section::make('Outbound email (sender)')
                     ->description('Customer mails (verify email, orders, stock alerts) use this From address only after the mailbox owner confirms a verification link. SMTP/API credentials still come from the server .env.')
@@ -185,7 +190,8 @@ class Settings extends Page implements HasForms
                             ->helperText('Must be a real mailbox you control. Changing it sends a new verification email; the old verified address stays live until the new one is confirmed. Leave empty and save to clear and fall back to MAIL_FROM_ADDRESS.'),
                     ])->columns(1),
             ])
-            ->statePath('data');
+            ->statePath('data')
+            ->model(fn (): SiteBranding => SiteBranding::current());
     }
 
     protected function getHeaderActions(): array
@@ -231,6 +237,7 @@ class Settings extends Page implements HasForms
         );
 
         $settings->saveAll($state);
+        $this->form->saveRelationships();
 
         // Storefront counts, currency and brand now live in settings, so the
         // cached homepage payload has to be rebuilt too (NO-HARDCODE rule).
@@ -249,6 +256,7 @@ class Settings extends Page implements HasForms
         }
 
         $this->form->fill($this->formDataFromSettings($settings, $mailSender));
+        $this->form->loadStateFromRelationships(shouldHydrate: true);
 
         Notification::make()
             ->success()

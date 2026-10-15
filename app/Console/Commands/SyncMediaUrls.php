@@ -11,6 +11,7 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\SiteBranding;
 use App\Observers\HomepageDataObserver;
 use App\Services\CategoryService;
 use Illuminate\Console\Command;
@@ -45,6 +46,7 @@ final class SyncMediaUrls extends Command
         Category::class,
         HeroSlide::class,
         HomepageBlock::class,
+        SiteBranding::class,
     ];
 
     public function handle(): int

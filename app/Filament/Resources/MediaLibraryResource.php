@@ -13,6 +13,7 @@ use App\Models\HomepageBlock;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\SiteBranding;
 use App\Services\MediaReuseService;
 use App\Support\MediaDisk;
 use Filament\Actions\Action;
@@ -73,6 +74,7 @@ class MediaLibraryResource extends Resource
         HeroSlide::class => 'Hero slide — desktop / mobile image',
         HeroBanner::class => 'Hero banner — image',
         HomepageBlock::class => 'Homepage block — image',
+        SiteBranding::class => 'Storefront — navbar / footer logo',
     ];
 
     /** @var array<string, list<string>> */
@@ -279,11 +281,13 @@ class MediaLibraryResource extends Resource
             $columns = self::searchableColumns($modelClass);
             $like = '%'.$search.'%';
 
-            $query->where(function (Builder $inner) use ($columns, $like): void {
-                foreach ($columns as $column) {
-                    $inner->orWhere($column, 'like', $like);
-                }
-            });
+            if ($columns !== []) {
+                $query->where(function (Builder $inner) use ($columns, $like): void {
+                    foreach ($columns as $column) {
+                        $inner->orWhere($column, 'like', $like);
+                    }
+                });
+            }
         }
 
         return $query

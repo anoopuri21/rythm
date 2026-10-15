@@ -164,7 +164,7 @@ class Media extends SpatieMedia
             $inner->where('shared_path', $basePath);
 
             if ($ownerKey !== null) {
-                $inner->orWhereKey($ownerKey);
+                $inner->orWhere($inner->getModel()->getQualifiedKeyName(), '=', $ownerKey);
             }
         });
     }

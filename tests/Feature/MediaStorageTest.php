@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\Settings;
 use App\Filament\Resources\BrandResource\Pages\ManageBrands;
 use App\Filament\Resources\CategoryResource\Pages\ManageCategories;
 use App\Filament\Resources\HeroSlideResource\Pages\ManageHeroSlides;
@@ -16,6 +17,7 @@ use App\Models\HeroSlide;
 use App\Models\HomepageBlock;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\SiteBranding;
 use App\Models\User;
 use App\Services\HomepageDataService;
 use Filament\Actions\Testing\TestAction;
@@ -185,6 +187,50 @@ class MediaStorageTest extends TestCase
         $brand = Brand::query()->where('slug', 'yamaha-media')->firstOrFail();
 
         $this->assertSavedMediaPreviews($brand, 'logo', $this->reopenedUploads($page, $brand, 'logo'), expected: 1);
+    }
+
+    public function test_navbar_and_footer_logos_upload_from_settings_and_render_separately(): void
+    {
+        Livewire::actingAs($this->admin, 'admin')
+            ->test(Settings::class)
+            ->fillForm([
+                'return_window_days' => 7,
+                'navbar_logo' => [UploadedFile::fake()->image('navbar.png', 400, 120)],
+                'footer_logo' => [UploadedFile::fake()->image('footer.png', 400, 120)],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $branding = SiteBranding::current()->fresh();
+        $navbar = $branding->navbarLogoUrl();
+        $footer = $branding->footerLogoUrl();
+
+        $this->assertNotNull($navbar);
+        $this->assertNotNull($footer);
+        $this->assertNotSame($navbar, $footer);
+
+        $form = Livewire::actingAs($this->admin, 'admin')
+            ->test(Settings::class)
+            ->instance()
+            ->getSchema('form');
+
+        $this->assertSavedMediaPreviews($branding, 'navbar_logo', $this->uploadedFiles($form, 'navbar_logo'), expected: 1);
+        $this->assertSavedMediaPreviews($branding, 'footer_logo', $this->uploadedFiles($form, 'footer_logo'), expected: 1);
+
+        $html = $this->storefront('/')->assertOk()->getContent();
+        $this->assertIsString($html);
+        $this->assertStringContainsString($navbar, $html);
+        $this->assertStringContainsString($footer, $html);
+        $this->assertStringNotContainsString('brightness-0 invert', $html);
+
+        $branding->clearMediaCollection('footer_logo');
+
+        $fallback = $this->storefront('/')->assertOk()->getContent();
+        $this->assertIsString($fallback);
+        $this->assertStringContainsString($navbar, $fallback);
+        $this->assertStringNotContainsString($footer, $fallback);
+        $this->assertStringContainsString('brightness-0 invert', $fallback);
+        $this->assertStringContainsString('rhythmexports.com/wp-content/uploads/2023/10/Rhythm.png', $fallback);
     }
 
     public function test_category_icon_previews_after_save(): void

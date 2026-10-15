@@ -1,7 +1,7 @@
 @php
     $settings = app(\App\Services\SiteSettingsService::class);
     $brand = $settings->brandOrMedia('brand_name');
-    $logo = $settings->brandOrMedia('brand_logo_url');
+    $logo = \App\Models\SiteBranding::current()->navbarLogoUrl() ?: $settings->brandOrMedia('brand_logo_url');
 @endphp
 
 {{-- ============================================================
