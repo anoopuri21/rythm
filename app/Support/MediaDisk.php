@@ -12,7 +12,7 @@ namespace App\Support;
  * `config('media-library.disk_name')` ← `MEDIA_DISK`. When the Cloudinary
  * rollout is switched on (`MEDIA_CLOUDINARY=true` + credentials), the
  * collections named in `media-library.cloudinary.collections` — products
- * (gallery + og), variant images and category icons — are written to the
+ * (gallery + og) and variant images — are written to the
  * `cloudinary` disk instead, and served straight from its CDN.
  *
  * Existing files are NOT touched: a media row keeps the disk it was stored on,
@@ -34,7 +34,7 @@ final class MediaDisk
     public const CLOUDINARY = 'cloudinary';
 
     /** Collections that follow Cloudinary when the rollout is enabled (phase 1). */
-    public const DEFAULT_CLOUD_COLLECTIONS = ['gallery', 'og', 'variant_gallery', 'icon'];
+    public const DEFAULT_CLOUD_COLLECTIONS = ['gallery', 'og', 'variant_gallery'];
 
     /**
      * Is the Cloudinary rollout active?

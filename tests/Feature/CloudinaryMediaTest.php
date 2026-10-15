@@ -26,8 +26,9 @@ use Tests\Concerns\IsolatesMediaDisks;
 use Tests\TestCase;
 
 /**
- * docs/cloudinary-media.md → M-9 — phase 1: product (gallery/og/variants) and
- * category icons are stored on and served from Cloudinary.
+ * docs/cloudinary-media.md → M-9 — phase 1: product gallery, og image and
+ * variant images are stored on and served from Cloudinary. Category icons stay
+ * on the public disk.
  *
  * The rollout is enabled per test with a fake disk, so no credentials and no
  * network are needed; the delivery URLs are still the real derived
@@ -72,12 +73,13 @@ class CloudinaryMediaTest extends TestCase
     {
         $this->assertTrue(MediaDisk::enabled());
 
-        foreach (['gallery', 'og', 'variant_gallery', 'icon'] as $collection) {
+        foreach (['gallery', 'og', 'variant_gallery'] as $collection) {
             $this->assertSame('cloudinary', MediaDisk::forCollection($collection), $collection);
         }
 
-        // Everything else keeps the media disk until the owner widens the list.
-        foreach (['logo', 'image', 'desktop_image', 'mobile_image'] as $collection) {
+        // Category icons stay on the public disk: the live Cloudinary URL for
+        // an uploaded icon 404s, while /storage images on the same site load.
+        foreach (['icon', 'logo', 'image', 'desktop_image', 'mobile_image'] as $collection) {
             $this->assertSame('public', MediaDisk::forCollection($collection), $collection);
         }
     }
@@ -158,7 +160,7 @@ class CloudinaryMediaTest extends TestCase
 
     // ── Category icons (admin panel) ────────────────────────────────────────
 
-    public function test_category_icons_uploaded_in_the_panel_are_stored_on_cloudinary(): void
+    public function test_category_icons_uploaded_in_the_panel_stay_on_the_public_disk(): void
     {
         Livewire::actingAs($this->admin, 'admin')->test(ManageCategories::class)
             ->callAction(TestAction::make('create'), data: [
@@ -172,12 +174,12 @@ class CloudinaryMediaTest extends TestCase
         $media = $category->getFirstMedia('icon');
 
         $this->assertNotNull($media);
-        $this->assertSame('cloudinary', $media->disk);
-        $this->assertTrue(Storage::disk('cloudinary')->exists($media->getPathRelativeToRoot()));
-        $this->assertFalse(Storage::disk('public')->exists($media->getPathRelativeToRoot()));
+        $this->assertSame('public', $media->disk);
+        $this->assertTrue(Storage::disk('public')->exists($media->getPathRelativeToRoot()));
+        $this->assertFalse(Storage::disk('cloudinary')->exists($media->getPathRelativeToRoot()));
 
         $this->assertSame(
-            self::BASE_URL.'f_auto,q_auto:good/'.$media->getPathRelativeToRoot(),
+            '/storage/'.$media->getPathRelativeToRoot(),
             $category->fresh()->icon_url,
         );
     }

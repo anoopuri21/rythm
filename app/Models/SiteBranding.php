@@ -8,6 +8,7 @@ use App\Models\Concerns\SyncsResolvedMediaUrls;
 use App\Models\Contracts\HasResolvedMediaUrls;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -25,7 +26,15 @@ class SiteBranding extends Model implements HasMedia, HasResolvedMediaUrls
 
     public static function current(): self
     {
-        $existing = static::query()->first();
+        try {
+            $existing = static::query()->first();
+        } catch (QueryException $e) {
+            if (self::isMissingTable($e)) {
+                return new static();
+            }
+
+            throw $e;
+        }
 
         if ($existing instanceof self) {
             return $existing;
@@ -37,13 +46,28 @@ class SiteBranding extends Model implements HasMedia, HasResolvedMediaUrls
     /** Navbar logo — stored column first, Media Library when the column is not synced yet. */
     public function navbarLogoUrl(): ?string
     {
+        if (! $this->exists) {
+            return null;
+        }
+
         return $this->navbar_logo_url ?? $this->getFirstMedia('navbar_logo')?->getUrl();
     }
 
     /** Footer logo — stored column first, Media Library when the column is not synced yet. */
     public function footerLogoUrl(): ?string
     {
+        if (! $this->exists) {
+            return null;
+        }
+
         return $this->footer_logo_url ?? $this->getFirstMedia('footer_logo')?->getUrl();
+    }
+
+    private static function isMissingTable(QueryException $exception): bool
+    {
+        $sqlState = (string) ($exception->errorInfo[0] ?? '');
+
+        return $sqlState === '42S02' || str_contains($exception->getMessage(), "doesn't exist");
     }
 
     public function resolvedMediaUrls(): array

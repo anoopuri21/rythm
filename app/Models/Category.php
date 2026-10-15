@@ -75,7 +75,7 @@ class Category extends Model implements HasMedia, HasResolvedMediaUrls
 
     public function registerMediaCollections(): void
     {
-        // Category icons are phase-1 Cloudinary media (docs/cloudinary-media.md).
+        // Not a Cloudinary collection: that delivery URL 404s on the live site.
         $this->addMediaCollection('icon')
             ->singleFile()
             ->useDisk(MediaDisk::forCollection('icon'));
