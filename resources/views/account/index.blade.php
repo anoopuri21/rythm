@@ -369,6 +369,25 @@
                     </div>
                     <button type="submit" class="rounded-full bg-brand px-7 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">Update password</button>
                 </form>
+
+                @if(auth()->user()->role === \App\Models\User::ROLE_CUSTOMER)
+                    <div class="mt-6 rounded-3xl border border-brand/20 bg-white p-6 sm:p-8">
+                        <h3 class="text-sm font-bold text-ink">Close account</h3>
+                        <p class="mt-2 text-sm leading-6 text-muted">
+                            We email a private link to this account. Open it while you are signed in here, then choose to deactivate your login or remove your personal data.
+                        </p>
+                        @if(session('closure_success'))
+                            <p class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('closure_success') }}</p>
+                        @endif
+                        @if(session('closure_error'))
+                            <p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="status">{{ session('closure_error') }}</p>
+                        @endif
+                        <form method="POST" action="{{ route('account.closure.send') }}" class="mt-5">
+                            @csrf
+                            <button type="submit" class="rounded-full border border-brand px-7 py-3 text-sm font-bold text-brand transition hover:bg-brand hover:text-white">Email me a closure link</button>
+                        </form>
+                    </div>
+                @endif
             </section>
         </div>
     </div>

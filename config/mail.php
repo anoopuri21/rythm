@@ -41,7 +41,13 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
+            // tls/ssl are old MAIL_ENCRYPTION names. Symfony only accepts smtp (port 587) and smtps (port 465).
+            'scheme' => match (strtolower((string) env('MAIL_SCHEME'))) {
+                'tls' => 'smtp',
+                'ssl' => 'smtps',
+                '' => null,
+                default => env('MAIL_SCHEME'),
+            },
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),

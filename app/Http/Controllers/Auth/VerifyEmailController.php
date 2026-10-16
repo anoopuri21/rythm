@@ -20,8 +20,17 @@ final class VerifyEmailController extends Controller
 
     public function send(Request $request): RedirectResponse
     {
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            // Same guard as signup: a mailer error must not turn Resend into a 500.
+            $request->user()->sendEmailVerificationNotification();
+        } catch (\Throwable $exception) {
+            report($exception);
 
-        return back()->with('status', 'Verification link sent!');
+            return back()->with('verification_mail_failed', true);
+        }
+
+        return back()
+            ->with('verification_mail_sent', true)
+            ->with('status', 'Verification link sent!');
     }
 }

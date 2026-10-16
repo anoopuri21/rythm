@@ -12,6 +12,10 @@
                 New here? <a href="{{ route('register') }}" class="font-bold text-brand transition hover:text-brand-dark">Create an account</a>
             </p>
 
+            @if(session('status'))
+                <p class="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('status') }}</p>
+            @endif
+
             <form method="POST" action="{{ route('login.store') }}" class="mt-8 space-y-5">
                 @csrf
 

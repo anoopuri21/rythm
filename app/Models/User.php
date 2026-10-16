@@ -23,7 +23,7 @@ use Illuminate\Notifications\Notifiable;
 
 #[Table('users')]
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'account_closure_token'])]
 class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, MustVerifyEmail
 {
     public const ROLE_CUSTOMER = 'customer';
@@ -140,6 +140,9 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     {
         return [
             'email_verified_at' => 'datetime',
+            'deactivated_at' => 'datetime',
+            'removed_at' => 'datetime',
+            'account_closure_expires_at' => 'datetime',
             'password' => 'hashed',
             'role' => 'string',
         ];

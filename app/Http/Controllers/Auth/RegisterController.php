@@ -27,11 +27,22 @@ final class RegisterController extends Controller
             'password' => $request->validated('password'),
         ]);
 
-        event(new Registered($user));
-
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('verification.notice');
+        try {
+            // Any mailer failure (SMTP, bad From, view) must still land on the verify screen.
+            event(new Registered($user));
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->route('verification.notice')
+                ->with('verification_mail_failed', true);
+        }
+
+        return redirect()
+            ->route('verification.notice')
+            ->with('verification_mail_sent', true);
     }
 }

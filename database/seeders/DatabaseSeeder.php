@@ -32,7 +32,10 @@ class DatabaseSeeder extends Seeder
             ['email' => 'test@example.com'],
             ['name' => 'Test User', 'password' => bcrypt('password')],
         );
-        $customer->forceFill(['role' => User::ROLE_CUSTOMER])->save();
+        $customer->forceFill([
+            'role' => User::ROLE_CUSTOMER,
+            'email_verified_at' => $customer->email_verified_at ?? now(),
+        ])->save();
 
         $this->call([
             CategorySeeder::class,

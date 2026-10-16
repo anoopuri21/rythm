@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -36,7 +37,23 @@ final class LoginController extends Controller
                 ->withErrors(['email' => 'These credentials do not match our records.']);
         }
 
+        $user = Auth::guard('web')->user();
+        if ($user instanceof User && ($user->deactivated_at !== null || $user->removed_at !== null)) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()
+                ->withInput($request->only('email', 'remember'))
+                ->withErrors(['email' => 'This account is deactivated.']);
+        }
+
         $request->session()->regenerate();
+
+        $user = Auth::guard('web')->user();
+        if ($user instanceof User && ! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
 
         return redirect()->intended(route('home'));
     }

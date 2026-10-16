@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -35,10 +38,56 @@ class AuthTest extends TestCase
             'email' => 'musician@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
-        ])->assertRedirect('/email/verify');
+        ])->assertRedirect('/email/verify')
+            ->assertSessionHas('verification_mail_sent', true);
 
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', ['email' => 'musician@example.com']);
+        $this->assertNull(User::where('email', 'musician@example.com')->firstOrFail()->email_verified_at);
+    }
+
+    public function test_register_still_reaches_verify_screen_when_mail_fails(): void
+    {
+        Event::listen(Registered::class, function (): void {
+            throw new TransportException('smtp down');
+        });
+
+        $this->post('/register', [
+            'name' => 'New Musician',
+            'email' => 'musician@example.com',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ])->assertRedirect('/email/verify')
+            ->assertSessionHas('verification_mail_failed', true);
+
+        $this->assertAuthenticated();
+        $this->assertNull(User::where('email', 'musician@example.com')->firstOrFail()->email_verified_at);
+
+        $this->get('/email/verify')
+            ->assertOk()
+            ->assertSee('could not send the verification email');
+    }
+
+    public function test_resend_stays_on_verify_screen_when_mail_fails(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $this->actingAs($user);
+
+        $this->app->bind(\Illuminate\Notifications\Channels\MailChannel::class, function ($app) {
+            return new class($app->make('mail.manager'), $app->make(\Illuminate\Mail\Markdown::class)) extends \Illuminate\Notifications\Channels\MailChannel
+            {
+                public function send($notifiable, $notification): void
+                {
+                    throw new TransportException('smtp down');
+                }
+            };
+        });
+
+        $this->post(route('verification.send'))
+            ->assertRedirect()
+            ->assertSessionHas('verification_mail_failed', true);
+
+        $this->assertNull($user->fresh()->email_verified_at);
     }
 
     public function test_register_validates_password_strength(): void
@@ -103,6 +152,7 @@ class AuthTest extends TestCase
     public function test_login_redirects_to_intended_url(): void
     {
         $user = User::where('email', 'test@example.com')->firstOrFail();
+        $user->markEmailAsVerified();
 
         // Guest hits a protected page → redirected to login, intended stored.
         $this->get('/checkout')->assertRedirect('/login');
@@ -111,6 +161,27 @@ class AuthTest extends TestCase
             'email' => $user->email,
             'password' => 'password',
         ])->assertRedirect('/checkout');
+    }
+
+    public function test_unverified_login_goes_to_the_verify_screen(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect('/email/verify');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_unverified_user_cannot_open_account_or_checkout(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)->get('/account')->assertRedirect('/email/verify');
+        $this->actingAs($user)->get('/checkout')->assertRedirect('/email/verify');
+        $this->actingAs($user)->get('/wishlist')->assertRedirect('/email/verify');
     }
     public function test_forgot_password_page_renders(): void
     {
@@ -187,7 +258,7 @@ class AuthTest extends TestCase
 
     public function test_new_user_is_not_verified(): void
     {
-        $user = User::where('email', 'test@example.com')->firstOrFail();
+        $user = User::factory()->unverified()->create();
 
         $this->assertFalse($user->hasVerifiedEmail());
     }

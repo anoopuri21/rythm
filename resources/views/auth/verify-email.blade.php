@@ -8,10 +8,23 @@
             <p class="text-6xl" aria-hidden="true">📬</p>
             <p class="section-kicker mb-4 mt-8 justify-center">One more step</p>
             <h1 class="font-playfair text-4xl font-bold text-ink sm:text-5xl">Verify your email</h1>
-            <p class="mt-4 text-sm leading-6 text-muted">
-                We sent a verification link to <span class="font-bold text-ink">{{ auth()->user()?->email }}</span>.
-                Click it to activate your account and unlock everything.
-            </p>
+            @if(session('verification_mail_failed'))
+                <p class="mt-4 text-sm leading-6 text-muted" role="status">
+                    Your account exists, but we could not send the verification email to
+                    <span class="font-bold text-ink">{{ auth()->user()?->email }}</span>.
+                    Use Resend to try again.
+                </p>
+            @elseif(session('verification_mail_sent'))
+                <p class="mt-4 text-sm leading-6 text-muted" role="status">
+                    We sent a verification link to <span class="font-bold text-ink">{{ auth()->user()?->email }}</span>.
+                    Click it to activate your account and unlock everything.
+                </p>
+            @else
+                <p class="mt-4 text-sm leading-6 text-muted">
+                    Use Resend to email a new verification link to
+                    <span class="font-bold text-ink">{{ auth()->user()?->email }}</span>.
+                </p>
+            @endif
 
             @if(session('status'))
                 <p class="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">{{ session('status') }}</p>

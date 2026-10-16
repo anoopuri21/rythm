@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AccountClosureController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -47,8 +48,8 @@ Route::get('/mail/from/verify', MailFromVerifyController::class)
     ->middleware(['signed', 'throttle:20,1'])
     ->name('mail-from.verify');
 
-// Wishlist — auth only
-Route::middleware('auth')->group(function () {
+// Wishlist — signed-in customers only, after the email link is confirmed
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 });
 
@@ -92,8 +93,8 @@ Route::middleware('auth')->group(function () {
         ->name('verification.send');
 });
 
-// Checkout — LOGIN FORCED (guest cart auto-merges on login)
-Route::middleware('auth')->group(function () {
+// Checkout and account — login plus a confirmed email (guest cart auto-merges on login)
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
         ->middleware('signed')
@@ -135,6 +136,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('/account/addresses/{address}', [AccountController::class, 'destroyAddress'])
         ->middleware('throttle:10,1')
         ->name('account.addresses.destroy');
+    Route::post('/account/closure', [AccountClosureController::class, 'send'])
+        ->middleware('throttle:3,60')
+        ->name('account.closure.send');
+    Route::get('/account/closure/{user}/{hash}', [AccountClosureController::class, 'show'])
+        ->middleware('signed')
+        ->name('account.closure.show');
+    Route::post('/account/closure/{user}/{hash}/deactivate', [AccountClosureController::class, 'deactivate'])
+        ->middleware(['signed', 'throttle:5,1'])
+        ->name('account.closure.deactivate');
+    Route::post('/account/closure/{user}/{hash}/remove', [AccountClosureController::class, 'remove'])
+        ->middleware(['signed', 'throttle:5,1'])
+        ->name('account.closure.remove');
     Route::get('/orders/{order}/returns/create', [ReturnRequestController::class, 'create'])->name('returns.create');
     Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])
         ->middleware('throttle:5,1')
@@ -159,10 +172,10 @@ Route::post('/newsletter', NewsletterSubscriptionController::class)
 // Order detail + tracking — owner, signed link, or guest lookup result
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])
-    ->middleware(['auth', 'throttle:3,1'])
+    ->middleware(['auth', 'verified', 'throttle:3,1'])
     ->name('orders.retry-payment');
 Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
-    ->middleware(['auth', 'throttle:5,1'])
+    ->middleware(['auth', 'verified', 'throttle:5,1'])
     ->name('orders.cancel');
 Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 
