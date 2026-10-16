@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Storage;
+
 /**
  * The ONE place that decides which disk a new upload for a collection is
  * written to (docs/cloudinary-media.md).
@@ -30,7 +32,7 @@ namespace App\Support;
  */
 final class MediaDisk
 {
-    /** The Laravel filesystem disk provided by cloudinary-labs/cloudinary-laravel. */
+    /** The Laravel filesystem disk registered by App\Filesystem\CloudinaryAdapter. */
     public const CLOUDINARY = 'cloudinary';
 
     /** Collections that follow Cloudinary when the rollout is enabled (phase 1). */
@@ -46,7 +48,26 @@ final class MediaDisk
     public static function enabled(): bool
     {
         return (bool) config('media-library.cloudinary.enabled', false)
-            && self::cloudName() !== null;
+            && self::cloudName() !== null
+            && self::driverAvailable();
+    }
+
+    /**
+     * Can Laravel actually build the cloudinary disk?
+     *
+     * Credentials alone are not enough: a missing driver used to throw
+     * "Driver [cloudinary] is not supported" in the middle of a product save.
+     * When this is false, uploads stay on MEDIA_DISK instead of failing.
+     */
+    public static function driverAvailable(): bool
+    {
+        try {
+            Storage::disk(self::CLOUDINARY);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /** The disk a new upload for $collection must be written to. */

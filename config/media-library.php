@@ -81,9 +81,10 @@ return [
     | Decision point: App\Support\MediaDisk. Both the Filament upload field and
     | the models' media collections read it, so they cannot drift.
     |
-    | Requirements: `composer require cloudinary-labs/cloudinary-laravel` plus
-    | credentials in .env, then set MEDIA_CLOUDINARY=true. `php artisan
-    | media:doctor` verifies the whole chain. See docs/cloudinary-media.md.
+    | Requirements: credentials in .env, then set MEDIA_CLOUDINARY=true. The
+    | filesystem driver is App\Filesystem\CloudinaryAdapter (Laravel 13 does not
+    | support cloudinary-labs/cloudinary-laravel). `php artisan media:doctor`
+    | verifies the whole chain. See docs/cloudinary-media.md.
     |
     */
 

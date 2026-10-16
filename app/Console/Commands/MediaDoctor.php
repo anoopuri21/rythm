@@ -272,6 +272,17 @@ final class MediaDoctor extends Command
             return;
         }
 
+        $rolloutRequested = (bool) config('media-library.cloudinary.enabled');
+
+        if ($rolloutRequested && MediaDisk::cloudName() !== null && ! MediaDisk::driverAvailable()) {
+            $this->reportFail(
+                'The [cloudinary] disk cannot be resolved',
+                'Product image saves need the Cloudinary driver from App\Filesystem\CloudinaryAdapter. Run php artisan config:clear after deploy.',
+            );
+
+            return;
+        }
+
         if (! MediaDisk::enabled()) {
             $reason = config('media-library.cloudinary.enabled')
                 ? 'no Cloudinary credentials'
@@ -287,7 +298,7 @@ final class MediaDoctor extends Command
         } catch (Throwable $exception) {
             $this->reportFail(
                 'The [cloudinary] disk cannot be resolved: '.$exception->getMessage(),
-                'Run: composer require cloudinary-labs/cloudinary-laravel, then php artisan config:clear',
+                'The Cloudinary driver is registered by App\Filesystem\CloudinaryAdapter. Run php artisan config:clear after deploy.',
             );
 
             return;

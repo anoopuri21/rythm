@@ -69,6 +69,22 @@ class CloudinaryMediaTest extends TestCase
 
     // ── Which collections follow Cloudinary ─────────────────────────────────
 
+    public function test_the_app_cloudinary_driver_resolves_for_product_uploads(): void
+    {
+        Storage::forgetDisk(MediaDisk::CLOUDINARY);
+        config([
+            'filesystems.disks.cloudinary.url' => 'cloudinary://key:secret@demo',
+            'filesystems.disks.cloudinary.cloud' => 'demo',
+            'media-library.cloudinary.enabled' => true,
+        ]);
+
+        $this->assertSame('215/photo', \App\Filesystem\CloudinaryAdapter::publicId('215/photo.jpg'));
+        $this->assertTrue(MediaDisk::driverAvailable());
+        $this->assertTrue(MediaDisk::enabled());
+        $this->assertSame(MediaDisk::CLOUDINARY, MediaDisk::forCollection('gallery'));
+        $this->assertNotNull(Storage::disk(MediaDisk::CLOUDINARY));
+    }
+
     public function test_only_the_phase_one_collections_follow_cloudinary(): void
     {
         $this->assertTrue(MediaDisk::enabled());

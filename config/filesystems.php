@@ -90,9 +90,9 @@ return [
 
         // Cloudinary — products + categories images (phase 1, docs/cloudinary-media.md).
         //
-        // The `cloudinary` driver is registered by cloudinary-labs/cloudinary-laravel
-        // (`FilesystemManager::extend('cloudinary', …)`), so this is an ordinary
-        // Laravel disk: put/read/delete/url all go through Cloudinary's API.
+        // The `cloudinary` driver is registered by App\Filesystem\CloudinaryAdapter
+        // (AppServiceProvider). cloudinary-labs/cloudinary-laravel does not support
+        // Laravel 13, so this app owns the driver.
         //
         // NOTE: `url` here is Cloudinary's *connection string*
         // (`cloudinary://API_KEY:API_SECRET@CLOUD_NAME`) — that is the package's

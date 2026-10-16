@@ -11,6 +11,7 @@ use App\Listeners\HandleBackInStockNotification;
 use App\Listeners\HandleCommerceNotification;
 use App\Listeners\MarkNotificationDeliveryFailed;
 use App\Listeners\MarkNotificationDeliverySent;
+use App\Filesystem\CloudinaryAdapter;
 use App\Services\MailSenderSettingsService;
 use App\Models\AdminAuditLog;
 use App\Models\Brand;
@@ -66,7 +67,10 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Illuminate\Filesystem\FilesystemAdapter;
+use League\Flysystem\Filesystem as Flysystem;
 use Illuminate\Support\ServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -85,6 +89,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Storage::extend('cloudinary', function ($app, array $config) {
+            $adapter = new CloudinaryAdapter($config);
+
+            return new FilesystemAdapter(new Flysystem($adapter), $adapter, $config);
+        });
+
         foreach ([
             AdminAuditLog::class => AuditPolicy::class,
             Product::class => CataloguePolicy::class,

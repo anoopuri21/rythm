@@ -29,7 +29,8 @@
 ## 2. Install (once, on the server)
 
 ```bash
-composer require cloudinary-labs/cloudinary-laravel
+# The Cloudinary filesystem driver ships with the app (cloudinary/cloudinary_php).
+# Do not install cloudinary-labs/cloudinary-laravel — it does not support Laravel 13.
 php artisan config:clear
 ```
 
