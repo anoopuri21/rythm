@@ -39,7 +39,7 @@ await test('CSP stays bounded to self plus the approved Razorpay/fonts/media ori
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        'frame-src https://checkout.razorpay.com',
+        'frame-src https://checkout.razorpay.com https://api.razorpay.com',
     ]) {
         assert.ok(headers.includes(directive), `missing CSP directive: ${directive}`);
     }

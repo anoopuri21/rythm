@@ -33,7 +33,7 @@ final class SecurityHeaders
             "img-src 'self' data: blob: https:",
             "connect-src 'self' https://api.razorpay.com https://fonts.googleapis.com https://videos.pexels.com",
             "media-src 'self' https://videos.pexels.com blob:",
-            'frame-src https://checkout.razorpay.com',
+            'frame-src https://checkout.razorpay.com https://api.razorpay.com',
             "frame-ancestors 'self'",
             "object-src 'none'",
             "base-uri 'self'",
