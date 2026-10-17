@@ -170,9 +170,8 @@
                         <p class="mt-2 text-sm text-muted">{{ $paymentMessage }}</p>
 
                         @if($razorpayConfigured)
-                            <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
                             <p class="mt-6 rounded-xl border border-ink/10 bg-paper px-4 py-3 text-sm text-muted">
-                                Razorpay will show the payment methods for this amount.
+                                See the payment methods for this amount.
                             </p>
                         @elseif($paymentMode === 'fake')
                             <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950" role="status">
