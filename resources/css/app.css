@@ -1701,6 +1701,7 @@ input:focus-visible {
   top: 100%;
   z-index: 40;
   width: 268px;
+  max-height: calc(100vh - 145px);
   background: var(--color-paper);
   border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
   border-radius: 0 0 12px 12px;
@@ -1710,7 +1711,8 @@ input:focus-visible {
   flex-direction: column;
 }
 .nav__cats-scroll {
-  max-height: min(440px, calc(100vh - 180px));
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
@@ -1746,6 +1748,7 @@ input:focus-visible {
   background: var(--color-paper-dark);
 }
 .nav__cats-fly {
+  display: none;
   position: absolute;
   left: 100%;
   top: -6px;
@@ -1766,6 +1769,7 @@ input:focus-visible {
 }
 .nav__cats-item:hover .nav__cats-fly,
 .nav__cats-item:focus-within .nav__cats-fly {
+  display: block;
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
