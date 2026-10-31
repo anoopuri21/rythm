@@ -91,6 +91,8 @@
             {{-- All Categories dropdown --}}
             <div class="nav__cats" x-data="{
                     open: false,
+                    activeCat: null,
+                    flyoutTop: 0,
                     canScrollDown: false,
                     updateScrollState() {
                         const el = this.$refs.catsScroll;
@@ -103,11 +105,19 @@
                             el.scrollBy({ top: 180, behavior: 'smooth' });
                             setTimeout(() => this.updateScrollState(), 250);
                         }
+                    },
+                    setActiveCat(id, el) {
+                        this.activeCat = id;
+                        if (el && this.$refs.catsPanel) {
+                            const panelRect = this.$refs.catsPanel.getBoundingClientRect();
+                            const itemRect = el.getBoundingClientRect();
+                            this.flyoutTop = Math.max(0, itemRect.top - panelRect.top);
+                        }
                     }
                  }"
                  @mouseenter="open = true; $nextTick(() => { setTimeout(() => updateScrollState(), 50); })"
-                 @mouseleave="open = false"
-                 @keydown.escape="open = false">
+                 @mouseleave="open = false; activeCat = null"
+                 @keydown.escape="open = false; activeCat = null">
                 <button type="button" class="nav__cats-btn" :aria-expanded="open" aria-haspopup="true"
                         @click="open = !open; if (open) $nextTick(() => { setTimeout(() => updateScrollState(), 50); })">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -115,32 +125,24 @@
                     <svg class="nav__cats-chev" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </button>
 
-                <div class="nav__cats-panel" x-cloak x-show="open"
+                <div class="nav__cats-panel" x-ref="catsPanel" x-cloak x-show="open"
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 -translate-y-1.5"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                    <div class="nav__cats-scroll" x-ref="catsScroll" data-lenis-prevent @scroll.passive="updateScrollState()">
+                    <div class="nav__cats-scroll" x-ref="catsScroll" data-lenis-prevent @scroll.passive="updateScrollState(); if (activeCat) { const activeEl = $el.querySelector(`[data-cat-id='${activeCat}']`); if (activeEl) setActiveCat(activeCat, activeEl); }">
                         <ul>
                             @foreach($navCategories as $cat)
-                                <li class="nav__cats-item">
+                                <li class="nav__cats-item" data-cat-id="{{ $cat['id'] }}"
+                                    :class="activeCat === {{ $cat['id'] }} && 'is-hovered'"
+                                    @mouseenter="{{ count($cat['children']) ? "setActiveCat({$cat['id']}, \$el)" : "activeCat = null" }}">
                                     <a href="/shop?category={{ $cat['slug'] }}">
                                         {{ $cat['name'] }}
                                         @if(count($cat['children']))
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                                         @endif
                                     </a>
-                                    @if(count($cat['children']))
-                                        <div class="nav__cats-fly">
-                                            <p>{{ $cat['name'] }}</p>
-                                            <ul>
-                                                @foreach($cat['children'] as $child)
-                                                    <li><a href="/shop?category={{ $child['slug'] }}">{{ $child['name'] }}</a></li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
                                 </li>
                             @endforeach
                         </ul>
@@ -151,6 +153,26 @@
                     </button>
                     <div class="nav__cats-all">
                         <a href="/shop">View all products →</a>
+                    </div>
+
+                    {{-- Flyouts rendered outside the scrollable container to avoid overflow clipping --}}
+                    <div class="nav__cats-fly"
+                         x-show="activeCat !== null"
+                         x-cloak
+                         :style="{ top: flyoutTop + 'px' }"
+                         @mouseleave="activeCat = null">
+                        @foreach($navCategories as $cat)
+                            @if(count($cat['children']))
+                                <div x-show="activeCat === {{ $cat['id'] }}">
+                                    <p>{{ $cat['name'] }}</p>
+                                    <ul>
+                                        @foreach($cat['children'] as $child)
+                                            <li><a href="/shop?category={{ $child['slug'] }}">{{ $child['name'] }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
             </div>
