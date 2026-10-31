@@ -89,9 +89,27 @@
         <div class="nav__inner nav__row2">
 
             {{-- All Categories dropdown --}}
-            <div class="nav__cats" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @keydown.escape="open = false">
+            <div class="nav__cats" x-data="{
+                    open: false,
+                    canScrollDown: false,
+                    updateScrollState() {
+                        const el = this.$refs.catsScroll;
+                        if (!el) return;
+                        this.canScrollDown = (el.scrollHeight - el.clientHeight > 4) && (el.scrollTop + el.clientHeight < el.scrollHeight - 6);
+                    },
+                    scrollDown() {
+                        const el = this.$refs.catsScroll;
+                        if (el) {
+                            el.scrollBy({ top: 180, behavior: 'smooth' });
+                            setTimeout(() => this.updateScrollState(), 250);
+                        }
+                    }
+                 }"
+                 @mouseenter="open = true; $nextTick(() => { setTimeout(() => updateScrollState(), 50); })"
+                 @mouseleave="open = false"
+                 @keydown.escape="open = false">
                 <button type="button" class="nav__cats-btn" :aria-expanded="open" aria-haspopup="true"
-                        @click="open = !open">
+                        @click="open = !open; if (open) $nextTick(() => { setTimeout(() => updateScrollState(), 50); })">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                     All Categories
                     <svg class="nav__cats-chev" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -103,29 +121,37 @@
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                    <ul>
-                        @foreach($navCategories as $cat)
-                            <li class="nav__cats-item">
-                                <a href="/shop?category={{ $cat['slug'] }}">
-                                    {{ $cat['name'] }}
+                    <div class="nav__cats-scroll" x-ref="catsScroll" data-lenis-prevent @scroll.passive="updateScrollState()">
+                        <ul>
+                            @foreach($navCategories as $cat)
+                                <li class="nav__cats-item">
+                                    <a href="/shop?category={{ $cat['slug'] }}">
+                                        {{ $cat['name'] }}
+                                        @if(count($cat['children']))
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        @endif
+                                    </a>
                                     @if(count($cat['children']))
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        <div class="nav__cats-fly">
+                                            <p>{{ $cat['name'] }}</p>
+                                            <ul>
+                                                @foreach($cat['children'] as $child)
+                                                    <li><a href="/shop?category={{ $child['slug'] }}">{{ $child['name'] }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     @endif
-                                </a>
-                                @if(count($cat['children']))
-                                    <div class="nav__cats-fly">
-                                        <p>{{ $cat['name'] }}</p>
-                                        <ul>
-                                            @foreach($cat['children'] as $child)
-                                                <li><a href="/shop?category={{ $child['slug'] }}">{{ $child['name'] }}</a></li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
-                            </li>
-                        @endforeach
-                        <li class="nav__cats-all"><a href="/shop">View all products →</a></li>
-                    </ul>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button type="button" class="nav__cats-scroll-btn" x-show="canScrollDown" x-cloak
+                            aria-label="Scroll down categories" @click="scrollDown()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="nav__cats-all">
+                        <a href="/shop">View all products →</a>
+                    </div>
                 </div>
             </div>
 
