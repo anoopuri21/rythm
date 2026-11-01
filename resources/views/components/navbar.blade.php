@@ -106,12 +106,17 @@
                             setTimeout(() => this.updateScrollState(), 250);
                         }
                     },
+                    flyoutMaxHeight: 'calc(100vh - 145px)',
                     setActiveCat(id, el) {
                         this.activeCat = id;
                         if (el && this.$refs.catsPanel) {
                             const panelRect = this.$refs.catsPanel.getBoundingClientRect();
                             const itemRect = el.getBoundingClientRect();
-                            this.flyoutTop = Math.max(0, itemRect.top - panelRect.top);
+                            const topOffset = Math.max(0, itemRect.top - panelRect.top);
+                            this.flyoutTop = topOffset;
+                            // Ensure flyout does not extend beyond bottom of screen (leaves 20px padding)
+                            const availableHeight = Math.max(160, window.innerHeight - itemRect.top - 20);
+                            this.flyoutMaxHeight = availableHeight + 'px';
                         }
                     }
                  }"
@@ -132,15 +137,20 @@
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                     <div class="nav__cats-scroll" x-ref="catsScroll" data-lenis-prevent @scroll.passive="updateScrollState(); if (activeCat) { const activeEl = $el.querySelector(`[data-cat-id='${activeCat}']`); if (activeEl) setActiveCat(activeCat, activeEl); }">
-                        <ul>
+                        <ul class="nav__cats-list">
                             @foreach($navCategories as $cat)
                                 <li class="nav__cats-item" data-cat-id="{{ $cat['id'] }}"
                                     :class="activeCat === {{ $cat['id'] }} && 'is-hovered'"
                                     @mouseenter="{{ count($cat['children']) ? "setActiveCat({$cat['id']}, \$el)" : "activeCat = null" }}">
                                     <a href="/shop?category={{ $cat['slug'] }}">
-                                        {{ $cat['name'] }}
+                                        <span class="nav__cats-item-left">
+                                            <svg class="nav__cats-bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+                                            </svg>
+                                            <span class="nav__cats-label">{{ $cat['name'] }}</span>
+                                        </span>
                                         @if(count($cat['children']))
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                            <svg class="nav__cats-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                                         @endif
                                     </a>
                                 </li>
@@ -159,17 +169,41 @@
                     <div class="nav__cats-fly"
                          x-show="activeCat !== null"
                          x-cloak
-                         :style="{ top: flyoutTop + 'px' }"
+                         :style="{ top: flyoutTop + 'px', maxHeight: flyoutMaxHeight }"
                          @mouseleave="activeCat = null">
                         @foreach($navCategories as $cat)
                             @if(count($cat['children']))
-                                <div x-show="activeCat === {{ $cat['id'] }}">
-                                    <p>{{ $cat['name'] }}</p>
-                                    <ul>
-                                        @foreach($cat['children'] as $child)
-                                            <li><a href="/shop?category={{ $child['slug'] }}">{{ $child['name'] }}</a></li>
-                                        @endforeach
-                                    </ul>
+                                <div class="nav__cats-fly-group" x-show="activeCat === {{ $cat['id'] }}" data-lenis-prevent>
+                                    <div class="nav__cats-fly-header">
+                                        <div class="nav__cats-fly-header-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                            </svg>
+                                        </div>
+                                        <p class="nav__cats-fly-title">{{ $cat['name'] }}</p>
+                                    </div>
+                                    <div class="nav__cats-fly-scroll" data-lenis-prevent>
+                                        <ul class="nav__cats-fly-list">
+                                            @foreach($cat['children'] as $child)
+                                                <li class="nav__cats-fly-item">
+                                                    <a href="/shop?category={{ $child['slug'] }}">
+                                                        <span class="nav__cats-fly-item-left">
+                                                            <svg class="nav__cats-sub-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                            <span>{{ $child['name'] }}</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div class="nav__cats-fly-all">
+                                        <a href="/shop?category={{ $cat['slug'] }}">
+                                            Explore all {{ $cat['name'] }}
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         @endforeach
