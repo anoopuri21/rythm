@@ -31,6 +31,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\TextSize;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -186,6 +187,19 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('product_image')
+                    ->label('')
+                    ->state(function (Order $record): ?string {
+                        $firstItem = $record->items->first();
+                        if ($firstItem === null || $firstItem->product === null) {
+                            return null;
+                        }
+
+                        return $firstItem->product->thumbnailImage() ?? $firstItem->product->heroImage();
+                    })
+                    ->circular()
+                    ->size(40)
+                    ->defaultImageUrl(fn (): string => asset('images/placeholder-product.svg')),
                 TextColumn::make('order_number')->searchable()->sortable()->weight('bold')->fontFamily('mono'),
                 TextColumn::make('customer')
                     ->state(fn (Order $record): string => $record->user?->name ?? ($record->shipping_address['name'] ?? '—'))
@@ -412,7 +426,8 @@ class OrderResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         // Customer name column + view header use $record->user; preventLazyLoading is enabled.
-        return parent::getEloquentQuery()->with(['user:id,name']);
+        // Product image column uses items.product for the first order item thumbnail.
+        return parent::getEloquentQuery()->with(['user:id,name', 'items:id,order_id,product_id,name,sku,qty', 'items.product:id,name,slug,gallery_urls,thumbnail_url']);
     }
 
     public static function getRelations(): array

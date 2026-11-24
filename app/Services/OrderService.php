@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\DTOs\CheckoutData;
 use App\Events\CommerceNotificationRequested;
+use App\Mail\OrderInvoiceMail;
 use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -16,6 +17,8 @@ use App\Models\User;
 use App\Payment\PaymentResult;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use RuntimeException;
 
 /**
@@ -336,6 +339,8 @@ final class OrderService
                 $lockedOrder->id,
             );
 
+            $this->sendInvoiceEmail($lockedOrder);
+
             return true;
         });
     }
@@ -501,6 +506,35 @@ final class OrderService
             ->decrement('used_count');
 
         $order->update(['coupon_usage_released_at' => now()]);
+    }
+
+    /**
+     * Send the invoice email to the customer, with an optional BCC to the
+     * owner when an order_notification_email is configured in Settings.
+     */
+    private function sendInvoiceEmail(Order $order): void
+    {
+        $customerEmail = $order->user?->email ?? $order->email;
+
+        if ($customerEmail === null || $customerEmail === '') {
+            return;
+        }
+
+        $ownerEmail = trim((string) $this->settings->get('order_notification_email', ''));
+
+        try {
+            $mail = Mail::to($customerEmail);
+
+            if ($ownerEmail !== '') {
+                $mail->bcc($ownerEmail);
+            }
+
+            $mail->send(new OrderInvoiceMail($order->fresh(['items', 'user'])));
+        } catch (\Throwable $e) {
+            // Invoice email failure must never block order confirmation.
+            // Log it so ops can investigate and retry if needed.
+            Log::warning('Invoice email failed for order '.$order->order_number.': '.$e->getMessage());
+        }
     }
 
     private function shippingFeeFor(float $subtotal): float

@@ -170,6 +170,16 @@ class Settings extends Page implements HasForms
                             ->label('Footer logo')
                             ->helperText('Shown in the footer as uploaded. JPEG, PNG or WebP.'),
                     ])->columns(2),
+                Section::make('Order invoice notifications')
+                    ->description('A copy of every confirmed order invoice is sent to this email. Leave empty to skip owner copies.')
+                    ->schema([
+                        TextInput::make('order_notification_email')
+                            ->label('Owner invoice email')
+                            ->email()
+                            ->maxLength(254)
+                            ->placeholder('owner@yourdomain.com')
+                            ->helperText('Receives a copy of the invoice email every time a customer order is confirmed. Leave empty to disable.'),
+                    ])->columns(1),
                 Section::make('Outbound email (sender)')
                     ->description('Customer mails (verify email, orders, stock alerts) use this From address only after the mailbox owner confirms a verification link. SMTP/API credentials still come from the server .env.')
                     ->schema([

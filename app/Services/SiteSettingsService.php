@@ -47,6 +47,8 @@ final class SiteSettingsService
         'mail_from_pending_address' => '',
         'mail_from_pending_token' => '',
         'mail_from_pending_sent_at' => '',
+        // Owner / admin email that receives a copy of every invoice.
+        'order_notification_email' => '',
 
         /*
         |----------------------------------------------------------------------
