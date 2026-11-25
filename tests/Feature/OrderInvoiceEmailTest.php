@@ -159,5 +159,4 @@ class OrderInvoiceEmailTest extends TestCase
 
         Mail::assertNotSent(OrderInvoiceMail::class);
     }
-
 }
